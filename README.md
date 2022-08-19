@@ -21,14 +21,6 @@ See [`the official docs`](https://api.mambu.com/) for the complete documentation
 
 PR's are very welcome if you think your project is missing here.
 
-## When not to use Therefore?
-
-- By default, we create as strict a JSON Schema/type as possible. We are aware that this doesn't suit everyone's needs.
-  - additional properties will result in validation errors **without** extra work
-  - indexable types are always explicitly nullable, i.e. `Record<string, string | undefined>` instead of `Record<string, string>`
-- We only support JSON Schema validation through Ajv. If you do not want to/can't use Ajv, Therefore probably isn't for you.
-- Therefore is an insanely opinionated implementation of runtime validation of types; It will not fit everyone's needs.
-
 ## License
 
 Therefore is [MIT licensed](./LICENSE).
