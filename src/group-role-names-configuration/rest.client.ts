@@ -40,14 +40,14 @@ export class MambuGroupRoleNamesConfiguration {
     /**
      * Retrieves the group role names configuration.
      */
-    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/grouprolenames.yaml`)
     }
 
     /**
      * Updates the group role names configuration.
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).put(`configuration/grouprolenames.yaml`)
     }
 

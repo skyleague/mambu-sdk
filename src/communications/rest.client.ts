@@ -77,12 +77,21 @@ export class MambuCommunications {
     /**
      * Allows sending a new communication message. The message can be either SMS or Email.
      */
-    public async send({ body, auth = [['apiKey'], ['basic']] }: { body: CommunicationMessage; auth?: string[][] | string[] }) {
+    public async send({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CommunicationMessage
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(CommunicationMessage, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`communications/messages`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -99,9 +108,11 @@ export class MambuCommunications {
      */
     public async enqueueByDate({
         body,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
         body: CommunicationMessageEnqueueAction
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(CommunicationMessageEnqueueAction, body)
@@ -109,6 +120,7 @@ export class MambuCommunications {
         return this.awaitResponse(
             this.buildClient(auth).post(`communications/messages:resendAsyncByDate`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -124,12 +136,12 @@ export class MambuCommunications {
      * Client Directed Query. Allows searching communication messages by various criteria
      */
     public async search({
-        query,
         body,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         body: SearchRequest
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(SearchRequest, body)
@@ -154,9 +166,11 @@ export class MambuCommunications {
      */
     public async resend({
         body,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
         body: CommunicationMessageAction
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(CommunicationMessageAction, body)
@@ -164,6 +178,7 @@ export class MambuCommunications {
         return this.awaitResponse(
             this.buildClient(auth).post(`communications/messages:resend`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -180,9 +195,11 @@ export class MambuCommunications {
      */
     public async enqueueByKeys({
         body,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
         body: CommunicationMessageAction
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(CommunicationMessageAction, body)
@@ -190,6 +207,7 @@ export class MambuCommunications {
         return this.awaitResponse(
             this.buildClient(auth).post(`communications/messages:resendAsyncByKeys`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -215,7 +233,7 @@ export class MambuCommunications {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

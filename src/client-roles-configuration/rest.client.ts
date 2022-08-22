@@ -40,7 +40,10 @@ export class MambuClientRolesConfiguration {
     /**
      * Allows retrieval of the client roles configuration.
      */
-    public async get({ query, auth = [['apiKey'], ['basic']] }: { query?: { type?: string }; auth?: string[][] | string[] }) {
+    public async get({
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: { query?: { type?: string }; auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/clientroles.yaml`, {
             searchParams: query ?? {},
         })
@@ -49,7 +52,7 @@ export class MambuClientRolesConfiguration {
     /**
      * Allows the update of the client roles configuration.
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).put(`configuration/clientroles.yaml`)
     }
 

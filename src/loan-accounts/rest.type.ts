@@ -14,8 +14,6 @@ export const GetLoanAccountDocumentResponse = {
     get schema() {
         return GetLoanAccountDocumentResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getLoanAccountDocumentResponse',
     is: (o: unknown): o is GetLoanAccountDocumentResponse => GetLoanAccountDocumentResponse.validate(o) === true,
 } as const
 
@@ -28,8 +26,6 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ErrorResponse',
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
 } as const
 
@@ -41,8 +37,6 @@ export const UpdateLoanAccountFundingSourcesRequest = {
     get schema() {
         return UpdateLoanAccountFundingSourcesRequest.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'updateLoanAccountFundingSourcesRequest',
     is: (o: unknown): o is UpdateLoanAccountFundingSourcesRequest => UpdateLoanAccountFundingSourcesRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!UpdateLoanAccountFundingSourcesRequest.validate(o)) {
@@ -59,8 +53,6 @@ export const UpdateLoanAccountFundingSourcesResponse = {
     get schema() {
         return UpdateLoanAccountFundingSourcesResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'updateLoanAccountFundingSourcesResponse',
     is: (o: unknown): o is UpdateLoanAccountFundingSourcesResponse =>
         UpdateLoanAccountFundingSourcesResponse.validate(o) === true,
 } as const
@@ -73,8 +65,6 @@ export const CreateLoanAccountFundingSourcesRequest = {
     get schema() {
         return CreateLoanAccountFundingSourcesRequest.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'createLoanAccountFundingSourcesRequest',
     is: (o: unknown): o is CreateLoanAccountFundingSourcesRequest => CreateLoanAccountFundingSourcesRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!CreateLoanAccountFundingSourcesRequest.validate(o)) {
@@ -91,8 +81,6 @@ export const CreateLoanAccountFundingSourcesResponse = {
     get schema() {
         return CreateLoanAccountFundingSourcesResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'createLoanAccountFundingSourcesResponse',
     is: (o: unknown): o is CreateLoanAccountFundingSourcesResponse =>
         CreateLoanAccountFundingSourcesResponse.validate(o) === true,
 } as const
@@ -112,8 +100,6 @@ export const LoanActionDetails = {
     get schema() {
         return LoanActionDetails.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'LoanActionDetails',
     is: (o: unknown): o is LoanActionDetails => LoanActionDetails.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanActionDetails.validate(o)) {
@@ -143,8 +129,6 @@ export const LoanAccountPayOffInput = {
     get schema() {
         return LoanAccountPayOffInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'LoanAccountPayOffInput',
     is: (o: unknown): o is LoanAccountPayOffInput => LoanAccountPayOffInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanAccountPayOffInput.validate(o)) {
@@ -177,8 +161,6 @@ export const ChangePeriodicPaymentLoanAccountInput = {
     get schema() {
         return ChangePeriodicPaymentLoanAccountInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ChangePeriodicPaymentLoanAccountInput',
     is: (o: unknown): o is ChangePeriodicPaymentLoanAccountInput => ChangePeriodicPaymentLoanAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!ChangePeriodicPaymentLoanAccountInput.validate(o)) {
@@ -208,8 +190,6 @@ export const RefinanceLoanAccountAction = {
     get schema() {
         return RefinanceLoanAccountAction.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'RefinanceLoanAccountAction',
     is: (o: unknown): o is RefinanceLoanAccountAction => RefinanceLoanAccountAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!RefinanceLoanAccountAction.validate(o)) {
@@ -453,8 +433,6 @@ export const LoanAccount = {
     get schema() {
         return LoanAccount.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'LoanAccount',
     is: (o: unknown): o is LoanAccount => LoanAccount.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanAccount.validate(o)) {
@@ -479,8 +457,6 @@ export const PreviewPayOffDueAmountsInAFutureDateInput = {
     get schema() {
         return PreviewPayOffDueAmountsInAFutureDateInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'PreviewPayOffDueAmountsInAFutureDateInput',
     is: (o: unknown): o is PreviewPayOffDueAmountsInAFutureDateInput =>
         PreviewPayOffDueAmountsInAFutureDateInput.validate(o) === true,
     assert: (o: unknown) => {
@@ -522,8 +498,6 @@ export const PreviewPayOffDueAmountsInAFutureDateWrapper = {
     get schema() {
         return PreviewPayOffDueAmountsInAFutureDateWrapper.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'PreviewPayOffDueAmountsInAFutureDateWrapper',
     is: (o: unknown): o is PreviewPayOffDueAmountsInAFutureDateWrapper =>
         PreviewPayOffDueAmountsInAFutureDateWrapper.validate(o) === true,
 } as const
@@ -545,8 +519,6 @@ export const RescheduleLoanAccountAction = {
     get schema() {
         return RescheduleLoanAccountAction.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'RescheduleLoanAccountAction',
     is: (o: unknown): o is RescheduleLoanAccountAction => RescheduleLoanAccountAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!RescheduleLoanAccountAction.validate(o)) {
@@ -578,8 +550,6 @@ export const ChangeArrearsSettingsInput = {
     get schema() {
         return ChangeArrearsSettingsInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ChangeArrearsSettingsInput',
     is: (o: unknown): o is ChangeArrearsSettingsInput => ChangeArrearsSettingsInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!ChangeArrearsSettingsInput.validate(o)) {
@@ -603,8 +573,6 @@ export const PlannedFeeKeys = {
     get schema() {
         return PlannedFeeKeys.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'PlannedFeeKeys',
     is: (o: unknown): o is PlannedFeeKeys => PlannedFeeKeys.validate(o) === true,
     assert: (o: unknown) => {
         if (!PlannedFeeKeys.validate(o)) {
@@ -620,8 +588,6 @@ export const ApplyPlannedFeesResponse = {
     get schema() {
         return ApplyPlannedFeesResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'applyPlannedFeesResponse',
     is: (o: unknown): o is ApplyPlannedFeesResponse => ApplyPlannedFeesResponse.validate(o) === true,
 } as const
 
@@ -653,8 +619,6 @@ export const ChangeInterestRateLoanAccountInput = {
     get schema() {
         return ChangeInterestRateLoanAccountInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ChangeInterestRateLoanAccountInput',
     is: (o: unknown): o is ChangeInterestRateLoanAccountInput => ChangeInterestRateLoanAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!ChangeInterestRateLoanAccountInput.validate(o)) {
@@ -686,8 +650,6 @@ export const CollateralAssetFilter = {
     get schema() {
         return CollateralAssetFilter.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'CollateralAssetFilter',
     is: (o: unknown): o is CollateralAssetFilter => CollateralAssetFilter.validate(o) === true,
     assert: (o: unknown) => {
         if (!CollateralAssetFilter.validate(o)) {
@@ -726,8 +688,6 @@ export const CollateralAssetsReevaluationResponse = {
     get schema() {
         return CollateralAssetsReevaluationResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'CollateralAssetsReevaluationResponse',
     is: (o: unknown): o is CollateralAssetsReevaluationResponse => CollateralAssetsReevaluationResponse.validate(o) === true,
 } as const
 
@@ -758,8 +718,6 @@ export const ChangeDueDatesSettingsInput = {
     get schema() {
         return ChangeDueDatesSettingsInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ChangeDueDatesSettingsInput',
     is: (o: unknown): o is ChangeDueDatesSettingsInput => ChangeDueDatesSettingsInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!ChangeDueDatesSettingsInput.validate(o)) {
@@ -784,8 +742,6 @@ export const LoanAccountSearchCriteria = {
     get schema() {
         return LoanAccountSearchCriteria.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'LoanAccountSearchCriteria',
     is: (o: unknown): o is LoanAccountSearchCriteria => LoanAccountSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanAccountSearchCriteria.validate(o)) {
@@ -801,8 +757,6 @@ export const SearchResponse = {
     get schema() {
         return SearchResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'searchResponse',
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
 } as const
 
@@ -813,8 +767,6 @@ export const PatchFundingSourceRequest = {
     get schema() {
         return PatchFundingSourceRequest.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'patchFundingSourceRequest',
     is: (o: unknown): o is PatchFundingSourceRequest => PatchFundingSourceRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchFundingSourceRequest.validate(o)) {
@@ -830,8 +782,6 @@ export const GetAllPlannedFeesResponse = {
     get schema() {
         return GetAllPlannedFeesResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getAllPlannedFeesResponse',
     is: (o: unknown): o is GetAllPlannedFeesResponse => GetAllPlannedFeesResponse.validate(o) === true,
 } as const
 
@@ -842,8 +792,6 @@ export const UpdatePlannedFeesRequest = {
     get schema() {
         return UpdatePlannedFeesRequest.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'updatePlannedFeesRequest',
     is: (o: unknown): o is UpdatePlannedFeesRequest => UpdatePlannedFeesRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!UpdatePlannedFeesRequest.validate(o)) {
@@ -859,8 +807,6 @@ export const UpdatePlannedFeesResponse = {
     get schema() {
         return UpdatePlannedFeesResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'updatePlannedFeesResponse',
     is: (o: unknown): o is UpdatePlannedFeesResponse => UpdatePlannedFeesResponse.validate(o) === true,
 } as const
 
@@ -871,8 +817,6 @@ export const CreatePlannedFeesRequest = {
     get schema() {
         return CreatePlannedFeesRequest.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'createPlannedFeesRequest',
     is: (o: unknown): o is CreatePlannedFeesRequest => CreatePlannedFeesRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!CreatePlannedFeesRequest.validate(o)) {
@@ -888,8 +832,6 @@ export const CreatePlannedFeesResponse = {
     get schema() {
         return CreatePlannedFeesResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'createPlannedFeesResponse',
     is: (o: unknown): o is CreatePlannedFeesResponse => CreatePlannedFeesResponse.validate(o) === true,
 } as const
 
@@ -900,8 +842,6 @@ export const PatchRequest = {
     get schema() {
         return PatchRequest.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'patchRequest',
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
@@ -918,8 +858,6 @@ export const GetAllAuthorizationHoldsResponse = {
     get schema() {
         return GetAllAuthorizationHoldsResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getAllAuthorizationHoldsResponse',
     is: (o: unknown): o is GetAllAuthorizationHoldsResponse => GetAllAuthorizationHoldsResponse.validate(o) === true,
 } as const
 
@@ -930,8 +868,6 @@ export const GetAllCardsResponse = {
     get schema() {
         return GetAllCardsResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getAllCardsResponse',
     is: (o: unknown): o is GetAllCardsResponse => GetAllCardsResponse.validate(o) === true,
 } as const
 
@@ -950,8 +886,6 @@ export const Card = {
     get schema() {
         return Card.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'Card',
     is: (o: unknown): o is Card => Card.validate(o) === true,
     assert: (o: unknown) => {
         if (!Card.validate(o)) {
@@ -988,8 +922,6 @@ export const ChangeRepaymentValueLoanAccountInput = {
     get schema() {
         return ChangeRepaymentValueLoanAccountInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ChangeRepaymentValueLoanAccountInput',
     is: (o: unknown): o is ChangeRepaymentValueLoanAccountInput => ChangeRepaymentValueLoanAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!ChangeRepaymentValueLoanAccountInput.validate(o)) {
@@ -1025,8 +957,6 @@ export const ApplyInterestInput = {
     get schema() {
         return ApplyInterestInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ApplyInterestInput',
     is: (o: unknown): o is ApplyInterestInput => ApplyInterestInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!ApplyInterestInput.validate(o)) {
@@ -1042,8 +972,6 @@ export const GetAllResponse = {
     get schema() {
         return GetAllResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getAllResponse',
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
@@ -1066,8 +994,6 @@ export const TerminateLoanAccountInput = {
     get schema() {
         return TerminateLoanAccountInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'TerminateLoanAccountInput',
     is: (o: unknown): o is TerminateLoanAccountInput => TerminateLoanAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!TerminateLoanAccountInput.validate(o)) {
@@ -1105,8 +1031,6 @@ export const LoanAccountAction = {
     get schema() {
         return LoanAccountAction.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'LoanAccountAction',
     is: (o: unknown): o is LoanAccountAction => LoanAccountAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanAccountAction.validate(o)) {
@@ -1122,8 +1046,6 @@ export const GetByIdWitVersionsResponse = {
     get schema() {
         return GetByIdWitVersionsResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getByIdWitVersionsResponse',
     is: (o: unknown): o is GetByIdWitVersionsResponse => GetByIdWitVersionsResponse.validate(o) === true,
 } as const
 
@@ -1161,8 +1083,6 @@ export const PreviewLoanAccountSchedule = {
     get schema() {
         return PreviewLoanAccountSchedule.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'PreviewLoanAccountSchedule',
     is: (o: unknown): o is PreviewLoanAccountSchedule => PreviewLoanAccountSchedule.validate(o) === true,
     assert: (o: unknown) => {
         if (!PreviewLoanAccountSchedule.validate(o)) {
@@ -1187,8 +1107,6 @@ export const LoanAccountSchedule = {
     get schema() {
         return LoanAccountSchedule.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'LoanAccountSchedule',
     is: (o: unknown): o is LoanAccountSchedule => LoanAccountSchedule.validate(o) === true,
 } as const
 
@@ -2533,6 +2451,7 @@ export interface RestError {
         | 'DEPOSIT_PRODUCT_AVAILABILITY_FOR_GROUPS_BLANK'
         | 'DEPOSIT_PRODUCT_CURRENCY_NOT_DEFINED'
         | 'BLANK_DEPOSIT_PRODUCT_CURRENCY'
+        | 'DEPOSIT_PRODUCT_MULTIPLE_CURRENCIES_NOT_ALLOWED'
         | 'DEPOSIT_PRODUCT_INVALID_MATURITY_MIN_MAX'
         | 'DEPOSIT_PRODUCT_INVALID_WITHHOLDING_TAX_ENABLED'
         | 'DEPOSIT_PRODUCT_NEGATIVE_TERM_LENGTH'
@@ -2620,6 +2539,7 @@ export interface RestError {
         | 'DEPOSIT_PRODUCT_OVERDRAFT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_CRYPTOCURRENCIES'
         | 'DEPOSIT_PRODUCT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_NON_TRADITIONAL_CURRENCIES'
         | 'DEPOSIT_PRODUCT_OVERDRAFT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_NON_TRADITIONAL_CURRENCIES'
+        | 'DEPOSIT_PRODUCT_OVERDRAFT_INDEX_RATE_AVAILABLE_ONLY_FOR_FIXED_TERMS'
         | 'DEPOSIT_PRODUCT_HAS_ASSOCIATED_LOAN_PRODUCTS'
         | 'CF_SET_ID_ERROR'
         | 'CF_SET_INVALID_ID'

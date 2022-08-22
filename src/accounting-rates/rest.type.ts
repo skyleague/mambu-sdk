@@ -13,8 +13,6 @@ export const GetAllResponse = {
     get schema() {
         return GetAllResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getAllResponse',
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
@@ -27,8 +25,6 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ErrorResponse',
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
 } as const
 
@@ -51,8 +47,6 @@ export const PostAccountingRateDto = {
     get schema() {
         return PostAccountingRateDto.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'PostAccountingRateDTO',
     is: (o: unknown): o is PostAccountingRateDto => PostAccountingRateDto.validate(o) === true,
     assert: (o: unknown) => {
         if (!PostAccountingRateDto.validate(o)) {
@@ -96,8 +90,6 @@ export const AccountingRate = {
     get schema() {
         return AccountingRate.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'AccountingRate',
     is: (o: unknown): o is AccountingRate => AccountingRate.validate(o) === true,
 } as const
 
@@ -1442,6 +1434,7 @@ export interface RestError {
         | 'DEPOSIT_PRODUCT_AVAILABILITY_FOR_GROUPS_BLANK'
         | 'DEPOSIT_PRODUCT_CURRENCY_NOT_DEFINED'
         | 'BLANK_DEPOSIT_PRODUCT_CURRENCY'
+        | 'DEPOSIT_PRODUCT_MULTIPLE_CURRENCIES_NOT_ALLOWED'
         | 'DEPOSIT_PRODUCT_INVALID_MATURITY_MIN_MAX'
         | 'DEPOSIT_PRODUCT_INVALID_WITHHOLDING_TAX_ENABLED'
         | 'DEPOSIT_PRODUCT_NEGATIVE_TERM_LENGTH'
@@ -1529,6 +1522,7 @@ export interface RestError {
         | 'DEPOSIT_PRODUCT_OVERDRAFT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_CRYPTOCURRENCIES'
         | 'DEPOSIT_PRODUCT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_NON_TRADITIONAL_CURRENCIES'
         | 'DEPOSIT_PRODUCT_OVERDRAFT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_NON_TRADITIONAL_CURRENCIES'
+        | 'DEPOSIT_PRODUCT_OVERDRAFT_INDEX_RATE_AVAILABLE_ONLY_FOR_FIXED_TERMS'
         | 'DEPOSIT_PRODUCT_HAS_ASSOCIATED_LOAN_PRODUCTS'
         | 'CF_SET_ID_ERROR'
         | 'CF_SET_INVALID_ID'

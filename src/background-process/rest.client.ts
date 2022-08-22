@@ -44,12 +44,12 @@ export class MambuBackgroundProcess {
      * Allows to change the state of background process by its encoded key.
      */
     public async update({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { encodedKey: string }
         body: string
+        path: { encodedKey: string }
         auth?: string[][] | string[]
     }) {
         return this.awaitResponse(
@@ -74,10 +74,7 @@ export class MambuBackgroundProcess {
     public async getLatestByType({
         query,
         auth = [['apiKey'], ['basic']],
-    }: {
-        query?: { type?: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { query?: { type?: string }; auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`backgroundprocess/latest`, {
                 searchParams: query ?? {},
@@ -100,7 +97,7 @@ export class MambuBackgroundProcess {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

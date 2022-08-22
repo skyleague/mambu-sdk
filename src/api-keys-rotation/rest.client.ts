@@ -41,12 +41,21 @@ export class MambuApiKeysRotation {
     /**
      * Allows rotation of an existing apikey. The rotation operation invalidates the existing apikey and the secretkey used and returns a new apikey together with the new secretkey
      */
-    public async rotateKey({ body, auth = [[]] }: { body: ApiKey; auth?: string[][] | string[] }) {
+    public async rotateKey({
+        body,
+        headers,
+        auth = [[]],
+    }: {
+        body: ApiKey
+        headers: { secretkey: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(ApiKey, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`apikey/rotation`, {
                 json: body,
+                headers: headers,
                 responseType: 'json',
             }),
             {
@@ -72,7 +81,7 @@ export class MambuApiKeysRotation {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

@@ -56,12 +56,14 @@ export class MambuCreditArrangements {
      * Remove account from credit arrangement
      */
     public async removeAccount({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { creditArrangementId: string }
         body: RemoveCreditArrangementAccountInput
+        path: { creditArrangementId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(RemoveCreditArrangementAccountInput, body)
@@ -69,6 +71,7 @@ export class MambuCreditArrangements {
         return this.awaitResponse(
             this.buildClient(auth).post(`creditarrangements/${path.creditArrangementId}:removeAccount`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -90,7 +93,7 @@ export class MambuCreditArrangements {
     }: {
         query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string; sortBy?: string }
         auth?: string[][] | string[]
-    }) {
+    } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`creditarrangements`, {
                 searchParams: query ?? {},
@@ -108,12 +111,21 @@ export class MambuCreditArrangements {
     /**
      * Create a new credit arrangement
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: CreditArrangement; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CreditArrangement
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(CreditArrangement, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`creditarrangements`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -129,12 +141,14 @@ export class MambuCreditArrangements {
      * Allows posting an action such as change credit arrangement state
      */
     public async changeState({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { creditArrangementId: string }
         body: CreditArrangementAction
+        path: { creditArrangementId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(CreditArrangementAction, body)
@@ -142,6 +156,7 @@ export class MambuCreditArrangements {
         return this.awaitResponse(
             this.buildClient(auth).post(`creditarrangements/${path.creditArrangementId}:changeState`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -158,12 +173,12 @@ export class MambuCreditArrangements {
      * Client Directed Query. Allows you to search credit arrangements by various criteria
      */
     public async search({
-        query,
         body,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         body: CreditArrangementSearchCriteria
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(CreditArrangementSearchCriteria, body)
@@ -187,12 +202,14 @@ export class MambuCreditArrangements {
      * Add account to credit arrangement
      */
     public async addAccount({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { creditArrangementId: string }
         body: AddCreditArrangementAccountInput
+        path: { creditArrangementId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(AddCreditArrangementAccountInput, body)
@@ -200,6 +217,7 @@ export class MambuCreditArrangements {
         return this.awaitResponse(
             this.buildClient(auth).post(`creditarrangements/${path.creditArrangementId}:addAccount`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -270,12 +288,12 @@ export class MambuCreditArrangements {
      * Update an existing credit arrangement
      */
     public async update({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { creditArrangementId: string }
         body: CreditArrangement
+        path: { creditArrangementId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(CreditArrangement, body)
@@ -322,12 +340,12 @@ export class MambuCreditArrangements {
      * Partially update an existing credit arrangement
      */
     public async patch({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { creditArrangementId: string }
         body: PatchRequest
+        path: { creditArrangementId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PatchRequest, body)
@@ -383,7 +401,7 @@ export class MambuCreditArrangements {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

@@ -40,14 +40,14 @@ export class MambuTransactionChannelsConfiguration {
     /**
      * Retrieve the transaction channels configuration.
      */
-    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/transactionchannels.yaml`)
     }
 
     /**
      * Allows the update of the transaction channels configuration.
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).put(`configuration/transactionchannels.yaml`)
     }
 

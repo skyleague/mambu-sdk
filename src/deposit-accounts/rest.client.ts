@@ -13,6 +13,7 @@ import {
     BlockFund,
     Card,
     ChangeInterestRateAction,
+    ChangeWithholdingTaxAction,
     DepositAccount,
     DepositAccountAction,
     DepositAccountSearchCriteria,
@@ -141,12 +142,14 @@ export class MambuDepositAccounts {
      * Create and associate a new card to the provided account
      */
     public async createCard({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositAccountId: string }
         body: Card
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(Card, body)
@@ -154,6 +157,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}/cards`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -169,12 +173,14 @@ export class MambuDepositAccounts {
      * Starts the maturity period for the specified deposit account
      */
     public async startMaturity({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositAccountId: string }
         body: StartMaturityAction
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(StartMaturityAction, body)
@@ -182,6 +188,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:startMaturity`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -225,12 +232,14 @@ export class MambuDepositAccounts {
      * Creates an authorization hold corresponding to a given account.
      */
     public async createAuthorizationHold({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositAccountId: string }
         body: AuthorizationHold
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(AuthorizationHold, body)
@@ -238,6 +247,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}/authorizationholds`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -294,7 +304,7 @@ export class MambuDepositAccounts {
             accountHolderId?: string
         }
         auth?: string[][] | string[]
-    }) {
+    } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`deposits`, {
                 searchParams: query ?? {},
@@ -313,12 +323,21 @@ export class MambuDepositAccounts {
     /**
      * Creates a new deposit account
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: DepositAccount; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: DepositAccount
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(DepositAccount, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -326,6 +345,37 @@ export class MambuDepositAccounts {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Allows to change the withholding tax for a deposit account
+     */
+    public async changeWithholdingTax({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: ChangeWithholdingTaxAction
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(ChangeWithholdingTaxAction, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`deposits/${path.depositAccountId}:changeWithholdingTax`, {
+                json: body,
+                headers: headers ?? {},
+                responseType: 'json',
+            }),
+            {
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }
@@ -351,12 +401,14 @@ export class MambuDepositAccounts {
      * Apply accrued interest
      */
     public async applyInterest({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositAccountId: string }
         body: ApplyInterestInput
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(ApplyInterestInput, body)
@@ -364,6 +416,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:applyInterest`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -379,12 +432,14 @@ export class MambuDepositAccounts {
      * Reopen a deposit account
      */
     public async reopen({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositAccountId: string }
         body: ReopenDepositAction
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(ReopenDepositAction, body)
@@ -392,6 +447,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:reopen`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -408,12 +464,14 @@ export class MambuDepositAccounts {
      * Undo the maturity period for the specified deposit account
      */
     public async undoMaturity({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositAccountId: string }
         body: UndoMaturityAction
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(UndoMaturityAction, body)
@@ -421,6 +479,38 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:undoMaturity`, {
                 json: body,
+                headers: headers ?? {},
+                responseType: 'json',
+            }),
+            {
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Allows to change the interest rate for a deposit account
+     */
+    public async changeInterestRate({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: ChangeInterestRateAction
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(ChangeInterestRateAction, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`deposits/${path.depositAccountId}:changeInterestRate`, {
+                json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -436,12 +526,14 @@ export class MambuDepositAccounts {
      * Allows posting an action such as approve deposit account
      */
     public async changeState({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositAccountId: string }
         body: DepositAccountAction
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(DepositAccountAction, body)
@@ -449,38 +541,11 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:changeState`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
                 200: DepositAccount,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Allows to change the interest rate for a deposit account
-     */
-    public async changeInterestRate({
-        path,
-        body,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { depositAccountId: string }
-        body: ChangeInterestRateAction
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ChangeInterestRateAction, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`deposits/${path.depositAccountId}:changeInterestRate`, {
-                json: body,
-                responseType: 'json',
-            }),
-            {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -516,12 +581,12 @@ export class MambuDepositAccounts {
      * Updates the amount of an existing blocked fund on a deposit account. If the new amount equals the seized amount the block fund will transition to a seized state.
      */
     public async patchBlockFund({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositAccountId: string; externalReferenceId: string }
         body: PatchBlockFundRequest
+        path: { depositAccountId: string; externalReferenceId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PatchBlockFundRequest, body)
@@ -571,12 +636,12 @@ export class MambuDepositAccounts {
      * Update an existing deposit account
      */
     public async update({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositAccountId: string }
         body: DepositAccount
+        path: { depositAccountId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(DepositAccount, body)
@@ -623,12 +688,12 @@ export class MambuDepositAccounts {
      * Partially update a deposit account
      */
     public async patch({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositAccountId: string }
         body: PatchRequest
+        path: { depositAccountId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PatchRequest, body)
@@ -678,12 +743,14 @@ export class MambuDepositAccounts {
      * Create a block fund for the provided account
      */
     public async createBlockFund({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositAccountId: string }
         body: BlockFund
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(BlockFund, body)
@@ -691,6 +758,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}/blocks`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -760,12 +828,12 @@ export class MambuDepositAccounts {
      * Allows retrieval of deposit accounts using search parameters.
      */
     public async search({
-        query,
         body,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         body: DepositAccountSearchCriteria
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(DepositAccountSearchCriteria, body)
@@ -823,7 +891,7 @@ export class MambuDepositAccounts {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

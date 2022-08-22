@@ -53,12 +53,14 @@ export class MambuCards {
      * Increases the amount of an authorization hold.
      */
     public async increaseAuthorizationHold({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
         body: AuthorizationHoldAmountAdjustmentRequest
+        path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(AuthorizationHoldAmountAdjustmentRequest, body)
@@ -68,6 +70,7 @@ export class MambuCards {
                 `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}:increase`,
                 {
                     json: body,
+                    headers: headers ?? {},
                     responseType: 'json',
                 }
             ),
@@ -160,12 +163,14 @@ export class MambuCards {
      * Reverses a card transaction.
      */
     public async reverseCardTransaction({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { cardReferenceToken: string; cardTransactionExternalReferenceId: string }
         body: CardTransactionReversal
+        path: { cardReferenceToken: string; cardTransactionExternalReferenceId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(CardTransactionReversal, body)
@@ -175,6 +180,7 @@ export class MambuCards {
                 `cards/${path.cardReferenceToken}/financialtransactions/${path.cardTransactionExternalReferenceId}:decrease`,
                 {
                     json: body,
+                    headers: headers ?? {},
                     responseType: 'json',
                 }
             ),
@@ -191,12 +197,14 @@ export class MambuCards {
      * Creates a financial transaction corresponding to a given card.
      */
     public async createCardTransaction({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { cardReferenceToken: string }
         body: CardTransactionInput
+        path: { cardReferenceToken: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(CardTransactionInput, body)
@@ -204,6 +212,7 @@ export class MambuCards {
         return this.awaitResponse(
             this.buildClient(auth).post(`cards/${path.cardReferenceToken}/financialtransactions`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -220,12 +229,14 @@ export class MambuCards {
      * Decreases the amount of an authorization hold. If the amount is greater or equal to the authorization hold amount, then the authorization hold is reversed.
      */
     public async decreaseAuthorizationHold({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
         body: AuthorizationHoldAmountAdjustmentRequest
+        path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(AuthorizationHoldAmountAdjustmentRequest, body)
@@ -235,6 +246,7 @@ export class MambuCards {
                 `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}:decrease`,
                 {
                     json: body,
+                    headers: headers ?? {},
                     responseType: 'json',
                 }
             ),
@@ -251,12 +263,14 @@ export class MambuCards {
      * Creates an authorization hold corresponding to a given card.
      */
     public async createAuthorizationHold({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { cardReferenceToken: string }
         body: AuthorizationHold
+        path: { cardReferenceToken: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(AuthorizationHold, body)
@@ -264,6 +278,7 @@ export class MambuCards {
         return this.awaitResponse(
             this.buildClient(auth).post(`cards/${path.cardReferenceToken}/authorizationholds`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -290,7 +305,7 @@ export class MambuCards {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

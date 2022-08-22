@@ -1,4 +1,4 @@
-import { StreamingClient } from '../src'
+import { MambuStreaming } from '../src'
 import type { streaming } from '../src'
 
 import { eitherToError } from '@skyleague/axioms'
@@ -12,7 +12,11 @@ describe('streaming cient', () => {
         nock.enableNetConnect()
     })
 
-    const client = new StreamingClient({ prefixUrl: prefixUrl, auth: { apiKeyAuth: 'footoken' }, defaultAuth: ['apiKeyAuth'] })
+    const client = new MambuStreaming({
+        prefixUrl: prefixUrl,
+        auth: { apiKeyAuth: 'footoken' },
+        defaultAuth: ['apiKeyAuth'],
+    })
 
     test('gives valid response', async () => {
         const subscription: streaming.Subscription = {

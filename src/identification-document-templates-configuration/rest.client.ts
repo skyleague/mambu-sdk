@@ -40,14 +40,14 @@ export class MambuIdentificationDocumentTemplatesConfiguration {
     /**
      * Allows retrieval of id document templates configuration.
      */
-    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/iddocumenttemplates.yaml`)
     }
 
     /**
      * Update the current configuration of id document templates
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).put(`configuration/iddocumenttemplates.yaml`)
     }
 

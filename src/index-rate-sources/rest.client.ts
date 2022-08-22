@@ -43,7 +43,7 @@ export class MambuIndexRateSources {
     /**
      * Allows retrieval of all index rate sources
      */
-    public async getAll({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async getAll({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`indexratesources`, {
                 responseType: 'json',
@@ -60,12 +60,21 @@ export class MambuIndexRateSources {
     /**
      * Create a new index rate source
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: IndexRateSource; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: IndexRateSource
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(IndexRateSource, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`indexratesources`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -174,12 +183,14 @@ export class MambuIndexRateSources {
      * Create a new index rate
      */
     public async create1({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { indexRateSourceId: string }
         body: IndexRate
+        path: { indexRateSourceId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(IndexRate, body)
@@ -187,6 +198,7 @@ export class MambuIndexRateSources {
         return this.awaitResponse(
             this.buildClient(auth).post(`indexratesources/${path.indexRateSourceId}/indexrates`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -212,7 +224,7 @@ export class MambuIndexRateSources {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

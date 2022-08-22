@@ -40,7 +40,10 @@ export class MambuDepositProductsConfiguration {
     /**
      * Allows retrieval of the deposit products configuration.
      */
-    public async get({ query, auth = [['apiKey'], ['basic']] }: { query?: { type?: string }; auth?: string[][] | string[] }) {
+    public async get({
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: { query?: { type?: string }; auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/depositproducts.yaml`, {
             searchParams: query ?? {},
         })
@@ -49,8 +52,13 @@ export class MambuDepositProductsConfiguration {
     /**
      * Allows updating the deposit products configuration.
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
-        return this.buildClient(auth).put(`configuration/depositproducts.yaml`)
+    public async update({
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: { headers?: { ['X-Mambu-Async']?: string; ['X-Mambu-Callback']?: string }; auth?: string[][] | string[] } = {}) {
+        return this.buildClient(auth).put(`configuration/depositproducts.yaml`, {
+            headers: headers ?? {},
+        })
     }
 
     protected buildBasicClient(client: Got) {

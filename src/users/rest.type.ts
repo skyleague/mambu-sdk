@@ -108,8 +108,6 @@ export const User = {
     get schema() {
         return User.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'User',
     is: (o: unknown): o is User => User.validate(o) === true,
     assert: (o: unknown) => {
         if (!User.validate(o)) {
@@ -127,8 +125,6 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ErrorResponse',
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
 } as const
 
@@ -139,8 +135,6 @@ export const PatchRequest = {
     get schema() {
         return PatchRequest.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'patchRequest',
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
@@ -156,8 +150,6 @@ export const GetAllResponse = {
     get schema() {
         return GetAllResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getAllResponse',
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
@@ -247,8 +239,6 @@ export const UserRequest = {
     get schema() {
         return UserRequest.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'User_Request',
     is: (o: unknown): o is UserRequest => UserRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!UserRequest.validate(o)) {
@@ -518,6 +508,7 @@ type Local0 =
     | 'MANAGE_AUDIT_TRAIL'
     | 'MANAGE_APPS'
     | 'MANAGE_CARDS_CAPABILITY'
+    | 'MANAGE_NOTIFICATIONS'
     | 'ADMIN'
     | 'CREATE_ROLE'
     | 'EDIT_ROLE'
@@ -1899,6 +1890,7 @@ export interface RestError {
         | 'DEPOSIT_PRODUCT_AVAILABILITY_FOR_GROUPS_BLANK'
         | 'DEPOSIT_PRODUCT_CURRENCY_NOT_DEFINED'
         | 'BLANK_DEPOSIT_PRODUCT_CURRENCY'
+        | 'DEPOSIT_PRODUCT_MULTIPLE_CURRENCIES_NOT_ALLOWED'
         | 'DEPOSIT_PRODUCT_INVALID_MATURITY_MIN_MAX'
         | 'DEPOSIT_PRODUCT_INVALID_WITHHOLDING_TAX_ENABLED'
         | 'DEPOSIT_PRODUCT_NEGATIVE_TERM_LENGTH'
@@ -1986,6 +1978,7 @@ export interface RestError {
         | 'DEPOSIT_PRODUCT_OVERDRAFT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_CRYPTOCURRENCIES'
         | 'DEPOSIT_PRODUCT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_NON_TRADITIONAL_CURRENCIES'
         | 'DEPOSIT_PRODUCT_OVERDRAFT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_NON_TRADITIONAL_CURRENCIES'
+        | 'DEPOSIT_PRODUCT_OVERDRAFT_INDEX_RATE_AVAILABLE_ONLY_FOR_FIXED_TERMS'
         | 'DEPOSIT_PRODUCT_HAS_ASSOCIATED_LOAN_PRODUCTS'
         | 'CF_SET_ID_ERROR'
         | 'CF_SET_INVALID_ID'

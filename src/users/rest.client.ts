@@ -71,12 +71,14 @@ export class MambuUsers {
      * Update an existing User
      */
     public async update({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { userId: string }
         body: User
+        path: { userId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(User, body)
@@ -84,6 +86,7 @@ export class MambuUsers {
         return this.awaitResponse(
             this.buildClient(auth).put(`users/${path.userId}`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -117,12 +120,14 @@ export class MambuUsers {
      * Partially update an existing User
      */
     public async patch({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { userId: string }
         body: PatchRequest
+        path: { userId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PatchRequest, body)
@@ -130,6 +135,7 @@ export class MambuUsers {
         return this.awaitResponse(
             this.buildClient(auth).patch(`users/${path.userId}`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -157,7 +163,7 @@ export class MambuUsers {
             branchIdType?: string
         }
         auth?: string[][] | string[]
-    }) {
+    } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`users`, {
                 searchParams: query ?? {},
@@ -175,12 +181,21 @@ export class MambuUsers {
     /**
      * Create a new UI User
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: UserRequest; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: UserRequest
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(UserRequest, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`users`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -206,7 +221,7 @@ export class MambuUsers {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

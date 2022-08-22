@@ -40,14 +40,14 @@ export class MambuHolidaysConfiguration {
     /**
      * Allows retrieval of holidays configuration details.
      */
-    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/holidays.yaml`)
     }
 
     /**
      * Update the current holidays configuration
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).put(`configuration/holidays.yaml`)
     }
 

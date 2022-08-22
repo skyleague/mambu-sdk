@@ -15,8 +15,6 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ErrorResponse',
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
 } as const
 
@@ -28,8 +26,6 @@ export const GetDepositAccountDocumentResponse = {
     get schema() {
         return GetDepositAccountDocumentResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getDepositAccountDocumentResponse',
     is: (o: unknown): o is GetDepositAccountDocumentResponse => GetDepositAccountDocumentResponse.validate(o) === true,
 } as const
 
@@ -40,8 +36,6 @@ export const GetAllCardsResponse = {
     get schema() {
         return GetAllCardsResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getAllCardsResponse',
     is: (o: unknown): o is GetAllCardsResponse => GetAllCardsResponse.validate(o) === true,
 } as const
 
@@ -60,8 +54,6 @@ export const Card = {
     get schema() {
         return Card.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'Card',
     is: (o: unknown): o is Card => Card.validate(o) === true,
     assert: (o: unknown) => {
         if (!Card.validate(o)) {
@@ -89,8 +81,6 @@ export const StartMaturityAction = {
     get schema() {
         return StartMaturityAction.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'StartMaturityAction',
     is: (o: unknown): o is StartMaturityAction => StartMaturityAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!StartMaturityAction.validate(o)) {
@@ -247,8 +237,6 @@ export const DepositAccount = {
     get schema() {
         return DepositAccount.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'DepositAccount',
     is: (o: unknown): o is DepositAccount => DepositAccount.validate(o) === true,
     assert: (o: unknown) => {
         if (!DepositAccount.validate(o)) {
@@ -265,8 +253,6 @@ export const GetAllAuthorizationHoldsResponse = {
     get schema() {
         return GetAllAuthorizationHoldsResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getAllAuthorizationHoldsResponse',
     is: (o: unknown): o is GetAllAuthorizationHoldsResponse => GetAllAuthorizationHoldsResponse.validate(o) === true,
 } as const
 
@@ -338,8 +324,6 @@ export const AuthorizationHold = {
     get schema() {
         return AuthorizationHold.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'AuthorizationHold',
     is: (o: unknown): o is AuthorizationHold => AuthorizationHold.validate(o) === true,
     assert: (o: unknown) => {
         if (!AuthorizationHold.validate(o)) {
@@ -355,8 +339,6 @@ export const GetFundedLoansResponse = {
     get schema() {
         return GetFundedLoansResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getFundedLoansResponse',
     is: (o: unknown): o is GetFundedLoansResponse => GetFundedLoansResponse.validate(o) === true,
 } as const
 
@@ -367,9 +349,30 @@ export const GetAllResponse = {
     get schema() {
         return GetAllResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getAllResponse',
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+} as const
+
+/**
+ * Allows to change the withholding tax for a deposit account
+ */
+export interface ChangeWithholdingTaxAction {
+    /**
+     * The key of the new withholding tax to be used by the account
+     */
+    withholdingTaxSourceKey: string
+}
+
+export const ChangeWithholdingTaxAction = {
+    validate: require('./schemas/change-withholding-tax-action.schema.js') as ValidateFunction<ChangeWithholdingTaxAction>,
+    get schema() {
+        return ChangeWithholdingTaxAction.validate.schema
+    },
+    is: (o: unknown): o is ChangeWithholdingTaxAction => ChangeWithholdingTaxAction.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ChangeWithholdingTaxAction.validate(o)) {
+            throw new AjvValidator.ValidationError(ChangeWithholdingTaxAction.validate.errors ?? [])
+        }
+    },
 } as const
 
 /**
@@ -399,8 +402,6 @@ export const ApplyInterestInput = {
     get schema() {
         return ApplyInterestInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ApplyInterestInput',
     is: (o: unknown): o is ApplyInterestInput => ApplyInterestInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!ApplyInterestInput.validate(o)) {
@@ -424,8 +425,6 @@ export const ReopenDepositAction = {
     get schema() {
         return ReopenDepositAction.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ReopenDepositAction',
     is: (o: unknown): o is ReopenDepositAction => ReopenDepositAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!ReopenDepositAction.validate(o)) {
@@ -449,41 +448,10 @@ export const UndoMaturityAction = {
     get schema() {
         return UndoMaturityAction.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'UndoMaturityAction',
     is: (o: unknown): o is UndoMaturityAction => UndoMaturityAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!UndoMaturityAction.validate(o)) {
             throw new AjvValidator.ValidationError(UndoMaturityAction.validate.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Allows specifying the action details for a deposit account
- */
-export interface DepositAccountAction {
-    /**
-     * The action type to be applied
-     */
-    action: 'APPROVE' | 'UNDO_APPROVE' | 'LOCK' | 'UNLOCK' | 'CLOSE' | 'CLOSE_WITHDRAW' | 'CLOSE_REJECT' | 'CLOSE_WRITE_OFF'
-    /**
-     * The notes related to the action performed
-     */
-    notes?: string
-}
-
-export const DepositAccountAction = {
-    validate: require('./schemas/deposit-account-action.schema.js') as ValidateFunction<DepositAccountAction>,
-    get schema() {
-        return DepositAccountAction.validate.schema
-    },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'DepositAccountAction',
-    is: (o: unknown): o is DepositAccountAction => DepositAccountAction.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!DepositAccountAction.validate(o)) {
-            throw new AjvValidator.ValidationError(DepositAccountAction.validate.errors ?? [])
         }
     },
 } as const
@@ -511,12 +479,37 @@ export const ChangeInterestRateAction = {
     get schema() {
         return ChangeInterestRateAction.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ChangeInterestRateAction',
     is: (o: unknown): o is ChangeInterestRateAction => ChangeInterestRateAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!ChangeInterestRateAction.validate(o)) {
             throw new AjvValidator.ValidationError(ChangeInterestRateAction.validate.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Allows specifying the action details for a deposit account
+ */
+export interface DepositAccountAction {
+    /**
+     * The action type to be applied
+     */
+    action: 'APPROVE' | 'UNDO_APPROVE' | 'LOCK' | 'UNLOCK' | 'CLOSE' | 'CLOSE_WITHDRAW' | 'CLOSE_REJECT' | 'CLOSE_WRITE_OFF'
+    /**
+     * The notes related to the action performed
+     */
+    notes?: string
+}
+
+export const DepositAccountAction = {
+    validate: require('./schemas/deposit-account-action.schema.js') as ValidateFunction<DepositAccountAction>,
+    get schema() {
+        return DepositAccountAction.validate.schema
+    },
+    is: (o: unknown): o is DepositAccountAction => DepositAccountAction.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!DepositAccountAction.validate(o)) {
+            throw new AjvValidator.ValidationError(DepositAccountAction.validate.errors ?? [])
         }
     },
 } as const
@@ -528,8 +521,6 @@ export const PatchBlockFundRequest = {
     get schema() {
         return PatchBlockFundRequest.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'patchBlockFundRequest',
     is: (o: unknown): o is PatchBlockFundRequest => PatchBlockFundRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchBlockFundRequest.validate(o)) {
@@ -545,8 +536,6 @@ export const PatchRequest = {
     get schema() {
         return PatchRequest.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'patchRequest',
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
@@ -562,8 +551,6 @@ export const GetAllBlocksResponse = {
     get schema() {
         return GetAllBlocksResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getAllBlocksResponse',
     is: (o: unknown): o is GetAllBlocksResponse => GetAllBlocksResponse.validate(o) === true,
 } as const
 
@@ -610,8 +597,6 @@ export const BlockFund = {
     get schema() {
         return BlockFund.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'BlockFund',
     is: (o: unknown): o is BlockFund => BlockFund.validate(o) === true,
     assert: (o: unknown) => {
         if (!BlockFund.validate(o)) {
@@ -636,8 +621,6 @@ export const DepositAccountSearchCriteria = {
     get schema() {
         return DepositAccountSearchCriteria.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'DepositAccountSearchCriteria',
     is: (o: unknown): o is DepositAccountSearchCriteria => DepositAccountSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
         if (!DepositAccountSearchCriteria.validate(o)) {
@@ -653,8 +636,6 @@ export const SearchResponse = {
     get schema() {
         return SearchResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'searchResponse',
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
 } as const
 
@@ -674,8 +655,6 @@ export const LoanAccountSchedule = {
     get schema() {
         return LoanAccountSchedule.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'LoanAccountSchedule',
     is: (o: unknown): o is LoanAccountSchedule => LoanAccountSchedule.validate(o) === true,
 } as const
 
@@ -2020,6 +1999,7 @@ export interface RestError {
         | 'DEPOSIT_PRODUCT_AVAILABILITY_FOR_GROUPS_BLANK'
         | 'DEPOSIT_PRODUCT_CURRENCY_NOT_DEFINED'
         | 'BLANK_DEPOSIT_PRODUCT_CURRENCY'
+        | 'DEPOSIT_PRODUCT_MULTIPLE_CURRENCIES_NOT_ALLOWED'
         | 'DEPOSIT_PRODUCT_INVALID_MATURITY_MIN_MAX'
         | 'DEPOSIT_PRODUCT_INVALID_WITHHOLDING_TAX_ENABLED'
         | 'DEPOSIT_PRODUCT_NEGATIVE_TERM_LENGTH'
@@ -2107,6 +2087,7 @@ export interface RestError {
         | 'DEPOSIT_PRODUCT_OVERDRAFT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_CRYPTOCURRENCIES'
         | 'DEPOSIT_PRODUCT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_NON_TRADITIONAL_CURRENCIES'
         | 'DEPOSIT_PRODUCT_OVERDRAFT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_NON_TRADITIONAL_CURRENCIES'
+        | 'DEPOSIT_PRODUCT_OVERDRAFT_INDEX_RATE_AVAILABLE_ONLY_FOR_FIXED_TERMS'
         | 'DEPOSIT_PRODUCT_HAS_ASSOCIATED_LOAN_PRODUCTS'
         | 'CF_SET_ID_ERROR'
         | 'CF_SET_INVALID_ID'

@@ -44,12 +44,14 @@ export class MambuFundingSources {
      * Performs the sell of a funding share owned by an investor. Investors can sell the total share or only a part of the investment. In case of a partial sale, multiple operations can be performed until the entire investment is sold. For the seller, money will be deposited in the funding account, for the buyers money will be withdrawn from provided accounts.
      */
     public async sell({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { fundingSourceId: string }
         body: SellFundingSourceAction
+        path: { fundingSourceId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(SellFundingSourceAction, body)
@@ -57,6 +59,7 @@ export class MambuFundingSources {
         return this.awaitResponse(
             this.buildClient(auth).post(`fundingsources/${path.fundingSourceId}:sell`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -83,7 +86,7 @@ export class MambuFundingSources {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

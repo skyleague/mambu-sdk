@@ -62,12 +62,12 @@ export class MambuTasks {
      * Update an existing task
      */
     public async update({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { taskId: string }
         body: Task
+        path: { taskId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(Task, body)
@@ -108,12 +108,12 @@ export class MambuTasks {
      * Partially update an existing task
      */
     public async patch({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { taskId: string }
         body: PatchRequest
+        path: { taskId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PatchRequest, body)
@@ -150,7 +150,7 @@ export class MambuTasks {
             status?: string
         }
         auth?: string[][] | string[]
-    }) {
+    } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`tasks`, {
                 searchParams: query ?? {},
@@ -168,12 +168,21 @@ export class MambuTasks {
     /**
      * Create a new task. The status will be set as OPEN.
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: Task; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: Task
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(Task, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`tasks`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -199,7 +208,7 @@ export class MambuTasks {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

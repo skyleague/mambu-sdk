@@ -71,12 +71,12 @@ export class MambuGeneralLedgerAccounts {
      * Partially update an existing GL account
      */
     public async patch({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { glAccountId: string }
         body: PatchRequest
+        path: { glAccountId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PatchRequest, body)
@@ -131,12 +131,21 @@ export class MambuGeneralLedgerAccounts {
     /**
      * Create GL Accounts
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: CreateRequest; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CreateRequest
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(CreateRequest, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`glaccounts`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -163,7 +172,7 @@ export class MambuGeneralLedgerAccounts {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

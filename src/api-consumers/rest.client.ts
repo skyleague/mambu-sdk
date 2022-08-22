@@ -77,12 +77,14 @@ export class MambuApiConsumers {
      * Create a new API key for the API Consumer.
      */
     public async createApiKeyForConsumer({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { apiConsumerId: string }
         body: ApiKeyInput
+        path: { apiConsumerId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(ApiKeyInput, body)
@@ -90,6 +92,7 @@ export class MambuApiConsumers {
         return this.awaitResponse(
             this.buildClient(auth).post(`consumers/${path.apiConsumerId}/apikeys`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -130,12 +133,14 @@ export class MambuApiConsumers {
      * Update an existing API Consumer
      */
     public async update({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { apiConsumerId: string }
         body: ApiConsumer
+        path: { apiConsumerId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(ApiConsumer, body)
@@ -143,6 +148,7 @@ export class MambuApiConsumers {
         return this.awaitResponse(
             this.buildClient(auth).put(`consumers/${path.apiConsumerId}`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -182,12 +188,14 @@ export class MambuApiConsumers {
      * Partially update an existing API Consumer
      */
     public async patch({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { apiConsumerId: string }
         body: PatchRequest
+        path: { apiConsumerId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PatchRequest, body)
@@ -195,6 +203,7 @@ export class MambuApiConsumers {
         return this.awaitResponse(
             this.buildClient(auth).patch(`consumers/${path.apiConsumerId}`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -238,7 +247,7 @@ export class MambuApiConsumers {
     }: {
         query?: { offset?: string; limit?: string; paginationDetails?: string; type?: string }
         auth?: string[][] | string[]
-    }) {
+    } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`consumers`, {
                 searchParams: query ?? {},
@@ -256,12 +265,21 @@ export class MambuApiConsumers {
     /**
      * Create a new API Consumer
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: ApiConsumer; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: ApiConsumer
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(ApiConsumer, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`consumers`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -278,13 +296,16 @@ export class MambuApiConsumers {
      */
     public async createSecretKeyForConsumer({
         path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
         path: { apiConsumerId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         return this.awaitResponse(
             this.buildClient(auth).post(`consumers/${path.apiConsumerId}/secretkeys`, {
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -311,7 +332,7 @@ export class MambuApiConsumers {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

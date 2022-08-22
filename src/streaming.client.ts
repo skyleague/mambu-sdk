@@ -17,7 +17,7 @@ import {
     SubscriptionEventStreamBatch,
 } from './streaming.type'
 
-export class StreamingClient {
+export class MambuStreaming {
     public client: Got
 
     public auth: {
@@ -57,12 +57,13 @@ export class StreamingClient {
      *
      * - If this endpoint is invoked several times with the same key subscription properties in body (order of even_types is not important) - the subscription will be created only once and for all other calls it will just return the subscription that was already created.
      */
-    public async createSubscription({ body }: { body: Subscription }) {
+    public async createSubscription({ body, headers }: { body: Subscription; headers?: { apikey?: string } }) {
         this.validateRequestBody(Subscription, body)
 
         return this.awaitResponse(
             this.buildClient().post(`subscriptions`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -102,6 +103,7 @@ export class StreamingClient {
     public async getSubscriptionEvents({
         path,
         query,
+        headers,
     }: {
         path: { subscriptionId: string }
         query?: {
@@ -113,10 +115,12 @@ export class StreamingClient {
             stream_keep_alive_limit?: string
             commit_timeout?: string
         }
+        headers?: { ['X-Flow-Id']?: string; apikey?: string }
     }) {
         return this.awaitResponse(
             this.buildClient().get(`subscriptions/${path.subscriptionId}/events`, {
                 searchParams: query ?? {},
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -141,17 +145,20 @@ export class StreamingClient {
      * - When a batch is committed, that also automatically commits all previous batches that were sent in a stream for this partition.
      */
     public async createSubscriptionCursor({
-        path,
         body,
+        path,
+        headers,
     }: {
-        path: { subscriptionId: string }
         body: CreateSubscriptionCursorRequest
+        path: { subscriptionId: string }
+        headers: { ['X-Mambu-StreamId']: string; apikey?: string }
     }) {
         this.validateRequestBody(CreateSubscriptionCursorRequest, body)
 
         return this.awaitResponse(
             this.buildClient().post(`subscriptions/${path.subscriptionId}/cursors`, {
                 json: body,
+                headers: headers,
                 responseType: 'json',
             }),
             {
@@ -176,9 +183,16 @@ export class StreamingClient {
      *
      * - In case the subscription is not needed anymore, it can be manually deleted by providing its unique subscription id.
      */
-    public async deleteSubscriptionBySubscriptionId({ path }: { path: { subscriptionId: string } }) {
+    public async deleteSubscriptionBySubscriptionId({
+        path,
+        headers,
+    }: {
+        path: { subscriptionId: string }
+        headers?: { apikey?: string }
+    }) {
         return this.awaitResponse(
             this.buildClient().delete(`subscriptions/${path.subscriptionId}`, {
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -203,10 +217,19 @@ export class StreamingClient {
      *
      * The latest offset is compared with committed offset in order to calculate unconsumed events count for specific partition.
      */
-    public async getSubscriptionStats({ path, query }: { path: { subscriptionId: string }; query?: { show_time_lag?: string } }) {
+    public async getSubscriptionStats({
+        path,
+        query,
+        headers,
+    }: {
+        path: { subscriptionId: string }
+        query?: { show_time_lag?: string }
+        headers?: { apikey?: string }
+    }) {
         return this.awaitResponse(
             this.buildClient().get(`subscriptions/${path.subscriptionId}/stats`, {
                 searchParams: query ?? {},
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -230,7 +253,7 @@ export class StreamingClient {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

@@ -43,9 +43,13 @@ export class MambuDocuments {
     /**
      * Create a new document
      */
-    public async createDocument({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async createDocument({
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: { headers?: { ['Idempotency-Key']?: string }; auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).post(`documents`, {
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -128,7 +132,7 @@ export class MambuDocuments {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

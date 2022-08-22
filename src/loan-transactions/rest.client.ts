@@ -61,12 +61,12 @@ export class MambuLoanTransactions {
      * Client Directed Query. Allows you to search loan transactions for loan accounts by various criteria
      */
     public async search({
-        query,
         body,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         body: LoanTransactionSearchCriteria
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(LoanTransactionSearchCriteria, body)
@@ -91,12 +91,14 @@ export class MambuLoanTransactions {
      * Lock a loan account's income sources (e.g. interest, fees, penalties)
      */
     public async applyLock({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { loanAccountId: string }
         body: LockLoanAccountInput
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(LockLoanAccountInput, body)
@@ -104,6 +106,7 @@ export class MambuLoanTransactions {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/lock-transactions`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -120,12 +123,14 @@ export class MambuLoanTransactions {
      * Unlock a loan account's income sources (e.g. interest, fees, penalties)
      */
     public async applyUnlock({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { loanAccountId: string }
         body: UnlockLoanAccountInput
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(UnlockLoanAccountInput, body)
@@ -133,6 +138,7 @@ export class MambuLoanTransactions {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/unlock-transactions`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -149,12 +155,14 @@ export class MambuLoanTransactions {
      * Make a repayment transaction on a loan
      */
     public async makeRepayment({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { loanAccountId: string }
         body: RepaymentLoanTransactionInput
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(RepaymentLoanTransactionInput, body)
@@ -162,6 +170,7 @@ export class MambuLoanTransactions {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/repayment-transactions`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -178,12 +187,14 @@ export class MambuLoanTransactions {
      * Adjustment of loan transactions. Note that adjusting fees is still in beta and known issues will be fixed start of Q2/2019
      */
     public async adjust({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { loanTransactionId: string }
         body: LoanTransactionAdjustmentDetails
+        path: { loanTransactionId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(LoanTransactionAdjustmentDetails, body)
@@ -191,6 +202,7 @@ export class MambuLoanTransactions {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/transactions/${path.loanTransactionId}:adjust`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -207,12 +219,14 @@ export class MambuLoanTransactions {
      * Make a disbursement on a loan
      */
     public async makeDisbursement({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { loanAccountId: string }
         body: DisbursementLoanTransactionInput
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(DisbursementLoanTransactionInput, body)
@@ -220,6 +234,7 @@ export class MambuLoanTransactions {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/disbursement-transactions`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -290,12 +305,14 @@ export class MambuLoanTransactions {
      * Make a withdrawal from redraw balance
      */
     public async makeWithdrawal({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { loanAccountId: string }
         body: WithdrawalRedrawTransactionInput
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(WithdrawalRedrawTransactionInput, body)
@@ -303,6 +320,7 @@ export class MambuLoanTransactions {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/withdrawal-transactions`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -319,12 +337,14 @@ export class MambuLoanTransactions {
      * Make a payment in redraw balance for a loan
      */
     public async applyPaymentMade({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { loanAccountId: string }
         body: PaymentMadeTransactionInput
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PaymentMadeTransactionInput, body)
@@ -332,6 +352,7 @@ export class MambuLoanTransactions {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/payment-made-transactions`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -348,12 +369,14 @@ export class MambuLoanTransactions {
      * Make a redraw repayment transaction on a loan
      */
     public async makeRedrawRepayment({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { loanAccountId: string }
         body: RedrawRepaymentTransactionInputDto
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(RedrawRepaymentTransactionInputDto, body)
@@ -361,6 +384,7 @@ export class MambuLoanTransactions {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/redraw-repayment-transactions`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -404,12 +428,14 @@ export class MambuLoanTransactions {
      * Apply a fee on a loan account
      */
     public async applyFee({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { loanAccountId: string }
         body: FeeLoanTransactionInput
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(FeeLoanTransactionInput, body)
@@ -417,6 +443,7 @@ export class MambuLoanTransactions {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/fee-transactions`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -443,7 +470,7 @@ export class MambuLoanTransactions {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {
