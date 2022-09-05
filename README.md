@@ -5,10 +5,12 @@
   <img alt="Version" src="https://img.shields.io/github/package-json/v/skyleague/mambu-sdk" />
   <img alt="LGTM Grade" src="https://img.shields.io/lgtm/grade/javascript/github/skyleague/mambu-sdk">
   <img src="https://img.shields.io/badge/node-%3E%3D16-blue.svg" />
-  <a href="#" target="_blank">
+  <a href="./LICENSE.md" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
   </a>
-  [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=skyleague_mambu-sdk&metric=alert_status&token=b45e203ec15513147bede75da8d3a5971794c79d)](https://sonarcloud.io/summary/new_code?id=skyleague_mambu-sdk)
+  <a href="https://sonarcloud.io/summary/new_code?id=skyleague_mambu-sdk" target="_blank">
+    <img alt="SonarCloud" src="https://sonarcloud.io/api/project_badges/measure?project=skyleague_mambu-sdk&metric=alert_status&token=b45e203ec15513147bede75da8d3a5971794c79d">
+  </a>
 </p>
 
 This _independent_ TypeScript SDK provides REST clients for the [Mambu API v2](https://api.mambu.com/) based on the published openapi schemas.
