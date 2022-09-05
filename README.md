@@ -25,7 +25,7 @@ The official Mambu API v2 documentation is published at [`https://api.mambu.com/
 
 Official Release Notes for the Mambu API v2 are published at [`https://community.mambu.com/c/release-notes/`](https://community.mambu.com/c/release-notes/)
 
-This SDK is generated using [`@skyleague/therefore`](https://github.com/skyleague/therefore) :party:, you'll find more documentation [here](https://github.com/skyleague/therefore).
+This SDK is generated using [`@skyleague/therefore`](https://github.com/skyleague/therefore) :partying_face:, you'll find more documentation [here](https://github.com/skyleague/therefore).
 
 If you'd like to contribute to this _independent_ SDK, feel free to raise a PR or add a bug report!
 
@@ -46,7 +46,7 @@ PR's are very welcome if you think your project is missing here.
 
 `@skyleague/mambu-sdk` is licensed under the MIT License (see [LICENSE.md](./LICENSE.md) for details.). 
 
-This SDK is generated using [`@skyleague/therefore`](https://github.com/skyleague/therefore) :party:, which is licensed under the MIT License.
+This SDK is generated using [`@skyleague/therefore`](https://github.com/skyleague/therefore) :partying_face:, which is licensed under the MIT License.
 
 Copyright (c) 2022, SkyLeague Technologies B.V..
 'SkyLeague' and the astronaut logo are trademarks of SkyLeague Technologies, registered at Chamber of Commerce in The Netherlands under number 86650564.
