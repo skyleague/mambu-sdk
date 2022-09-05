@@ -1,6 +1,6 @@
 {
   "name": "@skyleague/mambu-sdk",
-  "description": "",
+  "description": "TypeScript SDK generated from the Mambu API v2 spec.",
   "version": "1.0.0",
   "license": "MIT",
   "main": ".main.js",
