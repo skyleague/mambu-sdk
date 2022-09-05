@@ -27,7 +27,7 @@ SDK Features:
 
 We are currently tracking [**verion 9.128.4**](https://community.mambu.com/t/mambu-release-notes-v9-128-4/) of the Mambu API v2.
 
-`@skyleague/mambu-sdk` is licensed under the MIT License (see [LICENSE.md](./LICENSE.md) for details.). 
+`@skyleague/mambu-sdk` is licensed under the MIT License (see [LICENSE.md](./LICENSE.md) for details). 
 
 ## Documentation
 
@@ -54,7 +54,7 @@ PR's for this list are very welcome, if you think your project is missing here!
 
 ## License & Copyright
 
-`@skyleague/mambu-sdk` is licensed under the MIT License (see [LICENSE.md](./LICENSE.md) for details.). 
+`@skyleague/mambu-sdk` is licensed under the MIT License (see [LICENSE.md](./LICENSE.md) for details). 
 
 If you using this SDK without Enterprise Support, please note this (partial) MIT license clause:
 
