@@ -1,7 +1,7 @@
 # Mambu SDK _(@skyleague/mambu-sdk)_
 
 <p>
-  <img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/skyleague/mambu-sdk">
+  <img alt="Lines of Code" src="https://img.shields.io/tokei/lines/github/skyleague/mambu-sdk">
   <img alt="Version" src="https://img.shields.io/github/package-json/v/skyleague/mambu-sdk" />
   <img alt="LGTM Grade" src="https://img.shields.io/lgtm/grade/javascript/github/skyleague/mambu-sdk">
   <img src="https://img.shields.io/badge/node-%3E%3D16-blue.svg" />
@@ -14,6 +14,16 @@
 </p>
 
 This _independent_ TypeScript SDK provides REST clients for the [Mambu API v2](https://api.mambu.com/) based on the published openapi schemas.
+
+Supported Schemas:
+- [REST APIs](https://demotenant.dev.mambucloud.com/api/swagger/resources)
+- [Streaming API](https://api.mambu.com/streaming-api/mambu-streaming-api-spec-oas3.json)
+
+SDK Features:
+- Separate SDK client per sub-API
+- Fully type safe with run-time validation
+- Standardized authentication
+- Fully documented using jsdoc (w/ intellisense)
 
 We are currently tracking [**verion 9.128.4**](https://community.mambu.com/t/mambu-release-notes-v9-128-4/) of the Mambu API v2.
 
