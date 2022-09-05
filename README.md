@@ -40,11 +40,15 @@ If you are not under Enterprise Support, feel free to [raise an issue](https://g
 - [`mambu-sdk`](https://www.npmjs.com/package/mambu-sdk)
 - [`MambuPy`](https://pypi.org/project/MambuPy/)
 
-PR's are very welcome if you think your project is missing here.
+PR's for this list are very welcome, if you think your project is missing here!
 
 ## License & Copyright
 
 `@skyleague/mambu-sdk` is licensed under the MIT License (see [LICENSE.md](./LICENSE.md) for details.). 
+
+If you using this SDK without Enterprise Support, please note this (partial) MIT license clause:
+
+> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND
 
 This SDK is generated using [`@skyleague/therefore`](https://github.com/skyleague/therefore) :partying_face:, which is licensed under the MIT License.
 
