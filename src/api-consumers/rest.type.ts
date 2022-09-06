@@ -14,8 +14,6 @@ export const GetApiKeysByConsumerIdResponse = {
     get schema() {
         return GetApiKeysByConsumerIdResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getApiKeysByConsumerIdResponse',
     is: (o: unknown): o is GetApiKeysByConsumerIdResponse => GetApiKeysByConsumerIdResponse.validate(o) === true,
 } as const
 
@@ -28,8 +26,6 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ErrorResponse',
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
 } as const
 
@@ -48,8 +44,6 @@ export const ApiKeyInput = {
     get schema() {
         return ApiKeyInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ApiKeyInput',
     is: (o: unknown): o is ApiKeyInput => ApiKeyInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!ApiKeyInput.validate(o)) {
@@ -81,8 +75,6 @@ export const ApiKey = {
     get schema() {
         return ApiKey.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ApiKey',
     is: (o: unknown): o is ApiKey => ApiKey.validate(o) === true,
 } as const
 
@@ -117,7 +109,7 @@ export interface ApiConsumer {
     /**
      * The type of Api Consumer
      */
-    type?: 'STREAMING_API' | 'AUDIT_TRAIL' | 'PAYMENTS' | 'MAMBU_API' | 'CARDS_CAPABILITY'
+    type?: 'STREAMING_API' | 'AUDIT_TRAIL' | 'PAYMENTS' | 'MAMBU_API' | 'CARDS_CAPABILITY' | 'NOTIFICATIONS'
     /**
      * Date when the Api Consumer was created, as UTC
      */
@@ -133,8 +125,6 @@ export const ApiConsumer = {
     get schema() {
         return ApiConsumer.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ApiConsumer',
     is: (o: unknown): o is ApiConsumer => ApiConsumer.validate(o) === true,
     assert: (o: unknown) => {
         if (!ApiConsumer.validate(o)) {
@@ -150,8 +140,6 @@ export const PatchRequest = {
     get schema() {
         return PatchRequest.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'patchRequest',
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
@@ -167,8 +155,6 @@ export const GetAllResponse = {
     get schema() {
         return GetAllResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getAllResponse',
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
@@ -187,8 +173,6 @@ export const SecretKey = {
     get schema() {
         return SecretKey.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'SecretKey',
     is: (o: unknown): o is SecretKey => SecretKey.validate(o) === true,
 } as const
 
@@ -1533,6 +1517,7 @@ export interface RestError {
         | 'DEPOSIT_PRODUCT_AVAILABILITY_FOR_GROUPS_BLANK'
         | 'DEPOSIT_PRODUCT_CURRENCY_NOT_DEFINED'
         | 'BLANK_DEPOSIT_PRODUCT_CURRENCY'
+        | 'DEPOSIT_PRODUCT_MULTIPLE_CURRENCIES_NOT_ALLOWED'
         | 'DEPOSIT_PRODUCT_INVALID_MATURITY_MIN_MAX'
         | 'DEPOSIT_PRODUCT_INVALID_WITHHOLDING_TAX_ENABLED'
         | 'DEPOSIT_PRODUCT_NEGATIVE_TERM_LENGTH'
@@ -1620,6 +1605,7 @@ export interface RestError {
         | 'DEPOSIT_PRODUCT_OVERDRAFT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_CRYPTOCURRENCIES'
         | 'DEPOSIT_PRODUCT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_NON_TRADITIONAL_CURRENCIES'
         | 'DEPOSIT_PRODUCT_OVERDRAFT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_NON_TRADITIONAL_CURRENCIES'
+        | 'DEPOSIT_PRODUCT_OVERDRAFT_INDEX_RATE_AVAILABLE_ONLY_FOR_FIXED_TERMS'
         | 'DEPOSIT_PRODUCT_HAS_ASSOCIATED_LOAN_PRODUCTS'
         | 'CF_SET_ID_ERROR'
         | 'CF_SET_INVALID_ID'
@@ -2141,6 +2127,7 @@ type Local0 =
     | 'DELETE_API_CONSUMERS_AND_KEYS'
     | 'EDIT_API_CONSUMERS_AND_KEYS'
     | 'VIEW_API_CONSUMERS_AND_KEYS'
+    | 'MANAGE_NOTIFICATIONS'
 
 /**
  * Branch that can be managed by the user or API Consumer

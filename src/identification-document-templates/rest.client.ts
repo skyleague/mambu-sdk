@@ -46,10 +46,7 @@ export class MambuIdentificationDocumentTemplates {
     public async getAll({
         query,
         auth = [['apiKey'], ['basic']],
-    }: {
-        query?: { detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { query?: { detailsLevel?: string }; auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`organization/identificationDocumentTemplates`, {
                 searchParams: query ?? {},
@@ -73,7 +70,7 @@ export class MambuIdentificationDocumentTemplates {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

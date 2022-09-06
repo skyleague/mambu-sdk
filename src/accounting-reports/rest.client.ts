@@ -62,9 +62,11 @@ export class MambuAccountingReports {
      */
     public async create({
         body,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
         body: AccountingReportGenerationInput
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(AccountingReportGenerationInput, body)
@@ -72,6 +74,7 @@ export class MambuAccountingReports {
         return this.awaitResponse(
             this.buildClient(auth).post(`accounting/reports`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -98,7 +101,7 @@ export class MambuAccountingReports {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

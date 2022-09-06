@@ -40,7 +40,7 @@ export class MambuCustomFieldsConfiguration {
     /**
      * Allows retrieval of the custom fields configuration template.
      */
-    public async getTemplate({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async getTemplate({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/customfields/template.yaml`)
     }
 
@@ -50,10 +50,7 @@ export class MambuCustomFieldsConfiguration {
     public async get({
         query,
         auth = [['apiKey'], ['basic']],
-    }: {
-        query?: { availableFor?: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { query?: { availableFor?: string }; auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/customfields.yaml`, {
             searchParams: query ?? {},
         })
@@ -62,8 +59,13 @@ export class MambuCustomFieldsConfiguration {
     /**
      * Allows updating the current custom fields configuration.
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
-        return this.buildClient(auth).put(`configuration/customfields.yaml`)
+    public async update({
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: { headers?: { ['X-Mambu-Async']?: string; ['X-Mambu-Callback']?: string }; auth?: string[][] | string[] } = {}) {
+        return this.buildClient(auth).put(`configuration/customfields.yaml`, {
+            headers: headers ?? {},
+        })
     }
 
     protected buildBasicClient(client: Got) {

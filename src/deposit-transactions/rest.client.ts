@@ -44,12 +44,14 @@ export class MambuDepositTransactions {
      * Create new deposit transaction for account
      */
     public async makeDepositAsync({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositAccountId: string }
         body: DepositTransactionInput
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(DepositTransactionInput, body)
@@ -57,6 +59,7 @@ export class MambuDepositTransactions {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}/transaction/deposit`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -72,12 +75,14 @@ export class MambuDepositTransactions {
      * Create a new withdrawal transaction
      */
     public async makeWithdrawalAsync({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositAccountId: string }
         body: WithdrawalDepositTransactionInput
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(WithdrawalDepositTransactionInput, body)
@@ -85,6 +90,7 @@ export class MambuDepositTransactions {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}/transaction/withdraw`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -110,7 +116,7 @@ export class MambuDepositTransactions {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

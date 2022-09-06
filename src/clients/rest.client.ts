@@ -80,12 +80,12 @@ export class MambuClients {
      * Update an existing client
      */
     public async update({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { clientId: string }
         body: Client
+        path: { clientId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(Client, body)
@@ -126,12 +126,12 @@ export class MambuClients {
      * Partially update an existing client
      */
     public async patch({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { clientId: string }
         body: PatchRequest
+        path: { clientId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PatchRequest, body)
@@ -173,7 +173,7 @@ export class MambuClients {
             sortBy?: string
         }
         auth?: string[][] | string[]
-    }) {
+    } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`clients`, {
                 searchParams: query ?? {},
@@ -191,12 +191,21 @@ export class MambuClients {
     /**
      * Create a new client
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: Client; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: Client
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(Client, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`clients`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -212,12 +221,12 @@ export class MambuClients {
      * Allows you to search clients by various criteria
      */
     public async search({
-        query,
         body,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         body: ClientSearchCriteria
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(ClientSearchCriteria, body)
@@ -301,7 +310,7 @@ export class MambuClients {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

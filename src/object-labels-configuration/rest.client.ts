@@ -40,14 +40,14 @@ export class MambuObjectLabelsConfiguration {
     /**
      * Retrieve object labels configuration
      */
-    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/labels.yaml`)
     }
 
     /**
      * Update the object labels configuration
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).put(`configuration/labels.yaml`)
     }
 

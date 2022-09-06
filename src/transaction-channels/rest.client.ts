@@ -46,10 +46,7 @@ export class MambuTransactionChannels {
     public async getAll({
         query,
         auth = [['apiKey'], ['basic']],
-    }: {
-        query?: { detailsLevel?: string; transactionChannelState?: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { query?: { detailsLevel?: string; transactionChannelState?: string }; auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`organization/transactionChannels`, {
                 searchParams: query ?? {},
@@ -67,12 +64,21 @@ export class MambuTransactionChannels {
     /**
      * Creates a new transaction channel
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: TransactionChannel; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: TransactionChannel
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(TransactionChannel, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`organization/transactionChannels`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -112,12 +118,12 @@ export class MambuTransactionChannels {
      * Updates an existing transaction channel
      */
     public async update({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { transactionChannelId: string }
         body: TransactionChannel
+        path: { transactionChannelId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(TransactionChannel, body)
@@ -173,7 +179,7 @@ export class MambuTransactionChannels {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

@@ -43,10 +43,7 @@ export class MambuCurrenciesConfiguration {
     public async get({
         query,
         auth = [['apiKey'], ['basic']],
-    }: {
-        query?: { startDate?: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { query?: { startDate?: string }; auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/currencies.yaml`, {
             searchParams: query ?? {},
         })
@@ -55,7 +52,7 @@ export class MambuCurrenciesConfiguration {
     /**
      * Allows updating the currencies configuration.
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).put(`configuration/currencies.yaml`)
     }
 

@@ -51,12 +51,14 @@ export class MambuDepositProducts {
      * Perform batch update action for the specified deposit product
      */
     public async batchUpdate({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositProductId: string }
         body: DepositProductAction
+        path: { depositProductId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(DepositProductAction, body)
@@ -64,6 +66,7 @@ export class MambuDepositProducts {
         return this.awaitResponse(
             this.buildClient(auth).post(`depositproducts/${path.depositProductId}:batchUpdate`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -85,7 +88,7 @@ export class MambuDepositProducts {
     }: {
         query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string; branchId?: string }
         auth?: string[][] | string[]
-    }) {
+    } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`depositproducts`, {
                 searchParams: query ?? {},
@@ -103,12 +106,21 @@ export class MambuDepositProducts {
     /**
      * Create a new deposit product
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: DepositProduct; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: DepositProduct
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(DepositProduct, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`depositproducts`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -151,12 +163,12 @@ export class MambuDepositProducts {
      * Update an existing deposit product
      */
     public async update({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositProductId: string }
         body: DepositProduct
+        path: { depositProductId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(DepositProduct, body)
@@ -203,12 +215,12 @@ export class MambuDepositProducts {
      * Partially update an existing deposit product
      */
     public async patch({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositProductId: string }
         body: PatchRequest
+        path: { depositProductId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PatchRequest, body)
@@ -241,7 +253,7 @@ export class MambuDepositProducts {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

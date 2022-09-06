@@ -40,21 +40,21 @@ export class MambuUserRolesConfiguration {
     /**
      * Allows retrieval of the user roles configuration.
      */
-    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/userroles.yaml`)
     }
 
     /**
      * Allows updating the current user roles configuration.
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).put(`configuration/userroles.yaml`)
     }
 
     /**
      * Allows retrieval of the user roles configuration template.
      */
-    public async getTemplate({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async getTemplate({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/userroles/template.yaml`)
     }
 

@@ -40,14 +40,14 @@ export class MambuLoanRiskLevelsConfiguration {
     /**
      * Allows retrieval of loan risk levels configuration.
      */
-    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/loanrisklevels.yaml`)
     }
 
     /**
      * Updates the loan risk levels configuration.
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).put(`configuration/loanrisklevels.yaml`)
     }
 

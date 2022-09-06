@@ -44,12 +44,12 @@ export class MambuAccountingInterestAccrual {
      * Allows search of interest accrual breakdown entries by various criteria
      */
     public async search({
-        query,
         body,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         body: InterestAccrualSearchCriteria
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(InterestAccrualSearchCriteria, body)
@@ -83,7 +83,7 @@ export class MambuAccountingInterestAccrual {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

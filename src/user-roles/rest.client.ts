@@ -71,12 +71,14 @@ export class MambuUserRoles {
      * Update an existing user role
      */
     public async update({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { roleId: string }
         body: Role
+        path: { roleId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(Role, body)
@@ -84,6 +86,7 @@ export class MambuUserRoles {
         return this.awaitResponse(
             this.buildClient(auth).put(`userroles/${path.roleId}`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -117,12 +120,12 @@ export class MambuUserRoles {
      * Partially update an existing user role
      */
     public async patch({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { roleId: string }
         body: PatchRequest
+        path: { roleId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PatchRequest, body)
@@ -150,7 +153,7 @@ export class MambuUserRoles {
     }: {
         query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         auth?: string[][] | string[]
-    }) {
+    } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`userroles`, {
                 searchParams: query ?? {},
@@ -168,12 +171,21 @@ export class MambuUserRoles {
     /**
      * Create a new user role
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: Role; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: Role
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(Role, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`userroles`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -199,7 +211,7 @@ export class MambuUserRoles {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

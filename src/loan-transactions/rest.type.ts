@@ -22,8 +22,6 @@ export const LoanTransactionSearchCriteria = {
     get schema() {
         return LoanTransactionSearchCriteria.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'LoanTransactionSearchCriteria',
     is: (o: unknown): o is LoanTransactionSearchCriteria => LoanTransactionSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanTransactionSearchCriteria.validate(o)) {
@@ -39,8 +37,6 @@ export const SearchResponse = {
     get schema() {
         return SearchResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'searchResponse',
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
 } as const
 
@@ -53,8 +49,6 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'ErrorResponse',
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
 } as const
 
@@ -77,8 +71,6 @@ export const LockLoanAccountInput = {
     get schema() {
         return LockLoanAccountInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'LockLoanAccountInput',
     is: (o: unknown): o is LockLoanAccountInput => LockLoanAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!LockLoanAccountInput.validate(o)) {
@@ -102,8 +94,6 @@ export const LockLoanTransactionsWrapper = {
     get schema() {
         return LockLoanTransactionsWrapper.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'LockLoanTransactionsWrapper',
     is: (o: unknown): o is LockLoanTransactionsWrapper => LockLoanTransactionsWrapper.validate(o) === true,
 } as const
 
@@ -122,8 +112,6 @@ export const UnlockLoanAccountInput = {
     get schema() {
         return UnlockLoanAccountInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'UnlockLoanAccountInput',
     is: (o: unknown): o is UnlockLoanAccountInput => UnlockLoanAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!UnlockLoanAccountInput.validate(o)) {
@@ -188,8 +176,6 @@ export const RepaymentLoanTransactionInput = {
     get schema() {
         return RepaymentLoanTransactionInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'RepaymentLoanTransactionInput',
     is: (o: unknown): o is RepaymentLoanTransactionInput => RepaymentLoanTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!RepaymentLoanTransactionInput.validate(o)) {
@@ -372,8 +358,6 @@ export const LoanTransaction = {
     get schema() {
         return LoanTransaction.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'LoanTransaction',
     is: (o: unknown): o is LoanTransaction => LoanTransaction.validate(o) === true,
 } as const
 
@@ -401,8 +385,6 @@ export const LoanTransactionAdjustmentDetails = {
     get schema() {
         return LoanTransactionAdjustmentDetails.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'LoanTransactionAdjustmentDetails',
     is: (o: unknown): o is LoanTransactionAdjustmentDetails => LoanTransactionAdjustmentDetails.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanTransactionAdjustmentDetails.validate(o)) {
@@ -461,8 +443,6 @@ export const DisbursementLoanTransactionInput = {
     get schema() {
         return DisbursementLoanTransactionInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'DisbursementLoanTransactionInput',
     is: (o: unknown): o is DisbursementLoanTransactionInput => DisbursementLoanTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!DisbursementLoanTransactionInput.validate(o)) {
@@ -479,8 +459,6 @@ export const GetTransactionsForAllVersionsResponse = {
     get schema() {
         return GetTransactionsForAllVersionsResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getTransactionsForAllVersionsResponse',
     is: (o: unknown): o is GetTransactionsForAllVersionsResponse => GetTransactionsForAllVersionsResponse.validate(o) === true,
 } as const
 
@@ -521,8 +499,6 @@ export const WithdrawalRedrawTransactionInput = {
     get schema() {
         return WithdrawalRedrawTransactionInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'WithdrawalRedrawTransactionInput',
     is: (o: unknown): o is WithdrawalRedrawTransactionInput => WithdrawalRedrawTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!WithdrawalRedrawTransactionInput.validate(o)) {
@@ -567,8 +543,6 @@ export const PaymentMadeTransactionInput = {
     get schema() {
         return PaymentMadeTransactionInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'PaymentMadeTransactionInput',
     is: (o: unknown): o is PaymentMadeTransactionInput => PaymentMadeTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!PaymentMadeTransactionInput.validate(o)) {
@@ -605,8 +579,6 @@ export const RedrawRepaymentTransactionInputDto = {
     get schema() {
         return RedrawRepaymentTransactionInputDto.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'RedrawRepaymentTransactionInputDTO',
     is: (o: unknown): o is RedrawRepaymentTransactionInputDto => RedrawRepaymentTransactionInputDto.validate(o) === true,
     assert: (o: unknown) => {
         if (!RedrawRepaymentTransactionInputDto.validate(o)) {
@@ -622,8 +594,6 @@ export const GetAllResponse = {
     get schema() {
         return GetAllResponse.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'getAllResponse',
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
@@ -666,8 +636,6 @@ export const FeeLoanTransactionInput = {
     get schema() {
         return FeeLoanTransactionInput.validate.schema
     },
-    source: `${__dirname}rest.client`,
-    sourceSymbol: 'FeeLoanTransactionInput',
     is: (o: unknown): o is FeeLoanTransactionInput => FeeLoanTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!FeeLoanTransactionInput.validate(o)) {
@@ -2179,6 +2147,7 @@ export interface RestError {
         | 'DEPOSIT_PRODUCT_AVAILABILITY_FOR_GROUPS_BLANK'
         | 'DEPOSIT_PRODUCT_CURRENCY_NOT_DEFINED'
         | 'BLANK_DEPOSIT_PRODUCT_CURRENCY'
+        | 'DEPOSIT_PRODUCT_MULTIPLE_CURRENCIES_NOT_ALLOWED'
         | 'DEPOSIT_PRODUCT_INVALID_MATURITY_MIN_MAX'
         | 'DEPOSIT_PRODUCT_INVALID_WITHHOLDING_TAX_ENABLED'
         | 'DEPOSIT_PRODUCT_NEGATIVE_TERM_LENGTH'
@@ -2266,6 +2235,7 @@ export interface RestError {
         | 'DEPOSIT_PRODUCT_OVERDRAFT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_CRYPTOCURRENCIES'
         | 'DEPOSIT_PRODUCT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_NON_TRADITIONAL_CURRENCIES'
         | 'DEPOSIT_PRODUCT_OVERDRAFT_INTEREST_RATE_SETTINGS_NOT_ALLOWED_FOR_PRODUCT_WITH_NON_TRADITIONAL_CURRENCIES'
+        | 'DEPOSIT_PRODUCT_OVERDRAFT_INDEX_RATE_AVAILABLE_ONLY_FOR_FIXED_TERMS'
         | 'DEPOSIT_PRODUCT_HAS_ASSOCIATED_LOAN_PRODUCTS'
         | 'CF_SET_ID_ERROR'
         | 'CF_SET_INVALID_ID'

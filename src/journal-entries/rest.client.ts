@@ -84,9 +84,11 @@ export class MambuJournalEntries {
      */
     public async create({
         body,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
         body: PostGlJournalEntriesDto
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PostGlJournalEntriesDto, body)
@@ -94,6 +96,7 @@ export class MambuJournalEntries {
         return this.awaitResponse(
             this.buildClient(auth).post(`gljournalentries`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -109,12 +112,12 @@ export class MambuJournalEntries {
      * Allows you to search for GL Journal Entries by various criteria
      */
     public async search({
-        query,
         body,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string }
         body: GlJournalEntrySearchCriteria
+        query?: { offset?: string; limit?: string; paginationDetails?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(GlJournalEntrySearchCriteria, body)
@@ -148,7 +151,7 @@ export class MambuJournalEntries {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

@@ -41,6 +41,33 @@ export class MambuClientDocuments {
     }
 
     /**
+     * Retrieve metadata regarding all documents for a specific client
+     */
+    public async getDocumentsByClientId({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { clientId: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`clients/${path.clientId}/documentsMetadata`, {
+                searchParams: query ?? {},
+                responseType: 'json',
+            }),
+            {
+                200: GetDocumentsByClientIdResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Allows retrieval of a single document metadata via id or encoded key
      */
     public async getClientDocumentById({
@@ -69,44 +96,20 @@ export class MambuClientDocuments {
      */
     public async createDocument({
         path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
         path: { clientId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         return this.awaitResponse(
             this.buildClient(auth).post(`clients/${path.clientId}/documents`, {
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
                 201: Document,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Retrieve metadata regarding all documents for a specific client
-     */
-    public async getDocumentsByClientId({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { clientId: string }
-        query?: { offset?: string; limit?: string; paginationDetails?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`clients/${path.clientId}/documentsMetadata`, {
-                searchParams: query ?? {},
-                responseType: 'json',
-            }),
-            {
-                200: GetDocumentsByClientIdResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -137,7 +140,7 @@ export class MambuClientDocuments {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

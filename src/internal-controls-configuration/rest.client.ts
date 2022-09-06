@@ -40,14 +40,14 @@ export class MambuInternalControlsConfiguration {
     /**
      * Allows the retrieval of the internal controls configuration.
      */
-    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/internalcontrols.yaml`)
     }
 
     /**
      * Update the current internal controls configuration
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).put(`configuration/internalcontrols.yaml`)
     }
 

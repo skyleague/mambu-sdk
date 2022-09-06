@@ -40,14 +40,14 @@ export class MambuAuthorizationHoldsConfiguration {
     /**
      * Retrieve authorization holds configuration
      */
-    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/authorizationholds.yaml`)
     }
 
     /**
      * Update the current authorization holds configuration
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).put(`configuration/authorizationholds.yaml`)
     }
 

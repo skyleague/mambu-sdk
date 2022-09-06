@@ -68,12 +68,21 @@ export class MambuComments {
     /**
      * Create a new comment for an entity
      */
-    public async createComment({ body, auth = [['apiKey'], ['basic']] }: { body: Comment; auth?: string[][] | string[] }) {
+    public async createComment({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: Comment
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(Comment, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`comments`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -99,7 +108,7 @@ export class MambuComments {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

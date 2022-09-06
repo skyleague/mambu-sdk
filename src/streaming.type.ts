@@ -49,8 +49,6 @@ export const Subscription = {
     get schema() {
         return Subscription.validate.schema
     },
-    source: `${__dirname}streaming.client`,
-    sourceSymbol: 'Subscription',
     is: (o: unknown): o is Subscription => Subscription.validate(o) === true,
     assert: (o: unknown) => {
         if (!Subscription.validate(o)) {
@@ -87,8 +85,6 @@ export const Problem = {
     get schema() {
         return Problem.validate.schema
     },
-    source: `${__dirname}streaming.client`,
-    sourceSymbol: 'Problem',
     is: (o: unknown): o is Problem => Problem.validate(o) === true,
 } as const
 
@@ -113,8 +109,6 @@ export const SubscriptionEventStreamBatch = {
     get schema() {
         return SubscriptionEventStreamBatch.validate.schema
     },
-    source: `${__dirname}streaming.client`,
-    sourceSymbol: 'Subscription-Event-Stream-Batch',
     is: (o: unknown): o is SubscriptionEventStreamBatch => SubscriptionEventStreamBatch.validate(o) === true,
 } as const
 
@@ -158,8 +152,6 @@ export const CreateSubscriptionCursorRequest = {
     get schema() {
         return CreateSubscriptionCursorRequest.validate.schema
     },
-    source: `${__dirname}streaming.client`,
-    sourceSymbol: 'createSubscriptionCursorRequest',
     is: (o: unknown): o is CreateSubscriptionCursorRequest => CreateSubscriptionCursorRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!CreateSubscriptionCursorRequest.validate(o)) {
@@ -178,8 +170,6 @@ export const CreateSubscriptionCursorResponse200 = {
     get schema() {
         return CreateSubscriptionCursorResponse200.validate.schema
     },
-    source: `${__dirname}streaming.client`,
-    sourceSymbol: 'createSubscriptionCursorResponse200',
     is: (o: unknown): o is CreateSubscriptionCursorResponse200 => CreateSubscriptionCursorResponse200.validate(o) === true,
 } as const
 
@@ -204,8 +194,6 @@ export const DeleteSubscriptionBySubscriptionIdResponse404 = {
     get schema() {
         return DeleteSubscriptionBySubscriptionIdResponse404.validate.schema
     },
-    source: `${__dirname}streaming.client`,
-    sourceSymbol: 'deleteSubscriptionBySubscriptionIdResponse404',
     is: (o: unknown): o is DeleteSubscriptionBySubscriptionIdResponse404 =>
         DeleteSubscriptionBySubscriptionIdResponse404.validate(o) === true,
 } as const
@@ -222,8 +210,6 @@ export const GetSubscriptionStatsResponse = {
     get schema() {
         return GetSubscriptionStatsResponse.validate.schema
     },
-    source: `${__dirname}streaming.client`,
-    sourceSymbol: 'getSubscriptionStatsResponse',
     is: (o: unknown): o is GetSubscriptionStatsResponse => GetSubscriptionStatsResponse.validate(o) === true,
 } as const
 

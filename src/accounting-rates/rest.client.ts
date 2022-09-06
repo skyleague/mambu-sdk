@@ -71,12 +71,14 @@ export class MambuAccountingRates {
      * Create Accounting Rates
      */
     public async create({
-        path,
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { currencyCode: string }
         body: PostAccountingRateDto
+        path: { currencyCode: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PostAccountingRateDto, body)
@@ -84,6 +86,7 @@ export class MambuAccountingRates {
         return this.awaitResponse(
             this.buildClient(auth).post(`currencies/${path.currencyCode}/accountingRates`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -110,7 +113,7 @@ export class MambuAccountingRates {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

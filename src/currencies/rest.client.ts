@@ -49,7 +49,7 @@ export class MambuCurrencies {
     }: {
         query?: { offset?: string; limit?: string; paginationDetails?: string; type?: string }
         auth?: string[][] | string[]
-    }) {
+    } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`currencies`, {
                 searchParams: query ?? {},
@@ -67,12 +67,21 @@ export class MambuCurrencies {
     /**
      * Create a new currency.
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: CurrencyDetails; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CurrencyDetails
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(CurrencyDetails, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`currencies`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -105,12 +114,12 @@ export class MambuCurrencies {
      * Updates a currency by code
      */
     public async update({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { currencyCode: string }
         body: CurrencyDetails
+        path: { currencyCode: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(CurrencyDetails, body)
@@ -167,7 +176,7 @@ export class MambuCurrencies {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

@@ -1,7 +1,7 @@
 import { hasPropertiesDefined, pick, valuesOf } from '@skyleague/axioms'
 import type { OpenapiV3 } from '@skyleague/therefore'
 import { $restclient } from '@skyleague/therefore'
-import type { PathItem } from '@skyleague/therefore/src/openapi.type'
+import type { PathItem } from '@skyleague/therefore/src/lib/primitives/restclient/openapi.type'
 import camelCase from 'camelcase'
 import got from 'got'
 

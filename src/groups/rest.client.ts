@@ -66,7 +66,7 @@ export class MambuGroups {
             sortBy?: string
         }
         auth?: string[][] | string[]
-    }) {
+    } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`groups`, {
                 searchParams: query ?? {},
@@ -84,12 +84,21 @@ export class MambuGroups {
     /**
      * Create a new group
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: Group; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: Group
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(Group, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`groups`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -159,12 +168,12 @@ export class MambuGroups {
      * Update an existing group
      */
     public async update({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { groupId: string }
         body: Group
+        path: { groupId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(Group, body)
@@ -205,12 +214,12 @@ export class MambuGroups {
      * Partially update an existing group
      */
     public async patch({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { groupId: string }
         body: PatchRequest
+        path: { groupId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PatchRequest, body)
@@ -233,12 +242,12 @@ export class MambuGroups {
      * Allows you to search groups by various criteria
      */
     public async search({
-        query,
         body,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         body: GroupSearchCriteria
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(GroupSearchCriteria, body)
@@ -272,7 +281,7 @@ export class MambuGroups {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

@@ -40,14 +40,14 @@ export class MambuAccountingRulesConfiguration {
     /**
      * Retrieve accounting rulesconfiguration
      */
-    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/accountingrules.yaml`)
     }
 
     /**
      * Update the current accounting rules configuration
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).put(`configuration/accountingrules.yaml`)
     }
 

@@ -40,14 +40,14 @@ export class MambuEndOfDayProcessingConfiguration {
     /**
      * Retrieve the end of day processing configuration.
      */
-    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).get(`configuration/endofdayprocessing.yaml`)
     }
 
     /**
      * Allows the update of the end of day processing configuration.
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] }) {
+    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.buildClient(auth).put(`configuration/endofdayprocessing.yaml`)
     }
 

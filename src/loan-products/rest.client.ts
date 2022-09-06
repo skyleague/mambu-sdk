@@ -71,12 +71,12 @@ export class MambuLoanProducts {
      * Update an existing loan product
      */
     public async update({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { loanProductId: string }
         body: LoanProduct
+        path: { loanProductId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(LoanProduct, body)
@@ -123,12 +123,12 @@ export class MambuLoanProducts {
      * Partially update an existing loan product
      */
     public async patch({
-        path,
         body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { loanProductId: string }
         body: PatchRequest
+        path: { loanProductId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(PatchRequest, body)
@@ -156,7 +156,7 @@ export class MambuLoanProducts {
     }: {
         query?: { offset?: string; limit?: string; paginationDetails?: string; sortBy?: string }
         auth?: string[][] | string[]
-    }) {
+    } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`loanproducts`, {
                 searchParams: query ?? {},
@@ -174,12 +174,21 @@ export class MambuLoanProducts {
     /**
      * Create a new loan product
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: LoanProduct; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: LoanProduct
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(LoanProduct, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loanproducts`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -205,7 +214,7 @@ export class MambuLoanProducts {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {

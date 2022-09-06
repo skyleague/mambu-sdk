@@ -92,12 +92,21 @@ export class MambuGeneralHolidays {
     /**
      * Creates multiple general holidays
      */
-    public async create({ body, auth = [['apiKey'], ['basic']] }: { body: CreateRequest; auth?: string[][] | string[] }) {
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CreateRequest
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
         this.validateRequestBody(CreateRequest, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`organization/holidays/general`, {
                 json: body,
+                headers: headers ?? {},
                 responseType: 'json',
             }),
             {
@@ -123,7 +132,7 @@ export class MambuGeneralHolidays {
                 ? S
                 : never
             : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S; assert: (o: unknown) => void } ? S : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
         const validator = schemas[result.statusCode]
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {
