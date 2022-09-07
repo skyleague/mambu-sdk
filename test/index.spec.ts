@@ -9,7 +9,7 @@ const prefixUrl = 'http://www.example.com'
 describe('streaming cient', () => {
     afterEach(() => {
         nock.cleanAll()
-        nock.enableNetConnect()
+        nock.disableNetConnect()
     })
 
     const client = new MambuStreaming({
