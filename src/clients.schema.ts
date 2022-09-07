@@ -40,6 +40,11 @@ module.exports = (async () => {
                         }
                     }
                 }
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                if ((api?.components?.schemas?.['RestError'] as any)?.properties?.['errorReason']?.['enum'] !== undefined) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    delete (api?.components?.schemas?.['RestError'] as any)?.properties?.['errorReason']?.['enum']
+                }
 
                 return api
             },

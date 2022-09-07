@@ -41,6 +41,30 @@ export class MambuClientDocuments {
     }
 
     /**
+     * Allows retrieval of a single document metadata via id or encoded key
+     */
+    public async getClientDocumentById({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { documentId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`clients/documents/${path.documentId}/metadata`, {
+                responseType: 'json',
+            }),
+            {
+                200: Document,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Retrieve metadata regarding all documents for a specific client
      */
     public async getDocumentsByClientId({
@@ -59,30 +83,6 @@ export class MambuClientDocuments {
             }),
             {
                 200: GetDocumentsByClientIdResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Allows retrieval of a single document metadata via id or encoded key
-     */
-    public async getClientDocumentById({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { documentId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`clients/documents/${path.documentId}/metadata`, {
-                responseType: 'json',
-            }),
-            {
-                200: Document,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
