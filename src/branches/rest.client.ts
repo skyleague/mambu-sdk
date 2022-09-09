@@ -55,6 +55,7 @@ export class MambuBranches {
         return this.awaitResponse(
             this.buildClient(auth).get(`branches/${path.branchId}`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -80,6 +81,7 @@ export class MambuBranches {
         return this.awaitResponse(
             this.buildClient(auth).get(`branches`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -155,7 +157,7 @@ export class MambuBranches {
     }
 
     protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
-        const auth = (auths ?? [])
+        const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
         for (const chosen of auth[0] ?? []) {

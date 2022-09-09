@@ -46,6 +46,7 @@ export class MambuTasks {
     public async getById({ path, auth = [['apiKey'], ['basic']] }: { path: { taskId: string }; auth?: string[][] | string[] }) {
         return this.awaitResponse(
             this.buildClient(auth).get(`tasks/${path.taskId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -75,6 +76,7 @@ export class MambuTasks {
         return this.awaitResponse(
             this.buildClient(auth).put(`tasks/${path.taskId}`, {
                 json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -154,6 +156,7 @@ export class MambuTasks {
         return this.awaitResponse(
             this.buildClient(auth).get(`tasks`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -182,7 +185,7 @@ export class MambuTasks {
         return this.awaitResponse(
             this.buildClient(auth).post(`tasks`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -263,7 +266,7 @@ export class MambuTasks {
     }
 
     protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
-        const auth = (auths ?? [])
+        const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
         for (const chosen of auth[0] ?? []) {

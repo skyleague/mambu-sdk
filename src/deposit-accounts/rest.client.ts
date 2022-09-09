@@ -102,6 +102,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/templates/${path.templateId}`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -126,6 +127,7 @@ export class MambuDepositAccounts {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/cards`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -188,7 +190,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:startMaturity`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -216,6 +218,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/authorizationholds`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -247,7 +250,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}/authorizationholds`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -272,6 +275,7 @@ export class MambuDepositAccounts {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/funding`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -308,6 +312,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).get(`deposits`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -337,7 +342,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -447,7 +452,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:reopen`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -541,7 +546,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:changeState`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -620,6 +625,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).get(`deposits/${path.depositAccountId}`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -649,6 +655,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).put(`deposits/${path.depositAccountId}`, {
                 json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -727,6 +734,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/blocks`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -758,7 +766,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}/blocks`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -785,6 +793,7 @@ export class MambuDepositAccounts {
             this.buildClient(auth).get(
                 `deposits/${path.depositAccountId}/authorizationholds/${path.authorizationHoldExternalReferenceId}`,
                 {
+                    headers: { Accept: 'application/vnd.mambu.v2+json' },
                     responseType: 'json',
                 }
             ),
@@ -842,6 +851,7 @@ export class MambuDepositAccounts {
             this.buildClient(auth).post(`deposits:search`, {
                 json: body,
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -865,6 +875,7 @@ export class MambuDepositAccounts {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/funding/${path.loanAccountId}/schedule`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -946,7 +957,7 @@ export class MambuDepositAccounts {
     }
 
     protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
-        const auth = (auths ?? [])
+        const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
         for (const chosen of auth[0] ?? []) {

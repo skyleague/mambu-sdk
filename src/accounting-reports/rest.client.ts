@@ -46,6 +46,7 @@ export class MambuAccountingReports {
     public async get({ path, auth = [['apiKey'], ['basic']] }: { path: { reportKey: string }; auth?: string[][] | string[] }) {
         return this.awaitResponse(
             this.buildClient(auth).get(`accounting/reports/${path.reportKey}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -74,7 +75,7 @@ export class MambuAccountingReports {
         return this.awaitResponse(
             this.buildClient(auth).post(`accounting/reports`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -156,7 +157,7 @@ export class MambuAccountingReports {
     }
 
     protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
-        const auth = (auths ?? [])
+        const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
         for (const chosen of auth[0] ?? []) {

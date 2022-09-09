@@ -71,7 +71,7 @@ export class MambuCreditArrangements {
         return this.awaitResponse(
             this.buildClient(auth).post(`creditarrangements/${path.creditArrangementId}:removeAccount`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -97,6 +97,7 @@ export class MambuCreditArrangements {
         return this.awaitResponse(
             this.buildClient(auth).get(`creditarrangements`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -125,7 +126,7 @@ export class MambuCreditArrangements {
         return this.awaitResponse(
             this.buildClient(auth).post(`creditarrangements`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -156,7 +157,7 @@ export class MambuCreditArrangements {
         return this.awaitResponse(
             this.buildClient(auth).post(`creditarrangements/${path.creditArrangementId}:changeState`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -187,6 +188,7 @@ export class MambuCreditArrangements {
             this.buildClient(auth).post(`creditarrangements:search`, {
                 json: body,
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -217,7 +219,7 @@ export class MambuCreditArrangements {
         return this.awaitResponse(
             this.buildClient(auth).post(`creditarrangements/${path.creditArrangementId}:addAccount`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -245,6 +247,7 @@ export class MambuCreditArrangements {
         return this.awaitResponse(
             this.buildClient(auth).get(`creditarrangements/${path.creditArrangementId}/schedule`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -272,6 +275,7 @@ export class MambuCreditArrangements {
         return this.awaitResponse(
             this.buildClient(auth).get(`creditarrangements/${path.creditArrangementId}`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -301,6 +305,7 @@ export class MambuCreditArrangements {
         return this.awaitResponse(
             this.buildClient(auth).put(`creditarrangements/${path.creditArrangementId}`, {
                 json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -376,6 +381,7 @@ export class MambuCreditArrangements {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).get(`creditarrangements/${path.creditArrangementId}/accounts`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -456,7 +462,7 @@ export class MambuCreditArrangements {
     }
 
     protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
-        const auth = (auths ?? [])
+        const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
         for (const chosen of auth[0] ?? []) {

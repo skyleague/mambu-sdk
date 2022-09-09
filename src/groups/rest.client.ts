@@ -70,6 +70,7 @@ export class MambuGroups {
         return this.awaitResponse(
             this.buildClient(auth).get(`groups`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -98,7 +99,7 @@ export class MambuGroups {
         return this.awaitResponse(
             this.buildClient(auth).post(`groups`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -125,6 +126,7 @@ export class MambuGroups {
         return this.awaitResponse(
             this.buildClient(auth).get(`groups/${path.groupId}/creditarrangements`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -152,6 +154,7 @@ export class MambuGroups {
         return this.awaitResponse(
             this.buildClient(auth).get(`groups/${path.groupId}`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -181,6 +184,7 @@ export class MambuGroups {
         return this.awaitResponse(
             this.buildClient(auth).put(`groups/${path.groupId}`, {
                 json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -256,6 +260,7 @@ export class MambuGroups {
             this.buildClient(auth).post(`groups:search`, {
                 json: body,
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -336,7 +341,7 @@ export class MambuGroups {
     }
 
     protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
-        const auth = (auths ?? [])
+        const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
         for (const chosen of auth[0] ?? []) {

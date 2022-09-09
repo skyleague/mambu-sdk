@@ -97,6 +97,7 @@ export class MambuCards {
             this.buildClient(auth).get(
                 `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}`,
                 {
+                    headers: { Accept: 'application/vnd.mambu.v2+json' },
                     responseType: 'json',
                 }
             ),
@@ -148,6 +149,7 @@ export class MambuCards {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).get(`cards/${path.cardReferenceToken}/balanceInquiry`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -212,7 +214,7 @@ export class MambuCards {
         return this.awaitResponse(
             this.buildClient(auth).post(`cards/${path.cardReferenceToken}/financialtransactions`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -278,7 +280,7 @@ export class MambuCards {
         return this.awaitResponse(
             this.buildClient(auth).post(`cards/${path.cardReferenceToken}/authorizationholds`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -360,7 +362,7 @@ export class MambuCards {
     }
 
     protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
-        const auth = (auths ?? [])
+        const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
         for (const chosen of auth[0] ?? []) {
