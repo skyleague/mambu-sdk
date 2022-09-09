@@ -291,7 +291,7 @@ export class MambuStreaming {
     }
 
     protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
-        const auth = (auths ?? [])
+        const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
         for (const chosen of auth[0] ?? []) {

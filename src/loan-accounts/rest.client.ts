@@ -97,6 +97,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans/${path.loanAccountId}/templates/${path.templateId}`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -126,6 +127,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).put(`loans/${path.loanAccountId}/funding`, {
                 json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -157,7 +159,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/funding`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -305,7 +307,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:refinance`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -337,7 +339,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:previewPayOffAmounts`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -369,7 +371,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:reschedule`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -486,7 +488,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/plannedfees:apply`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -547,7 +549,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans:reevaluateCollateral`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -608,6 +610,7 @@ export class MambuLoanAccounts {
             this.buildClient(auth).post(`loans:search`, {
                 json: body,
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -683,6 +686,7 @@ export class MambuLoanAccounts {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans/${path.loanAccountId}/plannedfees`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -711,6 +715,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).put(`loans/${path.loanAccountId}/plannedfees`, {
                 json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -742,7 +747,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/plannedfees`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -801,6 +806,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans/${path.loanAccountId}`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -830,6 +836,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).put(`loans/${path.loanAccountId}`, {
                 json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -908,6 +915,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans/${path.loanAccountId}/authorizationholds`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -932,6 +940,7 @@ export class MambuLoanAccounts {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans/${path.loanAccountId}/cards`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -1062,6 +1071,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -1090,7 +1100,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -1134,6 +1144,38 @@ export class MambuLoanAccounts {
     }
 
     /**
+     * Allows posting an action such as approve/reject/withdraw/close loan account
+     */
+    public async changeState({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: LoanAccountAction
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(LoanAccountAction, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:changeState`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                200: LoanAccount,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Allows to terminate a loan account
      */
     public async terminateLoanAccount({
@@ -1165,38 +1207,6 @@ export class MambuLoanAccounts {
     }
 
     /**
-     * Allows posting an action such as approve/reject/withdraw/close loan account
-     */
-    public async changeState({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: LoanAccountAction
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanAccountAction, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:changeState`, {
-                json: body,
-                headers: headers ?? {},
-                responseType: 'json',
-            }),
-            {
-                200: LoanAccount,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Allows retrieval of a single loan account via id. The result contains details all the previous versions of the particular account if it was refinanced/rescheduled
      */
     public async getByIdWitVersions({
@@ -1211,6 +1221,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans/${path.loanAccountId}:versions`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -1261,6 +1272,7 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans:previewSchedule`, {
                 json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -1358,7 +1370,7 @@ export class MambuLoanAccounts {
     }
 
     protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
-        const auth = (auths ?? [])
+        const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
         for (const chosen of auth[0] ?? []) {

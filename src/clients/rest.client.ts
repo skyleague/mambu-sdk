@@ -64,6 +64,7 @@ export class MambuClients {
         return this.awaitResponse(
             this.buildClient(auth).get(`clients/${path.clientId}`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -93,6 +94,7 @@ export class MambuClients {
         return this.awaitResponse(
             this.buildClient(auth).put(`clients/${path.clientId}`, {
                 json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -177,6 +179,7 @@ export class MambuClients {
         return this.awaitResponse(
             this.buildClient(auth).get(`clients`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -205,7 +208,7 @@ export class MambuClients {
         return this.awaitResponse(
             this.buildClient(auth).post(`clients`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -235,6 +238,7 @@ export class MambuClients {
             this.buildClient(auth).post(`clients:search`, {
                 json: body,
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -258,6 +262,7 @@ export class MambuClients {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).get(`clients/${path.clientId}/role`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -284,6 +289,7 @@ export class MambuClients {
         return this.awaitResponse(
             this.buildClient(auth).get(`clients/${path.clientId}/creditarrangements`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -365,7 +371,7 @@ export class MambuClients {
     }
 
     protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
-        const auth = (auths ?? [])
+        const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
         for (const chosen of auth[0] ?? []) {

@@ -48,6 +48,7 @@ module.exports = (async () => {
 
                 return api
             },
+            explicitContentNegotiation: true,
         })
         const clientName = item.label.replace(/[_\s]/g, '-').toLowerCase()
         node.value.filePath = `${clientName}/rest`

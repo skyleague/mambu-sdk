@@ -55,6 +55,7 @@ export class MambuBackgroundProcess {
         return this.awaitResponse(
             this.buildClient(auth).put(`backgroundprocess/${path.encodedKey}`, {
                 body: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -78,6 +79,7 @@ export class MambuBackgroundProcess {
         return this.awaitResponse(
             this.buildClient(auth).get(`backgroundprocess/latest`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -152,7 +154,7 @@ export class MambuBackgroundProcess {
     }
 
     protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
-        const auth = (auths ?? [])
+        const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
         for (const chosen of auth[0] ?? []) {
