@@ -976,6 +976,33 @@ export const GetAllResponse = {
 } as const
 
 /**
+ * Represents the request payload for the terminate a loan account action
+ */
+export interface TerminateLoanAccountInput {
+    /**
+     * The date when terminate the loan account
+     */
+    valueDate: string
+    /**
+     * The notes for the terminate action performed on the loan account
+     */
+    notes?: string
+}
+
+export const TerminateLoanAccountInput = {
+    validate: require('./schemas/terminate-loan-account-input.schema.js') as ValidateFunction<TerminateLoanAccountInput>,
+    get schema() {
+        return TerminateLoanAccountInput.validate.schema
+    },
+    is: (o: unknown): o is TerminateLoanAccountInput => TerminateLoanAccountInput.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!TerminateLoanAccountInput.validate(o)) {
+            throw new AjvValidator.ValidationError(TerminateLoanAccountInput.validate.errors ?? [])
+        }
+    },
+} as const
+
+/**
  * Allows specifying the action details for a loan account
  */
 export interface LoanAccountAction {
@@ -1008,33 +1035,6 @@ export const LoanAccountAction = {
     assert: (o: unknown) => {
         if (!LoanAccountAction.validate(o)) {
             throw new AjvValidator.ValidationError(LoanAccountAction.validate.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents the request payload for the terminate a loan account action
- */
-export interface TerminateLoanAccountInput {
-    /**
-     * The date when terminate the loan account
-     */
-    valueDate: string
-    /**
-     * The notes for the terminate action performed on the loan account
-     */
-    notes?: string
-}
-
-export const TerminateLoanAccountInput = {
-    validate: require('./schemas/terminate-loan-account-input.schema.js') as ValidateFunction<TerminateLoanAccountInput>,
-    get schema() {
-        return TerminateLoanAccountInput.validate.schema
-    },
-    is: (o: unknown): o is TerminateLoanAccountInput => TerminateLoanAccountInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!TerminateLoanAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(TerminateLoanAccountInput.validate.errors ?? [])
         }
     },
 } as const

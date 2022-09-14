@@ -18,6 +18,7 @@ module.exports = (async () => {
         const openapi = await client.get(item.jsonPath).json<OpenapiV3>()
 
         const node = await $restclient(openapi, {
+            strict: false,
             transformOpenapi: (api: OpenapiV3) => {
                 const securitySchemes = api.components?.securitySchemes
                 const injectApiKey =

@@ -1144,6 +1144,37 @@ export class MambuLoanAccounts {
     }
 
     /**
+     * Allows to terminate a loan account
+     */
+    public async terminateLoanAccount({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: TerminateLoanAccountInput
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(TerminateLoanAccountInput, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:terminate`, {
+                json: body,
+                headers: headers ?? {},
+                responseType: 'json',
+            }),
+            {
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Allows posting an action such as approve/reject/withdraw/close loan account
      */
     public async changeState({
@@ -1167,37 +1198,6 @@ export class MambuLoanAccounts {
             }),
             {
                 200: LoanAccount,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Allows to terminate a loan account
-     */
-    public async terminateLoanAccount({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: TerminateLoanAccountInput
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(TerminateLoanAccountInput, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:terminate`, {
-                json: body,
-                headers: headers ?? {},
-                responseType: 'json',
-            }),
-            {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
