@@ -12,5 +12,8 @@ export const mambuStreaming = got
             apiKeyAuth.name = 'apikey'
         }
         data.security ??= [{ ApiKeyAuth: [] }]
-        return $restclient(data, { preferOperationId: false })
+        return $restclient(data, {
+            strict: false,
+            preferOperationId: false,
+        })
     })

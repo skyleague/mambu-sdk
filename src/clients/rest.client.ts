@@ -251,30 +251,6 @@ export class MambuClients {
     }
 
     /**
-     * Allows to retrieve the client role for a client
-     */
-    public async getRoleByClientId({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { clientId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`clients/${path.clientId}/role`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: ClientRole,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Credit arrangements list retrieved
      */
     public async getCreditArrangementsByClientIdOrKey({
@@ -295,6 +271,30 @@ export class MambuClients {
             {
                 200: GetCreditArrangementsByClientIdOrKeyResponse,
                 400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Allows to retrieve the client role for a client
+     */
+    public async getRoleByClientId({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { clientId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`clients/${path.clientId}/role`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: ClientRole,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
