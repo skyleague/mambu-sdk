@@ -41,7 +41,7 @@ export interface Subscription {
     /**
      * List of cursors to start reading from. This property is required when `read_from` = cursors. The `initial` cursors should cover all partitions of subscription. Clients will get events starting from next offset positions.
      */
-    initial_cursors?: [SubscriptionCursorWithoutToken, ...SubscriptionCursorWithoutToken[]]
+    initial_cursors?: SubscriptionCursorWithoutToken[]
 }
 
 export const Subscription = {
