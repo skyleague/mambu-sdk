@@ -65,7 +65,7 @@ export interface AccountingReportGenerationInput {
      */
     branchId?: string
     /**
-     * The account types to filter GL Accounts by. For Header GL Accounts the report will reflect the sum of Details GL Accounts that match the given filters used
+     * The account types to filter GL Accounts by
      */
     glTypes?: AccountingReportGenerationInputGlTypesArray[]
     /**
@@ -232,11 +232,7 @@ export interface GlAccount {
  */
 export interface Currency {
     /**
-     * Currency code for NON_FIAT currency.
-     */
-    currencyCode?: string
-    /**
-     * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
+     * Code of the currency.
      */
     code?:
         | 'AED'
@@ -427,7 +423,6 @@ export interface Currency {
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
-        | 'NON_FIAT'
 }
 
 export interface RestError {

@@ -97,6 +97,7 @@ export class MambuApiConsumers {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 201: ApiKey,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -154,6 +155,7 @@ export class MambuApiConsumers {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 200: ApiConsumer,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -175,9 +177,11 @@ export class MambuApiConsumers {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).delete(`consumers/${path.apiConsumerId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -205,10 +209,11 @@ export class MambuApiConsumers {
         return this.awaitResponse(
             this.buildClient(auth).patch(`consumers/${path.apiConsumerId}`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -229,9 +234,11 @@ export class MambuApiConsumers {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).delete(`consumers/${path.apiConsumerId}/apikeys/${path.apiKeyId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -286,6 +293,7 @@ export class MambuApiConsumers {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 201: ApiConsumer,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -312,6 +320,7 @@ export class MambuApiConsumers {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 201: SecretKey,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -328,7 +337,7 @@ export class MambuApiConsumers {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`
@@ -337,13 +346,13 @@ export class MambuApiConsumers {
             : never
         type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
-        const validator = schemas[result.statusCode]
+        const validator = schemas[result.statusCode] ?? schemas.default
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {
             return {
                 statusCode: result.statusCode,
                 headers: result.headers,
                 left: result.body,
-                validationErrors: validator?.validate.errors ?? undefined,
+                validationErrors: validator?.validate?.errors ?? undefined,
             } as {
                 statusCode: number
                 headers: IncomingHttpHeaders
@@ -354,7 +363,7 @@ export class MambuApiConsumers {
         return { statusCode: result.statusCode, headers: result.headers, right: result.body } as {
             statusCode: number
             headers: IncomingHttpHeaders
-            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2'>>]>
+            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2' | 'default'>>]>
         }
     }
 

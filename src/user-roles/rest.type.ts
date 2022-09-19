@@ -335,8 +335,6 @@ type Local0 =
     | 'MANAGE_PAYMENTS'
     | 'MANAGE_AUDIT_TRAIL'
     | 'MANAGE_APPS'
-    | 'MANAGE_CARDS_CAPABILITY'
-    | 'MANAGE_NOTIFICATIONS'
     | 'ADMIN'
     | 'CREATE_ROLE'
     | 'EDIT_ROLE'

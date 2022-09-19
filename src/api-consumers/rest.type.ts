@@ -109,7 +109,7 @@ export interface ApiConsumer {
     /**
      * The type of Api Consumer
      */
-    type?: 'STREAMING_API' | 'AUDIT_TRAIL' | 'PAYMENTS' | 'MAMBU_API' | 'CARDS_CAPABILITY' | 'NOTIFICATIONS'
+    type?: 'STREAMING_API' | 'AUDIT_TRAIL' | 'PAYMENTS' | 'MAMBU_API'
     /**
      * Date when the Api Consumer was created, as UTC
      */
@@ -416,12 +416,10 @@ type Local0 =
     | 'MANAGE_EVENTS_STREAMING'
     | 'MANAGE_AUDIT_TRAIL'
     | 'MANAGE_PAYMENTS'
-    | 'MANAGE_CARDS_CAPABILITY'
     | 'CREATE_API_CONSUMERS_AND_KEYS'
     | 'DELETE_API_CONSUMERS_AND_KEYS'
     | 'EDIT_API_CONSUMERS_AND_KEYS'
     | 'VIEW_API_CONSUMERS_AND_KEYS'
-    | 'MANAGE_NOTIFICATIONS'
 
 /**
  * Branch that can be managed by the user or API Consumer

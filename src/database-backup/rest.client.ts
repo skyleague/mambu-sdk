@@ -61,6 +61,7 @@ export class MambuDatabaseBackup {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 202: TriggerDatabaseBackupResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -79,7 +80,12 @@ export class MambuDatabaseBackup {
         path: { databaseBackupVersion: string }
         auth?: string[][] | string[]
     }) {
-        return this.buildClient(auth).get(`database/backup/${path.databaseBackupVersion}`)
+        return this.awaitResponse(this.buildClient(auth).get(`database/backup/${path.databaseBackupVersion}`, {}), {
+            200: { is: (x: unknown): x is string => true },
+            400: { is: (x: unknown): x is string => true },
+            401: { is: (x: unknown): x is string => true },
+            403: { is: (x: unknown): x is string => true },
+        })
     }
 
     public validateRequestBody<T>(schema: { is: (o: unknown) => o is T; assert: (o: unknown) => void }, body: T) {
@@ -89,7 +95,7 @@ export class MambuDatabaseBackup {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`
@@ -98,13 +104,13 @@ export class MambuDatabaseBackup {
             : never
         type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
-        const validator = schemas[result.statusCode]
+        const validator = schemas[result.statusCode] ?? schemas.default
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {
             return {
                 statusCode: result.statusCode,
                 headers: result.headers,
                 left: result.body,
-                validationErrors: validator?.validate.errors ?? undefined,
+                validationErrors: validator?.validate?.errors ?? undefined,
             } as {
                 statusCode: number
                 headers: IncomingHttpHeaders
@@ -115,7 +121,7 @@ export class MambuDatabaseBackup {
         return { statusCode: result.statusCode, headers: result.headers, right: result.body } as {
             statusCode: number
             headers: IncomingHttpHeaders
-            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2'>>]>
+            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2' | 'default'>>]>
         }
     }
 

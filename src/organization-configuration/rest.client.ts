@@ -5,6 +5,8 @@
 /* eslint-disable */
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
+import type { ValidateFunction, ErrorObject } from 'ajv'
+import { IncomingHttpHeaders } from 'http'
 
 export class MambuOrganizationConfiguration {
     public client: Got
@@ -41,21 +43,89 @@ export class MambuOrganizationConfiguration {
      * Allows retrieval of organization configuration details.
      */
     public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
-        return this.buildClient(auth).get(`configuration/organization.yaml`)
+        return this.awaitResponse(
+            this.buildClient(auth).get(`configuration/organization.yaml`, {
+                headers: { Accept: 'application/vnd.mambu.v2+yaml' },
+                responseType: 'text',
+            }),
+            {
+                200: { is: (x: unknown): x is string => true },
+                400: { is: (x: unknown): x is string => true },
+                401: { is: (x: unknown): x is string => true },
+                403: { is: (x: unknown): x is string => true },
+                404: { is: (x: unknown): x is string => true },
+            }
+        )
     }
 
     /**
      * Updates the existing organization configuration.
      */
     public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
-        return this.buildClient(auth).put(`configuration/organization.yaml`)
+        return this.awaitResponse(
+            this.buildClient(auth).put(`configuration/organization.yaml`, {
+                headers: { Accept: 'application/vnd.mambu.v2+yaml' },
+                responseType: 'text',
+            }),
+            {
+                200: { is: (x: unknown): x is string => true },
+                400: { is: (x: unknown): x is string => true },
+                401: { is: (x: unknown): x is string => true },
+                403: { is: (x: unknown): x is string => true },
+                404: { is: (x: unknown): x is string => true },
+            }
+        )
     }
 
     /**
      * Allows retrieval of organization configuration template.
      */
     public async getTemplate({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
-        return this.buildClient(auth).get(`configuration/organization/template.yaml`)
+        return this.awaitResponse(
+            this.buildClient(auth).get(`configuration/organization/template.yaml`, {
+                headers: { Accept: 'application/vnd.mambu.v2+yaml' },
+                responseType: 'text',
+            }),
+            {
+                200: { is: (x: unknown): x is string => true },
+                400: { is: (x: unknown): x is string => true },
+                401: { is: (x: unknown): x is string => true },
+                403: { is: (x: unknown): x is string => true },
+                404: { is: (x: unknown): x is string => true },
+            }
+        )
+    }
+
+    public async awaitResponse<
+        T,
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+    >(response: CancelableRequest<Response<unknown>>, schemas: S) {
+        type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
+            ? `${S}` extends `${T}${infer _X}`
+                ? S
+                : never
+            : never
+        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
+        const result = await response
+        const validator = schemas[result.statusCode] ?? schemas.default
+        if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {
+            return {
+                statusCode: result.statusCode,
+                headers: result.headers,
+                left: result.body,
+                validationErrors: validator?.validate?.errors ?? undefined,
+            } as {
+                statusCode: number
+                headers: IncomingHttpHeaders
+                left: InferSchemaType<S[keyof S]>
+                validationErrors?: ErrorObject[]
+            }
+        }
+        return { statusCode: result.statusCode, headers: result.headers, right: result.body } as {
+            statusCode: number
+            headers: IncomingHttpHeaders
+            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2' | 'default'>>]>
+        }
     }
 
     protected buildBasicClient(client: Got) {
