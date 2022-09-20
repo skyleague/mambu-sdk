@@ -3,7 +3,7 @@ import fs from 'fs'
 
 (() => {
     const directories = fs.readdirSync(`${__dirname}/../src`)
-    const globalExports: string[] = [`export * from './streaming.client'`,`export * as streaming from './streaming.type'`]
+    const globalExports: string[] = [`export * from './streaming'`,`export * as streaming from './base-streaming.type'`]
     for (const dir of directories) {
         if (fs.lstatSync(`${__dirname}/../src/${dir}`).isDirectory()) {
             const files = fs.readdirSync(`${__dirname}/../src/${dir}`)

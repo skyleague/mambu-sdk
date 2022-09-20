@@ -8,16 +8,16 @@ import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import {
-    CreateSubscriptionCursorRequest,
-    CreateSubscriptionCursorResponse200,
+    CommitSubscriptionCursorsRequest,
+    CommitSubscriptionCursorsResponse200,
     DeleteSubscriptionBySubscriptionIdResponse404,
     GetSubscriptionStatsResponse,
     Problem,
     Subscription,
     SubscriptionEventStreamBatch,
-} from './streaming.type'
+} from './base-streaming.type'
 
-export class MambuStreaming {
+export class BaseMambuStreaming {
     public client: Got
 
     public auth: {
@@ -144,16 +144,16 @@ export class MambuStreaming {
      *
      * - When a batch is committed, that also automatically commits all previous batches that were sent in a stream for this partition.
      */
-    public async createSubscriptionCursor({
+    public async commitSubscriptionCursors({
         body,
         path,
         headers,
     }: {
-        body: CreateSubscriptionCursorRequest
+        body: CommitSubscriptionCursorsRequest
         path: { subscriptionId: string }
         headers: { ['X-Mambu-StreamId']: string; apikey?: string }
     }) {
-        this.validateRequestBody(CreateSubscriptionCursorRequest, body)
+        this.validateRequestBody(CommitSubscriptionCursorsRequest, body)
 
         return this.awaitResponse(
             this.buildClient().post(`subscriptions/${path.subscriptionId}/cursors`, {
@@ -162,7 +162,7 @@ export class MambuStreaming {
                 responseType: 'json',
             }),
             {
-                200: CreateSubscriptionCursorResponse200,
+                200: CommitSubscriptionCursorsResponse200,
                 204: { is: (x: unknown): x is unknown => true },
                 403: Problem,
                 404: Problem,
