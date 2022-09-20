@@ -91,6 +91,7 @@ export class MambuUsers {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 200: User,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -106,9 +107,11 @@ export class MambuUsers {
     public async delete({ path, auth = [['apiKey'], ['basic']] }: { path: { userId: string }; auth?: string[][] | string[] }) {
         return this.awaitResponse(
             this.buildClient(auth).delete(`users/${path.userId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -136,10 +139,11 @@ export class MambuUsers {
         return this.awaitResponse(
             this.buildClient(auth).patch(`users/${path.userId}`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -201,6 +205,7 @@ export class MambuUsers {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 201: User,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -216,7 +221,7 @@ export class MambuUsers {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`
@@ -225,13 +230,13 @@ export class MambuUsers {
             : never
         type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
-        const validator = schemas[result.statusCode]
+        const validator = schemas[result.statusCode] ?? schemas.default
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {
             return {
                 statusCode: result.statusCode,
                 headers: result.headers,
                 left: result.body,
-                validationErrors: validator?.validate.errors ?? undefined,
+                validationErrors: validator?.validate?.errors ?? undefined,
             } as {
                 statusCode: number
                 headers: IncomingHttpHeaders
@@ -242,7 +247,7 @@ export class MambuUsers {
         return { statusCode: result.statusCode, headers: result.headers, right: result.body } as {
             statusCode: number
             headers: IncomingHttpHeaders
-            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2'>>]>
+            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2' | 'default'>>]>
         }
     }
 

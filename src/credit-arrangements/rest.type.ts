@@ -804,11 +804,7 @@ export interface Asset {
  */
 export interface Currency {
     /**
-     * Currency code for NON_FIAT currency.
-     */
-    currencyCode?: string
-    /**
-     * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
+     * Code of the currency.
      */
     code?:
         | 'AED'
@@ -999,7 +995,6 @@ export interface Currency {
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
-        | 'NON_FIAT'
 }
 
 /**

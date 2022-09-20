@@ -353,29 +353,6 @@ export const GetAllResponse = {
 } as const
 
 /**
- * Allows to change the withholding tax for a deposit account
- */
-export interface ChangeWithholdingTaxAction {
-    /**
-     * The key of the new withholding tax to be used by the account
-     */
-    withholdingTaxSourceKey: string
-}
-
-export const ChangeWithholdingTaxAction = {
-    validate: require('./schemas/change-withholding-tax-action.schema.js') as ValidateFunction<ChangeWithholdingTaxAction>,
-    get schema() {
-        return ChangeWithholdingTaxAction.validate.schema
-    },
-    is: (o: unknown): o is ChangeWithholdingTaxAction => ChangeWithholdingTaxAction.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ChangeWithholdingTaxAction.validate(o)) {
-            throw new AjvValidator.ValidationError(ChangeWithholdingTaxAction.validate.errors ?? [])
-        }
-    },
-} as const
-
-/**
  * Represents a request for applying the accrued interest
  */
 export interface ApplyInterestInput {
@@ -1559,11 +1536,7 @@ export interface Asset {
  */
 export interface Currency {
     /**
-     * Currency code for NON_FIAT currency.
-     */
-    currencyCode?: string
-    /**
-     * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
+     * Code of the currency.
      */
     code?:
         | 'AED'
@@ -1754,7 +1727,6 @@ export interface Currency {
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
-        | 'NON_FIAT'
 }
 
 /**

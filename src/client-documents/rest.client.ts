@@ -41,31 +41,6 @@ export class MambuClientDocuments {
     }
 
     /**
-     * Allows retrieval of a single document metadata via id or encoded key
-     */
-    public async getClientDocumentById({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { documentId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`clients/documents/${path.documentId}/metadata`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: Document,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Create a new client document
      */
     public async createDocument({
@@ -84,6 +59,31 @@ export class MambuClientDocuments {
             }),
             {
                 201: Document,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Allows retrieval of a single document metadata via id or encoded key
+     */
+    public async getClientDocumentById({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { documentId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`clients/documents/${path.documentId}/metadata`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: Document,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -130,12 +130,18 @@ export class MambuClientDocuments {
         path: { documentId: string }
         auth?: string[][] | string[]
     }) {
-        return this.buildClient(auth).get(`clients/documents/${path.documentId}`)
+        return this.awaitResponse(this.buildClient(auth).get(`clients/documents/${path.documentId}`, {}), {
+            200: { is: (x: unknown): x is string => true },
+            400: { is: (x: unknown): x is string => true },
+            401: { is: (x: unknown): x is string => true },
+            403: { is: (x: unknown): x is string => true },
+            404: { is: (x: unknown): x is string => true },
+        })
     }
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`
@@ -144,13 +150,13 @@ export class MambuClientDocuments {
             : never
         type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
-        const validator = schemas[result.statusCode]
+        const validator = schemas[result.statusCode] ?? schemas.default
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {
             return {
                 statusCode: result.statusCode,
                 headers: result.headers,
                 left: result.body,
-                validationErrors: validator?.validate.errors ?? undefined,
+                validationErrors: validator?.validate?.errors ?? undefined,
             } as {
                 statusCode: number
                 headers: IncomingHttpHeaders
@@ -161,7 +167,7 @@ export class MambuClientDocuments {
         return { statusCode: result.statusCode, headers: result.headers, right: result.body } as {
             statusCode: number
             headers: IncomingHttpHeaders
-            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2'>>]>
+            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2' | 'default'>>]>
         }
     }
 

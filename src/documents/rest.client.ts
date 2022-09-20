@@ -53,6 +53,7 @@ export class MambuDocuments {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 201: Document,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -72,7 +73,13 @@ export class MambuDocuments {
         path: { documentId: string }
         auth?: string[][] | string[]
     }) {
-        return this.buildClient(auth).get(`documents/${path.documentId}`)
+        return this.awaitResponse(this.buildClient(auth).get(`documents/${path.documentId}`, {}), {
+            200: { is: (x: unknown): x is string => true },
+            400: { is: (x: unknown): x is string => true },
+            401: { is: (x: unknown): x is string => true },
+            403: { is: (x: unknown): x is string => true },
+            404: { is: (x: unknown): x is string => true },
+        })
     }
 
     /**
@@ -87,9 +94,11 @@ export class MambuDocuments {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).delete(`documents/${path.documentId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -126,7 +135,7 @@ export class MambuDocuments {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`
@@ -135,13 +144,13 @@ export class MambuDocuments {
             : never
         type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
-        const validator = schemas[result.statusCode]
+        const validator = schemas[result.statusCode] ?? schemas.default
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {
             return {
                 statusCode: result.statusCode,
                 headers: result.headers,
                 left: result.body,
-                validationErrors: validator?.validate.errors ?? undefined,
+                validationErrors: validator?.validate?.errors ?? undefined,
             } as {
                 statusCode: number
                 headers: IncomingHttpHeaders
@@ -152,7 +161,7 @@ export class MambuDocuments {
         return { statusCode: result.statusCode, headers: result.headers, right: result.body } as {
             statusCode: number
             headers: IncomingHttpHeaders
-            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2'>>]>
+            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2' | 'default'>>]>
         }
     }
 

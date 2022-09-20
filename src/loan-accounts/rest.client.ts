@@ -163,6 +163,7 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 201: CreateLoanAccountFundingSourcesResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -184,9 +185,11 @@ export class MambuLoanAccounts {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).delete(`loans/${path.loanAccountId}/funding`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -214,10 +217,12 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:undoWriteOff`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -245,10 +250,12 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:payOff`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -276,10 +283,12 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:changePeriodicPayment`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -311,6 +320,7 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 200: LoanAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -343,6 +353,7 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 200: PreviewPayOffDueAmountsInAFutureDateWrapper,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -375,6 +386,7 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 200: LoanAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -396,9 +408,11 @@ export class MambuLoanAccounts {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).delete(`loans/${path.loanAccountId}/cards/${path.cardReferenceToken}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -426,10 +440,12 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:undoReschedule`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -457,10 +473,12 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:changeArrearsSettings`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -492,6 +510,7 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 201: ApplyPlannedFeesResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -520,10 +539,12 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:changeInterestRate`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -553,6 +574,7 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 202: CollateralAssetsReevaluationResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -580,10 +602,12 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:changeDueDatesSettings`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -635,9 +659,11 @@ export class MambuLoanAccounts {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).delete(`loans/${path.loanAccountId}/funding/${path.fundEncodedKey}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -663,9 +689,11 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).patch(`loans/${path.loanAccountId}/funding/${path.fundEncodedKey}`, {
                 json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -751,6 +779,7 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 201: CreatePlannedFeesResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -779,10 +808,12 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:writeOff`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -861,9 +892,11 @@ export class MambuLoanAccounts {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).delete(`loans/${path.loanAccountId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -889,9 +922,11 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).patch(`loans/${path.loanAccountId}`, {
                 json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -972,10 +1007,12 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/cards`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
+                201: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -1003,10 +1040,12 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:changeRepaymentValue`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -1034,10 +1073,12 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:applyInterest`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -1104,6 +1145,7 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 201: LoanAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -1131,10 +1173,12 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:undoRefinance`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -1162,10 +1206,12 @@ export class MambuLoanAccounts {
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:terminate`, {
                 json: body,
-                headers: headers ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -1197,6 +1243,7 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 200: LoanAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -1246,9 +1293,11 @@ export class MambuLoanAccounts {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).delete(`loans/${path.loanAccountId}/plannedfees/${path.plannedInstallmentFeeKey}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -1296,9 +1345,18 @@ export class MambuLoanAccounts {
         query?: { startDate?: string; endDate?: string }
         auth?: string[][] | string[]
     }) {
-        return this.buildClient(auth).get(`loans/${path.loanAccountId}/templates/${path.templateId}/pdf`, {
-            searchParams: query ?? {},
-        })
+        return this.awaitResponse(
+            this.buildClient(auth).get(`loans/${path.loanAccountId}/templates/${path.templateId}/pdf`, {
+                searchParams: query ?? {},
+            }),
+            {
+                200: { is: (x: unknown): x is string => true },
+                400: { is: (x: unknown): x is string => true },
+                401: { is: (x: unknown): x is string => true },
+                403: { is: (x: unknown): x is string => true },
+                404: { is: (x: unknown): x is string => true },
+            }
+        )
     }
 
     public validateRequestBody<T>(schema: { is: (o: unknown) => o is T; assert: (o: unknown) => void }, body: T) {
@@ -1308,7 +1366,7 @@ export class MambuLoanAccounts {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`
@@ -1317,13 +1375,13 @@ export class MambuLoanAccounts {
             : never
         type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
-        const validator = schemas[result.statusCode]
+        const validator = schemas[result.statusCode] ?? schemas.default
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {
             return {
                 statusCode: result.statusCode,
                 headers: result.headers,
                 left: result.body,
-                validationErrors: validator?.validate.errors ?? undefined,
+                validationErrors: validator?.validate?.errors ?? undefined,
             } as {
                 statusCode: number
                 headers: IncomingHttpHeaders
@@ -1334,7 +1392,7 @@ export class MambuLoanAccounts {
         return { statusCode: result.statusCode, headers: result.headers, right: result.body } as {
             statusCode: number
             headers: IncomingHttpHeaders
-            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2'>>]>
+            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2' | 'default'>>]>
         }
     }
 

@@ -113,9 +113,11 @@ export class MambuClients {
     public async delete({ path, auth = [['apiKey'], ['basic']] }: { path: { clientId: string }; auth?: string[][] | string[] }) {
         return this.awaitResponse(
             this.buildClient(auth).delete(`clients/${path.clientId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -141,9 +143,11 @@ export class MambuClients {
         return this.awaitResponse(
             this.buildClient(auth).patch(`clients/${path.clientId}`, {
                 json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
+                204: { is: (x: unknown): x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -212,6 +216,7 @@ export class MambuClients {
                 responseType: 'json',
             }),
             {
+                102: { is: (x: unknown): x is unknown => true },
                 201: Client,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -251,6 +256,30 @@ export class MambuClients {
     }
 
     /**
+     * Allows to retrieve the client role for a client
+     */
+    public async getRoleByClientId({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { clientId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`clients/${path.clientId}/role`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: ClientRole,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Credit arrangements list retrieved
      */
     public async getCreditArrangementsByClientIdOrKey({
@@ -278,30 +307,6 @@ export class MambuClients {
         )
     }
 
-    /**
-     * Allows to retrieve the client role for a client
-     */
-    public async getRoleByClientId({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { clientId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`clients/${path.clientId}/role`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: ClientRole,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
     public validateRequestBody<T>(schema: { is: (o: unknown) => o is T; assert: (o: unknown) => void }, body: T) {
         schema.assert(body)
         return body
@@ -309,7 +314,7 @@ export class MambuClients {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`
@@ -318,13 +323,13 @@ export class MambuClients {
             : never
         type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
         const result = await response
-        const validator = schemas[result.statusCode]
+        const validator = schemas[result.statusCode] ?? schemas.default
         if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {
             return {
                 statusCode: result.statusCode,
                 headers: result.headers,
                 left: result.body,
-                validationErrors: validator?.validate.errors ?? undefined,
+                validationErrors: validator?.validate?.errors ?? undefined,
             } as {
                 statusCode: number
                 headers: IncomingHttpHeaders
@@ -335,7 +340,7 @@ export class MambuClients {
         return { statusCode: result.statusCode, headers: result.headers, right: result.body } as {
             statusCode: number
             headers: IncomingHttpHeaders
-            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2'>>]>
+            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2' | 'default'>>]>
         }
     }
 
