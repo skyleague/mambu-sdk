@@ -1,5 +1,5 @@
-export * from './streaming.client'
-export * as streaming from './streaming.type'
+export * from './streaming'
+export * as streaming from './base-streaming.type'
 export * from './accounting-interest-accrual'
 export * from './accounting-rates'
 export * from './accounting-reports'

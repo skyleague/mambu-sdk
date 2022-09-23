@@ -112,7 +112,7 @@ export const SubscriptionEventStreamBatch = {
     is: (o: unknown): o is SubscriptionEventStreamBatch => SubscriptionEventStreamBatch.validate(o) === true,
 } as const
 
-interface CreateSubscriptionCursorRequestItemsArray {
+interface CommitSubscriptionCursorsRequestItemsArray {
     /**
      * Id of the partition pointed to by this cursor.
      */
@@ -139,38 +139,38 @@ interface CreateSubscriptionCursorRequestItemsArray {
     cursor_token: string
 }
 
-export interface CreateSubscriptionCursorRequest {
+export interface CommitSubscriptionCursorsRequest {
     /**
      * List of cursors that the consumer acknowledges to have successfully processed.
      */
-    items: [CreateSubscriptionCursorRequestItemsArray, ...CreateSubscriptionCursorRequestItemsArray[]]
+    items: [CommitSubscriptionCursorsRequestItemsArray, ...CommitSubscriptionCursorsRequestItemsArray[]]
 }
 
-export const CreateSubscriptionCursorRequest = {
+export const CommitSubscriptionCursorsRequest = {
     validate:
-        require('./schemas/create-subscription-cursor-request.schema.js') as ValidateFunction<CreateSubscriptionCursorRequest>,
+        require('./schemas/commit-subscription-cursors-request.schema.js') as ValidateFunction<CommitSubscriptionCursorsRequest>,
     get schema() {
-        return CreateSubscriptionCursorRequest.validate.schema
+        return CommitSubscriptionCursorsRequest.validate.schema
     },
-    is: (o: unknown): o is CreateSubscriptionCursorRequest => CreateSubscriptionCursorRequest.validate(o) === true,
+    is: (o: unknown): o is CommitSubscriptionCursorsRequest => CommitSubscriptionCursorsRequest.validate(o) === true,
     assert: (o: unknown) => {
-        if (!CreateSubscriptionCursorRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(CreateSubscriptionCursorRequest.validate.errors ?? [])
+        if (!CommitSubscriptionCursorsRequest.validate(o)) {
+            throw new AjvValidator.ValidationError(CommitSubscriptionCursorsRequest.validate.errors ?? [])
         }
     },
 } as const
 
-export interface CreateSubscriptionCursorResponse200 {
+export interface CommitSubscriptionCursorsResponse200 {
     items: [CursorCommitResult, ...CursorCommitResult[]]
 }
 
-export const CreateSubscriptionCursorResponse200 = {
+export const CommitSubscriptionCursorsResponse200 = {
     validate:
-        require('./schemas/create-subscription-cursor-response200.schema.js') as ValidateFunction<CreateSubscriptionCursorResponse200>,
+        require('./schemas/commit-subscription-cursors-response200.schema.js') as ValidateFunction<CommitSubscriptionCursorsResponse200>,
     get schema() {
-        return CreateSubscriptionCursorResponse200.validate.schema
+        return CommitSubscriptionCursorsResponse200.validate.schema
     },
-    is: (o: unknown): o is CreateSubscriptionCursorResponse200 => CreateSubscriptionCursorResponse200.validate(o) === true,
+    is: (o: unknown): o is CommitSubscriptionCursorsResponse200 => CommitSubscriptionCursorsResponse200.validate(o) === true,
 } as const
 
 export interface DeleteSubscriptionBySubscriptionIdResponse404 {
@@ -213,9 +213,39 @@ export const GetSubscriptionStatsResponse = {
     is: (o: unknown): o is GetSubscriptionStatsResponse => GetSubscriptionStatsResponse.validate(o) === true,
 } as const
 
-export type SubscriptionCursorWithoutToken = unknown
+export interface SubscriptionCursorWithoutToken {
+    /**
+     * Id of the partition pointed to by this cursor.
+     */
+    partition: string
+    /**
+     * Offset of the event being pointed to. Note that if you want to specify beginning position of a stream with first event at offset `N`, you should specify offset `N-1`. This applies in cases when you create new subscription or reset subscription offsets. Also for stream start offsets one can use two special values: - `begin` - read from the oldest available event. - `end` - read from the most recent offset.
+     */
+    offset: string
+    /**
+     * The name of the event type this partition's events belong to.
+     */
+    event_type?: string
+}
 
-export type SubscriptionCursor = unknown
+export interface SubscriptionCursor {
+    /**
+     * Id of the partition pointed to by this cursor.
+     */
+    partition: string
+    /**
+     * Offset of the event being pointed to. Note that if you want to specify beginning position of a stream with first event at offset `N`, you should specify offset `N-1`. This applies in cases when you create new subscription or reset subscription offsets. Also for stream start offsets one can use two special values: - `begin` - read from the oldest available event. - `end` - read from the most recent offset.
+     */
+    offset: string
+    /**
+     * The name of the event type this partition's events belong to.
+     */
+    event_type: string
+    /**
+     * An opaque value defined by the server.
+     */
+    cursor_token: string
+}
 
 /**
  * This object contains general information about the stream. Used only for debugging purposes. We recommend logging this object in order to solve connection issues.
@@ -229,10 +259,7 @@ export type StreamInfo = unknown
  */
 export interface Event {
     metadata: EventMetadata
-    /**
-     * Actual content of the notification.
-     */
-    body: string
+    body: string | unknown
     /**
      * Name of the notification template.
      */
