@@ -1,9 +1,13 @@
 import camelcase from 'camelcase'
-import fs from 'fs'
 
-(() => {
+import fs from 'fs'
+;(() => {
     const directories = fs.readdirSync(`${__dirname}/../src`)
-    const globalExports: string[] = [`export * from './streaming'`,`export * as streaming from './base-streaming.type'`]
+    const globalExports: string[] = [
+        `export * from './pagination'`,
+        `export * from './streaming'`,
+        `export * as streaming from './base-streaming.type'`,
+    ]
     for (const dir of directories) {
         if (fs.lstatSync(`${__dirname}/../src/${dir}`).isDirectory()) {
             const files = fs.readdirSync(`${__dirname}/../src/${dir}`)
@@ -18,12 +22,12 @@ import fs from 'fs'
             }
 
             if (exports.length > 0) {
-                fs.writeFileSync(`${__dirname}/../src/${dir}/index.ts`, [...exports,''].join('\n'))
+                fs.writeFileSync(`${__dirname}/../src/${dir}/index.ts`, [...exports, ''].join('\n'))
                 globalExports.push(`export * from './${dir}'`)
             }
         }
         if (globalExports.length > 0) {
-            fs.writeFileSync(`${__dirname}/../src/index.ts`, [...globalExports,''].join('\n'))
+            fs.writeFileSync(`${__dirname}/../src/index.ts`, [...globalExports, ''].join('\n'))
         }
     }
 })()
