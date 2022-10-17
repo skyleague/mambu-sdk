@@ -3,6 +3,7 @@
   "description": "TypeScript SDK generated from the Mambu API v2 spec.",
   "version": "1.0.0",
   "license": "MIT",
+  "author": "SkyLeague Technologies B.V. <technologies@skyleague.io> (https://skyleague.io)",
   "main": ".main.js",
   "types": "index.d.ts",
   "sideEffects": false,
