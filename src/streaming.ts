@@ -65,7 +65,7 @@ export class MambuStreaming extends BaseMambuStreaming {
             if (SubscriptionEventStreamBatch.is(batch)) {
                 yield { batch: batch, streamId }
             } else {
-                throw new AjvValidator.ValidationError(Subscription.validate.errors ?? [])
+                throw new AjvValidator.ValidationError(SubscriptionEventStreamBatch.validate.errors ?? [])
             }
         }
         await response
