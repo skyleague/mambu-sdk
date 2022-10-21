@@ -1,5 +1,5 @@
 import { BaseMambuStreaming } from './base-streaming.client'
-import { Subscription, SubscriptionEventStreamBatch } from './base-streaming.type'
+import { SubscriptionEventStreamBatch } from './base-streaming.type'
 
 import AjvValidator from 'ajv'
 import split2 from 'split2'
