@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { Document, ErrorResponse, GetDocumentsByClientIdResponse } from './rest.type'
 
+/**
+ * clients/documents
+ */
 export class MambuClientDocuments {
     public client: Got
 
@@ -38,33 +41,6 @@ export class MambuClientDocuments {
         this.auth = auth
         this.availableAuth = new Set(Object.keys(auth))
         this.defaultAuth = defaultAuth
-    }
-
-    /**
-     * Create a new client document
-     */
-    public async createDocument({
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { clientId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).post(`clients/${path.clientId}/documents`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                201: Document,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
     }
 
     /**
@@ -112,6 +88,33 @@ export class MambuClientDocuments {
             }),
             {
                 200: GetDocumentsByClientIdResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Create a new client document
+     */
+    public async createDocument({
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { clientId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).post(`clients/${path.clientId}/documents`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                201: Document,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

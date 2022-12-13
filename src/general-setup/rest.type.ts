@@ -3,6 +3,7 @@
  * Do not manually touch this
  */
 /* eslint-disable */
+import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
 
 type GeneralSetupAssignmentConstraintsArray = 'BRANCH' | 'CENTRE' | 'CREDIT_OFFICER' | 'GROUP'
@@ -170,6 +171,9 @@ export const GeneralSetup = {
     get schema() {
         return GeneralSetup.validate.schema
     },
+    get errors() {
+        return GeneralSetup.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GeneralSetup => GeneralSetup.validate(o) === true,
 } as const
 
@@ -182,7 +186,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**

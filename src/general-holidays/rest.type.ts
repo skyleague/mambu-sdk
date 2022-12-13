@@ -41,6 +41,9 @@ export const Holiday = {
     get schema() {
         return Holiday.validate.schema
     },
+    get errors() {
+        return Holiday.validate.errors ?? undefined
+    },
     is: (o: unknown): o is Holiday => Holiday.validate(o) === true,
 } as const
 
@@ -53,7 +56,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 export type CreateRequest = Holiday[]
@@ -63,10 +74,13 @@ export const CreateRequest = {
     get schema() {
         return CreateRequest.validate.schema
     },
+    get errors() {
+        return CreateRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CreateRequest => CreateRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!CreateRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(CreateRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CreateRequest.errors ?? [])
         }
     },
 } as const
@@ -77,6 +91,9 @@ export const CreateResponse = {
     validate: require('./schemas/create-response.schema.js') as ValidateFunction<CreateResponse>,
     get schema() {
         return CreateResponse.validate.schema
+    },
+    get errors() {
+        return CreateResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is CreateResponse => CreateResponse.validate(o) === true,
 } as const

@@ -6,12 +6,15 @@
 import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
 
-export type GetAllResponse = GlJournalEntry[]
+export type GetAllResponse = GLJournalEntry[]
 
 export const GetAllResponse = {
     validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
@@ -25,13 +28,21 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**
  * The representation of a payload for creating GL Journal Entries
  */
-export interface PostGlJournalEntriesDto {
+export interface PostGLJournalEntriesDTO {
     /**
      * Date/time stamp when the entries were recorded (Booking Date)
      */
@@ -47,36 +58,42 @@ export interface PostGlJournalEntriesDto {
     /**
      * The list of GL Accounts to be credited with the corresponding amounts
      */
-    credits?: GlAccountAmount[]
+    credits?: GLAccountAmount[]
     /**
      * The list of GL Accounts to be debited with the corresponding amounts
      */
-    debits?: GlAccountAmount[]
+    debits?: GLAccountAmount[]
     /**
      * An id for the transaction. Not unique. Will be auto generated if not provided.
      */
     transactionId?: string
 }
 
-export const PostGlJournalEntriesDto = {
-    validate: require('./schemas/post-gl-journal-entries-dto.schema.js') as ValidateFunction<PostGlJournalEntriesDto>,
+export const PostGLJournalEntriesDTO = {
+    validate: require('./schemas/post-gl-journal-entries-dto.schema.js') as ValidateFunction<PostGLJournalEntriesDTO>,
     get schema() {
-        return PostGlJournalEntriesDto.validate.schema
+        return PostGLJournalEntriesDTO.validate.schema
     },
-    is: (o: unknown): o is PostGlJournalEntriesDto => PostGlJournalEntriesDto.validate(o) === true,
+    get errors() {
+        return PostGLJournalEntriesDTO.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PostGLJournalEntriesDTO => PostGLJournalEntriesDTO.validate(o) === true,
     assert: (o: unknown) => {
-        if (!PostGlJournalEntriesDto.validate(o)) {
-            throw new AjvValidator.ValidationError(PostGlJournalEntriesDto.validate.errors ?? [])
+        if (!PostGLJournalEntriesDTO.validate(o)) {
+            throw new AjvValidator.ValidationError(PostGLJournalEntriesDTO.errors ?? [])
         }
     },
 } as const
 
-export type CreateResponse = GlJournalEntry[]
+export type CreateResponse = GLJournalEntry[]
 
 export const CreateResponse = {
     validate: require('./schemas/create-response.schema.js') as ValidateFunction<CreateResponse>,
     get schema() {
         return CreateResponse.validate.schema
+    },
+    get errors() {
+        return CreateResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is CreateResponse => CreateResponse.validate(o) === true,
 } as const
@@ -84,33 +101,39 @@ export const CreateResponse = {
 /**
  * Wrapper that holds a list of filtering criteria and a sorting criteria for GL Journal Entries
  */
-export interface GlJournalEntrySearchCriteria {
-    sortingCriteria?: GlJournalEntrySortingCriteria
+export interface GLJournalEntrySearchCriteria {
+    sortingCriteria?: GLJournalEntrySortingCriteria
     /**
      * The list of filtering criteria
      */
-    filterCriteria?: GlJournalEntryFilterCriteria[]
+    filterCriteria?: GLJournalEntryFilterCriteria[]
 }
 
-export const GlJournalEntrySearchCriteria = {
-    validate: require('./schemas/gl-journal-entry-search-criteria.schema.js') as ValidateFunction<GlJournalEntrySearchCriteria>,
+export const GLJournalEntrySearchCriteria = {
+    validate: require('./schemas/gl-journal-entry-search-criteria.schema.js') as ValidateFunction<GLJournalEntrySearchCriteria>,
     get schema() {
-        return GlJournalEntrySearchCriteria.validate.schema
+        return GLJournalEntrySearchCriteria.validate.schema
     },
-    is: (o: unknown): o is GlJournalEntrySearchCriteria => GlJournalEntrySearchCriteria.validate(o) === true,
+    get errors() {
+        return GLJournalEntrySearchCriteria.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GLJournalEntrySearchCriteria => GLJournalEntrySearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
-        if (!GlJournalEntrySearchCriteria.validate(o)) {
-            throw new AjvValidator.ValidationError(GlJournalEntrySearchCriteria.validate.errors ?? [])
+        if (!GLJournalEntrySearchCriteria.validate(o)) {
+            throw new AjvValidator.ValidationError(GLJournalEntrySearchCriteria.errors ?? [])
         }
     },
 } as const
 
-export type SearchResponse = GlJournalEntry[]
+export type SearchResponse = GLJournalEntry[]
 
 export const SearchResponse = {
     validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
+    },
+    get errors() {
+        return SearchResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
 } as const
@@ -118,7 +141,7 @@ export const SearchResponse = {
 /**
  * The response representation of a GLJournalEntry.
  */
-export interface GlJournalEntry {
+export interface GLJournalEntry {
     /**
      * The amount which was debited or credited in organisation currency
      */
@@ -159,7 +182,7 @@ export interface GlJournalEntry {
      * Account associated with this journal action. Maybe null if just a general journal entry
      */
     accountKey?: string
-    foreignAmount?: GlJournalEntryForeignAmount
+    foreignAmount?: GLJournalEntryForeignAmount
     /**
      * Whether this GL Journal Entry was reversed or not
      */
@@ -172,7 +195,7 @@ export interface GlJournalEntry {
      * Date/time stamp when the GL Journal Entry was recorded
      */
     bookingDate?: string
-    glAccount?: GlAccount
+    glAccount?: GLAccount
     /**
      * Product type (eg: loan or savings) that is referred by the account key. May be null if just a general journal entry
      */
@@ -182,7 +205,7 @@ export interface GlJournalEntry {
 /**
  * Representation of details of GL Journal Entries posted in foreign currency.
  */
-export interface GlJournalEntryForeignAmount {
+export interface GLJournalEntryForeignAmount {
     accountingRate?: AccountingRate
     /**
      * Amount in foreign currency
@@ -226,7 +249,11 @@ export interface AccountingRate {
  */
 export interface Currency {
     /**
-     * Code of the currency.
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
+    /**
+     * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
     code?:
         | 'AED'
@@ -251,7 +278,6 @@ export interface Currency {
         | 'BOV'
         | 'BRL'
         | 'BSD'
-        | 'BTC'
         | 'BTN'
         | 'BWP'
         | 'BYR'
@@ -417,12 +443,13 @@ export interface Currency {
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
+        | 'NON_FIAT'
 }
 
 /**
  * The response representation of a GLAccount.
  */
-export interface GlAccount {
+export interface GLAccount {
     /**
      * The data migration event key if this GL Account was created as a part of a data migration event.
      */
@@ -487,7 +514,7 @@ export interface RestError {
 /**
  * The unit that represents the GL Account and Amount used in a GL Journal Entry record.
  */
-export interface GlAccountAmount {
+export interface GLAccountAmount {
     /**
      * The amount which was debited or credited
      */
@@ -501,7 +528,7 @@ export interface GlAccountAmount {
 /**
  * The sorting criteria used for GL Journal Entries
  */
-export interface GlJournalEntrySortingCriteria {
+export interface GLJournalEntrySortingCriteria {
     /**
      * Contains the field that can be used as sorting selection. Can be native (one from the provided list) or otherwise can specify a custom field using the format [customFieldSetId].[customFieldId].
      */
@@ -532,7 +559,7 @@ export interface GlJournalEntrySortingCriteria {
 /**
  * The unit that composes the list used for GL Journal Entry searching
  */
-export interface GlJournalEntryFilterCriteria {
+export interface GLJournalEntryFilterCriteria {
     /**
      * Contains the actual searching fields that can be native (one from the provided list) or otherwise can specify a custom field using the format [customFieldSetId].[customFieldId].
      */

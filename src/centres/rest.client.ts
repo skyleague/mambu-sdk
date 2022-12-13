@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { Centre, ErrorResponse, GetAllResponse } from './rest.type'
 
+/**
+ * centres
+ */
 export class MambuCentres {
     public client: Got
 

@@ -17,6 +17,9 @@ import {
     SearchResponse,
 } from './rest.type'
 
+/**
+ * groups
+ */
 export class MambuGroups {
     public client: Got
 

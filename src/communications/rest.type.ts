@@ -190,10 +190,13 @@ export const CommunicationMessage = {
     get schema() {
         return CommunicationMessage.validate.schema
     },
+    get errors() {
+        return CommunicationMessage.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CommunicationMessage => CommunicationMessage.validate(o) === true,
     assert: (o: unknown) => {
         if (!CommunicationMessage.validate(o)) {
-            throw new AjvValidator.ValidationError(CommunicationMessage.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CommunicationMessage.errors ?? [])
         }
     },
 } as const
@@ -207,7 +210,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 type CommunicationMessageEnqueueActionTemplateTypesArray = 'EMAIL' | 'SMS' | 'WEB_HOOK' | 'EVENT_STREAM' | 'TASK'
@@ -236,10 +247,13 @@ export const CommunicationMessageEnqueueAction = {
     get schema() {
         return CommunicationMessageEnqueueAction.validate.schema
     },
+    get errors() {
+        return CommunicationMessageEnqueueAction.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CommunicationMessageEnqueueAction => CommunicationMessageEnqueueAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!CommunicationMessageEnqueueAction.validate(o)) {
-            throw new AjvValidator.ValidationError(CommunicationMessageEnqueueAction.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CommunicationMessageEnqueueAction.errors ?? [])
         }
     },
 } as const
@@ -251,10 +265,13 @@ export const SearchRequest = {
     get schema() {
         return SearchRequest.validate.schema
     },
+    get errors() {
+        return SearchRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is SearchRequest => SearchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!SearchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(SearchRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(SearchRequest.errors ?? [])
         }
     },
 } as const
@@ -265,6 +282,9 @@ export const SearchResponse = {
     validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
+    },
+    get errors() {
+        return SearchResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
 } as const
@@ -284,10 +304,13 @@ export const CommunicationMessageAction = {
     get schema() {
         return CommunicationMessageAction.validate.schema
     },
+    get errors() {
+        return CommunicationMessageAction.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CommunicationMessageAction => CommunicationMessageAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!CommunicationMessageAction.validate(o)) {
-            throw new AjvValidator.ValidationError(CommunicationMessageAction.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CommunicationMessageAction.errors ?? [])
         }
     },
 } as const

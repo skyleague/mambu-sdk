@@ -8,11 +8,12 @@ import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import {
+    AccountAuthorizationHold,
     ApplyInterestInput,
-    AuthorizationHold,
     BlockFund,
     Card,
     ChangeInterestRateAction,
+    ChangeWithholdingTaxAction,
     DepositAccount,
     DepositAccountAction,
     DepositAccountSearchCriteria,
@@ -23,6 +24,7 @@ import {
     GetAllResponse,
     GetDepositAccountDocumentResponse,
     GetFundedLoansResponse,
+    GetWithholdingTaxHistoryResponse,
     LoanAccountSchedule,
     PatchBlockFundRequest,
     PatchRequest,
@@ -32,6 +34,9 @@ import {
     UndoMaturityAction,
 } from './rest.type'
 
+/**
+ * deposits
+ */
 export class MambuDepositAccounts {
     public client: Got
 
@@ -80,6 +85,34 @@ export class MambuDepositAccounts {
             }),
             {
                 204: { is: (x: unknown): x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Retrieves the withholding taxes related to a deposit account
+     */
+    public async getWithholdingTaxHistory({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { depositAccountId: string }
+        query?: { from?: string; to?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`deposits/${path.depositAccountId}/withholdingtaxes`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetWithholdingTaxHistoryResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -170,6 +203,7 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -203,6 +237,7 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -244,12 +279,12 @@ export class MambuDepositAccounts {
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: AuthorizationHold
+        body: AccountAuthorizationHold
         path: { depositAccountId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(AuthorizationHold, body)
+        this.validateRequestBody(AccountAuthorizationHold, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}/authorizationholds`, {
@@ -259,11 +294,12 @@ export class MambuDepositAccounts {
             }),
             {
                 102: { is: (x: unknown): x is unknown => true },
-                201: AuthorizationHold,
+                201: AccountAuthorizationHold,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -356,6 +392,40 @@ export class MambuDepositAccounts {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+                409: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Allows to change the withholding tax for a deposit account
+     */
+    public async changeWithholdingTax({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: ChangeWithholdingTaxAction
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(ChangeWithholdingTaxAction, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`deposits/${path.depositAccountId}:changeWithholdingTax`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (x: unknown): x is unknown => true },
+                204: { is: (x: unknown): x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }
@@ -415,6 +485,7 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -448,6 +519,7 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -514,6 +586,7 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -547,6 +620,7 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -572,6 +646,7 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -602,6 +677,7 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -685,6 +761,7 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -715,6 +792,7 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -776,6 +854,7 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -799,7 +878,7 @@ export class MambuDepositAccounts {
                 }
             ),
             {
-                200: AuthorizationHold,
+                200: AccountAuthorizationHold,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -832,6 +911,7 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }

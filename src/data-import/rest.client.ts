@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { DataImportAction, DataImportResponse, DataImportStatus, ErrorResponse } from './rest.type'
 
+/**
+ * data/import
+ */
 export class MambuDataImport {
     public client: Got
 

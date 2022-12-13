@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { Document, ErrorResponse, GetDocumentsByEntityIdResponse } from './rest.type'
 
+/**
+ * documents
+ */
 export class MambuDocuments {
     public client: Got
 
@@ -64,7 +67,7 @@ export class MambuDocuments {
     }
 
     /**
-     * Allows downloading a document via id or encoded key
+     * Allows downloading a document via id or encoded key.
      */
     public async downloadDocumentById({
         path,
@@ -83,7 +86,7 @@ export class MambuDocuments {
     }
 
     /**
-     * Allows deleting document via id or encoded key
+     * Allows deleting document via id or encoded key.
      */
     public async deleteDocumentById({
         path,

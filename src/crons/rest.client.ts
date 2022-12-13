@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { ErrorResponse, TriggerHourlyAndEndOfDayProcessingResponse } from './rest.type'
 
+/**
+ * crons/eod
+ */
 export class MambuCrons {
     public client: Got
 

@@ -3,6 +3,7 @@
  * Do not manually touch this
  */
 /* eslint-disable */
+import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
 
 /**
@@ -73,6 +74,9 @@ export const CustomFieldMeta = {
     get schema() {
         return CustomFieldMeta.validate.schema
     },
+    get errors() {
+        return CustomFieldMeta.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CustomFieldMeta => CustomFieldMeta.validate(o) === true,
 } as const
 
@@ -85,7 +89,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**

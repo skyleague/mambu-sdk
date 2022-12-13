@@ -3,6 +3,7 @@
  * Do not manually touch this
  */
 /* eslint-disable */
+import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
 
 /**
@@ -50,7 +51,15 @@ export const BackgroundProcess = {
     get schema() {
         return BackgroundProcess.validate.schema
     },
+    get errors() {
+        return BackgroundProcess.validate.errors ?? undefined
+    },
     is: (o: unknown): o is BackgroundProcess => BackgroundProcess.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!BackgroundProcess.validate(o)) {
+            throw new AjvValidator.ValidationError(BackgroundProcess.errors ?? [])
+        }
+    },
 } as const
 
 export interface ErrorResponse {
@@ -62,7 +71,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 export interface RestError {

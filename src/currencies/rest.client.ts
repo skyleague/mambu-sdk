@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { CurrencyDetails, ErrorResponse, GetAllResponse } from './rest.type'
 
+/**
+ * currencies
+ */
 export class MambuCurrencies {
     public client: Got
 

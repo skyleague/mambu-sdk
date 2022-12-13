@@ -51,6 +51,9 @@ import {
     UpdatePlannedFeesResponse,
 } from './rest.type'
 
+/**
+ * loans
+ */
 export class MambuLoanAccounts {
     public client: Got
 

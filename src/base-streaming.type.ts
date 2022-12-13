@@ -49,10 +49,13 @@ export const Subscription = {
     get schema() {
         return Subscription.validate.schema
     },
+    get errors() {
+        return Subscription.validate.errors ?? undefined
+    },
     is: (o: unknown): o is Subscription => Subscription.validate(o) === true,
     assert: (o: unknown) => {
         if (!Subscription.validate(o)) {
-            throw new AjvValidator.ValidationError(Subscription.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(Subscription.errors ?? [])
         }
     },
 } as const
@@ -85,7 +88,15 @@ export const Problem = {
     get schema() {
         return Problem.validate.schema
     },
+    get errors() {
+        return Problem.validate.errors ?? undefined
+    },
     is: (o: unknown): o is Problem => Problem.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!Problem.validate(o)) {
+            throw new AjvValidator.ValidationError(Problem.errors ?? [])
+        }
+    },
 } as const
 
 /**
@@ -108,6 +119,9 @@ export const SubscriptionEventStreamBatch = {
     validate: require('./schemas/subscription-event-stream-batch.schema.js') as ValidateFunction<SubscriptionEventStreamBatch>,
     get schema() {
         return SubscriptionEventStreamBatch.validate.schema
+    },
+    get errors() {
+        return SubscriptionEventStreamBatch.validate.errors ?? undefined
     },
     is: (o: unknown): o is SubscriptionEventStreamBatch => SubscriptionEventStreamBatch.validate(o) === true,
 } as const
@@ -152,10 +166,13 @@ export const CommitSubscriptionCursorsRequest = {
     get schema() {
         return CommitSubscriptionCursorsRequest.validate.schema
     },
+    get errors() {
+        return CommitSubscriptionCursorsRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CommitSubscriptionCursorsRequest => CommitSubscriptionCursorsRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!CommitSubscriptionCursorsRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(CommitSubscriptionCursorsRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CommitSubscriptionCursorsRequest.errors ?? [])
         }
     },
 } as const
@@ -169,6 +186,9 @@ export const CommitSubscriptionCursorsResponse200 = {
         require('./schemas/commit-subscription-cursors-response200.schema.js') as ValidateFunction<CommitSubscriptionCursorsResponse200>,
     get schema() {
         return CommitSubscriptionCursorsResponse200.validate.schema
+    },
+    get errors() {
+        return CommitSubscriptionCursorsResponse200.validate.errors ?? undefined
     },
     is: (o: unknown): o is CommitSubscriptionCursorsResponse200 => CommitSubscriptionCursorsResponse200.validate(o) === true,
 } as const
@@ -194,6 +214,9 @@ export const DeleteSubscriptionBySubscriptionIdResponse404 = {
     get schema() {
         return DeleteSubscriptionBySubscriptionIdResponse404.validate.schema
     },
+    get errors() {
+        return DeleteSubscriptionBySubscriptionIdResponse404.validate.errors ?? undefined
+    },
     is: (o: unknown): o is DeleteSubscriptionBySubscriptionIdResponse404 =>
         DeleteSubscriptionBySubscriptionIdResponse404.validate(o) === true,
 } as const
@@ -209,6 +232,9 @@ export const GetSubscriptionStatsResponse = {
     validate: require('./schemas/get-subscription-stats-response.schema.js') as ValidateFunction<GetSubscriptionStatsResponse>,
     get schema() {
         return GetSubscriptionStatsResponse.validate.schema
+    },
+    get errors() {
+        return GetSubscriptionStatsResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetSubscriptionStatsResponse => GetSubscriptionStatsResponse.validate(o) === true,
 } as const
@@ -252,14 +278,20 @@ export interface SubscriptionCursor {
  *
  * Clients should not parse this structure.
  */
-export type StreamInfo = unknown
+export interface StreamInfo {
+    [k: string]: unknown | undefined
+}
 
 /**
  * Payload of an Event. Usually represents a status transition in a Business process.
  */
 export interface Event {
     metadata: EventMetadata
-    body: string | unknown
+    body:
+        | string
+        | {
+              [k: string]: unknown | undefined
+          }
     /**
      * Name of the notification template.
      */

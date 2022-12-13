@@ -21,10 +21,13 @@ export const DepositProductAction = {
     get schema() {
         return DepositProductAction.validate.schema
     },
+    get errors() {
+        return DepositProductAction.validate.errors ?? undefined
+    },
     is: (o: unknown): o is DepositProductAction => DepositProductAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!DepositProductAction.validate(o)) {
-            throw new AjvValidator.ValidationError(DepositProductAction.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(DepositProductAction.errors ?? [])
         }
     },
 } as const
@@ -44,6 +47,9 @@ export const DepositProductActionResponse = {
     get schema() {
         return DepositProductActionResponse.validate.schema
     },
+    get errors() {
+        return DepositProductActionResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is DepositProductActionResponse => DepositProductActionResponse.validate(o) === true,
 } as const
 
@@ -56,7 +62,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 export type GetAllResponse = DepositProduct[]
@@ -65,6 +79,9 @@ export const GetAllResponse = {
     validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
@@ -139,10 +156,13 @@ export const DepositProduct = {
     get schema() {
         return DepositProduct.validate.schema
     },
+    get errors() {
+        return DepositProduct.validate.errors ?? undefined
+    },
     is: (o: unknown): o is DepositProduct => DepositProduct.validate(o) === true,
     assert: (o: unknown) => {
         if (!DepositProduct.validate(o)) {
-            throw new AjvValidator.ValidationError(DepositProduct.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(DepositProduct.errors ?? [])
         }
     },
 } as const
@@ -154,10 +174,13 @@ export const PatchRequest = {
     get schema() {
         return PatchRequest.validate.schema
     },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
@@ -222,26 +245,11 @@ export interface DepositProductPredefinedFee {
     /**
      * The amount from which the fee is calculated using percentageAmount
      */
-    amountCalculationMethod?:
-        | 'FLAT'
-        | 'LOAN_AMOUNT_PERCENTAGE'
-        | 'REPAYMENT_PRINCIPAL_AMOUNT_PERCENTAGE'
-        | 'LOAN_AMOUNT_PERCENTAGE_NUMBER_OF_INSTALLMENTS'
-        | 'FLAT_NUMBER_OF_INSTALLMENTS'
+    amountCalculationMethod?: 'FLAT'
     /**
      * Shows the event that will trigger a fee
      */
-    trigger:
-        | 'MANUAL'
-        | 'MANUAL_PLANNED'
-        | 'DISBURSEMENT'
-        | 'CAPITALIZED_DISBURSEMENT'
-        | 'UPFRONT_DISBURSEMENT'
-        | 'LATE_REPAYMENT'
-        | 'MONTHLY_FEE'
-        | 'PAYMENT_DUE'
-        | 'PAYMENT_DUE_APPLIED_ON_DUE_DATES'
-        | 'ARBITRARY'
+    trigger: 'MANUAL' | 'MONTHLY_FEE' | 'ARBITRARY'
     /**
      * Shows the creation date of the fee
      */
@@ -249,7 +257,7 @@ export interface DepositProductPredefinedFee {
     /**
      * A list of accounting rules defined for this fee. If null, product default rules are selected.
      */
-    accountingRules?: DepositGlAccountingRule[]
+    accountingRules?: DepositGLAccountingRule[]
     /**
      * The name of the fee
      */
@@ -279,7 +287,7 @@ export interface DepositProductPredefinedFee {
 /**
  * The GL accounting rule, it maps a financial resource with a GL account for a specific product (i.e loan or saving).
  */
-export interface DepositGlAccountingRule {
+export interface DepositGLAccountingRule {
     /**
      * The encoded key of the accounting rule, auto generated, unique.
      */
@@ -392,7 +400,11 @@ export interface DepositProductCurrencySettings {
  */
 export interface Currency {
     /**
-     * Code of the currency.
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
+    /**
+     * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
     code?:
         | 'AED'
@@ -417,7 +429,6 @@ export interface Currency {
         | 'BOV'
         | 'BRL'
         | 'BSD'
-        | 'BTC'
         | 'BTN'
         | 'BWP'
         | 'BYR'
@@ -583,6 +594,7 @@ export interface Currency {
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
+        | 'NON_FIAT'
 }
 
 /**
@@ -796,7 +808,7 @@ export interface DepositProductAccountingSettings {
     /**
      * A list of accounting rules for the product.
      */
-    accountingRules?: DepositGlAccountingRule[]
+    accountingRules?: DepositGLAccountingRule[]
     /**
      * A list of accounting rules for the product.
      */
@@ -949,5 +961,7 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: unknown
+    value?: {
+        [k: string]: unknown | undefined
+    }
 }

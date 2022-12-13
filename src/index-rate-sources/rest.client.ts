@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { ErrorResponse, GetAll1Response, GetAllResponse, IndexRate, IndexRateSource } from './rest.type'
 
+/**
+ * indexratesources
+ */
 export class MambuIndexRateSources {
     public client: Got
 

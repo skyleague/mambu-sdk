@@ -13,6 +13,9 @@ export const GetAllResponse = {
     get schema() {
         return GetAllResponse.validate.schema
     },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
@@ -25,7 +28,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**
@@ -75,10 +86,13 @@ export const CurrencyDetails = {
     get schema() {
         return CurrencyDetails.validate.schema
     },
+    get errors() {
+        return CurrencyDetails.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CurrencyDetails => CurrencyDetails.validate(o) === true,
     assert: (o: unknown) => {
         if (!CurrencyDetails.validate(o)) {
-            throw new AjvValidator.ValidationError(CurrencyDetails.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CurrencyDetails.errors ?? [])
         }
     },
 } as const

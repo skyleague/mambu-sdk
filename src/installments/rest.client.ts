@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { ErrorResponse, GetAllResponse } from './rest.type'
 
+/**
+ * installments
+ */
 export class MambuInstallments {
     public client: Got
 

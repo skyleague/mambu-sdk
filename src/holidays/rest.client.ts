@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { ErrorResponse, Holidays } from './rest.type'
 
+/**
+ * organization/holidays
+ */
 export class MambuHolidays {
     public client: Got
 

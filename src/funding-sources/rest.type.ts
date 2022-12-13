@@ -21,10 +21,13 @@ export const SellFundingSourceAction = {
     get schema() {
         return SellFundingSourceAction.validate.schema
     },
+    get errors() {
+        return SellFundingSourceAction.validate.errors ?? undefined
+    },
     is: (o: unknown): o is SellFundingSourceAction => SellFundingSourceAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!SellFundingSourceAction.validate(o)) {
-            throw new AjvValidator.ValidationError(SellFundingSourceAction.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(SellFundingSourceAction.errors ?? [])
         }
     },
 } as const
@@ -35,6 +38,9 @@ export const SellResponse = {
     validate: require('./schemas/sell-response.schema.js') as ValidateFunction<SellResponse>,
     get schema() {
         return SellResponse.validate.schema
+    },
+    get errors() {
+        return SellResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is SellResponse => SellResponse.validate(o) === true,
 } as const
@@ -48,7 +54,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**
@@ -81,7 +95,7 @@ export interface DepositTransaction {
     /**
      * All the amounts that have been applied or paid within this transaction and involved predefined fees
      */
-    fees?: Fee[]
+    fees?: DepositFee[]
     /**
      * Extra notes about this deposit transaction
      */
@@ -222,7 +236,7 @@ export interface TransactionDetails {
 /**
  * An amount of predefined fee that was applied or paid on an account.
  */
-export interface Fee {
+export interface DepositFee {
     /**
      * The name of the predefined fee
      */
@@ -234,17 +248,7 @@ export interface Fee {
     /**
      * Shows the event that will trigger a fee
      */
-    trigger?:
-        | 'MANUAL'
-        | 'MANUAL_PLANNED'
-        | 'DISBURSEMENT'
-        | 'CAPITALIZED_DISBURSEMENT'
-        | 'UPFRONT_DISBURSEMENT'
-        | 'LATE_REPAYMENT'
-        | 'MONTHLY_FEE'
-        | 'PAYMENT_DUE'
-        | 'PAYMENT_DUE_APPLIED_ON_DUE_DATES'
-        | 'ARBITRARY'
+    trigger?: 'MANUAL' | 'MONTHLY_FEE' | 'ARBITRARY'
     /**
      * The amount of the taxes on fee that was applied/paid in the transaction.
      */

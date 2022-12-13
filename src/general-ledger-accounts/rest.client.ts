@@ -7,8 +7,11 @@ import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
-import { CreateRequest, CreateResponse, ErrorResponse, GetAllResponse, GlAccount, PatchRequest } from './rest.type'
+import { CreateRequest, CreateResponse, ErrorResponse, GLAccount, GetAllResponse, PatchRequest } from './rest.type'
 
+/**
+ * glaccounts
+ */
 export class MambuGeneralLedgerAccounts {
     public client: Got
 
@@ -59,7 +62,7 @@ export class MambuGeneralLedgerAccounts {
                 responseType: 'json',
             }),
             {
-                200: GlAccount,
+                200: GLAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

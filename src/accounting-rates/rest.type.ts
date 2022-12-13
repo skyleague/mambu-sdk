@@ -13,6 +13,9 @@ export const GetAllResponse = {
     get schema() {
         return GetAllResponse.validate.schema
     },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
@@ -25,13 +28,21 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**
  * The representation of a payload for creating Accounting Rate
  */
-export interface PostAccountingRateDto {
+export interface PostAccountingRateDTO {
     /**
      * Value of conversions rate used in accounting to convert amounts from one currency to organisation currency
      */
@@ -42,15 +53,18 @@ export interface PostAccountingRateDto {
     startDate?: string
 }
 
-export const PostAccountingRateDto = {
-    validate: require('./schemas/post-accounting-rate-dto.schema.js') as ValidateFunction<PostAccountingRateDto>,
+export const PostAccountingRateDTO = {
+    validate: require('./schemas/post-accounting-rate-dto.schema.js') as ValidateFunction<PostAccountingRateDTO>,
     get schema() {
-        return PostAccountingRateDto.validate.schema
+        return PostAccountingRateDTO.validate.schema
     },
-    is: (o: unknown): o is PostAccountingRateDto => PostAccountingRateDto.validate(o) === true,
+    get errors() {
+        return PostAccountingRateDTO.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PostAccountingRateDTO => PostAccountingRateDTO.validate(o) === true,
     assert: (o: unknown) => {
-        if (!PostAccountingRateDto.validate(o)) {
-            throw new AjvValidator.ValidationError(PostAccountingRateDto.validate.errors ?? [])
+        if (!PostAccountingRateDTO.validate(o)) {
+            throw new AjvValidator.ValidationError(PostAccountingRateDTO.errors ?? [])
         }
     },
 } as const
@@ -89,6 +103,9 @@ export const AccountingRate = {
     validate: require('./schemas/accounting-rate.schema.js') as ValidateFunction<AccountingRate>,
     get schema() {
         return AccountingRate.validate.schema
+    },
+    get errors() {
+        return AccountingRate.validate.errors ?? undefined
     },
     is: (o: unknown): o is AccountingRate => AccountingRate.validate(o) === true,
 } as const

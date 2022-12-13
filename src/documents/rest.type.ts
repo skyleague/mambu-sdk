@@ -3,6 +3,7 @@
  * Do not manually touch this
  */
 /* eslint-disable */
+import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
 
 /**
@@ -76,6 +77,9 @@ export const Document = {
     get schema() {
         return Document.validate.schema
     },
+    get errors() {
+        return Document.validate.errors ?? undefined
+    },
     is: (o: unknown): o is Document => Document.validate(o) === true,
 } as const
 
@@ -88,7 +92,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 export type GetDocumentsByEntityIdResponse = Document[]
@@ -98,6 +110,9 @@ export const GetDocumentsByEntityIdResponse = {
         require('./schemas/get-documents-by-entity-id-response.schema.js') as ValidateFunction<GetDocumentsByEntityIdResponse>,
     get schema() {
         return GetDocumentsByEntityIdResponse.validate.schema
+    },
+    get errors() {
+        return GetDocumentsByEntityIdResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetDocumentsByEntityIdResponse => GetDocumentsByEntityIdResponse.validate(o) === true,
 } as const

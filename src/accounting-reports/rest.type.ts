@@ -39,6 +39,9 @@ export const AccountingReport = {
     get schema() {
         return AccountingReport.validate.schema
     },
+    get errors() {
+        return AccountingReport.validate.errors ?? undefined
+    },
     is: (o: unknown): o is AccountingReport => AccountingReport.validate(o) === true,
 } as const
 
@@ -51,7 +54,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 type AccountingReportGenerationInputGlTypesArray = 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE'
@@ -65,7 +76,7 @@ export interface AccountingReportGenerationInput {
      */
     branchId?: string
     /**
-     * The account types to filter GL Accounts by
+     * The account types to filter GL Accounts by. For Header GL Accounts the report will reflect the sum of Details GL Accounts that match the given filters used
      */
     glTypes?: AccountingReportGenerationInputGlTypesArray[]
     /**
@@ -92,10 +103,13 @@ export const AccountingReportGenerationInput = {
     get schema() {
         return AccountingReportGenerationInput.validate.schema
     },
+    get errors() {
+        return AccountingReportGenerationInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is AccountingReportGenerationInput => AccountingReportGenerationInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!AccountingReportGenerationInput.validate(o)) {
-            throw new AjvValidator.ValidationError(AccountingReportGenerationInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(AccountingReportGenerationInput.errors ?? [])
         }
     },
 } as const
@@ -130,6 +144,9 @@ export const AccountingReportGenerationResponse = {
     get schema() {
         return AccountingReportGenerationResponse.validate.schema
     },
+    get errors() {
+        return AccountingReportGenerationResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is AccountingReportGenerationResponse => AccountingReportGenerationResponse.validate(o) === true,
 } as const
 
@@ -138,7 +155,7 @@ export const AccountingReportGenerationResponse = {
  */
 export interface AccountingReportItem {
     foreignAmounts?: AccountingReportAmounts
-    glAccount?: GlAccount
+    glAccount?: GLAccount
     amounts?: AccountingReportAmounts
 }
 
@@ -171,7 +188,7 @@ export interface AccountingReportAmounts {
 /**
  * The response representation of a GLAccount.
  */
-export interface GlAccount {
+export interface GLAccount {
     /**
      * The data migration event key if this GL Account was created as a part of a data migration event.
      */
@@ -232,7 +249,11 @@ export interface GlAccount {
  */
 export interface Currency {
     /**
-     * Code of the currency.
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
+    /**
+     * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
     code?:
         | 'AED'
@@ -257,7 +278,6 @@ export interface Currency {
         | 'BOV'
         | 'BRL'
         | 'BSD'
-        | 'BTC'
         | 'BTN'
         | 'BWP'
         | 'BYR'
@@ -423,6 +443,7 @@ export interface Currency {
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
+        | 'NON_FIAT'
 }
 
 export interface RestError {

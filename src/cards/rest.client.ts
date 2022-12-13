@@ -18,6 +18,9 @@ import {
     GetAuthorizationHold,
 } from './rest.type'
 
+/**
+ * cards
+ */
 export class MambuCards {
     public client: Got
 
@@ -81,6 +84,7 @@ export class MambuCards {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -137,6 +141,7 @@ export class MambuCards {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -197,6 +202,7 @@ export class MambuCards {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -230,6 +236,7 @@ export class MambuCards {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -266,6 +273,7 @@ export class MambuCards {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -299,6 +307,7 @@ export class MambuCards {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }

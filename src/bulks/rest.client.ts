@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { BulkProcessStatus, ErrorResponse } from './rest.type'
 
+/**
+ * bulks
+ */
 export class MambuBulks {
     public client: Got
 

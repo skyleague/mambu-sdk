@@ -3,6 +3,7 @@
  * Do not manually touch this
  */
 /* eslint-disable */
+import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
 
 /**
@@ -38,6 +39,9 @@ export const BulkProcessStatus = {
     get schema() {
         return BulkProcessStatus.validate.schema
     },
+    get errors() {
+        return BulkProcessStatus.validate.errors ?? undefined
+    },
     is: (o: unknown): o is BulkProcessStatus => BulkProcessStatus.validate(o) === true,
 } as const
 
@@ -50,7 +54,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**

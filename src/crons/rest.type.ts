@@ -3,6 +3,7 @@
  * Do not manually touch this
  */
 /* eslint-disable */
+import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
 
 /**
@@ -31,6 +32,9 @@ export const TriggerHourlyAndEndOfDayProcessingResponse = {
     get schema() {
         return TriggerHourlyAndEndOfDayProcessingResponse.validate.schema
     },
+    get errors() {
+        return TriggerHourlyAndEndOfDayProcessingResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is TriggerHourlyAndEndOfDayProcessingResponse =>
         TriggerHourlyAndEndOfDayProcessingResponse.validate(o) === true,
 } as const
@@ -44,7 +48,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 export interface RestError {

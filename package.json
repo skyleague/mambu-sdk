@@ -34,9 +34,9 @@
     "check:full": "npm run lint && npm run check:types && npm run check:coverage && npm run build && npm run check:project",
     "check:project": "npx node-standards lint",
     "check:types": "npx tsc -p tsconfig.json",
-    "fix": "npm run lint -- --fix",
-    "format": "npx prettier \"**/*.{ts,js,json,yml,yaml}\" --ignore-path .gitignore --write",
+    "format": "npx prettier \"**/*.{ts,js,json,yml,yaml,md}\" --ignore-path .gitignore --write",
     "lint": "npx eslint \"{src,test,typing}/**/*.ts\" --no-eslintrc --cache -c .eslintrc.js --ignore-path .gitignore",
+    "lint:fix": "npm run lint -- --fix",
     "lint:full": "bash -c \"FULL_LINT=true npm run lint\"",
     "package": "rm -rf .dist && npm run build",
     "prepare": "npx husky install || true",
@@ -45,19 +45,19 @@
   "dependencies": {
     "ajv": "^8.11.0",
     "split2": "^4.1.0",
-    "tslib": "^2.4.0"
+    "tslib": "^2.4.1"
   },
   "peerDependencies": {
     "got": "^11.8.5"
   },
   "devDependencies": {
-    "@skyleague/axioms": "^1.3.2",
-    "@skyleague/node-standards": "^1.7.3",
-    "@skyleague/therefore": "^1.14.1",
+    "@skyleague/axioms": "^1.10.1",
+    "@skyleague/node-standards": "^1.11.2",
+    "@skyleague/therefore": "^1.22.0",
     "@types/split2": "^3.2.1",
     "camelcase": "^6.3.0",
     "got": "^11.8.5",
     "nock": "^13.2.9",
-    "typescript": "^4.8.2"
+    "typescript": "^4.9.4"
   }
 }

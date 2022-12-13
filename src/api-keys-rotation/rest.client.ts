@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { ApiKey, ApiKeyRotationResult, ErrorResponse } from './rest.type'
 
+/**
+ * apikey/rotation
+ */
 export class MambuApiKeysRotation {
     public client: Got
 

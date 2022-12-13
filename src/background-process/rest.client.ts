@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { BackgroundProcess, ErrorResponse } from './rest.type'
 
+/**
+ * backgroundprocess
+ */
 export class MambuBackgroundProcess {
     public client: Got
 

@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { Comment, ErrorResponse, GetCommentsResponse } from './rest.type'
 
+/**
+ * comments
+ */
 export class MambuComments {
     public client: Got
 

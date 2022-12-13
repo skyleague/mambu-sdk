@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { ErrorResponse, LoanAccountSchedule } from './rest.type'
 
+/**
+ * loans/schedule
+ */
 export class MambuLoanAccountSchedule {
     public client: Got
 

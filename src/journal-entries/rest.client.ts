@@ -10,12 +10,15 @@ import { IncomingHttpHeaders } from 'http'
 import {
     CreateResponse,
     ErrorResponse,
+    GLJournalEntrySearchCriteria,
     GetAllResponse,
-    GlJournalEntrySearchCriteria,
-    PostGlJournalEntriesDto,
+    PostGLJournalEntriesDTO,
     SearchResponse,
 } from './rest.type'
 
+/**
+ * gljournalentries
+ */
 export class MambuJournalEntries {
     public client: Got
 
@@ -88,11 +91,11 @@ export class MambuJournalEntries {
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: PostGlJournalEntriesDto
+        body: PostGLJournalEntriesDTO
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(PostGlJournalEntriesDto, body)
+        this.validateRequestBody(PostGLJournalEntriesDTO, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`gljournalentries`, {
@@ -118,11 +121,11 @@ export class MambuJournalEntries {
         query,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: GlJournalEntrySearchCriteria
+        body: GLJournalEntrySearchCriteria
         query?: { offset?: string; limit?: string; paginationDetails?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(GlJournalEntrySearchCriteria, body)
+        this.validateRequestBody(GLJournalEntrySearchCriteria, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`gljournalentries:search`, {

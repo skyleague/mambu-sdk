@@ -58,10 +58,13 @@ export const OrganizationSetup = {
     get schema() {
         return OrganizationSetup.validate.schema
     },
+    get errors() {
+        return OrganizationSetup.validate.errors ?? undefined
+    },
     is: (o: unknown): o is OrganizationSetup => OrganizationSetup.validate(o) === true,
     assert: (o: unknown) => {
         if (!OrganizationSetup.validate(o)) {
-            throw new AjvValidator.ValidationError(OrganizationSetup.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(OrganizationSetup.errors ?? [])
         }
     },
 } as const
@@ -75,7 +78,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**

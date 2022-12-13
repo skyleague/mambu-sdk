@@ -14,6 +14,9 @@ export const GetLoanAccountDocumentResponse = {
     get schema() {
         return GetLoanAccountDocumentResponse.validate.schema
     },
+    get errors() {
+        return GetLoanAccountDocumentResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GetLoanAccountDocumentResponse => GetLoanAccountDocumentResponse.validate(o) === true,
 } as const
 
@@ -26,7 +29,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 export type UpdateLoanAccountFundingSourcesRequest = InvestorFund[]
@@ -37,10 +48,13 @@ export const UpdateLoanAccountFundingSourcesRequest = {
     get schema() {
         return UpdateLoanAccountFundingSourcesRequest.validate.schema
     },
+    get errors() {
+        return UpdateLoanAccountFundingSourcesRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is UpdateLoanAccountFundingSourcesRequest => UpdateLoanAccountFundingSourcesRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!UpdateLoanAccountFundingSourcesRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(UpdateLoanAccountFundingSourcesRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(UpdateLoanAccountFundingSourcesRequest.errors ?? [])
         }
     },
 } as const
@@ -52,6 +66,9 @@ export const UpdateLoanAccountFundingSourcesResponse = {
         require('./schemas/update-loan-account-funding-sources-response.schema.js') as ValidateFunction<UpdateLoanAccountFundingSourcesResponse>,
     get schema() {
         return UpdateLoanAccountFundingSourcesResponse.validate.schema
+    },
+    get errors() {
+        return UpdateLoanAccountFundingSourcesResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is UpdateLoanAccountFundingSourcesResponse =>
         UpdateLoanAccountFundingSourcesResponse.validate(o) === true,
@@ -65,10 +82,13 @@ export const CreateLoanAccountFundingSourcesRequest = {
     get schema() {
         return CreateLoanAccountFundingSourcesRequest.validate.schema
     },
+    get errors() {
+        return CreateLoanAccountFundingSourcesRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CreateLoanAccountFundingSourcesRequest => CreateLoanAccountFundingSourcesRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!CreateLoanAccountFundingSourcesRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(CreateLoanAccountFundingSourcesRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CreateLoanAccountFundingSourcesRequest.errors ?? [])
         }
     },
 } as const
@@ -80,6 +100,9 @@ export const CreateLoanAccountFundingSourcesResponse = {
         require('./schemas/create-loan-account-funding-sources-response.schema.js') as ValidateFunction<CreateLoanAccountFundingSourcesResponse>,
     get schema() {
         return CreateLoanAccountFundingSourcesResponse.validate.schema
+    },
+    get errors() {
+        return CreateLoanAccountFundingSourcesResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is CreateLoanAccountFundingSourcesResponse =>
         CreateLoanAccountFundingSourcesResponse.validate(o) === true,
@@ -100,10 +123,13 @@ export const LoanActionDetails = {
     get schema() {
         return LoanActionDetails.validate.schema
     },
+    get errors() {
+        return LoanActionDetails.validate.errors ?? undefined
+    },
     is: (o: unknown): o is LoanActionDetails => LoanActionDetails.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanActionDetails.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanActionDetails.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(LoanActionDetails.errors ?? [])
         }
     },
 } as const
@@ -129,10 +155,13 @@ export const LoanAccountPayOffInput = {
     get schema() {
         return LoanAccountPayOffInput.validate.schema
     },
+    get errors() {
+        return LoanAccountPayOffInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is LoanAccountPayOffInput => LoanAccountPayOffInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanAccountPayOffInput.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanAccountPayOffInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(LoanAccountPayOffInput.errors ?? [])
         }
     },
 } as const
@@ -161,10 +190,13 @@ export const ChangePeriodicPaymentLoanAccountInput = {
     get schema() {
         return ChangePeriodicPaymentLoanAccountInput.validate.schema
     },
+    get errors() {
+        return ChangePeriodicPaymentLoanAccountInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ChangePeriodicPaymentLoanAccountInput => ChangePeriodicPaymentLoanAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!ChangePeriodicPaymentLoanAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(ChangePeriodicPaymentLoanAccountInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(ChangePeriodicPaymentLoanAccountInput.errors ?? [])
         }
     },
 } as const
@@ -190,10 +222,13 @@ export const RefinanceLoanAccountAction = {
     get schema() {
         return RefinanceLoanAccountAction.validate.schema
     },
+    get errors() {
+        return RefinanceLoanAccountAction.validate.errors ?? undefined
+    },
     is: (o: unknown): o is RefinanceLoanAccountAction => RefinanceLoanAccountAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!RefinanceLoanAccountAction.validate(o)) {
-            throw new AjvValidator.ValidationError(RefinanceLoanAccountAction.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(RefinanceLoanAccountAction.errors ?? [])
         }
     },
 } as const
@@ -433,10 +468,13 @@ export const LoanAccount = {
     get schema() {
         return LoanAccount.validate.schema
     },
+    get errors() {
+        return LoanAccount.validate.errors ?? undefined
+    },
     is: (o: unknown): o is LoanAccount => LoanAccount.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanAccount.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanAccount.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(LoanAccount.errors ?? [])
         }
     },
 } as const
@@ -457,11 +495,14 @@ export const PreviewPayOffDueAmountsInAFutureDateInput = {
     get schema() {
         return PreviewPayOffDueAmountsInAFutureDateInput.validate.schema
     },
+    get errors() {
+        return PreviewPayOffDueAmountsInAFutureDateInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is PreviewPayOffDueAmountsInAFutureDateInput =>
         PreviewPayOffDueAmountsInAFutureDateInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!PreviewPayOffDueAmountsInAFutureDateInput.validate(o)) {
-            throw new AjvValidator.ValidationError(PreviewPayOffDueAmountsInAFutureDateInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(PreviewPayOffDueAmountsInAFutureDateInput.errors ?? [])
         }
     },
 } as const
@@ -498,6 +539,9 @@ export const PreviewPayOffDueAmountsInAFutureDateWrapper = {
     get schema() {
         return PreviewPayOffDueAmountsInAFutureDateWrapper.validate.schema
     },
+    get errors() {
+        return PreviewPayOffDueAmountsInAFutureDateWrapper.validate.errors ?? undefined
+    },
     is: (o: unknown): o is PreviewPayOffDueAmountsInAFutureDateWrapper =>
         PreviewPayOffDueAmountsInAFutureDateWrapper.validate(o) === true,
 } as const
@@ -519,10 +563,13 @@ export const RescheduleLoanAccountAction = {
     get schema() {
         return RescheduleLoanAccountAction.validate.schema
     },
+    get errors() {
+        return RescheduleLoanAccountAction.validate.errors ?? undefined
+    },
     is: (o: unknown): o is RescheduleLoanAccountAction => RescheduleLoanAccountAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!RescheduleLoanAccountAction.validate(o)) {
-            throw new AjvValidator.ValidationError(RescheduleLoanAccountAction.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(RescheduleLoanAccountAction.errors ?? [])
         }
     },
 } as const
@@ -550,10 +597,13 @@ export const ChangeArrearsSettingsInput = {
     get schema() {
         return ChangeArrearsSettingsInput.validate.schema
     },
+    get errors() {
+        return ChangeArrearsSettingsInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ChangeArrearsSettingsInput => ChangeArrearsSettingsInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!ChangeArrearsSettingsInput.validate(o)) {
-            throw new AjvValidator.ValidationError(ChangeArrearsSettingsInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(ChangeArrearsSettingsInput.errors ?? [])
         }
     },
 } as const
@@ -573,10 +623,13 @@ export const PlannedFeeKeys = {
     get schema() {
         return PlannedFeeKeys.validate.schema
     },
+    get errors() {
+        return PlannedFeeKeys.validate.errors ?? undefined
+    },
     is: (o: unknown): o is PlannedFeeKeys => PlannedFeeKeys.validate(o) === true,
     assert: (o: unknown) => {
         if (!PlannedFeeKeys.validate(o)) {
-            throw new AjvValidator.ValidationError(PlannedFeeKeys.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(PlannedFeeKeys.errors ?? [])
         }
     },
 } as const
@@ -587,6 +640,9 @@ export const ApplyPlannedFeesResponse = {
     validate: require('./schemas/apply-planned-fees-response.schema.js') as ValidateFunction<ApplyPlannedFeesResponse>,
     get schema() {
         return ApplyPlannedFeesResponse.validate.schema
+    },
+    get errors() {
+        return ApplyPlannedFeesResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ApplyPlannedFeesResponse => ApplyPlannedFeesResponse.validate(o) === true,
 } as const
@@ -619,10 +675,13 @@ export const ChangeInterestRateLoanAccountInput = {
     get schema() {
         return ChangeInterestRateLoanAccountInput.validate.schema
     },
+    get errors() {
+        return ChangeInterestRateLoanAccountInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ChangeInterestRateLoanAccountInput => ChangeInterestRateLoanAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!ChangeInterestRateLoanAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(ChangeInterestRateLoanAccountInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(ChangeInterestRateLoanAccountInput.errors ?? [])
         }
     },
 } as const
@@ -650,10 +709,13 @@ export const CollateralAssetFilter = {
     get schema() {
         return CollateralAssetFilter.validate.schema
     },
+    get errors() {
+        return CollateralAssetFilter.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CollateralAssetFilter => CollateralAssetFilter.validate(o) === true,
     assert: (o: unknown) => {
         if (!CollateralAssetFilter.validate(o)) {
-            throw new AjvValidator.ValidationError(CollateralAssetFilter.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CollateralAssetFilter.errors ?? [])
         }
     },
 } as const
@@ -688,6 +750,9 @@ export const CollateralAssetsReevaluationResponse = {
     get schema() {
         return CollateralAssetsReevaluationResponse.validate.schema
     },
+    get errors() {
+        return CollateralAssetsReevaluationResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CollateralAssetsReevaluationResponse => CollateralAssetsReevaluationResponse.validate(o) === true,
 } as const
 
@@ -718,10 +783,13 @@ export const ChangeDueDatesSettingsInput = {
     get schema() {
         return ChangeDueDatesSettingsInput.validate.schema
     },
+    get errors() {
+        return ChangeDueDatesSettingsInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ChangeDueDatesSettingsInput => ChangeDueDatesSettingsInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!ChangeDueDatesSettingsInput.validate(o)) {
-            throw new AjvValidator.ValidationError(ChangeDueDatesSettingsInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(ChangeDueDatesSettingsInput.errors ?? [])
         }
     },
 } as const
@@ -742,10 +810,13 @@ export const LoanAccountSearchCriteria = {
     get schema() {
         return LoanAccountSearchCriteria.validate.schema
     },
+    get errors() {
+        return LoanAccountSearchCriteria.validate.errors ?? undefined
+    },
     is: (o: unknown): o is LoanAccountSearchCriteria => LoanAccountSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanAccountSearchCriteria.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanAccountSearchCriteria.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(LoanAccountSearchCriteria.errors ?? [])
         }
     },
 } as const
@@ -757,6 +828,9 @@ export const SearchResponse = {
     get schema() {
         return SearchResponse.validate.schema
     },
+    get errors() {
+        return SearchResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
 } as const
 
@@ -767,10 +841,13 @@ export const PatchFundingSourceRequest = {
     get schema() {
         return PatchFundingSourceRequest.validate.schema
     },
+    get errors() {
+        return PatchFundingSourceRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is PatchFundingSourceRequest => PatchFundingSourceRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchFundingSourceRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchFundingSourceRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(PatchFundingSourceRequest.errors ?? [])
         }
     },
 } as const
@@ -782,6 +859,9 @@ export const GetAllPlannedFeesResponse = {
     get schema() {
         return GetAllPlannedFeesResponse.validate.schema
     },
+    get errors() {
+        return GetAllPlannedFeesResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GetAllPlannedFeesResponse => GetAllPlannedFeesResponse.validate(o) === true,
 } as const
 
@@ -792,10 +872,13 @@ export const UpdatePlannedFeesRequest = {
     get schema() {
         return UpdatePlannedFeesRequest.validate.schema
     },
+    get errors() {
+        return UpdatePlannedFeesRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is UpdatePlannedFeesRequest => UpdatePlannedFeesRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!UpdatePlannedFeesRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(UpdatePlannedFeesRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(UpdatePlannedFeesRequest.errors ?? [])
         }
     },
 } as const
@@ -807,6 +890,9 @@ export const UpdatePlannedFeesResponse = {
     get schema() {
         return UpdatePlannedFeesResponse.validate.schema
     },
+    get errors() {
+        return UpdatePlannedFeesResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is UpdatePlannedFeesResponse => UpdatePlannedFeesResponse.validate(o) === true,
 } as const
 
@@ -817,10 +903,13 @@ export const CreatePlannedFeesRequest = {
     get schema() {
         return CreatePlannedFeesRequest.validate.schema
     },
+    get errors() {
+        return CreatePlannedFeesRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CreatePlannedFeesRequest => CreatePlannedFeesRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!CreatePlannedFeesRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(CreatePlannedFeesRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CreatePlannedFeesRequest.errors ?? [])
         }
     },
 } as const
@@ -832,6 +921,9 @@ export const CreatePlannedFeesResponse = {
     get schema() {
         return CreatePlannedFeesResponse.validate.schema
     },
+    get errors() {
+        return CreatePlannedFeesResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CreatePlannedFeesResponse => CreatePlannedFeesResponse.validate(o) === true,
 } as const
 
@@ -842,10 +934,13 @@ export const PatchRequest = {
     get schema() {
         return PatchRequest.validate.schema
     },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
@@ -858,6 +953,9 @@ export const GetAllAuthorizationHoldsResponse = {
     get schema() {
         return GetAllAuthorizationHoldsResponse.validate.schema
     },
+    get errors() {
+        return GetAllAuthorizationHoldsResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GetAllAuthorizationHoldsResponse => GetAllAuthorizationHoldsResponse.validate(o) === true,
 } as const
 
@@ -867,6 +965,9 @@ export const GetAllCardsResponse = {
     validate: require('./schemas/get-all-cards-response.schema.js') as ValidateFunction<GetAllCardsResponse>,
     get schema() {
         return GetAllCardsResponse.validate.schema
+    },
+    get errors() {
+        return GetAllCardsResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllCardsResponse => GetAllCardsResponse.validate(o) === true,
 } as const
@@ -886,10 +987,13 @@ export const Card = {
     get schema() {
         return Card.validate.schema
     },
+    get errors() {
+        return Card.validate.errors ?? undefined
+    },
     is: (o: unknown): o is Card => Card.validate(o) === true,
     assert: (o: unknown) => {
         if (!Card.validate(o)) {
-            throw new AjvValidator.ValidationError(Card.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(Card.errors ?? [])
         }
     },
 } as const
@@ -922,10 +1026,13 @@ export const ChangeRepaymentValueLoanAccountInput = {
     get schema() {
         return ChangeRepaymentValueLoanAccountInput.validate.schema
     },
+    get errors() {
+        return ChangeRepaymentValueLoanAccountInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ChangeRepaymentValueLoanAccountInput => ChangeRepaymentValueLoanAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!ChangeRepaymentValueLoanAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(ChangeRepaymentValueLoanAccountInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(ChangeRepaymentValueLoanAccountInput.errors ?? [])
         }
     },
 } as const
@@ -957,10 +1064,13 @@ export const ApplyInterestInput = {
     get schema() {
         return ApplyInterestInput.validate.schema
     },
+    get errors() {
+        return ApplyInterestInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ApplyInterestInput => ApplyInterestInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!ApplyInterestInput.validate(o)) {
-            throw new AjvValidator.ValidationError(ApplyInterestInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(ApplyInterestInput.errors ?? [])
         }
     },
 } as const
@@ -971,6 +1081,9 @@ export const GetAllResponse = {
     validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
@@ -994,10 +1107,13 @@ export const TerminateLoanAccountInput = {
     get schema() {
         return TerminateLoanAccountInput.validate.schema
     },
+    get errors() {
+        return TerminateLoanAccountInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is TerminateLoanAccountInput => TerminateLoanAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!TerminateLoanAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(TerminateLoanAccountInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(TerminateLoanAccountInput.errors ?? [])
         }
     },
 } as const
@@ -1031,10 +1147,13 @@ export const LoanAccountAction = {
     get schema() {
         return LoanAccountAction.validate.schema
     },
+    get errors() {
+        return LoanAccountAction.validate.errors ?? undefined
+    },
     is: (o: unknown): o is LoanAccountAction => LoanAccountAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanAccountAction.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanAccountAction.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(LoanAccountAction.errors ?? [])
         }
     },
 } as const
@@ -1045,6 +1164,9 @@ export const GetByIdWitVersionsResponse = {
     validate: require('./schemas/get-by-id-wit-versions-response.schema.js') as ValidateFunction<GetByIdWitVersionsResponse>,
     get schema() {
         return GetByIdWitVersionsResponse.validate.schema
+    },
+    get errors() {
+        return GetByIdWitVersionsResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetByIdWitVersionsResponse => GetByIdWitVersionsResponse.validate(o) === true,
 } as const
@@ -1083,10 +1205,13 @@ export const PreviewLoanAccountSchedule = {
     get schema() {
         return PreviewLoanAccountSchedule.validate.schema
     },
+    get errors() {
+        return PreviewLoanAccountSchedule.validate.errors ?? undefined
+    },
     is: (o: unknown): o is PreviewLoanAccountSchedule => PreviewLoanAccountSchedule.validate(o) === true,
     assert: (o: unknown) => {
         if (!PreviewLoanAccountSchedule.validate(o)) {
-            throw new AjvValidator.ValidationError(PreviewLoanAccountSchedule.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(PreviewLoanAccountSchedule.errors ?? [])
         }
     },
 } as const
@@ -1106,6 +1231,9 @@ export const LoanAccountSchedule = {
     validate: require('./schemas/loan-account-schedule.schema.js') as ValidateFunction<LoanAccountSchedule>,
     get schema() {
         return LoanAccountSchedule.validate.schema
+    },
+    get errors() {
+        return LoanAccountSchedule.validate.errors ?? undefined
     },
     is: (o: unknown): o is LoanAccountSchedule => LoanAccountSchedule.validate(o) === true,
 } as const
@@ -1681,7 +1809,11 @@ export interface Asset {
  */
 export interface Currency {
     /**
-     * Code of the currency.
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
+    /**
+     * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
     code?:
         | 'AED'
@@ -1706,7 +1838,6 @@ export interface Currency {
         | 'BOV'
         | 'BRL'
         | 'BSD'
-        | 'BTC'
         | 'BTN'
         | 'BWP'
         | 'BYR'
@@ -1872,6 +2003,7 @@ export interface Currency {
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
+        | 'NON_FIAT'
 }
 
 /**
@@ -2443,10 +2575,10 @@ export interface Fee {
         | 'CAPITALIZED_DISBURSEMENT'
         | 'UPFRONT_DISBURSEMENT'
         | 'LATE_REPAYMENT'
-        | 'MONTHLY_FEE'
         | 'PAYMENT_DUE'
         | 'PAYMENT_DUE_APPLIED_ON_DUE_DATES'
         | 'ARBITRARY'
+        | 'IOF'
     /**
      * The amount of the taxes on fee that was applied/paid in the transaction.
      */
@@ -2942,7 +3074,9 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: unknown
+    value?: {
+        [k: string]: unknown | undefined
+    }
 }
 
 /**

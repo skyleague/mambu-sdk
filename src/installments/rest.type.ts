@@ -3,6 +3,7 @@
  * Do not manually touch this
  */
 /* eslint-disable */
+import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
 
 export type GetAllResponse = Installment[]
@@ -11,6 +12,9 @@ export const GetAllResponse = {
     validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
@@ -24,7 +28,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**

@@ -13,6 +13,9 @@ export const GetAllResponse = {
     get schema() {
         return GetAllResponse.validate.schema
     },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
@@ -25,7 +28,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**
@@ -126,10 +137,13 @@ export const Group = {
     get schema() {
         return Group.validate.schema
     },
+    get errors() {
+        return Group.validate.errors ?? undefined
+    },
     is: (o: unknown): o is Group => Group.validate(o) === true,
     assert: (o: unknown) => {
         if (!Group.validate(o)) {
-            throw new AjvValidator.ValidationError(Group.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(Group.errors ?? [])
         }
     },
 } as const
@@ -142,6 +156,9 @@ export const GetCreditArrangementsByGroupIdOrKeyResponse = {
     get schema() {
         return GetCreditArrangementsByGroupIdOrKeyResponse.validate.schema
     },
+    get errors() {
+        return GetCreditArrangementsByGroupIdOrKeyResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GetCreditArrangementsByGroupIdOrKeyResponse =>
         GetCreditArrangementsByGroupIdOrKeyResponse.validate(o) === true,
 } as const
@@ -153,10 +170,13 @@ export const PatchRequest = {
     get schema() {
         return PatchRequest.validate.schema
     },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
@@ -177,10 +197,13 @@ export const GroupSearchCriteria = {
     get schema() {
         return GroupSearchCriteria.validate.schema
     },
+    get errors() {
+        return GroupSearchCriteria.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GroupSearchCriteria => GroupSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
         if (!GroupSearchCriteria.validate(o)) {
-            throw new AjvValidator.ValidationError(GroupSearchCriteria.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(GroupSearchCriteria.errors ?? [])
         }
     },
 } as const
@@ -191,6 +214,9 @@ export const SearchResponse = {
     validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
+    },
+    get errors() {
+        return SearchResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
 } as const
@@ -367,7 +393,11 @@ export interface CreditArrangement {
  */
 export interface Currency {
     /**
-     * Code of the currency.
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
+    /**
+     * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
     code?:
         | 'AED'
@@ -392,7 +422,6 @@ export interface Currency {
         | 'BOV'
         | 'BRL'
         | 'BSD'
-        | 'BTC'
         | 'BTN'
         | 'BWP'
         | 'BYR'
@@ -558,6 +587,7 @@ export interface Currency {
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
+        | 'NON_FIAT'
 }
 
 /**
@@ -579,7 +609,9 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: unknown
+    value?: {
+        [k: string]: unknown | undefined
+    }
 }
 
 /**

@@ -17,6 +17,9 @@ import {
     SubscriptionEventStreamBatch,
 } from './base-streaming.type'
 
+/**
+ * Mambu Streaming API
+ */
 export class BaseMambuStreaming {
     public client: Got
 

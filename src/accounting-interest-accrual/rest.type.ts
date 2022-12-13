@@ -22,10 +22,13 @@ export const InterestAccrualSearchCriteria = {
     get schema() {
         return InterestAccrualSearchCriteria.validate.schema
     },
+    get errors() {
+        return InterestAccrualSearchCriteria.validate.errors ?? undefined
+    },
     is: (o: unknown): o is InterestAccrualSearchCriteria => InterestAccrualSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
         if (!InterestAccrualSearchCriteria.validate(o)) {
-            throw new AjvValidator.ValidationError(InterestAccrualSearchCriteria.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(InterestAccrualSearchCriteria.errors ?? [])
         }
     },
 } as const
@@ -36,6 +39,9 @@ export const SearchResponse = {
     validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
+    },
+    get errors() {
+        return SearchResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
 } as const
@@ -49,7 +55,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**
@@ -289,7 +303,11 @@ export interface AccountingRate {
  */
 export interface Currency {
     /**
-     * Code of the currency.
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
+    /**
+     * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
     code?:
         | 'AED'
@@ -314,7 +332,6 @@ export interface Currency {
         | 'BOV'
         | 'BRL'
         | 'BSD'
-        | 'BTC'
         | 'BTN'
         | 'BWP'
         | 'BYR'
@@ -480,6 +497,7 @@ export interface Currency {
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
+        | 'NON_FIAT'
 }
 
 export interface RestError {
