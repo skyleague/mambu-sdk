@@ -42,10 +42,13 @@ export const Role = {
     get schema() {
         return Role.validate.schema
     },
+    get errors() {
+        return Role.validate.errors ?? undefined
+    },
     is: (o: unknown): o is Role => Role.validate(o) === true,
     assert: (o: unknown) => {
         if (!Role.validate(o)) {
-            throw new AjvValidator.ValidationError(Role.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(Role.errors ?? [])
         }
     },
 } as const
@@ -59,7 +62,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 export type PatchRequest = PatchOperation[]
@@ -69,10 +80,13 @@ export const PatchRequest = {
     get schema() {
         return PatchRequest.validate.schema
     },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
@@ -83,6 +97,9 @@ export const GetAllResponse = {
     validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
@@ -325,6 +342,7 @@ type Local0 =
     | 'EDIT_USER'
     | 'VIEW_USER_DETAILS'
     | 'DELETE_USER'
+    | 'MANAGE_TWO_FACTOR_AUTHENTICATION'
     | 'MANAGE_CLIENT_ASSOCIATION'
     | 'MANAGE_GROUP_ASSOCIATION'
     | 'EDIT_PRINCIPAL_PAYMENT_ACTIVE_REVOLVING_CREDIT'
@@ -335,6 +353,8 @@ type Local0 =
     | 'MANAGE_PAYMENTS'
     | 'MANAGE_AUDIT_TRAIL'
     | 'MANAGE_APPS'
+    | 'MANAGE_CARDS_CAPABILITY'
+    | 'MANAGE_NOTIFICATIONS'
     | 'ADMIN'
     | 'CREATE_ROLE'
     | 'EDIT_ROLE'
@@ -350,6 +370,10 @@ type Local0 =
     | 'CREATE_CUSTOM_FIELD'
     | 'EDIT_CUSTOM_FIELD'
     | 'DELETE_CUSTOM_FIELD'
+    | 'VIEW_MAMBU_FUNCTIONS'
+    | 'CREATE_MAMBU_FUNCTIONS'
+    | 'EDIT_MAMBU_FUNCTIONS'
+    | 'DELETE_MAMBU_FUNCTIONS'
 
 export interface RestError {
     errorCode?: number
@@ -376,5 +400,7 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: unknown
+    value?: {
+        [k: string]: unknown | undefined
+    }
 }

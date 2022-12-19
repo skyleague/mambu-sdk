@@ -29,10 +29,13 @@ export const ApiKey = {
     get schema() {
         return ApiKey.validate.schema
     },
+    get errors() {
+        return ApiKey.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ApiKey => ApiKey.validate(o) === true,
     assert: (o: unknown) => {
         if (!ApiKey.validate(o)) {
-            throw new AjvValidator.ValidationError(ApiKey.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(ApiKey.errors ?? [])
         }
     },
 } as const
@@ -56,6 +59,9 @@ export const ApiKeyRotationResult = {
     get schema() {
         return ApiKeyRotationResult.validate.schema
     },
+    get errors() {
+        return ApiKeyRotationResult.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ApiKeyRotationResult => ApiKeyRotationResult.validate(o) === true,
 } as const
 
@@ -68,7 +74,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 export interface RestError {

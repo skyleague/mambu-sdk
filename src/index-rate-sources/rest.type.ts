@@ -13,6 +13,9 @@ export const GetAllResponse = {
     get schema() {
         return GetAllResponse.validate.schema
     },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
@@ -25,7 +28,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**
@@ -59,10 +70,13 @@ export const IndexRateSource = {
     get schema() {
         return IndexRateSource.validate.schema
     },
+    get errors() {
+        return IndexRateSource.validate.errors ?? undefined
+    },
     is: (o: unknown): o is IndexRateSource => IndexRateSource.validate(o) === true,
     assert: (o: unknown) => {
         if (!IndexRateSource.validate(o)) {
-            throw new AjvValidator.ValidationError(IndexRateSource.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(IndexRateSource.errors ?? [])
         }
     },
 } as const
@@ -73,6 +87,9 @@ export const GetAll1Response = {
     validate: require('./schemas/get-all1-response.schema.js') as ValidateFunction<GetAll1Response>,
     get schema() {
         return GetAll1Response.validate.schema
+    },
+    get errors() {
+        return GetAll1Response.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAll1Response => GetAll1Response.validate(o) === true,
 } as const
@@ -116,10 +133,13 @@ export const IndexRate = {
     get schema() {
         return IndexRate.validate.schema
     },
+    get errors() {
+        return IndexRate.validate.errors ?? undefined
+    },
     is: (o: unknown): o is IndexRate => IndexRate.validate(o) === true,
     assert: (o: unknown) => {
         if (!IndexRate.validate(o)) {
-            throw new AjvValidator.ValidationError(IndexRate.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(IndexRate.errors ?? [])
         }
     },
 } as const

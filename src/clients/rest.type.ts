@@ -157,10 +157,13 @@ export const Client = {
     get schema() {
         return Client.validate.schema
     },
+    get errors() {
+        return Client.validate.errors ?? undefined
+    },
     is: (o: unknown): o is Client => Client.validate(o) === true,
     assert: (o: unknown) => {
         if (!Client.validate(o)) {
-            throw new AjvValidator.ValidationError(Client.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(Client.errors ?? [])
         }
     },
 } as const
@@ -174,7 +177,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 export type PatchRequest = PatchOperation[]
@@ -184,10 +195,13 @@ export const PatchRequest = {
     get schema() {
         return PatchRequest.validate.schema
     },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
@@ -198,6 +212,9 @@ export const GetAllResponse = {
     validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
@@ -218,10 +235,13 @@ export const ClientSearchCriteria = {
     get schema() {
         return ClientSearchCriteria.validate.schema
     },
+    get errors() {
+        return ClientSearchCriteria.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ClientSearchCriteria => ClientSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
         if (!ClientSearchCriteria.validate(o)) {
-            throw new AjvValidator.ValidationError(ClientSearchCriteria.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(ClientSearchCriteria.errors ?? [])
         }
     },
 } as const
@@ -232,6 +252,9 @@ export const SearchResponse = {
     validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
+    },
+    get errors() {
+        return SearchResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
 } as const
@@ -291,6 +314,9 @@ export const ClientRole = {
     get schema() {
         return ClientRole.validate.schema
     },
+    get errors() {
+        return ClientRole.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ClientRole => ClientRole.validate(o) === true,
 } as const
 
@@ -301,6 +327,9 @@ export const GetCreditArrangementsByClientIdOrKeyResponse = {
         require('./schemas/get-credit-arrangements-by-client-id-or-key-response.schema.js') as ValidateFunction<GetCreditArrangementsByClientIdOrKeyResponse>,
     get schema() {
         return GetCreditArrangementsByClientIdOrKeyResponse.validate.schema
+    },
+    get errors() {
+        return GetCreditArrangementsByClientIdOrKeyResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetCreditArrangementsByClientIdOrKeyResponse =>
         GetCreditArrangementsByClientIdOrKeyResponse.validate(o) === true,
@@ -507,7 +536,9 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: unknown
+    value?: {
+        [k: string]: unknown | undefined
+    }
 }
 
 /**
@@ -725,7 +756,11 @@ export interface CreditArrangement {
  */
 export interface Currency {
     /**
-     * Code of the currency.
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
+    /**
+     * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
     code?:
         | 'AED'
@@ -750,7 +785,6 @@ export interface Currency {
         | 'BOV'
         | 'BRL'
         | 'BSD'
-        | 'BTC'
         | 'BTN'
         | 'BWP'
         | 'BYR'
@@ -916,4 +950,5 @@ export interface Currency {
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
+        | 'NON_FIAT'
 }

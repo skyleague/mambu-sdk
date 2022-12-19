@@ -13,6 +13,9 @@ export const GetAllResponse = {
     get schema() {
         return GetAllResponse.validate.schema
     },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
@@ -25,7 +28,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**
@@ -73,10 +84,13 @@ export const TransactionChannel = {
     get schema() {
         return TransactionChannel.validate.schema
     },
+    get errors() {
+        return TransactionChannel.validate.errors ?? undefined
+    },
     is: (o: unknown): o is TransactionChannel => TransactionChannel.validate(o) === true,
     assert: (o: unknown) => {
         if (!TransactionChannel.validate(o)) {
-            throw new AjvValidator.ValidationError(TransactionChannel.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(TransactionChannel.errors ?? [])
         }
     },
 } as const

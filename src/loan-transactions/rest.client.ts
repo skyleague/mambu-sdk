@@ -19,13 +19,16 @@ import {
     LockLoanAccountInput,
     LockLoanTransactionsWrapper,
     PaymentMadeTransactionInput,
-    RedrawRepaymentTransactionInputDto,
+    RedrawRepaymentTransactionInputDTO,
     RepaymentLoanTransactionInput,
     SearchResponse,
     UnlockLoanAccountInput,
     WithdrawalRedrawTransactionInput,
 } from './rest.type'
 
+/**
+ * loans/transactions
+ */
 export class MambuLoanTransactions {
     public client: Got
 
@@ -384,12 +387,12 @@ export class MambuLoanTransactions {
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: RedrawRepaymentTransactionInputDto
+        body: RedrawRepaymentTransactionInputDTO
         path: { loanAccountId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(RedrawRepaymentTransactionInputDto, body)
+        this.validateRequestBody(RedrawRepaymentTransactionInputDTO, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/redraw-repayment-transactions`, {

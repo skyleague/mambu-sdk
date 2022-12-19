@@ -13,6 +13,9 @@ export const GetCommentsResponse = {
     get schema() {
         return GetCommentsResponse.validate.schema
     },
+    get errors() {
+        return GetCommentsResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GetCommentsResponse => GetCommentsResponse.validate(o) === true,
 } as const
 
@@ -25,7 +28,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**
@@ -79,10 +90,13 @@ export const Comment = {
     get schema() {
         return Comment.validate.schema
     },
+    get errors() {
+        return Comment.validate.errors ?? undefined
+    },
     is: (o: unknown): o is Comment => Comment.validate(o) === true,
     assert: (o: unknown) => {
         if (!Comment.validate(o)) {
-            throw new AjvValidator.ValidationError(Comment.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(Comment.errors ?? [])
         }
     },
 } as const

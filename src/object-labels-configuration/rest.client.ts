@@ -8,6 +8,9 @@ import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 
+/**
+ * configuration/labels.yaml
+ */
 export class MambuObjectLabelsConfiguration {
     public client: Got
 

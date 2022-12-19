@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { AccountingReport, AccountingReportGenerationInput, AccountingReportGenerationResponse, ErrorResponse } from './rest.type'
 
+/**
+ * accounting/reports
+ */
 export class MambuAccountingReports {
     public client: Got
 

@@ -35,6 +35,9 @@ export const DataImportResponse = {
     get schema() {
         return DataImportResponse.validate.schema
     },
+    get errors() {
+        return DataImportResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is DataImportResponse => DataImportResponse.validate(o) === true,
 } as const
 
@@ -47,7 +50,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**
@@ -83,6 +94,9 @@ export const DataImportStatus = {
     get schema() {
         return DataImportStatus.validate.schema
     },
+    get errors() {
+        return DataImportStatus.validate.errors ?? undefined
+    },
     is: (o: unknown): o is DataImportStatus => DataImportStatus.validate(o) === true,
 } as const
 
@@ -101,10 +115,13 @@ export const DataImportAction = {
     get schema() {
         return DataImportAction.validate.schema
     },
+    get errors() {
+        return DataImportAction.validate.errors ?? undefined
+    },
     is: (o: unknown): o is DataImportAction => DataImportAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!DataImportAction.validate(o)) {
-            throw new AjvValidator.ValidationError(DataImportAction.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(DataImportAction.errors ?? [])
         }
     },
 } as const

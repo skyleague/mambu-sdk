@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { ErrorResponse, GetAllResponse, TransactionChannel } from './rest.type'
 
+/**
+ * organization/transactionChannels
+ */
 export class MambuTransactionChannels {
     public client: Got
 

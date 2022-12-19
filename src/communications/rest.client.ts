@@ -16,6 +16,9 @@ import {
     SearchResponse,
 } from './rest.type'
 
+/**
+ * communications/messages
+ */
 export class MambuCommunications {
     public client: Got
 

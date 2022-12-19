@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { CustomFieldMeta, ErrorResponse } from './rest.type'
 
+/**
+ * customfields
+ */
 export class MambuCustomFields {
     public client: Got
 

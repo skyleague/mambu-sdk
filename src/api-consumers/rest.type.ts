@@ -6,78 +6,6 @@
 import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
 
-export type GetApiKeysByConsumerIdResponse = ApiKey[]
-
-export const GetApiKeysByConsumerIdResponse = {
-    validate:
-        require('./schemas/get-api-keys-by-consumer-id-response.schema.js') as ValidateFunction<GetApiKeysByConsumerIdResponse>,
-    get schema() {
-        return GetApiKeysByConsumerIdResponse.validate.schema
-    },
-    is: (o: unknown): o is GetApiKeysByConsumerIdResponse => GetApiKeysByConsumerIdResponse.validate(o) === true,
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[]
-}
-
-export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
-    get schema() {
-        return ErrorResponse.validate.schema
-    },
-    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-} as const
-
-/**
- * Representation of an API Consumer's API Key expiration time.
- */
-export interface ApiKeyInput {
-    /**
-     * The time to live of the key in seconds
-     */
-    expirationTime?: number
-}
-
-export const ApiKeyInput = {
-    validate: require('./schemas/api-key-input.schema.js') as ValidateFunction<ApiKeyInput>,
-    get schema() {
-        return ApiKeyInput.validate.schema
-    },
-    is: (o: unknown): o is ApiKeyInput => ApiKeyInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ApiKeyInput.validate(o)) {
-            throw new AjvValidator.ValidationError(ApiKeyInput.validate.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Representation of an API Consumer's API Key
- */
-export interface ApiKey {
-    /**
-     * The api key ID
-     */
-    id?: string
-    /**
-     * The api key
-     */
-    apiKey?: string
-    /**
-     * The time to live for the rotated key
-     */
-    expirationTime?: number
-}
-
-export const ApiKey = {
-    validate: require('./schemas/api-key.schema.js') as ValidateFunction<ApiKey>,
-    get schema() {
-        return ApiKey.validate.schema
-    },
-    is: (o: unknown): o is ApiKey => ApiKey.validate(o) === true,
-} as const
-
 /**
  * Api Consumer containing keys that can be used to access mambu API
  */
@@ -107,10 +35,6 @@ export interface ApiConsumer {
         [k: string]: number
     }
     /**
-     * The type of Api Consumer
-     */
-    type?: 'STREAMING_API' | 'AUDIT_TRAIL' | 'PAYMENTS' | 'MAMBU_API'
-    /**
      * Date when the Api Consumer was created, as UTC
      */
     creationDate?: string
@@ -125,10 +49,33 @@ export const ApiConsumer = {
     get schema() {
         return ApiConsumer.validate.schema
     },
+    get errors() {
+        return ApiConsumer.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ApiConsumer => ApiConsumer.validate(o) === true,
     assert: (o: unknown) => {
         if (!ApiConsumer.validate(o)) {
-            throw new AjvValidator.ValidationError(ApiConsumer.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(ApiConsumer.errors ?? [])
+        }
+    },
+} as const
+
+export interface ErrorResponse {
+    errors?: RestError[]
+}
+
+export const ErrorResponse = {
+    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    get schema() {
+        return ErrorResponse.validate.schema
+    },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -140,12 +87,84 @@ export const PatchRequest = {
     get schema() {
         return PatchRequest.validate.schema
     },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
         }
     },
+} as const
+
+export type GetApiKeysByConsumerIdResponse = ApiKey[]
+
+export const GetApiKeysByConsumerIdResponse = {
+    validate:
+        require('./schemas/get-api-keys-by-consumer-id-response.schema.js') as ValidateFunction<GetApiKeysByConsumerIdResponse>,
+    get schema() {
+        return GetApiKeysByConsumerIdResponse.validate.schema
+    },
+    get errors() {
+        return GetApiKeysByConsumerIdResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetApiKeysByConsumerIdResponse => GetApiKeysByConsumerIdResponse.validate(o) === true,
+} as const
+
+/**
+ * Representation of an API Consumer's API Key expiration time.
+ */
+export interface ApiKeyInput {
+    /**
+     * The time to live of the key in seconds
+     */
+    expirationTime?: number
+}
+
+export const ApiKeyInput = {
+    validate: require('./schemas/api-key-input.schema.js') as ValidateFunction<ApiKeyInput>,
+    get schema() {
+        return ApiKeyInput.validate.schema
+    },
+    get errors() {
+        return ApiKeyInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ApiKeyInput => ApiKeyInput.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ApiKeyInput.validate(o)) {
+            throw new AjvValidator.ValidationError(ApiKeyInput.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Representation of an API Consumer's API Key
+ */
+export interface ApiKey {
+    /**
+     * The api key ID
+     */
+    id?: string
+    /**
+     * The api key
+     */
+    apiKey?: string
+    /**
+     * The time to live for the rotated key
+     */
+    expirationTime?: number
+}
+
+export const ApiKey = {
+    validate: require('./schemas/api-key.schema.js') as ValidateFunction<ApiKey>,
+    get schema() {
+        return ApiKey.validate.schema
+    },
+    get errors() {
+        return ApiKey.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ApiKey => ApiKey.validate(o) === true,
 } as const
 
 export type GetAllResponse = ApiConsumer[]
@@ -155,7 +174,23 @@ export const GetAllResponse = {
     get schema() {
         return GetAllResponse.validate.schema
     },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+} as const
+
+export type GetKeysByConsumerIdResponse = ApiKey[]
+
+export const GetKeysByConsumerIdResponse = {
+    validate: require('./schemas/get-keys-by-consumer-id-response.schema.js') as ValidateFunction<GetKeysByConsumerIdResponse>,
+    get schema() {
+        return GetKeysByConsumerIdResponse.validate.schema
+    },
+    get errors() {
+        return GetKeysByConsumerIdResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetKeysByConsumerIdResponse => GetKeysByConsumerIdResponse.validate(o) === true,
 } as const
 
 /**
@@ -173,14 +208,11 @@ export const SecretKey = {
     get schema() {
         return SecretKey.validate.schema
     },
+    get errors() {
+        return SecretKey.validate.errors ?? undefined
+    },
     is: (o: unknown): o is SecretKey => SecretKey.validate(o) === true,
 } as const
-
-export interface RestError {
-    errorCode?: number
-    errorSource?: string
-    errorReason?: string
-}
 
 /**
  * The user role identifier
@@ -416,10 +448,16 @@ type Local0 =
     | 'MANAGE_EVENTS_STREAMING'
     | 'MANAGE_AUDIT_TRAIL'
     | 'MANAGE_PAYMENTS'
+    | 'MANAGE_CARDS_CAPABILITY'
     | 'CREATE_API_CONSUMERS_AND_KEYS'
     | 'DELETE_API_CONSUMERS_AND_KEYS'
     | 'EDIT_API_CONSUMERS_AND_KEYS'
     | 'VIEW_API_CONSUMERS_AND_KEYS'
+    | 'MANAGE_NOTIFICATIONS'
+    | 'VIEW_MAMBU_FUNCTIONS'
+    | 'CREATE_MAMBU_FUNCTIONS'
+    | 'EDIT_MAMBU_FUNCTIONS'
+    | 'DELETE_MAMBU_FUNCTIONS'
 
 /**
  * Branch that can be managed by the user or API Consumer
@@ -429,6 +467,12 @@ export interface UserManagedBranch {
      * The encoded key of the branch, generated
      */
     branchKey?: string
+}
+
+export interface RestError {
+    errorCode?: number
+    errorSource?: string
+    errorReason?: string
 }
 
 /**
@@ -450,5 +494,7 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: unknown
+    value?: {
+        [k: string]: unknown | undefined
+    }
 }

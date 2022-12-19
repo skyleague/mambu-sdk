@@ -38,11 +38,14 @@ export const AuthorizationHoldAmountAdjustmentRequest = {
     get schema() {
         return AuthorizationHoldAmountAdjustmentRequest.validate.schema
     },
+    get errors() {
+        return AuthorizationHoldAmountAdjustmentRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is AuthorizationHoldAmountAdjustmentRequest =>
         AuthorizationHoldAmountAdjustmentRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!AuthorizationHoldAmountAdjustmentRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(AuthorizationHoldAmountAdjustmentRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(AuthorizationHoldAmountAdjustmentRequest.errors ?? [])
         }
     },
 } as const
@@ -56,7 +59,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**
@@ -131,6 +142,9 @@ export const GetAuthorizationHold = {
     get schema() {
         return GetAuthorizationHold.validate.schema
     },
+    get errors() {
+        return GetAuthorizationHold.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GetAuthorizationHold => GetAuthorizationHold.validate(o) === true,
 } as const
 
@@ -169,6 +183,9 @@ export const AccountBalances = {
     get schema() {
         return AccountBalances.validate.schema
     },
+    get errors() {
+        return AccountBalances.validate.errors ?? undefined
+    },
     is: (o: unknown): o is AccountBalances => AccountBalances.validate(o) === true,
 } as const
 
@@ -203,10 +220,13 @@ export const CardTransactionReversal = {
     get schema() {
         return CardTransactionReversal.validate.schema
     },
+    get errors() {
+        return CardTransactionReversal.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CardTransactionReversal => CardTransactionReversal.validate(o) === true,
     assert: (o: unknown) => {
         if (!CardTransactionReversal.validate(o)) {
-            throw new AjvValidator.ValidationError(CardTransactionReversal.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CardTransactionReversal.errors ?? [])
         }
     },
 } as const
@@ -271,10 +291,13 @@ export const CardTransactionInput = {
     get schema() {
         return CardTransactionInput.validate.schema
     },
+    get errors() {
+        return CardTransactionInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CardTransactionInput => CardTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!CardTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(CardTransactionInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CardTransactionInput.errors ?? [])
         }
     },
 } as const
@@ -339,6 +362,9 @@ export const CardTransactionOutput = {
     validate: require('./schemas/card-transaction-output.schema.js') as ValidateFunction<CardTransactionOutput>,
     get schema() {
         return CardTransactionOutput.validate.schema
+    },
+    get errors() {
+        return CardTransactionOutput.validate.errors ?? undefined
     },
     is: (o: unknown): o is CardTransactionOutput => CardTransactionOutput.validate(o) === true,
 } as const
@@ -411,10 +437,13 @@ export const AuthorizationHold = {
     get schema() {
         return AuthorizationHold.validate.schema
     },
+    get errors() {
+        return AuthorizationHold.validate.errors ?? undefined
+    },
     is: (o: unknown): o is AuthorizationHold => AuthorizationHold.validate(o) === true,
     assert: (o: unknown) => {
         if (!AuthorizationHold.validate(o)) {
-            throw new AjvValidator.ValidationError(AuthorizationHold.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(AuthorizationHold.errors ?? [])
         }
     },
 } as const

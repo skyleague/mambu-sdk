@@ -23,10 +23,13 @@ export const NonWorkingDays = {
     get schema() {
         return NonWorkingDays.validate.schema
     },
+    get errors() {
+        return NonWorkingDays.validate.errors ?? undefined
+    },
     is: (o: unknown): o is NonWorkingDays => NonWorkingDays.validate(o) === true,
     assert: (o: unknown) => {
         if (!NonWorkingDays.validate(o)) {
-            throw new AjvValidator.ValidationError(NonWorkingDays.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(NonWorkingDays.errors ?? [])
         }
     },
 } as const
@@ -40,7 +43,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 export interface RestError {

@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { ApplicationStatus, ErrorResponse } from './rest.type'
 
+/**
+ * application/status
+ */
 export class MambuApplication {
     public client: Got
 

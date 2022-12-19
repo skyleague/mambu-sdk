@@ -2,7 +2,7 @@ import { cloneDeep, omitUndefined, pick } from '@skyleague/axioms'
 import { $restclient } from '@skyleague/therefore'
 import type { OpenapiV3 } from '@skyleague/therefore'
 import type {
-    ApiKeySecurityScheme,
+    APIKeySecurityScheme,
     Operation,
     PathItem,
     Schema,
@@ -13,8 +13,8 @@ export const baseMambuStreaming = got
     .get('https://api.mambu.com/streaming-api/mambu-streaming-api-spec-oas3.json')
     .json<OpenapiV3>()
     .then((data) => {
-        if (data?.components?.securitySchemes?.['ApiKeyAuth'] !== undefined) {
-            const apiKeyAuth = data.components.securitySchemes['ApiKeyAuth'] as ApiKeySecurityScheme
+        if (data.components?.securitySchemes?.ApiKeyAuth !== undefined) {
+            const apiKeyAuth = data.components.securitySchemes.ApiKeyAuth as APIKeySecurityScheme
             apiKeyAuth.name = 'apikey'
         }
 
@@ -36,16 +36,16 @@ export const baseMambuStreaming = got
 
         const schemas = data.components?.schemas
         if (schemas !== undefined) {
-            delete ((schemas['Subscription'] as Schema)?.properties?.['initial_cursors'] as Schema)?.minItems
+            delete ((schemas.Subscription as Schema).properties?.initial_cursors as Schema).minItems
 
-            const eventProperties = (schemas['Event'] as Schema)?.properties
+            const eventProperties = (schemas.Event as Schema).properties
             if (eventProperties?.body !== undefined) {
                 eventProperties.body = {
                     anyOf: [{ type: 'string' }, { type: 'object' }],
                 }
             }
 
-            const cursor = cloneDeep(schemas['Cursor'] as Schema)
+            const cursor = cloneDeep(schemas.Cursor as Schema)
             schemas['Subscription-Cursor'] = omitUndefined({
                 ...cloneDeep(cursor),
                 ...schemas['Subscription-Cursor'],

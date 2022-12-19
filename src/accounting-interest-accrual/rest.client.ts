@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { ErrorResponse, InterestAccrualSearchCriteria, SearchResponse } from './rest.type'
 
+/**
+ * accounting/interestaccrual
+ */
 export class MambuAccountingInterestAccrual {
     public client: Got
 

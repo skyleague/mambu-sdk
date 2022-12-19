@@ -21,10 +21,13 @@ export const TriggerDatabaseBackupRequest = {
     get schema() {
         return TriggerDatabaseBackupRequest.validate.schema
     },
+    get errors() {
+        return TriggerDatabaseBackupRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is TriggerDatabaseBackupRequest => TriggerDatabaseBackupRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!TriggerDatabaseBackupRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(TriggerDatabaseBackupRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(TriggerDatabaseBackupRequest.errors ?? [])
         }
     },
 } as const
@@ -54,6 +57,9 @@ export const TriggerDatabaseBackupResponse = {
     get schema() {
         return TriggerDatabaseBackupResponse.validate.schema
     },
+    get errors() {
+        return TriggerDatabaseBackupResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is TriggerDatabaseBackupResponse => TriggerDatabaseBackupResponse.validate(o) === true,
 } as const
 
@@ -66,7 +72,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 export interface RestError {

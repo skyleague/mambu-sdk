@@ -26,10 +26,13 @@ export const RemoveCreditArrangementAccountInput = {
     get schema() {
         return RemoveCreditArrangementAccountInput.validate.schema
     },
+    get errors() {
+        return RemoveCreditArrangementAccountInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is RemoveCreditArrangementAccountInput => RemoveCreditArrangementAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!RemoveCreditArrangementAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(RemoveCreditArrangementAccountInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(RemoveCreditArrangementAccountInput.errors ?? [])
         }
     },
 } as const
@@ -53,7 +56,15 @@ export const CreditArrangementAccounts = {
     get schema() {
         return CreditArrangementAccounts.validate.schema
     },
+    get errors() {
+        return CreditArrangementAccounts.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CreditArrangementAccounts => CreditArrangementAccounts.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!CreditArrangementAccounts.validate(o)) {
+            throw new AjvValidator.ValidationError(CreditArrangementAccounts.errors ?? [])
+        }
+    },
 } as const
 
 export interface ErrorResponse {
@@ -65,7 +76,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 export type GetAllResponse = CreditArrangement[]
@@ -74,6 +93,9 @@ export const GetAllResponse = {
     validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
@@ -158,10 +180,13 @@ export const CreditArrangement = {
     get schema() {
         return CreditArrangement.validate.schema
     },
+    get errors() {
+        return CreditArrangement.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CreditArrangement => CreditArrangement.validate(o) === true,
     assert: (o: unknown) => {
         if (!CreditArrangement.validate(o)) {
-            throw new AjvValidator.ValidationError(CreditArrangement.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CreditArrangement.errors ?? [])
         }
     },
 } as const
@@ -185,10 +210,13 @@ export const CreditArrangementAction = {
     get schema() {
         return CreditArrangementAction.validate.schema
     },
+    get errors() {
+        return CreditArrangementAction.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CreditArrangementAction => CreditArrangementAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!CreditArrangementAction.validate(o)) {
-            throw new AjvValidator.ValidationError(CreditArrangementAction.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CreditArrangementAction.errors ?? [])
         }
     },
 } as const
@@ -210,10 +238,13 @@ export const CreditArrangementSearchCriteria = {
     get schema() {
         return CreditArrangementSearchCriteria.validate.schema
     },
+    get errors() {
+        return CreditArrangementSearchCriteria.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CreditArrangementSearchCriteria => CreditArrangementSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
         if (!CreditArrangementSearchCriteria.validate(o)) {
-            throw new AjvValidator.ValidationError(CreditArrangementSearchCriteria.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CreditArrangementSearchCriteria.errors ?? [])
         }
     },
 } as const
@@ -224,6 +255,9 @@ export const SearchResponse = {
     validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
+    },
+    get errors() {
+        return SearchResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
 } as const
@@ -248,10 +282,13 @@ export const AddCreditArrangementAccountInput = {
     get schema() {
         return AddCreditArrangementAccountInput.validate.schema
     },
+    get errors() {
+        return AddCreditArrangementAccountInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is AddCreditArrangementAccountInput => AddCreditArrangementAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!AddCreditArrangementAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(AddCreditArrangementAccountInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(AddCreditArrangementAccountInput.errors ?? [])
         }
     },
 } as const
@@ -271,6 +308,9 @@ export const CreditArrangementSchedule = {
     get schema() {
         return CreditArrangementSchedule.validate.schema
     },
+    get errors() {
+        return CreditArrangementSchedule.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CreditArrangementSchedule => CreditArrangementSchedule.validate(o) === true,
 } as const
 
@@ -281,10 +321,13 @@ export const PatchRequest = {
     get schema() {
         return PatchRequest.validate.schema
     },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
@@ -804,7 +847,11 @@ export interface Asset {
  */
 export interface Currency {
     /**
-     * Code of the currency.
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
+    /**
+     * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
     code?:
         | 'AED'
@@ -829,7 +876,6 @@ export interface Currency {
         | 'BOV'
         | 'BRL'
         | 'BSD'
-        | 'BTC'
         | 'BTN'
         | 'BWP'
         | 'BYR'
@@ -995,6 +1041,7 @@ export interface Currency {
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
+        | 'NON_FIAT'
 }
 
 /**
@@ -2074,5 +2121,7 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: unknown
+    value?: {
+        [k: string]: unknown | undefined
+    }
 }

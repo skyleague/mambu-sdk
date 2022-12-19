@@ -27,10 +27,13 @@ export const Holidays = {
     get schema() {
         return Holidays.validate.schema
     },
+    get errors() {
+        return Holidays.validate.errors ?? undefined
+    },
     is: (o: unknown): o is Holidays => Holidays.validate(o) === true,
     assert: (o: unknown) => {
         if (!Holidays.validate(o)) {
-            throw new AjvValidator.ValidationError(Holidays.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(Holidays.errors ?? [])
         }
     },
 } as const
@@ -44,7 +47,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**

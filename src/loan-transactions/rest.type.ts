@@ -22,10 +22,13 @@ export const LoanTransactionSearchCriteria = {
     get schema() {
         return LoanTransactionSearchCriteria.validate.schema
     },
+    get errors() {
+        return LoanTransactionSearchCriteria.validate.errors ?? undefined
+    },
     is: (o: unknown): o is LoanTransactionSearchCriteria => LoanTransactionSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanTransactionSearchCriteria.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanTransactionSearchCriteria.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(LoanTransactionSearchCriteria.errors ?? [])
         }
     },
 } as const
@@ -36,6 +39,9 @@ export const SearchResponse = {
     validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
+    },
+    get errors() {
+        return SearchResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
 } as const
@@ -49,7 +55,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 /**
@@ -71,10 +85,13 @@ export const LockLoanAccountInput = {
     get schema() {
         return LockLoanAccountInput.validate.schema
     },
+    get errors() {
+        return LockLoanAccountInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is LockLoanAccountInput => LockLoanAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!LockLoanAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(LockLoanAccountInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(LockLoanAccountInput.errors ?? [])
         }
     },
 } as const
@@ -94,7 +111,15 @@ export const LockLoanTransactionsWrapper = {
     get schema() {
         return LockLoanTransactionsWrapper.validate.schema
     },
+    get errors() {
+        return LockLoanTransactionsWrapper.validate.errors ?? undefined
+    },
     is: (o: unknown): o is LockLoanTransactionsWrapper => LockLoanTransactionsWrapper.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!LockLoanTransactionsWrapper.validate(o)) {
+            throw new AjvValidator.ValidationError(LockLoanTransactionsWrapper.errors ?? [])
+        }
+    },
 } as const
 
 /**
@@ -112,10 +137,13 @@ export const UnlockLoanAccountInput = {
     get schema() {
         return UnlockLoanAccountInput.validate.schema
     },
+    get errors() {
+        return UnlockLoanAccountInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is UnlockLoanAccountInput => UnlockLoanAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!UnlockLoanAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(UnlockLoanAccountInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(UnlockLoanAccountInput.errors ?? [])
         }
     },
 } as const
@@ -176,10 +204,13 @@ export const RepaymentLoanTransactionInput = {
     get schema() {
         return RepaymentLoanTransactionInput.validate.schema
     },
+    get errors() {
+        return RepaymentLoanTransactionInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is RepaymentLoanTransactionInput => RepaymentLoanTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!RepaymentLoanTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(RepaymentLoanTransactionInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(RepaymentLoanTransactionInput.errors ?? [])
         }
     },
 } as const
@@ -358,7 +389,15 @@ export const LoanTransaction = {
     get schema() {
         return LoanTransaction.validate.schema
     },
+    get errors() {
+        return LoanTransaction.validate.errors ?? undefined
+    },
     is: (o: unknown): o is LoanTransaction => LoanTransaction.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!LoanTransaction.validate(o)) {
+            throw new AjvValidator.ValidationError(LoanTransaction.errors ?? [])
+        }
+    },
 } as const
 
 /**
@@ -376,7 +415,7 @@ export interface LoanTransactionAdjustmentDetails {
     /**
      * Details of installments with their corresponding amounts to be added to the reduced fee/penalty
      */
-    installments?: AdjustTransactionInstallmentDetailsDto[]
+    installments?: AdjustTransactionInstallmentDetailsDTO[]
 }
 
 export const LoanTransactionAdjustmentDetails = {
@@ -385,10 +424,13 @@ export const LoanTransactionAdjustmentDetails = {
     get schema() {
         return LoanTransactionAdjustmentDetails.validate.schema
     },
+    get errors() {
+        return LoanTransactionAdjustmentDetails.validate.errors ?? undefined
+    },
     is: (o: unknown): o is LoanTransactionAdjustmentDetails => LoanTransactionAdjustmentDetails.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanTransactionAdjustmentDetails.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanTransactionAdjustmentDetails.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(LoanTransactionAdjustmentDetails.errors ?? [])
         }
     },
 } as const
@@ -443,10 +485,13 @@ export const DisbursementLoanTransactionInput = {
     get schema() {
         return DisbursementLoanTransactionInput.validate.schema
     },
+    get errors() {
+        return DisbursementLoanTransactionInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is DisbursementLoanTransactionInput => DisbursementLoanTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!DisbursementLoanTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(DisbursementLoanTransactionInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(DisbursementLoanTransactionInput.errors ?? [])
         }
     },
 } as const
@@ -458,6 +503,9 @@ export const GetTransactionsForAllVersionsResponse = {
         require('./schemas/get-transactions-for-all-versions-response.schema.js') as ValidateFunction<GetTransactionsForAllVersionsResponse>,
     get schema() {
         return GetTransactionsForAllVersionsResponse.validate.schema
+    },
+    get errors() {
+        return GetTransactionsForAllVersionsResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetTransactionsForAllVersionsResponse => GetTransactionsForAllVersionsResponse.validate(o) === true,
 } as const
@@ -499,10 +547,13 @@ export const WithdrawalRedrawTransactionInput = {
     get schema() {
         return WithdrawalRedrawTransactionInput.validate.schema
     },
+    get errors() {
+        return WithdrawalRedrawTransactionInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is WithdrawalRedrawTransactionInput => WithdrawalRedrawTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!WithdrawalRedrawTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(WithdrawalRedrawTransactionInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(WithdrawalRedrawTransactionInput.errors ?? [])
         }
     },
 } as const
@@ -543,10 +594,13 @@ export const PaymentMadeTransactionInput = {
     get schema() {
         return PaymentMadeTransactionInput.validate.schema
     },
+    get errors() {
+        return PaymentMadeTransactionInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is PaymentMadeTransactionInput => PaymentMadeTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!PaymentMadeTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(PaymentMadeTransactionInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(PaymentMadeTransactionInput.errors ?? [])
         }
     },
 } as const
@@ -554,7 +608,7 @@ export const PaymentMadeTransactionInput = {
 /**
  * Represents the request payload for creating a transaction of type REDRAW_REPAYMENT
  */
-export interface RedrawRepaymentTransactionInputDto {
+export interface RedrawRepaymentTransactionInputDTO {
     /**
      * The amount of the redraw repayment
      */
@@ -573,16 +627,19 @@ export interface RedrawRepaymentTransactionInputDto {
     notes?: string
 }
 
-export const RedrawRepaymentTransactionInputDto = {
+export const RedrawRepaymentTransactionInputDTO = {
     validate:
-        require('./schemas/redraw-repayment-transaction-input-dto.schema.js') as ValidateFunction<RedrawRepaymentTransactionInputDto>,
+        require('./schemas/redraw-repayment-transaction-input-dto.schema.js') as ValidateFunction<RedrawRepaymentTransactionInputDTO>,
     get schema() {
-        return RedrawRepaymentTransactionInputDto.validate.schema
+        return RedrawRepaymentTransactionInputDTO.validate.schema
     },
-    is: (o: unknown): o is RedrawRepaymentTransactionInputDto => RedrawRepaymentTransactionInputDto.validate(o) === true,
+    get errors() {
+        return RedrawRepaymentTransactionInputDTO.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is RedrawRepaymentTransactionInputDTO => RedrawRepaymentTransactionInputDTO.validate(o) === true,
     assert: (o: unknown) => {
-        if (!RedrawRepaymentTransactionInputDto.validate(o)) {
-            throw new AjvValidator.ValidationError(RedrawRepaymentTransactionInputDto.validate.errors ?? [])
+        if (!RedrawRepaymentTransactionInputDTO.validate(o)) {
+            throw new AjvValidator.ValidationError(RedrawRepaymentTransactionInputDTO.errors ?? [])
         }
     },
 } as const
@@ -593,6 +650,9 @@ export const GetAllResponse = {
     validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
@@ -636,10 +696,13 @@ export const FeeLoanTransactionInput = {
     get schema() {
         return FeeLoanTransactionInput.validate.schema
     },
+    get errors() {
+        return FeeLoanTransactionInput.validate.errors ?? undefined
+    },
     is: (o: unknown): o is FeeLoanTransactionInput => FeeLoanTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!FeeLoanTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(FeeLoanTransactionInput.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(FeeLoanTransactionInput.errors ?? [])
         }
     },
 } as const
@@ -891,10 +954,10 @@ export interface Fee {
         | 'CAPITALIZED_DISBURSEMENT'
         | 'UPFRONT_DISBURSEMENT'
         | 'LATE_REPAYMENT'
-        | 'MONTHLY_FEE'
         | 'PAYMENT_DUE'
         | 'PAYMENT_DUE_APPLIED_ON_DUE_DATES'
         | 'ARBITRARY'
+        | 'IOF'
     /**
      * The amount of the taxes on fee that was applied/paid in the transaction.
      */
@@ -1106,7 +1169,11 @@ export interface TransferDetails {
  */
 export interface Currency {
     /**
-     * Code of the currency.
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
+    /**
+     * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
     code?:
         | 'AED'
@@ -1131,7 +1198,6 @@ export interface Currency {
         | 'BOV'
         | 'BRL'
         | 'BSD'
-        | 'BTC'
         | 'BTN'
         | 'BWP'
         | 'BYR'
@@ -1297,6 +1363,7 @@ export interface Currency {
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
+        | 'NON_FIAT'
 }
 
 /**
@@ -1332,7 +1399,7 @@ export interface TransactionBalances {
 /**
  * Contains the details for the spread of the adjusted amount over the installments
  */
-export interface AdjustTransactionInstallmentDetailsDto {
+export interface AdjustTransactionInstallmentDetailsDTO {
     /**
      * The encoded key of the installment
      */

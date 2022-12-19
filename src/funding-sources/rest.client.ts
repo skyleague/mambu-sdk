@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { ErrorResponse, SellFundingSourceAction, SellResponse } from './rest.type'
 
+/**
+ * fundingsources
+ */
 export class MambuFundingSources {
     public client: Got
 

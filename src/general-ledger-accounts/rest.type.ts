@@ -9,7 +9,7 @@ import type { ValidateFunction } from 'ajv'
 /**
  * The response representation of a GLAccount.
  */
-export interface GlAccount {
+export interface GLAccount {
     /**
      * The data migration event key if this GL Account was created as a part of a data migration event.
      */
@@ -65,12 +65,15 @@ export interface GlAccount {
     activated?: boolean
 }
 
-export const GlAccount = {
-    validate: require('./schemas/gl-account.schema.js') as ValidateFunction<GlAccount>,
+export const GLAccount = {
+    validate: require('./schemas/gl-account.schema.js') as ValidateFunction<GLAccount>,
     get schema() {
-        return GlAccount.validate.schema
+        return GLAccount.validate.schema
     },
-    is: (o: unknown): o is GlAccount => GlAccount.validate(o) === true,
+    get errors() {
+        return GLAccount.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GLAccount => GLAccount.validate(o) === true,
 } as const
 
 export interface ErrorResponse {
@@ -82,7 +85,15 @@ export const ErrorResponse = {
     get schema() {
         return ErrorResponse.validate.schema
     },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 export type PatchRequest = PatchOperation[]
@@ -92,45 +103,57 @@ export const PatchRequest = {
     get schema() {
         return PatchRequest.validate.schema
     },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
 
-export type GetAllResponse = GlAccount[]
+export type GetAllResponse = GLAccount[]
 
 export const GetAllResponse = {
     validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
-export type CreateRequest = GlAccountInput[]
+export type CreateRequest = GLAccountInput[]
 
 export const CreateRequest = {
     validate: require('./schemas/create-request.schema.js') as ValidateFunction<CreateRequest>,
     get schema() {
         return CreateRequest.validate.schema
     },
+    get errors() {
+        return CreateRequest.validate.errors ?? undefined
+    },
     is: (o: unknown): o is CreateRequest => CreateRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!CreateRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(CreateRequest.validate.errors ?? [])
+            throw new AjvValidator.ValidationError(CreateRequest.errors ?? [])
         }
     },
 } as const
 
-export type CreateResponse = GlAccount[]
+export type CreateResponse = GLAccount[]
 
 export const CreateResponse = {
     validate: require('./schemas/create-response.schema.js') as ValidateFunction<CreateResponse>,
     get schema() {
         return CreateResponse.validate.schema
+    },
+    get errors() {
+        return CreateResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is CreateResponse => CreateResponse.validate(o) === true,
 } as const
@@ -140,7 +163,11 @@ export const CreateResponse = {
  */
 export interface Currency {
     /**
-     * Code of the currency.
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
+    /**
+     * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
     code?:
         | 'AED'
@@ -165,7 +192,6 @@ export interface Currency {
         | 'BOV'
         | 'BRL'
         | 'BSD'
-        | 'BTC'
         | 'BTN'
         | 'BWP'
         | 'BYR'
@@ -331,6 +357,7 @@ export interface Currency {
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
+        | 'NON_FIAT'
 }
 
 export interface RestError {
@@ -358,13 +385,15 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: unknown
+    value?: {
+        [k: string]: unknown | undefined
+    }
 }
 
 /**
  * Represents the request payload for creating a GL Account
  */
-export interface GlAccountInput {
+export interface GLAccountInput {
     /**
      * General ledger code used to identify different account types. Also used for grouping and categorizing accounts. For instance an account code of '3201' is considered a subtype of account of '3200'
      */

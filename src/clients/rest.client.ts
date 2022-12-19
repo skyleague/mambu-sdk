@@ -18,6 +18,9 @@ import {
     SearchResponse,
 } from './rest.type'
 
+/**
+ * clients
+ */
 export class MambuClients {
     public client: Got
 

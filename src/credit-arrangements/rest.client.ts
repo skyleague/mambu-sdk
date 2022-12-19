@@ -21,6 +21,9 @@ import {
     SearchResponse,
 } from './rest.type'
 
+/**
+ * creditarrangements
+ */
 export class MambuCreditArrangements {
     public client: Got
 

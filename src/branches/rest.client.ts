@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { Branch, ErrorResponse, GetAllResponse } from './rest.type'
 
+/**
+ * branches
+ */
 export class MambuBranches {
     public client: Got
 
@@ -91,6 +94,41 @@ export class MambuBranches {
                 403: ErrorResponse,
             }
         )
+    }
+
+    /**
+     * Create a new Branch
+     */
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: Branch
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(Branch, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`branches`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (x: unknown): x is unknown => true },
+                201: Branch,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    public validateRequestBody<T>(schema: { is: (o: unknown) => o is T; assert: (o: unknown) => void }, body: T) {
+        schema.assert(body)
+        return body
     }
 
     public async awaitResponse<

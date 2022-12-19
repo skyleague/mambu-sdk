@@ -16,6 +16,9 @@ import {
     PatchRequest,
 } from './rest.type'
 
+/**
+ * depositproducts
+ */
 export class MambuDepositProducts {
     public client: Got
 
@@ -189,6 +192,7 @@ export class MambuDepositProducts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -214,6 +218,7 @@ export class MambuDepositProducts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -244,6 +249,7 @@ export class MambuDepositProducts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }

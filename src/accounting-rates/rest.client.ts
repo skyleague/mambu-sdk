@@ -7,8 +7,11 @@ import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
-import { AccountingRate, ErrorResponse, GetAllResponse, PostAccountingRateDto } from './rest.type'
+import { AccountingRate, ErrorResponse, GetAllResponse, PostAccountingRateDTO } from './rest.type'
 
+/**
+ * currencies/accountingRates
+ */
 export class MambuAccountingRates {
     public client: Got
 
@@ -77,12 +80,12 @@ export class MambuAccountingRates {
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: PostAccountingRateDto
+        body: PostAccountingRateDTO
         path: { currencyCode: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(PostAccountingRateDto, body)
+        this.validateRequestBody(PostAccountingRateDTO, body)
 
         return this.awaitResponse(
             this.buildClient(auth).post(`currencies/${path.currencyCode}/accountingRates`, {

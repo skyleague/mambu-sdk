@@ -9,6 +9,9 @@ import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
 import { ErrorResponse, TriggerDatabaseBackupRequest, TriggerDatabaseBackupResponse } from './rest.type'
 
+/**
+ * database/backup
+ */
 export class MambuDatabaseBackup {
     public client: Got
 
