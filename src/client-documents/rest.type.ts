@@ -6,6 +6,40 @@
 import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
 
+export type GetDocumentsByClientIdResponse = Document[]
+
+export const GetDocumentsByClientIdResponse = {
+    validate:
+        require('./schemas/get-documents-by-client-id-response.schema.js') as ValidateFunction<GetDocumentsByClientIdResponse>,
+    get schema() {
+        return GetDocumentsByClientIdResponse.validate.schema
+    },
+    get errors() {
+        return GetDocumentsByClientIdResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetDocumentsByClientIdResponse => GetDocumentsByClientIdResponse.validate(o) === true,
+} as const
+
+export interface ErrorResponse {
+    errors?: RestError[]
+}
+
+export const ErrorResponse = {
+    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    get schema() {
+        return ErrorResponse.validate.schema
+    },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
+} as const
+
 /**
  * Holds information regarding the documents uploaded as attachments
  */
@@ -86,40 +120,6 @@ export const Document = {
             throw new AjvValidator.ValidationError(Document.errors ?? [])
         }
     },
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[]
-}
-
-export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
-    get schema() {
-        return ErrorResponse.validate.schema
-    },
-    get errors() {
-        return ErrorResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
-        }
-    },
-} as const
-
-export type GetDocumentsByClientIdResponse = Document[]
-
-export const GetDocumentsByClientIdResponse = {
-    validate:
-        require('./schemas/get-documents-by-client-id-response.schema.js') as ValidateFunction<GetDocumentsByClientIdResponse>,
-    get schema() {
-        return GetDocumentsByClientIdResponse.validate.schema
-    },
-    get errors() {
-        return GetDocumentsByClientIdResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetDocumentsByClientIdResponse => GetDocumentsByClientIdResponse.validate(o) === true,
 } as const
 
 export interface RestError {

@@ -7,12 +7,11 @@ import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import { IncomingHttpHeaders } from 'http'
-import { Document, ErrorResponse, GetDocumentsByClientIdResponse } from './rest.type'
 
 /**
- * clients/documents
+ * configuration/loanproducts.yaml
  */
-export class MambuClientDocuments {
+export class MambuLoanProductsConfiguration {
     public client: Got
 
     public auth: {
@@ -44,102 +43,48 @@ export class MambuClientDocuments {
     }
 
     /**
-     * Retrieve metadata regarding all documents for a specific client
+     * Allows retrieval of the loan products configuration.
      */
-    public async getDocumentsByClientId({
-        path,
+    public async get({
         query,
         auth = [['apiKey'], ['basic']],
-    }: {
-        path: { clientId: string }
-        query?: { offset?: string; limit?: string; paginationDetails?: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { query?: { type?: string }; auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
-            this.buildClient(auth).get(`clients/${path.clientId}/documentsMetadata`, {
+            this.buildClient(auth).get(`configuration/loanproducts.yaml`, {
                 searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
+                headers: { Accept: 'application/vnd.mambu.v2+yaml' },
+                responseType: 'text',
             }),
             {
-                200: GetDocumentsByClientIdResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
+                200: { is: (x: unknown): x is string => true },
+                400: { is: (x: unknown): x is string => true },
+                401: { is: (x: unknown): x is string => true },
+                403: { is: (x: unknown): x is string => true },
             }
         )
     }
 
     /**
-     * Allows retrieval of a single document metadata via id or encoded key
+     * Allows updating the loan products configuration.
      */
-    public async getClientDocumentById({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { documentId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`clients/documents/${path.documentId}/metadata`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: Document,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create a new client document
-     */
-    public async createDocument({
-        path,
+    public async update({
         headers,
         auth = [['apiKey'], ['basic']],
-    }: {
-        path: { clientId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { headers?: { ['X-Mambu-Async']?: string; ['X-Mambu-Callback']?: string }; auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
-            this.buildClient(auth).post(`clients/${path.clientId}/documents`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+            this.buildClient(auth).put(`configuration/loanproducts.yaml`, {
+                headers: { Accept: 'application/vnd.mambu.v2+yaml', ...headers },
+                responseType: 'text',
             }),
             {
-                201: Document,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
+                200: { is: (x: unknown): x is string => true },
+                202: { is: (x: unknown): x is string => true },
+                400: { is: (x: unknown): x is string => true },
+                401: { is: (x: unknown): x is string => true },
+                403: { is: (x: unknown): x is string => true },
+                404: { is: (x: unknown): x is string => true },
             }
         )
-    }
-
-    /**
-     * Download a single client document
-     */
-    public async getClientDocumentFileById({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { documentId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(this.buildClient(auth).get(`clients/documents/${path.documentId}`, {}), {
-            200: { is: (x: unknown): x is string => true },
-            400: { is: (x: unknown): x is string => true },
-            401: { is: (x: unknown): x is string => true },
-            403: { is: (x: unknown): x is string => true },
-            404: { is: (x: unknown): x is string => true },
-        })
     }
 
     public async awaitResponse<

@@ -179,6 +179,7 @@ export interface CommunicationMessage {
         | 'COLLECTION_ORDER_ACTIVITY'
         | 'JOURNAL_ENTRY_ADDED'
         | 'JOURNAL_ENTRY_ADJUSTED'
+        | 'SAVINGS_TRANSACTION_EDITED'
     /**
      * The communication message template key
      */
