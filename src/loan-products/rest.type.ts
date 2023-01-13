@@ -874,6 +874,7 @@ export interface PredefinedFee {
         | 'FLAT_NUMBER_OF_INSTALLMENTS'
         | 'IOF_PERCENTAGE_OF_DISBURSED_AMOUNT'
         | 'IOF_PERCENTAGE_OF_INSTALLMENT_PRINCIPAL'
+        | 'IOF_PERCENTAGE_OF_LATE_INSTALLMENT_PRINCIPAL'
     taxSettings?: FeeTaxSettings
     /**
      * Shows the event that will trigger a fee

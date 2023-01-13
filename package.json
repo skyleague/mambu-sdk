@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "license": "MIT",
   "author": "SkyLeague Technologies B.V. <technologies@skyleague.io> (https://skyleague.io)",
-  "main": ".main.js",
-  "types": "index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "sideEffects": false,
   "node-standards": {
     "type": "library"
@@ -17,15 +17,9 @@
     "registry": "https://registry.npmjs.org",
     "access": "public"
   },
-  "files": [
-    ".main.js",
-    ".main.js.map",
-    "index.d.ts",
-    "src/**/*.d.ts",
-    "package.json"
-  ],
+  "files": ["dist", "package.json"],
   "scripts": {
-    "build": "npx ts-node esbuild.config.ts",
+    "build": "npx ts-node build.config.ts",
     "build:clean": "npx tsc --build --clean && rm .main.js && rm .main.js.map",
     "build:docs": "npx typedoc",
     "build:index": "npx ts-node scripts/build-index.ts",
@@ -52,7 +46,7 @@
   },
   "devDependencies": {
     "@skyleague/axioms": "^1.10.1",
-    "@skyleague/node-standards": "^1.11.2",
+    "@skyleague/node-standards": "^1.12.3",
     "@skyleague/therefore": "^1.22.0",
     "@types/split2": "^3.2.1",
     "camelcase": "^6.3.0",
