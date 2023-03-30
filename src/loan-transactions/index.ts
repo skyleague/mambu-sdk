@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as loanTransactions from './rest.type'
+export * from './rest.client.js'
+export * as loanTransactions from './rest.type.js'

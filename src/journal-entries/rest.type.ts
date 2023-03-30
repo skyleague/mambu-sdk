@@ -9,7 +9,7 @@ import type { ValidateFunction } from 'ajv'
 export type GetAllResponse = GLJournalEntry[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -24,7 +24,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -70,7 +70,8 @@ export interface PostGLJournalEntriesDTO {
 }
 
 export const PostGLJournalEntriesDTO = {
-    validate: require('./schemas/post-gl-journal-entries-dto.schema.js') as ValidateFunction<PostGLJournalEntriesDTO>,
+    validate: (await import('./schemas/post-gl-journal-entries-dto.schema.js'))
+        .validate10 as unknown as ValidateFunction<PostGLJournalEntriesDTO>,
     get schema() {
         return PostGLJournalEntriesDTO.validate.schema
     },
@@ -88,7 +89,7 @@ export const PostGLJournalEntriesDTO = {
 export type CreateResponse = GLJournalEntry[]
 
 export const CreateResponse = {
-    validate: require('./schemas/create-response.schema.js') as ValidateFunction<CreateResponse>,
+    validate: (await import('./schemas/create-response.schema.js')).validate10 as unknown as ValidateFunction<CreateResponse>,
     get schema() {
         return CreateResponse.validate.schema
     },
@@ -110,7 +111,8 @@ export interface GLJournalEntrySearchCriteria {
 }
 
 export const GLJournalEntrySearchCriteria = {
-    validate: require('./schemas/gl-journal-entry-search-criteria.schema.js') as ValidateFunction<GLJournalEntrySearchCriteria>,
+    validate: (await import('./schemas/gl-journal-entry-search-criteria.schema.js'))
+        .validate10 as unknown as ValidateFunction<GLJournalEntrySearchCriteria>,
     get schema() {
         return GLJournalEntrySearchCriteria.validate.schema
     },
@@ -128,7 +130,7 @@ export const GLJournalEntrySearchCriteria = {
 export type SearchResponse = GLJournalEntry[]
 
 export const SearchResponse = {
-    validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
+    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -581,6 +583,7 @@ export interface GLJournalEntryFilterCriteria {
         | 'foreignCredit'
         | 'loanAccountId'
         | 'foreignCurrencyCode'
+        | 'assignedBranchKey'
     /**
      * The value to match the searching criteria
      */

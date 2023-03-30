@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as generalHolidays from './rest.type'
+export * from './rest.client.js'
+export * as generalHolidays from './rest.type.js'

@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as bulks from './rest.type'
+export * from './rest.client.js'
+export * as bulks from './rest.type.js'

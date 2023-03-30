@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as crons from './rest.type'
+export * from './rest.client.js'
+export * as crons from './rest.type.js'

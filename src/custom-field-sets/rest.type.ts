@@ -9,7 +9,8 @@ import type { ValidateFunction } from 'ajv'
 export type GetAllBySetIdResponse = CustomFieldMeta[]
 
 export const GetAllBySetIdResponse = {
-    validate: require('./schemas/get-all-by-set-id-response.schema.js') as ValidateFunction<GetAllBySetIdResponse>,
+    validate: (await import('./schemas/get-all-by-set-id-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetAllBySetIdResponse>,
     get schema() {
         return GetAllBySetIdResponse.validate.schema
     },
@@ -24,7 +25,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -42,7 +43,7 @@ export const ErrorResponse = {
 export type GetAllResponse = CustomFieldSetMeta[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },

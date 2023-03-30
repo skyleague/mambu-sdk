@@ -9,7 +9,7 @@ import type { ValidateFunction } from 'ajv'
 export type GetAllResponse = IndexRateSource[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -24,7 +24,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -66,7 +66,7 @@ export interface IndexRateSource {
 }
 
 export const IndexRateSource = {
-    validate: require('./schemas/index-rate-source.schema.js') as ValidateFunction<IndexRateSource>,
+    validate: (await import('./schemas/index-rate-source.schema.js')).validate10 as unknown as ValidateFunction<IndexRateSource>,
     get schema() {
         return IndexRateSource.validate.schema
     },
@@ -84,7 +84,7 @@ export const IndexRateSource = {
 export type GetAll1Response = IndexRate[]
 
 export const GetAll1Response = {
-    validate: require('./schemas/get-all1-response.schema.js') as ValidateFunction<GetAll1Response>,
+    validate: (await import('./schemas/get-all1-response.schema.js')).validate10 as unknown as ValidateFunction<GetAll1Response>,
     get schema() {
         return GetAll1Response.validate.schema
     },
@@ -129,7 +129,7 @@ export interface IndexRate {
 }
 
 export const IndexRate = {
-    validate: require('./schemas/index-rate.schema.js') as ValidateFunction<IndexRate>,
+    validate: (await import('./schemas/index-rate.schema.js')).validate10 as unknown as ValidateFunction<IndexRate>,
     get schema() {
         return IndexRate.validate.schema
     },

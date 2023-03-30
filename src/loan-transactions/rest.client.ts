@@ -6,7 +6,7 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
+import type { IncomingHttpHeaders } from 'http'
 import {
     DisbursementLoanTransactionInput,
     ErrorResponse,
@@ -24,7 +24,7 @@ import {
     SearchResponse,
     UnlockLoanAccountInput,
     WithdrawalRedrawTransactionInput,
-} from './rest.type'
+} from './rest.type.js'
 
 /**
  * loans/transactions
@@ -114,7 +114,7 @@ export class MambuLoanTransactions {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: LockLoanTransactionsWrapper,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -147,7 +147,7 @@ export class MambuLoanTransactions {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: LockLoanTransactionsWrapper,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -180,7 +180,7 @@ export class MambuLoanTransactions {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: LoanTransaction,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -213,7 +213,7 @@ export class MambuLoanTransactions {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 200: LoanTransaction,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -246,7 +246,7 @@ export class MambuLoanTransactions {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: LoanTransaction,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -335,7 +335,7 @@ export class MambuLoanTransactions {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: LoanTransaction,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -368,7 +368,7 @@ export class MambuLoanTransactions {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: LoanTransaction,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -401,7 +401,7 @@ export class MambuLoanTransactions {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: LoanTransaction,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -462,7 +462,7 @@ export class MambuLoanTransactions {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: LoanTransaction,
                 400: ErrorResponse,
                 401: ErrorResponse,

@@ -27,8 +27,8 @@ export interface TriggerHourlyAndEndOfDayProcessingResponse {
 }
 
 export const TriggerHourlyAndEndOfDayProcessingResponse = {
-    validate:
-        require('./schemas/trigger-hourly-and-end-of-day-processing-response.schema.js') as ValidateFunction<TriggerHourlyAndEndOfDayProcessingResponse>,
+    validate: (await import('./schemas/trigger-hourly-and-end-of-day-processing-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<TriggerHourlyAndEndOfDayProcessingResponse>,
     get schema() {
         return TriggerHourlyAndEndOfDayProcessingResponse.validate.schema
     },
@@ -44,7 +44,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },

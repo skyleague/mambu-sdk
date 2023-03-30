@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as dataImport from './rest.type'
+export * from './rest.client.js'
+export * as dataImport from './rest.type.js'

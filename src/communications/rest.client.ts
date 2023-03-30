@@ -6,7 +6,7 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
+import type { IncomingHttpHeaders } from 'http'
 import {
     CommunicationMessage,
     CommunicationMessageAction,
@@ -14,7 +14,7 @@ import {
     ErrorResponse,
     SearchRequest,
     SearchResponse,
-} from './rest.type'
+} from './rest.type.js'
 
 /**
  * communications/messages
@@ -99,7 +99,7 @@ export class MambuCommunications {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: CommunicationMessage,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -129,8 +129,8 @@ export class MambuCommunications {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
-                200: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
+                200: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -190,8 +190,8 @@ export class MambuCommunications {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
-                202: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
+                202: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -221,8 +221,8 @@ export class MambuCommunications {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
-                200: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
+                200: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

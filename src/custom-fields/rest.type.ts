@@ -70,7 +70,7 @@ export interface CustomFieldMeta {
 }
 
 export const CustomFieldMeta = {
-    validate: require('./schemas/custom-field-meta.schema.js') as ValidateFunction<CustomFieldMeta>,
+    validate: (await import('./schemas/custom-field-meta.schema.js')).validate10 as unknown as ValidateFunction<CustomFieldMeta>,
     get schema() {
         return CustomFieldMeta.validate.schema
     },
@@ -85,7 +85,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },

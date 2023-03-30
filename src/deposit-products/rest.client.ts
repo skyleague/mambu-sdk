@@ -6,7 +6,7 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
+import type { IncomingHttpHeaders } from 'http'
 import {
     DepositProduct,
     DepositProductAction,
@@ -14,7 +14,7 @@ import {
     ErrorResponse,
     GetAllResponse,
     PatchRequest,
-} from './rest.type'
+} from './rest.type.js'
 
 /**
  * depositproducts
@@ -73,7 +73,7 @@ export class MambuDepositProducts {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 202: DepositProductActionResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -129,7 +129,7 @@ export class MambuDepositProducts {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: DepositProduct,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -213,7 +213,7 @@ export class MambuDepositProducts {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -244,7 +244,7 @@ export class MambuDepositProducts {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

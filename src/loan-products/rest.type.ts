@@ -81,7 +81,7 @@ export interface LoanProduct {
 }
 
 export const LoanProduct = {
-    validate: require('./schemas/loan-product.schema.js') as ValidateFunction<LoanProduct>,
+    validate: (await import('./schemas/loan-product.schema.js')).validate10 as unknown as ValidateFunction<LoanProduct>,
     get schema() {
         return LoanProduct.validate.schema
     },
@@ -101,7 +101,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -119,7 +119,7 @@ export const ErrorResponse = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: require('./schemas/patch-request.schema.js') as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -137,7 +137,7 @@ export const PatchRequest = {
 export type GetAllResponse = LoanProduct[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },

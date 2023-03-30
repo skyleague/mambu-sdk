@@ -18,7 +18,8 @@ export interface LoanAccountSchedule {
 }
 
 export const LoanAccountSchedule = {
-    validate: require('./schemas/loan-account-schedule.schema.js') as ValidateFunction<LoanAccountSchedule>,
+    validate: (await import('./schemas/loan-account-schedule.schema.js'))
+        .validate10 as unknown as ValidateFunction<LoanAccountSchedule>,
     get schema() {
         return LoanAccountSchedule.validate.schema
     },
@@ -26,6 +27,11 @@ export const LoanAccountSchedule = {
         return LoanAccountSchedule.validate.errors ?? undefined
     },
     is: (o: unknown): o is LoanAccountSchedule => LoanAccountSchedule.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!LoanAccountSchedule.validate(o)) {
+            throw new AjvValidator.ValidationError(LoanAccountSchedule.errors ?? [])
+        }
+    },
 } as const
 
 export interface ErrorResponse {
@@ -33,7 +39,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -44,6 +50,75 @@ export const ErrorResponse = {
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
             throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
+} as const
+
+export type PreviewTranchesOnScheduleRequest = LoanTranche[]
+
+export const PreviewTranchesOnScheduleRequest = {
+    validate: (await import('./schemas/preview-tranches-on-schedule-request.schema.js'))
+        .validate10 as unknown as ValidateFunction<PreviewTranchesOnScheduleRequest>,
+    get schema() {
+        return PreviewTranchesOnScheduleRequest.validate.schema
+    },
+    get errors() {
+        return PreviewTranchesOnScheduleRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PreviewTranchesOnScheduleRequest => PreviewTranchesOnScheduleRequest.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!PreviewTranchesOnScheduleRequest.validate(o)) {
+            throw new AjvValidator.ValidationError(PreviewTranchesOnScheduleRequest.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Payload structure to preview loan account schedule.
+ */
+export interface PreviewLoanAccountSchedule {
+    interestSettings?: InterestSettingsForSchedulePreview
+    disbursementDetails?: DisbursementDetailsForSchedulePreview
+    scheduleSettings?: ScheduleSettingsForSchedulePreview
+    /**
+     * The value of the interest booked by the organization from the accounts funded by investors. Null if the funds are not enable
+     */
+    interestCommission?: number
+    /**
+     * The key to the type of product that this account is based on.
+     */
+    productTypeKey: string
+    /**
+     * A list with planned manual fees to be applied on the installments for schedule preview.
+     */
+    plannedInstallmentFees?: PlannedInstallmentFee[]
+    /**
+     * The loan amount
+     */
+    loanAmount: number
+    /**
+     * The top up amount in case of a refinanced account
+     */
+    topUpAmount?: number
+    /**
+     * List of tranches to be considered for schedule preview.
+     */
+    tranches?: LoanTranche[]
+}
+
+export const PreviewLoanAccountSchedule = {
+    validate: (await import('./schemas/preview-loan-account-schedule.schema.js'))
+        .validate10 as unknown as ValidateFunction<PreviewLoanAccountSchedule>,
+    get schema() {
+        return PreviewLoanAccountSchedule.validate.schema
+    },
+    get errors() {
+        return PreviewLoanAccountSchedule.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PreviewLoanAccountSchedule => PreviewLoanAccountSchedule.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!PreviewLoanAccountSchedule.validate(o)) {
+            throw new AjvValidator.ValidationError(PreviewLoanAccountSchedule.errors ?? [])
         }
     },
 } as const
@@ -405,4 +480,227 @@ export interface RestError {
     errorCode?: number
     errorSource?: string
     errorReason?: string
+}
+
+/**
+ * In some cases organizations may approve loans but not disburse the full amount initially. They would like to spread the disbursement (and risk) over time. Likewise for the client, they may not need the full loan amount up front. They may want to have a loan to buy some equipment for their business but will make one purchase today and another purchase in a few months.  In these cases, they don't need the full amount and wouldn't want to pay interest on cash they don't need yet. A solution for this matter is the usage of disbursement in tranches. This class holds the information required for one of this tranche.
+ */
+export interface LoanTranche {
+    /**
+     * The encoded key of the transaction details , auto generated, unique.
+     */
+    encodedKey?: string
+    /**
+     * The amount this tranche has available for disburse
+     */
+    amount: number
+    /**
+     * Fees that are associated with this tranche
+     */
+    fees?: CustomPredefinedFee[]
+    disbursementDetails?: TrancheDisbursementDetails
+    /**
+     * Index indicating the tranche number
+     */
+    trancheNumber?: number
+}
+
+/**
+ * The custom predefined fees, they may be used as the expected predefined fees that will be applied on the disbursement.
+ */
+export interface CustomPredefinedFee {
+    /**
+     * The encoded key of the predefined fee
+     */
+    predefinedFeeEncodedKey?: string
+    /**
+     * The encoded key of the custom predefined fee, auto generated, unique.
+     */
+    encodedKey?: string
+    /**
+     * The amount of the custom fee.
+     */
+    amount?: number
+    /**
+     * The percentage of the custom fee.
+     */
+    percentage?: number
+}
+
+/**
+ * The disbursement details regarding a loan tranche.
+ */
+export interface TrancheDisbursementDetails {
+    /**
+     * The date when this tranche is supposed to be disbursed (as Organization Time)
+     */
+    expectedDisbursementDate?: string
+    /**
+     * The key of the disbursement transaction logged when this tranche was disbursed. This field will be null until the tranche disbursement
+     */
+    disbursementTransactionKey?: string
+}
+
+/**
+ * The interest settings, holds all the properties regarding interests for the loan account.
+ */
+export interface InterestSettingsForSchedulePreview {
+    /**
+     * Interest to be added to active organization index interest rate in order to find out actual interest rate
+     */
+    interestSpread?: number
+    /**
+     * The interest rate. Represents the interest rate for the loan account. The interest on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.
+     */
+    interestRate?: number
+    /**
+     * The interest settings details for schedule preview.
+     */
+    accountInterestRateSettings?: AccountInterestRateSettings[]
+}
+
+/**
+ * Adjustable interest rates settings for loan account
+ */
+export interface AccountInterestRateSettings {
+    /**
+     * Interest rate review frequency measurement unit. Valid only for index interest rate.
+     */
+    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
+    /**
+     * Interest rate value.
+     */
+    interestRate?: number
+    /**
+     * Interest spread value.
+     */
+    interestSpread?: number
+    /**
+     * Interest calculation method: fixed or indexed(interest spread + active organization index interest rate)
+     */
+    interestRateSource: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE'
+    /**
+     * Interest rate review frequency unit count. Valid only for index interest rate.
+     */
+    interestRateReviewCount?: number
+    /**
+     * Index rate source key.
+     */
+    indexSourceKey?: string
+    /**
+     * Maximum value allowed for index based interest rate. Valid only for index interest rate.
+     */
+    interestRateCeilingValue?: number
+    /**
+     * The encoded key of the interest rate settings, auto generated, unique
+     */
+    encodedKey?: string
+    /**
+     * Date since an interest rate is valid
+     */
+    validFrom: string
+    /**
+     * Minimum value allowed for index based interest rate. Valid only for index interest rate.
+     */
+    interestRateFloorValue?: number
+}
+
+/**
+ * The the disbursement details it holds the information related to the disbursement details as disbursement date, first repayment date, disbursement fees.
+ */
+export interface DisbursementDetailsForSchedulePreview {
+    /**
+     * The date of the expected disbursement.Stored as Organization Time.
+     */
+    expectedDisbursementDate?: string
+    /**
+     * List of fees that should be applied at the disbursement time.
+     */
+    fees?: CustomPredefinedFee[]
+    /**
+     * The date of the expected first repayment. Stored as Organization Time.
+     */
+    firstRepaymentDate?: string
+}
+
+/**
+ * The schedule settings, holds all schedule properties needed for schedule preview request.
+ */
+export interface ScheduleSettingsForSchedulePreview {
+    /**
+     * The principal repayment interval. Indicates the interval of repayments that the principal has to be paid.
+     */
+    principalRepaymentInterval?: number
+    /**
+     * The grace period. Represents the grace period for loan repayment - in number of installments.
+     */
+    gracePeriod?: number
+    /**
+     * The periodic payment amount for the accounts which have balloon payments or Reduce Number of Installments and Optimized Payments
+     */
+    periodicPayment?: number
+    /**
+     * The repayment period unit. Represents the frequency of loan repayment.
+     */
+    repaymentPeriodUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS'
+    /**
+     * A list of periodic payments for the current loan account.
+     */
+    paymentPlan?: PeriodicPaymentForSchedulePreview[]
+    /**
+     * Specifies the days of the month when the repayment due dates should be. Only available if the Repayment Methodology is FIXED_DAYS_OF_MONTH.
+     */
+    fixedDaysOfMonth?: number[]
+    /**
+     * The repayment installments. Represents how many installments are required to pay back the loan.
+     */
+    repaymentInstallments?: number
+    /**
+     * The repayment period count. Represents how often the loan is to be repaid: stored based on the type repayment option.
+     */
+    repaymentPeriodCount?: number
+}
+
+/**
+ * For fixed term loans there is the possibility to define a payment plan. A payment plan consists of multiple periodic payments. This class holds information about a periodic payment for schedule preview.
+ */
+export interface PeriodicPaymentForSchedulePreview {
+    /**
+     * The installment's position up to which the PMT will be used
+     */
+    toInstallment: number
+    /**
+     * The PMT value used in periodic payment
+     */
+    amount: number
+}
+
+/**
+ * The planned fee details holds the information related to the installment key, predefined fee key and amount
+ */
+export interface PlannedInstallmentFee {
+    /**
+     * The number of the installment on which the predefined fee is planned. It is used only in the case when fees are created at the same time with the loan account creation or during preview schedule, before account creation, otherwise this should be empty and installmentKey will be used to identify an installment.
+     */
+    installmentNumber?: number
+    /**
+     * The amount of the planned fee.
+     */
+    amount?: number
+    /**
+     * The date when a planned fee should be applied, overriding installment's due date. It should match the interval of the installment. If it belong to first installment, it should be between disbursement date and installment due date.
+     */
+    applyOnDate?: string
+    /**
+     * The encoded key of the predefined fee which is planned.
+     */
+    predefinedFeeKey: string
+    /**
+     * The encoded key of the planned installment fee, auto generated, unique.
+     */
+    encodedKey?: string
+    /**
+     * The encoded key of the installment on which the predefined fee is planned.
+     */
+    installmentKey?: string
 }

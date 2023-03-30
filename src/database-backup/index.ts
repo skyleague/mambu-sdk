@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as databaseBackup from './rest.type'
+export * from './rest.client.js'
+export * as databaseBackup from './rest.type.js'

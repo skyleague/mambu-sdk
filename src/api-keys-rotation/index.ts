@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as apiKeysRotation from './rest.type'
+export * from './rest.client.js'
+export * as apiKeysRotation from './rest.type.js'

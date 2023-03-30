@@ -21,8 +21,8 @@ export interface RemoveCreditArrangementAccountInput {
 }
 
 export const RemoveCreditArrangementAccountInput = {
-    validate:
-        require('./schemas/remove-credit-arrangement-account-input.schema.js') as ValidateFunction<RemoveCreditArrangementAccountInput>,
+    validate: (await import('./schemas/remove-credit-arrangement-account-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<RemoveCreditArrangementAccountInput>,
     get schema() {
         return RemoveCreditArrangementAccountInput.validate.schema
     },
@@ -52,7 +52,8 @@ export interface CreditArrangementAccounts {
 }
 
 export const CreditArrangementAccounts = {
-    validate: require('./schemas/credit-arrangement-accounts.schema.js') as ValidateFunction<CreditArrangementAccounts>,
+    validate: (await import('./schemas/credit-arrangement-accounts.schema.js'))
+        .validate10 as unknown as ValidateFunction<CreditArrangementAccounts>,
     get schema() {
         return CreditArrangementAccounts.validate.schema
     },
@@ -72,7 +73,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -90,7 +91,7 @@ export const ErrorResponse = {
 export type GetAllResponse = CreditArrangement[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -176,7 +177,8 @@ export interface CreditArrangement {
 }
 
 export const CreditArrangement = {
-    validate: require('./schemas/credit-arrangement.schema.js') as ValidateFunction<CreditArrangement>,
+    validate: (await import('./schemas/credit-arrangement.schema.js'))
+        .validate10 as unknown as ValidateFunction<CreditArrangement>,
     get schema() {
         return CreditArrangement.validate.schema
     },
@@ -206,7 +208,8 @@ export interface CreditArrangementAction {
 }
 
 export const CreditArrangementAction = {
-    validate: require('./schemas/credit-arrangement-action.schema.js') as ValidateFunction<CreditArrangementAction>,
+    validate: (await import('./schemas/credit-arrangement-action.schema.js'))
+        .validate10 as unknown as ValidateFunction<CreditArrangementAction>,
     get schema() {
         return CreditArrangementAction.validate.schema
     },
@@ -233,8 +236,8 @@ export interface CreditArrangementSearchCriteria {
 }
 
 export const CreditArrangementSearchCriteria = {
-    validate:
-        require('./schemas/credit-arrangement-search-criteria.schema.js') as ValidateFunction<CreditArrangementSearchCriteria>,
+    validate: (await import('./schemas/credit-arrangement-search-criteria.schema.js'))
+        .validate10 as unknown as ValidateFunction<CreditArrangementSearchCriteria>,
     get schema() {
         return CreditArrangementSearchCriteria.validate.schema
     },
@@ -252,7 +255,7 @@ export const CreditArrangementSearchCriteria = {
 export type SearchResponse = CreditArrangement[]
 
 export const SearchResponse = {
-    validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
+    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -277,8 +280,8 @@ export interface AddCreditArrangementAccountInput {
 }
 
 export const AddCreditArrangementAccountInput = {
-    validate:
-        require('./schemas/add-credit-arrangement-account-input.schema.js') as ValidateFunction<AddCreditArrangementAccountInput>,
+    validate: (await import('./schemas/add-credit-arrangement-account-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<AddCreditArrangementAccountInput>,
     get schema() {
         return AddCreditArrangementAccountInput.validate.schema
     },
@@ -304,7 +307,8 @@ export interface CreditArrangementSchedule {
 }
 
 export const CreditArrangementSchedule = {
-    validate: require('./schemas/credit-arrangement-schedule.schema.js') as ValidateFunction<CreditArrangementSchedule>,
+    validate: (await import('./schemas/credit-arrangement-schedule.schema.js'))
+        .validate10 as unknown as ValidateFunction<CreditArrangementSchedule>,
     get schema() {
         return CreditArrangementSchedule.validate.schema
     },
@@ -317,7 +321,7 @@ export const CreditArrangementSchedule = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: require('./schemas/patch-request.schema.js') as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -402,6 +406,10 @@ export interface LoanAccount {
      * Key of the user this loan is assigned to
      */
     assignedUserKey?: string
+    /**
+     * Locked account total due type
+     */
+    lockedAccountTotalDueType?: 'BALANCE_AMOUNT' | 'DUE_AMOUNT_ON_LATE_INSTALLMENTS'
     /**
      * Shows whether the future payments are allowed or not for this account (repayment transactions with entry date set in the future)
      */
@@ -661,6 +669,10 @@ export interface CustomPredefinedFee {
      * The amount of the custom fee.
      */
     amount?: number
+    /**
+     * The percentage of the custom fee.
+     */
+    percentage?: number
 }
 
 /**

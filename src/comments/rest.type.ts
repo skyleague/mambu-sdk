@@ -9,7 +9,8 @@ import type { ValidateFunction } from 'ajv'
 export type GetCommentsResponse = Comment[]
 
 export const GetCommentsResponse = {
-    validate: require('./schemas/get-comments-response.schema.js') as ValidateFunction<GetCommentsResponse>,
+    validate: (await import('./schemas/get-comments-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetCommentsResponse>,
     get schema() {
         return GetCommentsResponse.validate.schema
     },
@@ -24,7 +25,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -86,7 +87,7 @@ export interface Comment {
 }
 
 export const Comment = {
-    validate: require('./schemas/comment.schema.js') as ValidateFunction<Comment>,
+    validate: (await import('./schemas/comment.schema.js')).validate10 as unknown as ValidateFunction<Comment>,
     get schema() {
         return Comment.validate.schema
     },

@@ -6,7 +6,7 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
+import type { IncomingHttpHeaders } from 'http'
 import {
     CreateResponse,
     ErrorResponse,
@@ -14,7 +14,7 @@ import {
     GetAllResponse,
     PostGLJournalEntriesDTO,
     SearchResponse,
-} from './rest.type'
+} from './rest.type.js'
 
 /**
  * gljournalentries
@@ -104,7 +104,7 @@ export class MambuJournalEntries {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: CreateResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,

@@ -79,6 +79,7 @@ export interface CommunicationMessage {
      */
     failureReason?:
         | 'MESSAGING_EXCEPTION'
+        | 'INVALID_SMTP_CREDENTIALS'
         | 'UNSUPPORTED_ENCODING_EXCEPTION'
         | 'EMAIL_SERVICE_NOT_ENABLED'
         | 'SMS_TOO_LONG'
@@ -156,6 +157,7 @@ export interface CommunicationMessage {
         | 'DEPOSIT_INTEREST_APPLIED_ADJUSTMENT'
         | 'ACCOUNT_AUTHORISATION_HOLD_CREATED'
         | 'ACCOUNT_AUTHORISATION_HOLD_REVERSED'
+        | 'ACCOUNT_AUTHORISATION_HOLD_SETTLED'
         | 'CARDS_AUTHORISATION_HOLD_CREATED'
         | 'CARDS_AUTHORISATION_HOLD_SETTLED'
         | 'CARDS_AUTHORISATION_HOLD_AMOUNT_DECREASED'
@@ -187,7 +189,8 @@ export interface CommunicationMessage {
 }
 
 export const CommunicationMessage = {
-    validate: require('./schemas/communication-message.schema.js') as ValidateFunction<CommunicationMessage>,
+    validate: (await import('./schemas/communication-message.schema.js'))
+        .validate10 as unknown as ValidateFunction<CommunicationMessage>,
     get schema() {
         return CommunicationMessage.validate.schema
     },
@@ -207,7 +210,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -243,8 +246,8 @@ export interface CommunicationMessageEnqueueAction {
 }
 
 export const CommunicationMessageEnqueueAction = {
-    validate:
-        require('./schemas/communication-message-enqueue-action.schema.js') as ValidateFunction<CommunicationMessageEnqueueAction>,
+    validate: (await import('./schemas/communication-message-enqueue-action.schema.js'))
+        .validate10 as unknown as ValidateFunction<CommunicationMessageEnqueueAction>,
     get schema() {
         return CommunicationMessageEnqueueAction.validate.schema
     },
@@ -262,7 +265,7 @@ export const CommunicationMessageEnqueueAction = {
 export type SearchRequest = CommunicationMessageFilterCriteria[]
 
 export const SearchRequest = {
-    validate: require('./schemas/search-request.schema.js') as ValidateFunction<SearchRequest>,
+    validate: (await import('./schemas/search-request.schema.js')).validate10 as unknown as ValidateFunction<SearchRequest>,
     get schema() {
         return SearchRequest.validate.schema
     },
@@ -280,7 +283,7 @@ export const SearchRequest = {
 export type SearchResponse = CommunicationMessage[]
 
 export const SearchResponse = {
-    validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
+    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -301,7 +304,8 @@ export interface CommunicationMessageAction {
 }
 
 export const CommunicationMessageAction = {
-    validate: require('./schemas/communication-message-action.schema.js') as ValidateFunction<CommunicationMessageAction>,
+    validate: (await import('./schemas/communication-message-action.schema.js'))
+        .validate10 as unknown as ValidateFunction<CommunicationMessageAction>,
     get schema() {
         return CommunicationMessageAction.validate.schema
     },

@@ -43,8 +43,8 @@ export interface WithdrawalDepositTransactionInput {
 }
 
 export const WithdrawalDepositTransactionInput = {
-    validate:
-        require('./schemas/withdrawal-deposit-transaction-input.schema.js') as ValidateFunction<WithdrawalDepositTransactionInput>,
+    validate: (await import('./schemas/withdrawal-deposit-transaction-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<WithdrawalDepositTransactionInput>,
     get schema() {
         return WithdrawalDepositTransactionInput.validate.schema
     },
@@ -64,7 +64,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -216,7 +216,8 @@ export interface DepositTransaction {
 }
 
 export const DepositTransaction = {
-    validate: require('./schemas/deposit-transaction.schema.js') as ValidateFunction<DepositTransaction>,
+    validate: (await import('./schemas/deposit-transaction.schema.js'))
+        .validate10 as unknown as ValidateFunction<DepositTransaction>,
     get schema() {
         return DepositTransaction.validate.schema
     },
@@ -254,8 +255,8 @@ export interface FeeAppliedDepositTransactionInput {
 }
 
 export const FeeAppliedDepositTransactionInput = {
-    validate:
-        require('./schemas/fee-applied-deposit-transaction-input.schema.js') as ValidateFunction<FeeAppliedDepositTransactionInput>,
+    validate: (await import('./schemas/fee-applied-deposit-transaction-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<FeeAppliedDepositTransactionInput>,
     get schema() {
         return FeeAppliedDepositTransactionInput.validate.schema
     },
@@ -297,7 +298,8 @@ export interface SeizeBlockAmount {
 }
 
 export const SeizeBlockAmount = {
-    validate: require('./schemas/seize-block-amount.schema.js') as ValidateFunction<SeizeBlockAmount>,
+    validate: (await import('./schemas/seize-block-amount.schema.js'))
+        .validate10 as unknown as ValidateFunction<SeizeBlockAmount>,
     get schema() {
         return SeizeBlockAmount.validate.schema
     },
@@ -323,7 +325,8 @@ export interface BulkDepositTransactionsInput {
 }
 
 export const BulkDepositTransactionsInput = {
-    validate: require('./schemas/bulk-deposit-transactions-input.schema.js') as ValidateFunction<BulkDepositTransactionsInput>,
+    validate: (await import('./schemas/bulk-deposit-transactions-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<BulkDepositTransactionsInput>,
     get schema() {
         return BulkDepositTransactionsInput.validate.schema
     },
@@ -353,8 +356,8 @@ export interface DepositTransactionAdjustmentDetails {
 }
 
 export const DepositTransactionAdjustmentDetails = {
-    validate:
-        require('./schemas/deposit-transaction-adjustment-details.schema.js') as ValidateFunction<DepositTransactionAdjustmentDetails>,
+    validate: (await import('./schemas/deposit-transaction-adjustment-details.schema.js'))
+        .validate10 as unknown as ValidateFunction<DepositTransactionAdjustmentDetails>,
     get schema() {
         return DepositTransactionAdjustmentDetails.validate.schema
     },
@@ -372,8 +375,8 @@ export const DepositTransactionAdjustmentDetails = {
 export type GetDepositTransactionDocumentResponse = string
 
 export const GetDepositTransactionDocumentResponse = {
-    validate:
-        require('./schemas/get-deposit-transaction-document-response.schema.js') as ValidateFunction<GetDepositTransactionDocumentResponse>,
+    validate: (await import('./schemas/get-deposit-transaction-document-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetDepositTransactionDocumentResponse>,
     get schema() {
         return GetDepositTransactionDocumentResponse.validate.schema
     },
@@ -416,8 +419,8 @@ export interface TransferDepositTransactionInput {
 }
 
 export const TransferDepositTransactionInput = {
-    validate:
-        require('./schemas/transfer-deposit-transaction-input.schema.js') as ValidateFunction<TransferDepositTransactionInput>,
+    validate: (await import('./schemas/transfer-deposit-transaction-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<TransferDepositTransactionInput>,
     get schema() {
         return TransferDepositTransactionInput.validate.schema
     },
@@ -435,7 +438,7 @@ export const TransferDepositTransactionInput = {
 export type GetAllResponse = DepositTransaction[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -486,7 +489,8 @@ export interface DepositTransactionInput {
 }
 
 export const DepositTransactionInput = {
-    validate: require('./schemas/deposit-transaction-input.schema.js') as ValidateFunction<DepositTransactionInput>,
+    validate: (await import('./schemas/deposit-transaction-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<DepositTransactionInput>,
     get schema() {
         return DepositTransactionInput.validate.schema
     },
@@ -504,7 +508,8 @@ export const DepositTransactionInput = {
 export type EditTransactionDetailsRequest = PatchOperation[]
 
 export const EditTransactionDetailsRequest = {
-    validate: require('./schemas/edit-transaction-details-request.schema.js') as ValidateFunction<EditTransactionDetailsRequest>,
+    validate: (await import('./schemas/edit-transaction-details-request.schema.js'))
+        .validate10 as unknown as ValidateFunction<EditTransactionDetailsRequest>,
     get schema() {
         return EditTransactionDetailsRequest.validate.schema
     },
@@ -531,8 +536,8 @@ export interface DepositTransactionSearchCriteria {
 }
 
 export const DepositTransactionSearchCriteria = {
-    validate:
-        require('./schemas/deposit-transaction-search-criteria.schema.js') as ValidateFunction<DepositTransactionSearchCriteria>,
+    validate: (await import('./schemas/deposit-transaction-search-criteria.schema.js'))
+        .validate10 as unknown as ValidateFunction<DepositTransactionSearchCriteria>,
     get schema() {
         return DepositTransactionSearchCriteria.validate.schema
     },
@@ -550,7 +555,7 @@ export const DepositTransactionSearchCriteria = {
 export type SearchResponse = DepositTransaction[]
 
 export const SearchResponse = {
-    validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
+    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },

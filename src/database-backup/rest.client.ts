@@ -6,8 +6,8 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
-import { ErrorResponse, TriggerDatabaseBackupRequest, TriggerDatabaseBackupResponse } from './rest.type'
+import type { IncomingHttpHeaders } from 'http'
+import { ErrorResponse, TriggerDatabaseBackupRequest, TriggerDatabaseBackupResponse } from './rest.type.js'
 
 /**
  * database/backup
@@ -64,7 +64,7 @@ export class MambuDatabaseBackup {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 202: TriggerDatabaseBackupResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -84,10 +84,10 @@ export class MambuDatabaseBackup {
         auth?: string[][] | string[]
     }) {
         return this.awaitResponse(this.buildClient(auth).get(`database/backup/${path.databaseBackupVersion}`, {}), {
-            200: { is: (x: unknown): x is string => true },
-            400: { is: (x: unknown): x is string => true },
-            401: { is: (x: unknown): x is string => true },
-            403: { is: (x: unknown): x is string => true },
+            200: { is: (_x: unknown): _x is string => true },
+            400: { is: (_x: unknown): _x is string => true },
+            401: { is: (_x: unknown): _x is string => true },
+            403: { is: (_x: unknown): _x is string => true },
         })
     }
 

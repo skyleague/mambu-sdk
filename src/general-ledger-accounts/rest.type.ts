@@ -66,7 +66,7 @@ export interface GLAccount {
 }
 
 export const GLAccount = {
-    validate: require('./schemas/gl-account.schema.js') as ValidateFunction<GLAccount>,
+    validate: (await import('./schemas/gl-account.schema.js')).validate10 as unknown as ValidateFunction<GLAccount>,
     get schema() {
         return GLAccount.validate.schema
     },
@@ -81,7 +81,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -99,7 +99,7 @@ export const ErrorResponse = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: require('./schemas/patch-request.schema.js') as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -117,7 +117,7 @@ export const PatchRequest = {
 export type GetAllResponse = GLAccount[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -130,7 +130,7 @@ export const GetAllResponse = {
 export type CreateRequest = GLAccountInput[]
 
 export const CreateRequest = {
-    validate: require('./schemas/create-request.schema.js') as ValidateFunction<CreateRequest>,
+    validate: (await import('./schemas/create-request.schema.js')).validate10 as unknown as ValidateFunction<CreateRequest>,
     get schema() {
         return CreateRequest.validate.schema
     },
@@ -148,7 +148,7 @@ export const CreateRequest = {
 export type CreateResponse = GLAccount[]
 
 export const CreateResponse = {
-    validate: require('./schemas/create-response.schema.js') as ValidateFunction<CreateResponse>,
+    validate: (await import('./schemas/create-response.schema.js')).validate10 as unknown as ValidateFunction<CreateResponse>,
     get schema() {
         return CreateResponse.validate.schema
     },

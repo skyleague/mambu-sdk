@@ -6,8 +6,8 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
-import { Document, ErrorResponse, GetDocumentsByClientIdResponse } from './rest.type'
+import type { IncomingHttpHeaders } from 'http'
+import { Document, ErrorResponse, GetDocumentsByClientIdResponse } from './rest.type.js'
 
 /**
  * clients/documents
@@ -44,6 +44,31 @@ export class MambuClientDocuments {
     }
 
     /**
+     * Allows retrieval of a single document metadata via id or encoded key
+     */
+    public async getClientDocumentById({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { documentId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`clients/documents/${path.documentId}/metadata`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: Document,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Retrieve metadata regarding all documents for a specific client
      */
     public async getDocumentsByClientId({
@@ -63,31 +88,6 @@ export class MambuClientDocuments {
             }),
             {
                 200: GetDocumentsByClientIdResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Allows retrieval of a single document metadata via id or encoded key
-     */
-    public async getClientDocumentById({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { documentId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`clients/documents/${path.documentId}/metadata`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: Document,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -134,11 +134,11 @@ export class MambuClientDocuments {
         auth?: string[][] | string[]
     }) {
         return this.awaitResponse(this.buildClient(auth).get(`clients/documents/${path.documentId}`, {}), {
-            200: { is: (x: unknown): x is string => true },
-            400: { is: (x: unknown): x is string => true },
-            401: { is: (x: unknown): x is string => true },
-            403: { is: (x: unknown): x is string => true },
-            404: { is: (x: unknown): x is string => true },
+            200: { is: (_x: unknown): _x is string => true },
+            400: { is: (_x: unknown): _x is string => true },
+            401: { is: (_x: unknown): _x is string => true },
+            403: { is: (_x: unknown): _x is string => true },
+            404: { is: (_x: unknown): _x is string => true },
         })
     }
 

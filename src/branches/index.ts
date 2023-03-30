@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as branches from './rest.type'
+export * from './rest.client.js'
+export * as branches from './rest.type.js'

@@ -54,7 +54,8 @@ export interface OrganizationSetup {
 }
 
 export const OrganizationSetup = {
-    validate: require('./schemas/organization-setup.schema.js') as ValidateFunction<OrganizationSetup>,
+    validate: (await import('./schemas/organization-setup.schema.js'))
+        .validate10 as unknown as ValidateFunction<OrganizationSetup>,
     get schema() {
         return OrganizationSetup.validate.schema
     },
@@ -74,7 +75,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },

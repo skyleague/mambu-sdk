@@ -6,7 +6,7 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
+import type { IncomingHttpHeaders } from 'http'
 import {
     ErrorResponse,
     GetAllResponse,
@@ -15,7 +15,7 @@ import {
     GroupSearchCriteria,
     PatchRequest,
     SearchResponse,
-} from './rest.type'
+} from './rest.type.js'
 
 /**
  * groups
@@ -106,39 +106,11 @@ export class MambuGroups {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: Group,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Credit arrangements list retrieved
-     */
-    public async getCreditArrangementsByGroupIdOrKey({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { groupId: string }
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`groups/${path.groupId}/creditarrangements`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetCreditArrangementsByGroupIdOrKeyResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
             }
         )
     }
@@ -211,7 +183,7 @@ export class MambuGroups {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -241,7 +213,35 @@ export class MambuGroups {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Credit arrangements list retrieved
+     */
+    public async getCreditArrangementsByGroupIdOrKey({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { groupId: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`groups/${path.groupId}/creditarrangements`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetCreditArrangementsByGroupIdOrKeyResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

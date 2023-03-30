@@ -18,7 +18,8 @@ export interface LoanTransactionSearchCriteria {
 }
 
 export const LoanTransactionSearchCriteria = {
-    validate: require('./schemas/loan-transaction-search-criteria.schema.js') as ValidateFunction<LoanTransactionSearchCriteria>,
+    validate: (await import('./schemas/loan-transaction-search-criteria.schema.js'))
+        .validate10 as unknown as ValidateFunction<LoanTransactionSearchCriteria>,
     get schema() {
         return LoanTransactionSearchCriteria.validate.schema
     },
@@ -36,7 +37,7 @@ export const LoanTransactionSearchCriteria = {
 export type SearchResponse = LoanTransaction[]
 
 export const SearchResponse = {
-    validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
+    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -51,7 +52,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -71,17 +72,22 @@ export const ErrorResponse = {
  */
 export interface LockLoanAccountInput {
     /**
-     * The list of operations to lock
+     * Locked account total due type
      */
-    lockedOperations?: ('APPLY_INTEREST' | 'APPLY_FEES' | 'APPLY_PENALTIES')[]
+    lockedAccountTotalDueType?: 'BALANCE_AMOUNT' | 'DUE_AMOUNT_ON_LATE_INSTALLMENTS'
     /**
      * Extra notes about the current locking of account
      */
     notes?: string
+    /**
+     * The list of operations to lock
+     */
+    lockedOperations?: ('APPLY_INTEREST' | 'APPLY_FEES' | 'APPLY_PENALTIES')[]
 }
 
 export const LockLoanAccountInput = {
-    validate: require('./schemas/lock-loan-account-input.schema.js') as ValidateFunction<LockLoanAccountInput>,
+    validate: (await import('./schemas/lock-loan-account-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<LockLoanAccountInput>,
     get schema() {
         return LockLoanAccountInput.validate.schema
     },
@@ -107,7 +113,8 @@ export interface LockLoanTransactionsWrapper {
 }
 
 export const LockLoanTransactionsWrapper = {
-    validate: require('./schemas/lock-loan-transactions-wrapper.schema.js') as ValidateFunction<LockLoanTransactionsWrapper>,
+    validate: (await import('./schemas/lock-loan-transactions-wrapper.schema.js'))
+        .validate10 as unknown as ValidateFunction<LockLoanTransactionsWrapper>,
     get schema() {
         return LockLoanTransactionsWrapper.validate.schema
     },
@@ -133,7 +140,8 @@ export interface UnlockLoanAccountInput {
 }
 
 export const UnlockLoanAccountInput = {
-    validate: require('./schemas/unlock-loan-account-input.schema.js') as ValidateFunction<UnlockLoanAccountInput>,
+    validate: (await import('./schemas/unlock-loan-account-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<UnlockLoanAccountInput>,
     get schema() {
         return UnlockLoanAccountInput.validate.schema
     },
@@ -200,7 +208,8 @@ export interface RepaymentLoanTransactionInput {
 }
 
 export const RepaymentLoanTransactionInput = {
-    validate: require('./schemas/repayment-loan-transaction-input.schema.js') as ValidateFunction<RepaymentLoanTransactionInput>,
+    validate: (await import('./schemas/repayment-loan-transaction-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<RepaymentLoanTransactionInput>,
     get schema() {
         return RepaymentLoanTransactionInput.validate.schema
     },
@@ -385,7 +394,7 @@ export interface LoanTransaction {
 }
 
 export const LoanTransaction = {
-    validate: require('./schemas/loan-transaction.schema.js') as ValidateFunction<LoanTransaction>,
+    validate: (await import('./schemas/loan-transaction.schema.js')).validate10 as unknown as ValidateFunction<LoanTransaction>,
     get schema() {
         return LoanTransaction.validate.schema
     },
@@ -419,8 +428,8 @@ export interface LoanTransactionAdjustmentDetails {
 }
 
 export const LoanTransactionAdjustmentDetails = {
-    validate:
-        require('./schemas/loan-transaction-adjustment-details.schema.js') as ValidateFunction<LoanTransactionAdjustmentDetails>,
+    validate: (await import('./schemas/loan-transaction-adjustment-details.schema.js'))
+        .validate10 as unknown as ValidateFunction<LoanTransactionAdjustmentDetails>,
     get schema() {
         return LoanTransactionAdjustmentDetails.validate.schema
     },
@@ -480,8 +489,8 @@ export interface DisbursementLoanTransactionInput {
 }
 
 export const DisbursementLoanTransactionInput = {
-    validate:
-        require('./schemas/disbursement-loan-transaction-input.schema.js') as ValidateFunction<DisbursementLoanTransactionInput>,
+    validate: (await import('./schemas/disbursement-loan-transaction-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<DisbursementLoanTransactionInput>,
     get schema() {
         return DisbursementLoanTransactionInput.validate.schema
     },
@@ -499,8 +508,8 @@ export const DisbursementLoanTransactionInput = {
 export type GetTransactionsForAllVersionsResponse = LoanTransaction[]
 
 export const GetTransactionsForAllVersionsResponse = {
-    validate:
-        require('./schemas/get-transactions-for-all-versions-response.schema.js') as ValidateFunction<GetTransactionsForAllVersionsResponse>,
+    validate: (await import('./schemas/get-transactions-for-all-versions-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetTransactionsForAllVersionsResponse>,
     get schema() {
         return GetTransactionsForAllVersionsResponse.validate.schema
     },
@@ -542,8 +551,8 @@ export interface WithdrawalRedrawTransactionInput {
 }
 
 export const WithdrawalRedrawTransactionInput = {
-    validate:
-        require('./schemas/withdrawal-redraw-transaction-input.schema.js') as ValidateFunction<WithdrawalRedrawTransactionInput>,
+    validate: (await import('./schemas/withdrawal-redraw-transaction-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<WithdrawalRedrawTransactionInput>,
     get schema() {
         return WithdrawalRedrawTransactionInput.validate.schema
     },
@@ -590,7 +599,8 @@ export interface PaymentMadeTransactionInput {
 }
 
 export const PaymentMadeTransactionInput = {
-    validate: require('./schemas/payment-made-transaction-input.schema.js') as ValidateFunction<PaymentMadeTransactionInput>,
+    validate: (await import('./schemas/payment-made-transaction-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<PaymentMadeTransactionInput>,
     get schema() {
         return PaymentMadeTransactionInput.validate.schema
     },
@@ -628,8 +638,8 @@ export interface RedrawRepaymentTransactionInputDTO {
 }
 
 export const RedrawRepaymentTransactionInputDTO = {
-    validate:
-        require('./schemas/redraw-repayment-transaction-input-dto.schema.js') as ValidateFunction<RedrawRepaymentTransactionInputDTO>,
+    validate: (await import('./schemas/redraw-repayment-transaction-input-dto.schema.js'))
+        .validate10 as unknown as ValidateFunction<RedrawRepaymentTransactionInputDTO>,
     get schema() {
         return RedrawRepaymentTransactionInputDTO.validate.schema
     },
@@ -647,7 +657,7 @@ export const RedrawRepaymentTransactionInputDTO = {
 export type GetAllResponse = LoanTransaction[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -692,7 +702,8 @@ export interface FeeLoanTransactionInput {
 }
 
 export const FeeLoanTransactionInput = {
-    validate: require('./schemas/fee-loan-transaction-input.schema.js') as ValidateFunction<FeeLoanTransactionInput>,
+    validate: (await import('./schemas/fee-loan-transaction-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<FeeLoanTransactionInput>,
     get schema() {
         return FeeLoanTransactionInput.validate.schema
     },
@@ -1429,13 +1440,17 @@ export interface TransactionDetailsInput {
  */
 export interface FeeInput {
     /**
+     * The amount of the fee to apply
+     */
+    amount?: number
+    /**
      * The encoded key of the predefined fee
      */
     predefinedFeeKey: string
     /**
-     * The amount of the fee to apply
+     * The percentage of the fee to apply
      */
-    amount?: number
+    percentage?: number
 }
 
 /**

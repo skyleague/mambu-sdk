@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as creditArrangements from './rest.type'
+export * from './rest.client.js'
+export * as creditArrangements from './rest.type.js'

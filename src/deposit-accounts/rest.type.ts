@@ -11,7 +11,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -29,8 +29,8 @@ export const ErrorResponse = {
 export type GetWithholdingTaxHistoryResponse = AccountTax[]
 
 export const GetWithholdingTaxHistoryResponse = {
-    validate:
-        require('./schemas/get-withholding-tax-history-response.schema.js') as ValidateFunction<GetWithholdingTaxHistoryResponse>,
+    validate: (await import('./schemas/get-withholding-tax-history-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetWithholdingTaxHistoryResponse>,
     get schema() {
         return GetWithholdingTaxHistoryResponse.validate.schema
     },
@@ -43,8 +43,8 @@ export const GetWithholdingTaxHistoryResponse = {
 export type GetDepositAccountDocumentResponse = string
 
 export const GetDepositAccountDocumentResponse = {
-    validate:
-        require('./schemas/get-deposit-account-document-response.schema.js') as ValidateFunction<GetDepositAccountDocumentResponse>,
+    validate: (await import('./schemas/get-deposit-account-document-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetDepositAccountDocumentResponse>,
     get schema() {
         return GetDepositAccountDocumentResponse.validate.schema
     },
@@ -57,7 +57,8 @@ export const GetDepositAccountDocumentResponse = {
 export type GetAllCardsResponse = Card[]
 
 export const GetAllCardsResponse = {
-    validate: require('./schemas/get-all-cards-response.schema.js') as ValidateFunction<GetAllCardsResponse>,
+    validate: (await import('./schemas/get-all-cards-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetAllCardsResponse>,
     get schema() {
         return GetAllCardsResponse.validate.schema
     },
@@ -78,7 +79,7 @@ export interface Card {
 }
 
 export const Card = {
-    validate: require('./schemas/card.schema.js') as ValidateFunction<Card>,
+    validate: (await import('./schemas/card.schema.js')).validate10 as unknown as ValidateFunction<Card>,
     get schema() {
         return Card.validate.schema
     },
@@ -108,7 +109,8 @@ export interface StartMaturityAction {
 }
 
 export const StartMaturityAction = {
-    validate: require('./schemas/start-maturity-action.schema.js') as ValidateFunction<StartMaturityAction>,
+    validate: (await import('./schemas/start-maturity-action.schema.js'))
+        .validate10 as unknown as ValidateFunction<StartMaturityAction>,
     get schema() {
         return StartMaturityAction.validate.schema
     },
@@ -267,7 +269,7 @@ export interface DepositAccount {
 }
 
 export const DepositAccount = {
-    validate: require('./schemas/deposit-account.schema.js') as ValidateFunction<DepositAccount>,
+    validate: (await import('./schemas/deposit-account.schema.js')).validate10 as unknown as ValidateFunction<DepositAccount>,
     get schema() {
         return DepositAccount.validate.schema
     },
@@ -285,8 +287,8 @@ export const DepositAccount = {
 export type GetAllAuthorizationHoldsResponse = GetAuthorizationHold[]
 
 export const GetAllAuthorizationHoldsResponse = {
-    validate:
-        require('./schemas/get-all-authorization-holds-response.schema.js') as ValidateFunction<GetAllAuthorizationHoldsResponse>,
+    validate: (await import('./schemas/get-all-authorization-holds-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetAllAuthorizationHoldsResponse>,
     get schema() {
         return GetAllAuthorizationHoldsResponse.validate.schema
     },
@@ -360,7 +362,8 @@ export interface AccountAuthorizationHold {
 }
 
 export const AccountAuthorizationHold = {
-    validate: require('./schemas/account-authorization-hold.schema.js') as ValidateFunction<AccountAuthorizationHold>,
+    validate: (await import('./schemas/account-authorization-hold.schema.js'))
+        .validate10 as unknown as ValidateFunction<AccountAuthorizationHold>,
     get schema() {
         return AccountAuthorizationHold.validate.schema
     },
@@ -378,7 +381,8 @@ export const AccountAuthorizationHold = {
 export type GetFundedLoansResponse = LoanAccount[]
 
 export const GetFundedLoansResponse = {
-    validate: require('./schemas/get-funded-loans-response.schema.js') as ValidateFunction<GetFundedLoansResponse>,
+    validate: (await import('./schemas/get-funded-loans-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetFundedLoansResponse>,
     get schema() {
         return GetFundedLoansResponse.validate.schema
     },
@@ -391,7 +395,7 @@ export const GetFundedLoansResponse = {
 export type GetAllResponse = DepositAccount[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -406,13 +410,14 @@ export const GetAllResponse = {
  */
 export interface ChangeWithholdingTaxAction {
     /**
-     * The key of the new withholding tax to be used by the account
+     * The id or encoded key of the new withholding tax to be used by the account
      */
     withholdingTaxSourceKey: string
 }
 
 export const ChangeWithholdingTaxAction = {
-    validate: require('./schemas/change-withholding-tax-action.schema.js') as ValidateFunction<ChangeWithholdingTaxAction>,
+    validate: (await import('./schemas/change-withholding-tax-action.schema.js'))
+        .validate10 as unknown as ValidateFunction<ChangeWithholdingTaxAction>,
     get schema() {
         return ChangeWithholdingTaxAction.validate.schema
     },
@@ -450,7 +455,8 @@ export interface ApplyInterestInput {
 }
 
 export const ApplyInterestInput = {
-    validate: require('./schemas/apply-interest-input.schema.js') as ValidateFunction<ApplyInterestInput>,
+    validate: (await import('./schemas/apply-interest-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<ApplyInterestInput>,
     get schema() {
         return ApplyInterestInput.validate.schema
     },
@@ -476,7 +482,8 @@ export interface ReopenDepositAction {
 }
 
 export const ReopenDepositAction = {
-    validate: require('./schemas/reopen-deposit-action.schema.js') as ValidateFunction<ReopenDepositAction>,
+    validate: (await import('./schemas/reopen-deposit-action.schema.js'))
+        .validate10 as unknown as ValidateFunction<ReopenDepositAction>,
     get schema() {
         return ReopenDepositAction.validate.schema
     },
@@ -502,7 +509,8 @@ export interface UndoMaturityAction {
 }
 
 export const UndoMaturityAction = {
-    validate: require('./schemas/undo-maturity-action.schema.js') as ValidateFunction<UndoMaturityAction>,
+    validate: (await import('./schemas/undo-maturity-action.schema.js'))
+        .validate10 as unknown as ValidateFunction<UndoMaturityAction>,
     get schema() {
         return UndoMaturityAction.validate.schema
     },
@@ -513,6 +521,37 @@ export const UndoMaturityAction = {
     assert: (o: unknown) => {
         if (!UndoMaturityAction.validate(o)) {
             throw new AjvValidator.ValidationError(UndoMaturityAction.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Allows specifying the action details for a deposit account
+ */
+export interface DepositAccountAction {
+    /**
+     * The action type to be applied
+     */
+    action: 'APPROVE' | 'UNDO_APPROVE' | 'LOCK' | 'UNLOCK' | 'CLOSE' | 'CLOSE_WITHDRAW' | 'CLOSE_REJECT' | 'CLOSE_WRITE_OFF'
+    /**
+     * The notes related to the action performed
+     */
+    notes?: string
+}
+
+export const DepositAccountAction = {
+    validate: (await import('./schemas/deposit-account-action.schema.js'))
+        .validate10 as unknown as ValidateFunction<DepositAccountAction>,
+    get schema() {
+        return DepositAccountAction.validate.schema
+    },
+    get errors() {
+        return DepositAccountAction.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is DepositAccountAction => DepositAccountAction.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!DepositAccountAction.validate(o)) {
+            throw new AjvValidator.ValidationError(DepositAccountAction.errors ?? [])
         }
     },
 } as const
@@ -536,7 +575,8 @@ export interface ChangeInterestRateAction {
 }
 
 export const ChangeInterestRateAction = {
-    validate: require('./schemas/change-interest-rate-action.schema.js') as ValidateFunction<ChangeInterestRateAction>,
+    validate: (await import('./schemas/change-interest-rate-action.schema.js'))
+        .validate10 as unknown as ValidateFunction<ChangeInterestRateAction>,
     get schema() {
         return ChangeInterestRateAction.validate.schema
     },
@@ -551,40 +591,11 @@ export const ChangeInterestRateAction = {
     },
 } as const
 
-/**
- * Allows specifying the action details for a deposit account
- */
-export interface DepositAccountAction {
-    /**
-     * The action type to be applied
-     */
-    action: 'APPROVE' | 'UNDO_APPROVE' | 'LOCK' | 'UNLOCK' | 'CLOSE' | 'CLOSE_WITHDRAW' | 'CLOSE_REJECT' | 'CLOSE_WRITE_OFF'
-    /**
-     * The notes related to the action performed
-     */
-    notes?: string
-}
-
-export const DepositAccountAction = {
-    validate: require('./schemas/deposit-account-action.schema.js') as ValidateFunction<DepositAccountAction>,
-    get schema() {
-        return DepositAccountAction.validate.schema
-    },
-    get errors() {
-        return DepositAccountAction.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is DepositAccountAction => DepositAccountAction.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!DepositAccountAction.validate(o)) {
-            throw new AjvValidator.ValidationError(DepositAccountAction.errors ?? [])
-        }
-    },
-} as const
-
 export type PatchBlockFundRequest = PatchOperation[]
 
 export const PatchBlockFundRequest = {
-    validate: require('./schemas/patch-block-fund-request.schema.js') as ValidateFunction<PatchBlockFundRequest>,
+    validate: (await import('./schemas/patch-block-fund-request.schema.js'))
+        .validate10 as unknown as ValidateFunction<PatchBlockFundRequest>,
     get schema() {
         return PatchBlockFundRequest.validate.schema
     },
@@ -602,7 +613,7 @@ export const PatchBlockFundRequest = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: require('./schemas/patch-request.schema.js') as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -620,7 +631,8 @@ export const PatchRequest = {
 export type GetAllBlocksResponse = BlockFund[]
 
 export const GetAllBlocksResponse = {
-    validate: require('./schemas/get-all-blocks-response.schema.js') as ValidateFunction<GetAllBlocksResponse>,
+    validate: (await import('./schemas/get-all-blocks-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetAllBlocksResponse>,
     get schema() {
         return GetAllBlocksResponse.validate.schema
     },
@@ -669,7 +681,7 @@ export interface BlockFund {
 }
 
 export const BlockFund = {
-    validate: require('./schemas/block-fund.schema.js') as ValidateFunction<BlockFund>,
+    validate: (await import('./schemas/block-fund.schema.js')).validate10 as unknown as ValidateFunction<BlockFund>,
     get schema() {
         return BlockFund.validate.schema
     },
@@ -696,7 +708,8 @@ export interface DepositAccountSearchCriteria {
 }
 
 export const DepositAccountSearchCriteria = {
-    validate: require('./schemas/deposit-account-search-criteria.schema.js') as ValidateFunction<DepositAccountSearchCriteria>,
+    validate: (await import('./schemas/deposit-account-search-criteria.schema.js'))
+        .validate10 as unknown as ValidateFunction<DepositAccountSearchCriteria>,
     get schema() {
         return DepositAccountSearchCriteria.validate.schema
     },
@@ -714,7 +727,7 @@ export const DepositAccountSearchCriteria = {
 export type SearchResponse = DepositAccount[]
 
 export const SearchResponse = {
-    validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
+    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -736,7 +749,8 @@ export interface LoanAccountSchedule {
 }
 
 export const LoanAccountSchedule = {
-    validate: require('./schemas/loan-account-schedule.schema.js') as ValidateFunction<LoanAccountSchedule>,
+    validate: (await import('./schemas/loan-account-schedule.schema.js'))
+        .validate10 as unknown as ValidateFunction<LoanAccountSchedule>,
     get schema() {
         return LoanAccountSchedule.validate.schema
     },
@@ -1068,6 +1082,10 @@ export interface DepositAccountInternalControls {
  */
 export interface GetAuthorizationHold {
     /**
+     * The custom expiration period for the hold which overwrites mcc and default expiration periods
+     */
+    customExpirationPeriod?: number
+    /**
      * The amount of money to be held as a result of the authorization hold request.
      */
     amount: number
@@ -1092,6 +1110,10 @@ export interface GetAuthorizationHold {
      * The reference token of the card.
      */
     cardToken?: string
+    /**
+     * The date to consider as start date when calculating the number of days passed until expiration
+     */
+    referenceDateForExpiration?: string
     /**
      * The key of the account linked with the authorization hold.
      */
@@ -1234,6 +1256,10 @@ export interface LoanAccount {
      * Key of the user this loan is assigned to
      */
     assignedUserKey?: string
+    /**
+     * Locked account total due type
+     */
+    lockedAccountTotalDueType?: 'BALANCE_AMOUNT' | 'DUE_AMOUNT_ON_LATE_INSTALLMENTS'
     /**
      * Shows whether the future payments are allowed or not for this account (repayment transactions with entry date set in the future)
      */
@@ -1493,6 +1519,10 @@ export interface CustomPredefinedFee {
      * The amount of the custom fee.
      */
     amount?: number
+    /**
+     * The percentage of the custom fee.
+     */
+    percentage?: number
 }
 
 /**

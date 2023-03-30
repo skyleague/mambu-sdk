@@ -45,7 +45,7 @@ export interface ApiConsumer {
 }
 
 export const ApiConsumer = {
-    validate: require('./schemas/api-consumer.schema.js') as ValidateFunction<ApiConsumer>,
+    validate: (await import('./schemas/api-consumer.schema.js')).validate10 as unknown as ValidateFunction<ApiConsumer>,
     get schema() {
         return ApiConsumer.validate.schema
     },
@@ -65,7 +65,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -83,7 +83,7 @@ export const ErrorResponse = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: require('./schemas/patch-request.schema.js') as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -98,20 +98,6 @@ export const PatchRequest = {
     },
 } as const
 
-export type GetApiKeysByConsumerIdResponse = ApiKey[]
-
-export const GetApiKeysByConsumerIdResponse = {
-    validate:
-        require('./schemas/get-api-keys-by-consumer-id-response.schema.js') as ValidateFunction<GetApiKeysByConsumerIdResponse>,
-    get schema() {
-        return GetApiKeysByConsumerIdResponse.validate.schema
-    },
-    get errors() {
-        return GetApiKeysByConsumerIdResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetApiKeysByConsumerIdResponse => GetApiKeysByConsumerIdResponse.validate(o) === true,
-} as const
-
 /**
  * Representation of an API Consumer's API Key expiration time.
  */
@@ -123,7 +109,7 @@ export interface ApiKeyInput {
 }
 
 export const ApiKeyInput = {
-    validate: require('./schemas/api-key-input.schema.js') as ValidateFunction<ApiKeyInput>,
+    validate: (await import('./schemas/api-key-input.schema.js')).validate10 as unknown as ValidateFunction<ApiKeyInput>,
     get schema() {
         return ApiKeyInput.validate.schema
     },
@@ -147,7 +133,7 @@ export interface ApiKey {
      */
     id?: string
     /**
-     * The api key
+     * The api key. Deprecated field, please use id instead.
      */
     apiKey?: string
     /**
@@ -157,7 +143,7 @@ export interface ApiKey {
 }
 
 export const ApiKey = {
-    validate: require('./schemas/api-key.schema.js') as ValidateFunction<ApiKey>,
+    validate: (await import('./schemas/api-key.schema.js')).validate10 as unknown as ValidateFunction<ApiKey>,
     get schema() {
         return ApiKey.validate.schema
     },
@@ -170,7 +156,7 @@ export const ApiKey = {
 export type GetAllResponse = ApiConsumer[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -183,7 +169,8 @@ export const GetAllResponse = {
 export type GetKeysByConsumerIdResponse = ApiKey[]
 
 export const GetKeysByConsumerIdResponse = {
-    validate: require('./schemas/get-keys-by-consumer-id-response.schema.js') as ValidateFunction<GetKeysByConsumerIdResponse>,
+    validate: (await import('./schemas/get-keys-by-consumer-id-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetKeysByConsumerIdResponse>,
     get schema() {
         return GetKeysByConsumerIdResponse.validate.schema
     },
@@ -204,7 +191,7 @@ export interface SecretKey {
 }
 
 export const SecretKey = {
-    validate: require('./schemas/secret-key.schema.js') as ValidateFunction<SecretKey>,
+    validate: (await import('./schemas/secret-key.schema.js')).validate10 as unknown as ValidateFunction<SecretKey>,
     get schema() {
         return SecretKey.validate.schema
     },
@@ -316,6 +303,7 @@ type Local0 =
     | 'EDIT_SAVINGS_ACCOUNT'
     | 'APPROVE_SAVINGS'
     | 'MAKE_DEPOSIT'
+    | 'MAKE_BULK_DEPOSITS'
     | 'MAKE_WITHDRAWAL'
     | 'BACKDATE_SAVINGS_TRANSACTIONS'
     | 'APPLY_SAVINGS_ADJUSTMENTS'

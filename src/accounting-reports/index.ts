@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as accountingReports from './rest.type'
+export * from './rest.client.js'
+export * as accountingReports from './rest.type.js'

@@ -1,18 +1,11 @@
-import { BaseMambuStreaming } from './base-streaming.client'
-import { SubscriptionEventStreamBatch } from './base-streaming.type'
+import { BaseMambuStreaming } from './base-streaming.client.js'
+import { SubscriptionEventStreamBatch } from './base-streaming.type.js'
 
 import AjvValidator from 'ajv'
 import split2 from 'split2'
 
-import https from 'https'
-import type { TransformCallback } from 'stream'
-import { Transform } from 'stream'
-
-class AsyncIterableStream extends Transform {
-    public _transform(chunk: any, _encoding: BufferEncoding, callback: TransformCallback): void {
-        callback(null, chunk)
-    }
-}
+import https from 'node:https'
+import { PassThrough } from 'node:stream'
 
 export class MambuStreaming extends BaseMambuStreaming {
     public async *getSubscriptionEventBatches({
@@ -33,8 +26,8 @@ export class MambuStreaming extends BaseMambuStreaming {
         headers?: { ['X-Flow-Id']?: string; apikey?: string }
     }) {
         const apiKey = typeof this.auth.apiKeyAuth === 'string' ? this.auth.apiKeyAuth : await this.auth.apiKeyAuth?.()
-        const stream = new AsyncIterableStream()
-        const url = new URL(`${this.client.defaults.options.prefixUrl}subscriptions/${path.subscriptionId}/events`)
+        const stream = new PassThrough()
+        const url = new URL(`${this.client.defaults.options.prefixUrl.toString()}subscriptions/${path.subscriptionId}/events`)
         for (const [k, v] of Object.entries(query ?? {})) {
             url.searchParams.set(k, v)
         }

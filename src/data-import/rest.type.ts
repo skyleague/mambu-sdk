@@ -31,7 +31,8 @@ export interface DataImportResponse {
 }
 
 export const DataImportResponse = {
-    validate: require('./schemas/data-import-response.schema.js') as ValidateFunction<DataImportResponse>,
+    validate: (await import('./schemas/data-import-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<DataImportResponse>,
     get schema() {
         return DataImportResponse.validate.schema
     },
@@ -46,7 +47,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -90,7 +91,8 @@ export interface DataImportStatus {
 }
 
 export const DataImportStatus = {
-    validate: require('./schemas/data-import-status.schema.js') as ValidateFunction<DataImportStatus>,
+    validate: (await import('./schemas/data-import-status.schema.js'))
+        .validate10 as unknown as ValidateFunction<DataImportStatus>,
     get schema() {
         return DataImportStatus.validate.schema
     },
@@ -111,7 +113,8 @@ export interface DataImportAction {
 }
 
 export const DataImportAction = {
-    validate: require('./schemas/data-import-action.schema.js') as ValidateFunction<DataImportAction>,
+    validate: (await import('./schemas/data-import-action.schema.js'))
+        .validate10 as unknown as ValidateFunction<DataImportAction>,
     get schema() {
         return DataImportAction.validate.schema
     },

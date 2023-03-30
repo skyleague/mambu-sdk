@@ -9,7 +9,8 @@ import type { ValidateFunction } from 'ajv'
 export type GetTranchesResponse = LoanTranche[]
 
 export const GetTranchesResponse = {
-    validate: require('./schemas/get-tranches-response.schema.js') as ValidateFunction<GetTranchesResponse>,
+    validate: (await import('./schemas/get-tranches-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetTranchesResponse>,
     get schema() {
         return GetTranchesResponse.validate.schema
     },
@@ -24,7 +25,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -42,7 +43,8 @@ export const ErrorResponse = {
 export type EditTranchesRequest = LoanTranche[]
 
 export const EditTranchesRequest = {
-    validate: require('./schemas/edit-tranches-request.schema.js') as ValidateFunction<EditTranchesRequest>,
+    validate: (await import('./schemas/edit-tranches-request.schema.js'))
+        .validate10 as unknown as ValidateFunction<EditTranchesRequest>,
     get schema() {
         return EditTranchesRequest.validate.schema
     },
@@ -60,7 +62,8 @@ export const EditTranchesRequest = {
 export type EditTranchesResponse = LoanTranche[]
 
 export const EditTranchesResponse = {
-    validate: require('./schemas/edit-tranches-response.schema.js') as ValidateFunction<EditTranchesResponse>,
+    validate: (await import('./schemas/edit-tranches-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<EditTranchesResponse>,
     get schema() {
         return EditTranchesResponse.validate.schema
     },
@@ -109,6 +112,10 @@ export interface CustomPredefinedFee {
      * The amount of the custom fee.
      */
     amount?: number
+    /**
+     * The percentage of the custom fee.
+     */
+    percentage?: number
 }
 
 /**

@@ -35,7 +35,7 @@ export interface AccountingReport {
 }
 
 export const AccountingReport = {
-    validate: require('./schemas/accounting-report.schema.js') as ValidateFunction<AccountingReport>,
+    validate: (await import('./schemas/accounting-report.schema.js')).validate10 as unknown as ValidateFunction<AccountingReport>,
     get schema() {
         return AccountingReport.validate.schema
     },
@@ -50,7 +50,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -98,8 +98,8 @@ export interface AccountingReportGenerationInput {
 }
 
 export const AccountingReportGenerationInput = {
-    validate:
-        require('./schemas/accounting-report-generation-input.schema.js') as ValidateFunction<AccountingReportGenerationInput>,
+    validate: (await import('./schemas/accounting-report-generation-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<AccountingReportGenerationInput>,
     get schema() {
         return AccountingReportGenerationInput.validate.schema
     },
@@ -139,8 +139,8 @@ export interface AccountingReportGenerationResponse {
 }
 
 export const AccountingReportGenerationResponse = {
-    validate:
-        require('./schemas/accounting-report-generation-response.schema.js') as ValidateFunction<AccountingReportGenerationResponse>,
+    validate: (await import('./schemas/accounting-report-generation-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<AccountingReportGenerationResponse>,
     get schema() {
         return AccountingReportGenerationResponse.validate.schema
     },

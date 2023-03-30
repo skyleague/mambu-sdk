@@ -6,8 +6,8 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
-import { Document, ErrorResponse, GetDocumentsByEntityIdResponse } from './rest.type'
+import type { IncomingHttpHeaders } from 'http'
+import { Document, ErrorResponse, GetDocumentsByEntityIdResponse } from './rest.type.js'
 
 /**
  * documents
@@ -56,7 +56,7 @@ export class MambuDocuments {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: Document,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -77,11 +77,11 @@ export class MambuDocuments {
         auth?: string[][] | string[]
     }) {
         return this.awaitResponse(this.buildClient(auth).get(`documents/${path.documentId}`, {}), {
-            200: { is: (x: unknown): x is string => true },
-            400: { is: (x: unknown): x is string => true },
-            401: { is: (x: unknown): x is string => true },
-            403: { is: (x: unknown): x is string => true },
-            404: { is: (x: unknown): x is string => true },
+            200: { is: (_x: unknown): _x is string => true },
+            400: { is: (_x: unknown): _x is string => true },
+            401: { is: (_x: unknown): _x is string => true },
+            403: { is: (_x: unknown): _x is string => true },
+            404: { is: (_x: unknown): _x is string => true },
         })
     }
 
@@ -101,7 +101,7 @@ export class MambuDocuments {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

@@ -35,7 +35,8 @@ export interface BulkProcessStatus {
 }
 
 export const BulkProcessStatus = {
-    validate: require('./schemas/bulk-process-status.schema.js') as ValidateFunction<BulkProcessStatus>,
+    validate: (await import('./schemas/bulk-process-status.schema.js'))
+        .validate10 as unknown as ValidateFunction<BulkProcessStatus>,
     get schema() {
         return BulkProcessStatus.validate.schema
     },
@@ -50,7 +51,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },

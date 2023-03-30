@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as communications from './rest.type'
+export * from './rest.client.js'
+export * as communications from './rest.type.js'
