@@ -9,7 +9,7 @@ import type { ValidateFunction } from 'ajv'
 export type GetAllResponse = AccountingRate[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -24,7 +24,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -54,7 +54,8 @@ export interface PostAccountingRateDTO {
 }
 
 export const PostAccountingRateDTO = {
-    validate: require('./schemas/post-accounting-rate-dto.schema.js') as ValidateFunction<PostAccountingRateDTO>,
+    validate: (await import('./schemas/post-accounting-rate-dto.schema.js'))
+        .validate10 as unknown as ValidateFunction<PostAccountingRateDTO>,
     get schema() {
         return PostAccountingRateDTO.validate.schema
     },
@@ -100,7 +101,7 @@ export interface AccountingRate {
 }
 
 export const AccountingRate = {
-    validate: require('./schemas/accounting-rate.schema.js') as ValidateFunction<AccountingRate>,
+    validate: (await import('./schemas/accounting-rate.schema.js')).validate10 as unknown as ValidateFunction<AccountingRate>,
     get schema() {
         return AccountingRate.validate.schema
     },

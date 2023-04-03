@@ -73,7 +73,7 @@ export interface Document {
 }
 
 export const Document = {
-    validate: require('./schemas/document.schema.js') as ValidateFunction<Document>,
+    validate: (await import('./schemas/document.schema.js')).validate10 as unknown as ValidateFunction<Document>,
     get schema() {
         return Document.validate.schema
     },
@@ -88,7 +88,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -106,8 +106,8 @@ export const ErrorResponse = {
 export type GetDocumentsByEntityIdResponse = Document[]
 
 export const GetDocumentsByEntityIdResponse = {
-    validate:
-        require('./schemas/get-documents-by-entity-id-response.schema.js') as ValidateFunction<GetDocumentsByEntityIdResponse>,
+    validate: (await import('./schemas/get-documents-by-entity-id-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetDocumentsByEntityIdResponse>,
     get schema() {
         return GetDocumentsByEntityIdResponse.validate.schema
     },

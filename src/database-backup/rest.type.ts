@@ -14,10 +14,19 @@ export interface TriggerDatabaseBackupRequest {
      * If provided, needs to be a valid URL. It will be a webhook call that will be later executed when the backup is completed.
      */
     callback?: string
+    /**
+     * If provided, it needs to be a list of tables that exist in the database schema since it will include those tables in the backup. If not provided, all tables wil be included.
+     */
+    tables?: string[]
+    /**
+     * If provided, it needs to be a date time from which the backup should include data. If not provided, all time data will be included.
+     */
+    createBackupFromDate?: string
 }
 
 export const TriggerDatabaseBackupRequest = {
-    validate: require('./schemas/trigger-database-backup-request.schema.js') as ValidateFunction<TriggerDatabaseBackupRequest>,
+    validate: (await import('./schemas/trigger-database-backup-request.schema.js'))
+        .validate10 as unknown as ValidateFunction<TriggerDatabaseBackupRequest>,
     get schema() {
         return TriggerDatabaseBackupRequest.validate.schema
     },
@@ -53,7 +62,8 @@ export interface TriggerDatabaseBackupResponse {
 }
 
 export const TriggerDatabaseBackupResponse = {
-    validate: require('./schemas/trigger-database-backup-response.schema.js') as ValidateFunction<TriggerDatabaseBackupResponse>,
+    validate: (await import('./schemas/trigger-database-backup-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<TriggerDatabaseBackupResponse>,
     get schema() {
         return TriggerDatabaseBackupResponse.validate.schema
     },
@@ -68,7 +78,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },

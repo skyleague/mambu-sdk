@@ -23,7 +23,7 @@ export interface Holidays {
 }
 
 export const Holidays = {
-    validate: require('./schemas/holidays.schema.js') as ValidateFunction<Holidays>,
+    validate: (await import('./schemas/holidays.schema.js')).validate10 as unknown as ValidateFunction<Holidays>,
     get schema() {
         return Holidays.validate.schema
     },
@@ -43,7 +43,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },

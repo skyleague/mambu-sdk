@@ -6,7 +6,7 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
+import type { IncomingHttpHeaders } from 'http'
 import {
     AccountAuthorizationHold,
     ApplyInterestInput,
@@ -32,7 +32,7 @@ import {
     SearchResponse,
     StartMaturityAction,
     UndoMaturityAction,
-} from './rest.type'
+} from './rest.type.js'
 
 /**
  * deposits
@@ -84,7 +84,7 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -197,8 +197,8 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
-                201: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -231,7 +231,7 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 200: DepositAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -293,7 +293,7 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: AccountAuthorizationHold,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -387,7 +387,7 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: DepositAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -420,8 +420,8 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
-                204: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -447,11 +447,11 @@ export class MambuDepositAccounts {
                 searchParams: query ?? {},
             }),
             {
-                200: { is: (x: unknown): x is string => true },
-                400: { is: (x: unknown): x is string => true },
-                401: { is: (x: unknown): x is string => true },
-                403: { is: (x: unknown): x is string => true },
-                404: { is: (x: unknown): x is string => true },
+                200: { is: (_x: unknown): _x is string => true },
+                400: { is: (_x: unknown): _x is string => true },
+                401: { is: (_x: unknown): _x is string => true },
+                403: { is: (_x: unknown): _x is string => true },
+                404: { is: (_x: unknown): _x is string => true },
             }
         )
     }
@@ -479,8 +479,8 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
-                204: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -513,7 +513,7 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 200: DepositAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -547,46 +547,12 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
-                204: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Allows to change the interest rate for a deposit account
-     */
-    public async changeInterestRate({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: ChangeInterestRateAction
-        path: { depositAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ChangeInterestRateAction, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`deposits/${path.depositAccountId}:changeInterestRate`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (x: unknown): x is unknown => true },
-                204: { is: (x: unknown): x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-                409: ErrorResponse,
             }
         )
     }
@@ -614,8 +580,42 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 200: DepositAccount,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+                409: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Allows to change the interest rate for a deposit account
+     */
+    public async changeInterestRate({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: ChangeInterestRateAction
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(ChangeInterestRateAction, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`deposits/${path.depositAccountId}:changeInterestRate`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -641,7 +641,7 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -672,7 +672,7 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -756,7 +756,7 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -787,7 +787,7 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -848,7 +848,7 @@ export class MambuDepositAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: BlockFund,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -906,7 +906,7 @@ export class MambuDepositAccounts {
                 }
             ),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

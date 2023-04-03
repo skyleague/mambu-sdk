@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as generalLedgerAccounts from './rest.type'
+export * from './rest.client.js'
+export * as generalLedgerAccounts from './rest.type.js'

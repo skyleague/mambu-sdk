@@ -6,7 +6,7 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
+import type { IncomingHttpHeaders } from 'http'
 import {
     AccountBalances,
     AuthorizationHold,
@@ -16,7 +16,7 @@ import {
     CardTransactionReversal,
     ErrorResponse,
     GetAuthorizationHold,
-} from './rest.type'
+} from './rest.type.js'
 
 /**
  * cards
@@ -78,8 +78,8 @@ export class MambuCards {
                 }
             ),
             {
-                102: { is: (x: unknown): x is unknown => true },
-                204: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -136,7 +136,7 @@ export class MambuCards {
                 }
             ),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -196,8 +196,8 @@ export class MambuCards {
                 }
             ),
             {
-                102: { is: (x: unknown): x is unknown => true },
-                204: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -230,7 +230,7 @@ export class MambuCards {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: CardTransactionOutput,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -267,8 +267,8 @@ export class MambuCards {
                 }
             ),
             {
-                102: { is: (x: unknown): x is unknown => true },
-                204: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -301,7 +301,7 @@ export class MambuCards {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: AuthorizationHold,
                 400: ErrorResponse,
                 401: ErrorResponse,

@@ -6,7 +6,7 @@ import type {
     Operation,
     PathItem,
     Schema,
-} from '@skyleague/therefore/src/lib/primitives/restclient/openapi.type'
+} from '@skyleague/therefore/src/lib/primitives/restclient/openapi.type.js'
 import got from 'got'
 
 export const baseMambuStreaming = got
@@ -63,7 +63,7 @@ export const baseMambuStreaming = got
                         description: 'An opaque value defined by the server.',
                     },
                 },
-                required: [...(cursor.required ?? []), 'event_type', 'cursor_token'],
+                required: [...(cursor.required ?? []), 'event_type', 'cursor_token'] as [string, ...string[]],
             }) as Schema
             schemas['Subscription-Cursor-Without-Token'] = omitUndefined({
                 ...cloneDeep(cursor),
@@ -77,7 +77,7 @@ export const baseMambuStreaming = got
                         description: "The name of the event type this partition's events belong to.",
                     },
                 },
-                required: [...(cursor.required ?? []), 'cursor_token'],
+                required: [...(cursor.required ?? []), 'cursor_token'] as [string, ...string[]],
             }) as Schema
         }
 

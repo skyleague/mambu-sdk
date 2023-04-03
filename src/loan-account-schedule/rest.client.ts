@@ -6,8 +6,8 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
-import { ErrorResponse, LoanAccountSchedule } from './rest.type'
+import type { IncomingHttpHeaders } from 'http'
+import { ErrorResponse, LoanAccountSchedule, PreviewLoanAccountSchedule, PreviewTranchesOnScheduleRequest } from './rest.type.js'
 
 /**
  * loans/schedule
@@ -69,6 +69,71 @@ export class MambuLoanAccountSchedule {
                 404: ErrorResponse,
             }
         )
+    }
+
+    /**
+     * Allows retrieval of a loan account schedule for non existing loan account
+     */
+    public async previewTranchesOnSchedule({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: PreviewTranchesOnScheduleRequest
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(PreviewTranchesOnScheduleRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/${path.loanAccountId}/schedule:previewTranches`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                200: LoanAccountSchedule,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Allows retrieval of a loan account schedule for non existing loan account
+     */
+    public async previewSchedule({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: PreviewLoanAccountSchedule
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(PreviewLoanAccountSchedule, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/schedule:preview`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                200: LoanAccountSchedule,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    public validateRequestBody<T>(schema: { is: (o: unknown) => o is T; assert: (o: unknown) => void }, body: T) {
+        schema.assert(body)
+        return body
     }
 
     public async awaitResponse<

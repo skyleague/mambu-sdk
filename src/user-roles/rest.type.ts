@@ -38,7 +38,7 @@ export interface Role {
 }
 
 export const Role = {
-    validate: require('./schemas/role.schema.js') as ValidateFunction<Role>,
+    validate: (await import('./schemas/role.schema.js')).validate10 as unknown as ValidateFunction<Role>,
     get schema() {
         return Role.validate.schema
     },
@@ -58,7 +58,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -76,7 +76,7 @@ export const ErrorResponse = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: require('./schemas/patch-request.schema.js') as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -94,7 +94,7 @@ export const PatchRequest = {
 export type GetAllResponse = Role[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -159,6 +159,8 @@ type Local0 =
     | 'EDIT_CENTRE'
     | 'DELETE_CENTRE'
     | 'MANAGE_CONFIGURATION_AS_CODE'
+    | 'GET_MANAGE_CONFIGURATION_AS_CODE'
+    | 'PUT_MANAGE_CONFIGURATION_AS_CODE'
     | 'VIEW_BRANCH_DETAILS'
     | 'CREATE_BRANCH'
     | 'EDIT_BRANCH'
@@ -269,6 +271,7 @@ type Local0 =
     | 'EDIT_SAVINGS_ACCOUNT'
     | 'DELETE_SAVINGS_ACCOUNT'
     | 'MAKE_DEPOSIT'
+    | 'MAKE_BULK_DEPOSITS'
     | 'MAKE_WITHDRAWAL'
     | 'MAKE_EARLY_WITHDRAWALS'
     | 'APPROVE_SAVINGS'

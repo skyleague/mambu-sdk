@@ -9,7 +9,7 @@ import type { ValidateFunction } from 'ajv'
 export type GetAllResponse = CurrencyDetails[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -24,7 +24,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -82,7 +82,7 @@ export interface CurrencyDetails {
 }
 
 export const CurrencyDetails = {
-    validate: require('./schemas/currency-details.schema.js') as ValidateFunction<CurrencyDetails>,
+    validate: (await import('./schemas/currency-details.schema.js')).validate10 as unknown as ValidateFunction<CurrencyDetails>,
     get schema() {
         return CurrencyDetails.validate.schema
     },

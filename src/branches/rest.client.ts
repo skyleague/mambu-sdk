@@ -6,8 +6,8 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
-import { Branch, ErrorResponse, GetAllResponse } from './rest.type'
+import type { IncomingHttpHeaders } from 'http'
+import { Branch, ErrorResponse, GetAllResponse } from './rest.type.js'
 
 /**
  * branches
@@ -117,7 +117,7 @@ export class MambuBranches {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: Branch,
                 400: ErrorResponse,
                 401: ErrorResponse,

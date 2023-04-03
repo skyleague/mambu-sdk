@@ -9,7 +9,7 @@ import type { ValidateFunction } from 'ajv'
 export type GetAllResponse = Group[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -24,7 +24,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -133,7 +133,7 @@ export interface Group {
 }
 
 export const Group = {
-    validate: require('./schemas/group.schema.js') as ValidateFunction<Group>,
+    validate: (await import('./schemas/group.schema.js')).validate10 as unknown as ValidateFunction<Group>,
     get schema() {
         return Group.validate.schema
     },
@@ -148,25 +148,10 @@ export const Group = {
     },
 } as const
 
-export type GetCreditArrangementsByGroupIdOrKeyResponse = CreditArrangement[]
-
-export const GetCreditArrangementsByGroupIdOrKeyResponse = {
-    validate:
-        require('./schemas/get-credit-arrangements-by-group-id-or-key-response.schema.js') as ValidateFunction<GetCreditArrangementsByGroupIdOrKeyResponse>,
-    get schema() {
-        return GetCreditArrangementsByGroupIdOrKeyResponse.validate.schema
-    },
-    get errors() {
-        return GetCreditArrangementsByGroupIdOrKeyResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetCreditArrangementsByGroupIdOrKeyResponse =>
-        GetCreditArrangementsByGroupIdOrKeyResponse.validate(o) === true,
-} as const
-
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: require('./schemas/patch-request.schema.js') as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -181,6 +166,21 @@ export const PatchRequest = {
     },
 } as const
 
+export type GetCreditArrangementsByGroupIdOrKeyResponse = CreditArrangement[]
+
+export const GetCreditArrangementsByGroupIdOrKeyResponse = {
+    validate: (await import('./schemas/get-credit-arrangements-by-group-id-or-key-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetCreditArrangementsByGroupIdOrKeyResponse>,
+    get schema() {
+        return GetCreditArrangementsByGroupIdOrKeyResponse.validate.schema
+    },
+    get errors() {
+        return GetCreditArrangementsByGroupIdOrKeyResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetCreditArrangementsByGroupIdOrKeyResponse =>
+        GetCreditArrangementsByGroupIdOrKeyResponse.validate(o) === true,
+} as const
+
 /**
  * Wrapper that holds a list of filtering criteria and a sorting criteria for Groups client directed query
  */
@@ -193,7 +193,8 @@ export interface GroupSearchCriteria {
 }
 
 export const GroupSearchCriteria = {
-    validate: require('./schemas/group-search-criteria.schema.js') as ValidateFunction<GroupSearchCriteria>,
+    validate: (await import('./schemas/group-search-criteria.schema.js'))
+        .validate10 as unknown as ValidateFunction<GroupSearchCriteria>,
     get schema() {
         return GroupSearchCriteria.validate.schema
     },
@@ -211,7 +212,7 @@ export const GroupSearchCriteria = {
 export type SearchResponse = Group[]
 
 export const SearchResponse = {
-    validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
+    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -311,6 +312,30 @@ export interface Address {
      * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180
      */
     longitude?: number
+}
+
+/**
+ * A single change that needs to be made to a resource
+ */
+export interface PatchOperation {
+    /**
+     * The change to perform
+     */
+    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
+    /**
+     * The field to perform the operation on
+     */
+    path: string
+    /**
+     * The field from where a value should be moved, when using move
+     */
+    from?: string
+    /**
+     * The value of the field, can be null
+     */
+    value?: {
+        [k: string]: unknown | undefined
+    }
 }
 
 /**
@@ -588,30 +613,6 @@ export interface Currency {
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
-}
-
-/**
- * A single change that needs to be made to a resource
- */
-export interface PatchOperation {
-    /**
-     * The change to perform
-     */
-    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
-    /**
-     * The field to perform the operation on
-     */
-    path: string
-    /**
-     * The field from where a value should be moved, when using move
-     */
-    from?: string
-    /**
-     * The value of the field, can be null
-     */
-    value?: {
-        [k: string]: unknown | undefined
-    }
 }
 
 /**

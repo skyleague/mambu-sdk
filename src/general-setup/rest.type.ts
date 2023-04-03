@@ -167,7 +167,7 @@ export interface GeneralSetup {
 }
 
 export const GeneralSetup = {
-    validate: require('./schemas/general-setup.schema.js') as ValidateFunction<GeneralSetup>,
+    validate: (await import('./schemas/general-setup.schema.js')).validate10 as unknown as ValidateFunction<GeneralSetup>,
     get schema() {
         return GeneralSetup.validate.schema
     },
@@ -182,7 +182,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },

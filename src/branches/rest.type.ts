@@ -33,7 +33,7 @@ export interface Branch {
     /**
      * branch name
      */
-    name?: string
+    name: string
     /**
      * The encoded key of the entity, generated, globally unique
      */
@@ -41,7 +41,7 @@ export interface Branch {
     /**
      * branch ID, unique
      */
-    id?: string
+    id: string
     /**
      * branch state
      */
@@ -57,7 +57,7 @@ export interface Branch {
 }
 
 export const Branch = {
-    validate: require('./schemas/branch.schema.js') as ValidateFunction<Branch>,
+    validate: (await import('./schemas/branch.schema.js')).validate10 as unknown as ValidateFunction<Branch>,
     get schema() {
         return Branch.validate.schema
     },
@@ -77,7 +77,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -95,7 +95,7 @@ export const ErrorResponse = {
 export type GetAllResponse = Branch[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },

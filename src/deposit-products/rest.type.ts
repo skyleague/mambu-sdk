@@ -17,7 +17,8 @@ export interface DepositProductAction {
 }
 
 export const DepositProductAction = {
-    validate: require('./schemas/deposit-product-action.schema.js') as ValidateFunction<DepositProductAction>,
+    validate: (await import('./schemas/deposit-product-action.schema.js'))
+        .validate10 as unknown as ValidateFunction<DepositProductAction>,
     get schema() {
         return DepositProductAction.validate.schema
     },
@@ -43,7 +44,8 @@ export interface DepositProductActionResponse {
 }
 
 export const DepositProductActionResponse = {
-    validate: require('./schemas/deposit-product-action-response.schema.js') as ValidateFunction<DepositProductActionResponse>,
+    validate: (await import('./schemas/deposit-product-action-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<DepositProductActionResponse>,
     get schema() {
         return DepositProductActionResponse.validate.schema
     },
@@ -58,7 +60,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -76,7 +78,7 @@ export const ErrorResponse = {
 export type GetAllResponse = DepositProduct[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -152,7 +154,7 @@ export interface DepositProduct {
 }
 
 export const DepositProduct = {
-    validate: require('./schemas/deposit-product.schema.js') as ValidateFunction<DepositProduct>,
+    validate: (await import('./schemas/deposit-product.schema.js')).validate10 as unknown as ValidateFunction<DepositProduct>,
     get schema() {
         return DepositProduct.validate.schema
     },
@@ -170,7 +172,7 @@ export const DepositProduct = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: require('./schemas/patch-request.schema.js') as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -245,7 +247,7 @@ export interface DepositProductPredefinedFee {
     /**
      * The amount from which the fee is calculated using percentageAmount
      */
-    amountCalculationMethod?: 'FLAT'
+    amountCalculationMethod?: 'FLAT' | 'MAMBU_FUNCTION'
     /**
      * Shows the event that will trigger a fee
      */
@@ -652,7 +654,7 @@ export interface DepositProductInterestSettings {
     /**
      * The balance which is used for the Interest calculation
      */
-    interestCalculationBalance?: 'MINIMUM' | 'AVERAGE' | 'END_OF_DAY' | 'MINIMUM_TO_END_OF_DAY'
+    interestCalculationBalance?: 'MINIMUM' | 'AVERAGE' | 'END_OF_DAY' | 'MINIMUM_TO_END_OF_DAY' | 'FRENCH_INTEREST_ACCRUAL'
     /**
      * If interest should be payed into the deposit account
      */
@@ -882,7 +884,7 @@ export interface OverdraftInterestSettings {
     /**
      * The balance which is used for the overdraft interest calculation. Default value is MINIMUM. If set to null on a PUT call and the product allows overdrafts, the null value is ignored and not changed.
      */
-    interestCalculationBalance?: 'MINIMUM' | 'AVERAGE' | 'END_OF_DAY' | 'MINIMUM_TO_END_OF_DAY'
+    interestCalculationBalance?: 'MINIMUM' | 'AVERAGE' | 'END_OF_DAY' | 'MINIMUM_TO_END_OF_DAY' | 'FRENCH_INTEREST_ACCRUAL'
 }
 
 /**

@@ -153,7 +153,7 @@ export interface Client {
 }
 
 export const Client = {
-    validate: require('./schemas/client.schema.js') as ValidateFunction<Client>,
+    validate: (await import('./schemas/client.schema.js')).validate10 as unknown as ValidateFunction<Client>,
     get schema() {
         return Client.validate.schema
     },
@@ -173,7 +173,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -191,7 +191,7 @@ export const ErrorResponse = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: require('./schemas/patch-request.schema.js') as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -209,7 +209,7 @@ export const PatchRequest = {
 export type GetAllResponse = Client[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -231,7 +231,8 @@ export interface ClientSearchCriteria {
 }
 
 export const ClientSearchCriteria = {
-    validate: require('./schemas/client-search-criteria.schema.js') as ValidateFunction<ClientSearchCriteria>,
+    validate: (await import('./schemas/client-search-criteria.schema.js'))
+        .validate10 as unknown as ValidateFunction<ClientSearchCriteria>,
     get schema() {
         return ClientSearchCriteria.validate.schema
     },
@@ -249,7 +250,7 @@ export const ClientSearchCriteria = {
 export type SearchResponse = Client[]
 
 export const SearchResponse = {
-    validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
+    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -310,7 +311,7 @@ export interface ClientRole {
 }
 
 export const ClientRole = {
-    validate: require('./schemas/client-role.schema.js') as ValidateFunction<ClientRole>,
+    validate: (await import('./schemas/client-role.schema.js')).validate10 as unknown as ValidateFunction<ClientRole>,
     get schema() {
         return ClientRole.validate.schema
     },
@@ -323,8 +324,8 @@ export const ClientRole = {
 export type GetCreditArrangementsByClientIdOrKeyResponse = CreditArrangement[]
 
 export const GetCreditArrangementsByClientIdOrKeyResponse = {
-    validate:
-        require('./schemas/get-credit-arrangements-by-client-id-or-key-response.schema.js') as ValidateFunction<GetCreditArrangementsByClientIdOrKeyResponse>,
+    validate: (await import('./schemas/get-credit-arrangements-by-client-id-or-key-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetCreditArrangementsByClientIdOrKeyResponse>,
     get schema() {
         return GetCreditArrangementsByClientIdOrKeyResponse.validate.schema
     },

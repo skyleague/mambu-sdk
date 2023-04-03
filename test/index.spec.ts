@@ -1,5 +1,5 @@
-import { MambuStreaming } from '../src'
-import type { streaming } from '../src'
+import { MambuStreaming } from '../src/index.js'
+import type { streaming } from '../src/index.js'
 
 import { eitherToError } from '@skyleague/axioms'
 import nock from 'nock'

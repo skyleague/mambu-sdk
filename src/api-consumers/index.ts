@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as apiConsumers from './rest.type'
+export * from './rest.client.js'
+export * as apiConsumers from './rest.type.js'

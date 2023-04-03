@@ -17,7 +17,8 @@ export interface SellFundingSourceAction {
 }
 
 export const SellFundingSourceAction = {
-    validate: require('./schemas/sell-funding-source-action.schema.js') as ValidateFunction<SellFundingSourceAction>,
+    validate: (await import('./schemas/sell-funding-source-action.schema.js'))
+        .validate10 as unknown as ValidateFunction<SellFundingSourceAction>,
     get schema() {
         return SellFundingSourceAction.validate.schema
     },
@@ -35,7 +36,7 @@ export const SellFundingSourceAction = {
 export type SellResponse = DepositTransaction[]
 
 export const SellResponse = {
-    validate: require('./schemas/sell-response.schema.js') as ValidateFunction<SellResponse>,
+    validate: (await import('./schemas/sell-response.schema.js')).validate10 as unknown as ValidateFunction<SellResponse>,
     get schema() {
         return SellResponse.validate.schema
     },
@@ -50,7 +51,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },

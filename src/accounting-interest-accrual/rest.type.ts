@@ -18,7 +18,8 @@ export interface InterestAccrualSearchCriteria {
 }
 
 export const InterestAccrualSearchCriteria = {
-    validate: require('./schemas/interest-accrual-search-criteria.schema.js') as ValidateFunction<InterestAccrualSearchCriteria>,
+    validate: (await import('./schemas/interest-accrual-search-criteria.schema.js'))
+        .validate10 as unknown as ValidateFunction<InterestAccrualSearchCriteria>,
     get schema() {
         return InterestAccrualSearchCriteria.validate.schema
     },
@@ -36,7 +37,7 @@ export const InterestAccrualSearchCriteria = {
 export type SearchResponse = InterestAccrualBreakdown[]
 
 export const SearchResponse = {
-    validate: require('./schemas/search-response.schema.js') as ValidateFunction<SearchResponse>,
+    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -51,7 +52,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },

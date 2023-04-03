@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as customFields from './rest.type'
+export * from './rest.client.js'
+export * as customFields from './rest.type.js'

@@ -19,7 +19,7 @@ export interface NonWorkingDays {
 }
 
 export const NonWorkingDays = {
-    validate: require('./schemas/non-working-days.schema.js') as ValidateFunction<NonWorkingDays>,
+    validate: (await import('./schemas/non-working-days.schema.js')).validate10 as unknown as ValidateFunction<NonWorkingDays>,
     get schema() {
         return NonWorkingDays.validate.schema
     },
@@ -39,7 +39,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },

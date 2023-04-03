@@ -6,8 +6,8 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
-import { ErrorResponse, GetAllResponse, PatchRequest, User, UserRequest } from './rest.type'
+import type { IncomingHttpHeaders } from 'http'
+import { ErrorResponse, GetAllResponse, PatchRequest, User, UserRequest } from './rest.type.js'
 
 /**
  * users
@@ -94,7 +94,7 @@ export class MambuUsers {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 200: User,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -114,7 +114,7 @@ export class MambuUsers {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -146,7 +146,7 @@ export class MambuUsers {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -208,7 +208,7 @@ export class MambuUsers {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: User,
                 400: ErrorResponse,
                 401: ErrorResponse,

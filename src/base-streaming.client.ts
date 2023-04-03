@@ -6,7 +6,7 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
+import type { IncomingHttpHeaders } from 'http'
 import {
     CommitSubscriptionCursorsRequest,
     CommitSubscriptionCursorsResponse200,
@@ -15,7 +15,7 @@ import {
     Problem,
     Subscription,
     SubscriptionEventStreamBatch,
-} from './base-streaming.type'
+} from './base-streaming.type.js'
 
 /**
  * Mambu Streaming API
@@ -166,7 +166,7 @@ export class BaseMambuStreaming {
             }),
             {
                 200: CommitSubscriptionCursorsResponse200,
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 403: Problem,
                 404: Problem,
                 422: Problem,
@@ -200,7 +200,7 @@ export class BaseMambuStreaming {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 404: DeleteSubscriptionBySubscriptionIdResponse404,
             }
         )

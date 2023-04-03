@@ -104,7 +104,7 @@ export interface User {
 }
 
 export const User = {
-    validate: require('./schemas/user.schema.js') as ValidateFunction<User>,
+    validate: (await import('./schemas/user.schema.js')).validate10 as unknown as ValidateFunction<User>,
     get schema() {
         return User.validate.schema
     },
@@ -124,7 +124,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -142,7 +142,7 @@ export const ErrorResponse = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: require('./schemas/patch-request.schema.js') as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -160,7 +160,7 @@ export const PatchRequest = {
 export type GetAllResponse = User[]
 
 export const GetAllResponse = {
-    validate: require('./schemas/get-all-response.schema.js') as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -252,7 +252,7 @@ export interface UserRequest {
 }
 
 export const UserRequest = {
-    validate: require('./schemas/user_request.schema.js') as ValidateFunction<UserRequest>,
+    validate: (await import('./schemas/user_request.schema.js')).validate10 as unknown as ValidateFunction<UserRequest>,
     get schema() {
         return UserRequest.validate.schema
     },
@@ -334,6 +334,8 @@ type Local0 =
     | 'EDIT_CENTRE'
     | 'DELETE_CENTRE'
     | 'MANAGE_CONFIGURATION_AS_CODE'
+    | 'GET_MANAGE_CONFIGURATION_AS_CODE'
+    | 'PUT_MANAGE_CONFIGURATION_AS_CODE'
     | 'VIEW_BRANCH_DETAILS'
     | 'CREATE_BRANCH'
     | 'EDIT_BRANCH'
@@ -444,6 +446,7 @@ type Local0 =
     | 'EDIT_SAVINGS_ACCOUNT'
     | 'DELETE_SAVINGS_ACCOUNT'
     | 'MAKE_DEPOSIT'
+    | 'MAKE_BULK_DEPOSITS'
     | 'MAKE_WITHDRAWAL'
     | 'MAKE_EARLY_WITHDRAWALS'
     | 'APPROVE_SAVINGS'

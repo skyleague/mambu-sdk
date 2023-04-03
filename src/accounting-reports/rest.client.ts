@@ -6,8 +6,13 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
-import { AccountingReport, AccountingReportGenerationInput, AccountingReportGenerationResponse, ErrorResponse } from './rest.type'
+import type { IncomingHttpHeaders } from 'http'
+import {
+    AccountingReport,
+    AccountingReportGenerationInput,
+    AccountingReportGenerationResponse,
+    ErrorResponse,
+} from './rest.type.js'
 
 /**
  * accounting/reports
@@ -82,7 +87,7 @@ export class MambuAccountingReports {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 202: AccountingReportGenerationResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,

@@ -6,8 +6,8 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
-import { AccountingRate, ErrorResponse, GetAllResponse, PostAccountingRateDTO } from './rest.type'
+import type { IncomingHttpHeaders } from 'http'
+import { AccountingRate, ErrorResponse, GetAllResponse, PostAccountingRateDTO } from './rest.type.js'
 
 /**
  * currencies/accountingRates
@@ -94,7 +94,7 @@ export class MambuAccountingRates {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: AccountingRate,
                 400: ErrorResponse,
                 401: ErrorResponse,

@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as clients from './rest.type'
+export * from './rest.client.js'
+export * as clients from './rest.type.js'

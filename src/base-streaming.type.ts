@@ -45,7 +45,7 @@ export interface Subscription {
 }
 
 export const Subscription = {
-    validate: require('./schemas/subscription.schema.js') as ValidateFunction<Subscription>,
+    validate: (await import('./schemas/subscription.schema.js')).validate10 as unknown as ValidateFunction<Subscription>,
     get schema() {
         return Subscription.validate.schema
     },
@@ -84,7 +84,7 @@ export interface Problem {
 }
 
 export const Problem = {
-    validate: require('./schemas/problem.schema.js') as ValidateFunction<Problem>,
+    validate: (await import('./schemas/problem.schema.js')).validate10 as unknown as ValidateFunction<Problem>,
     get schema() {
         return Problem.validate.schema
     },
@@ -116,7 +116,8 @@ export interface SubscriptionEventStreamBatch {
 }
 
 export const SubscriptionEventStreamBatch = {
-    validate: require('./schemas/subscription-event-stream-batch.schema.js') as ValidateFunction<SubscriptionEventStreamBatch>,
+    validate: (await import('./schemas/subscription-event-stream-batch.schema.js'))
+        .validate10 as unknown as ValidateFunction<SubscriptionEventStreamBatch>,
     get schema() {
         return SubscriptionEventStreamBatch.validate.schema
     },
@@ -161,8 +162,8 @@ export interface CommitSubscriptionCursorsRequest {
 }
 
 export const CommitSubscriptionCursorsRequest = {
-    validate:
-        require('./schemas/commit-subscription-cursors-request.schema.js') as ValidateFunction<CommitSubscriptionCursorsRequest>,
+    validate: (await import('./schemas/commit-subscription-cursors-request.schema.js'))
+        .validate10 as unknown as ValidateFunction<CommitSubscriptionCursorsRequest>,
     get schema() {
         return CommitSubscriptionCursorsRequest.validate.schema
     },
@@ -182,8 +183,8 @@ export interface CommitSubscriptionCursorsResponse200 {
 }
 
 export const CommitSubscriptionCursorsResponse200 = {
-    validate:
-        require('./schemas/commit-subscription-cursors-response200.schema.js') as ValidateFunction<CommitSubscriptionCursorsResponse200>,
+    validate: (await import('./schemas/commit-subscription-cursors-response200.schema.js'))
+        .validate10 as unknown as ValidateFunction<CommitSubscriptionCursorsResponse200>,
     get schema() {
         return CommitSubscriptionCursorsResponse200.validate.schema
     },
@@ -209,8 +210,8 @@ export interface DeleteSubscriptionBySubscriptionIdResponse404 {
 }
 
 export const DeleteSubscriptionBySubscriptionIdResponse404 = {
-    validate:
-        require('./schemas/delete-subscription-by-subscription-id-response404.schema.js') as ValidateFunction<DeleteSubscriptionBySubscriptionIdResponse404>,
+    validate: (await import('./schemas/delete-subscription-by-subscription-id-response404.schema.js'))
+        .validate10 as unknown as ValidateFunction<DeleteSubscriptionBySubscriptionIdResponse404>,
     get schema() {
         return DeleteSubscriptionBySubscriptionIdResponse404.validate.schema
     },
@@ -229,7 +230,8 @@ export interface GetSubscriptionStatsResponse {
 }
 
 export const GetSubscriptionStatsResponse = {
-    validate: require('./schemas/get-subscription-stats-response.schema.js') as ValidateFunction<GetSubscriptionStatsResponse>,
+    validate: (await import('./schemas/get-subscription-stats-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetSubscriptionStatsResponse>,
     get schema() {
         return GetSubscriptionStatsResponse.validate.schema
     },

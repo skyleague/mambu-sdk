@@ -6,8 +6,8 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
-import { ApiKey, ApiKeyRotationResult, ErrorResponse } from './rest.type'
+import type { IncomingHttpHeaders } from 'http'
+import { ApiKey, ApiKeyRotationResult, ErrorResponse } from './rest.type.js'
 
 /**
  * apikey/rotation

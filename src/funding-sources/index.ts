@@ -1,2 +1,2 @@
-export * from './rest.client'
-export * as fundingSources from './rest.type'
+export * from './rest.client.js'
+export * as fundingSources from './rest.type.js'

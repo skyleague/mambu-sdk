@@ -37,7 +37,7 @@ export interface Holiday {
 }
 
 export const Holiday = {
-    validate: require('./schemas/holiday.schema.js') as ValidateFunction<Holiday>,
+    validate: (await import('./schemas/holiday.schema.js')).validate10 as unknown as ValidateFunction<Holiday>,
     get schema() {
         return Holiday.validate.schema
     },
@@ -52,7 +52,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -70,7 +70,7 @@ export const ErrorResponse = {
 export type CreateRequest = Holiday[]
 
 export const CreateRequest = {
-    validate: require('./schemas/create-request.schema.js') as ValidateFunction<CreateRequest>,
+    validate: (await import('./schemas/create-request.schema.js')).validate10 as unknown as ValidateFunction<CreateRequest>,
     get schema() {
         return CreateRequest.validate.schema
     },
@@ -88,7 +88,7 @@ export const CreateRequest = {
 export type CreateResponse = Holiday[]
 
 export const CreateResponse = {
-    validate: require('./schemas/create-response.schema.js') as ValidateFunction<CreateResponse>,
+    validate: (await import('./schemas/create-response.schema.js')).validate10 as unknown as ValidateFunction<CreateResponse>,
     get schema() {
         return CreateResponse.validate.schema
     },

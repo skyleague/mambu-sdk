@@ -6,7 +6,7 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
+import type { IncomingHttpHeaders } from 'http'
 
 /**
  * configuration/customfields
@@ -52,9 +52,9 @@ export class MambuCustomFieldsConfiguration {
                 responseType: 'text',
             }),
             {
-                200: { is: (x: unknown): x is string => true },
-                401: { is: (x: unknown): x is string => true },
-                403: { is: (x: unknown): x is string => true },
+                200: { is: (_x: unknown): _x is string => true },
+                401: { is: (_x: unknown): _x is string => true },
+                403: { is: (_x: unknown): _x is string => true },
             }
         )
     }
@@ -73,9 +73,9 @@ export class MambuCustomFieldsConfiguration {
                 responseType: 'text',
             }),
             {
-                200: { is: (x: unknown): x is string => true },
-                401: { is: (x: unknown): x is string => true },
-                403: { is: (x: unknown): x is string => true },
+                200: { is: (_x: unknown): _x is string => true },
+                401: { is: (_x: unknown): _x is string => true },
+                403: { is: (_x: unknown): _x is string => true },
             }
         )
     }
@@ -93,12 +93,12 @@ export class MambuCustomFieldsConfiguration {
                 responseType: 'text',
             }),
             {
-                200: { is: (x: unknown): x is string => true },
-                202: { is: (x: unknown): x is string => true },
-                400: { is: (x: unknown): x is string => true },
-                401: { is: (x: unknown): x is string => true },
-                403: { is: (x: unknown): x is string => true },
-                404: { is: (x: unknown): x is string => true },
+                200: { is: (_x: unknown): _x is string => true },
+                202: { is: (_x: unknown): _x is string => true },
+                400: { is: (_x: unknown): _x is string => true },
+                401: { is: (_x: unknown): _x is string => true },
+                403: { is: (_x: unknown): _x is string => true },
+                404: { is: (_x: unknown): _x is string => true },
             }
         )
     }

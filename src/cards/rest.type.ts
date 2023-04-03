@@ -33,8 +33,8 @@ export interface AuthorizationHoldAmountAdjustmentRequest {
 }
 
 export const AuthorizationHoldAmountAdjustmentRequest = {
-    validate:
-        require('./schemas/authorization-hold-amount-adjustment-request.schema.js') as ValidateFunction<AuthorizationHoldAmountAdjustmentRequest>,
+    validate: (await import('./schemas/authorization-hold-amount-adjustment-request.schema.js'))
+        .validate10 as unknown as ValidateFunction<AuthorizationHoldAmountAdjustmentRequest>,
     get schema() {
         return AuthorizationHoldAmountAdjustmentRequest.validate.schema
     },
@@ -55,7 +55,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -74,6 +74,10 @@ export const ErrorResponse = {
  * Details for retrieving a authorization hold. Deprecated due to encodedKey field.
  */
 export interface GetAuthorizationHold {
+    /**
+     * The custom expiration period for the hold which overwrites mcc and default expiration periods
+     */
+    customExpirationPeriod?: number
     /**
      * The amount of money to be held as a result of the authorization hold request.
      */
@@ -99,6 +103,10 @@ export interface GetAuthorizationHold {
      * The reference token of the card.
      */
     cardToken?: string
+    /**
+     * The date to consider as start date when calculating the number of days passed until expiration
+     */
+    referenceDateForExpiration?: string
     /**
      * The key of the account linked with the authorization hold.
      */
@@ -138,7 +146,8 @@ export interface GetAuthorizationHold {
 }
 
 export const GetAuthorizationHold = {
-    validate: require('./schemas/get-authorization-hold.schema.js') as ValidateFunction<GetAuthorizationHold>,
+    validate: (await import('./schemas/get-authorization-hold.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetAuthorizationHold>,
     get schema() {
         return GetAuthorizationHold.validate.schema
     },
@@ -179,7 +188,7 @@ export interface AccountBalances {
 }
 
 export const AccountBalances = {
-    validate: require('./schemas/account-balances.schema.js') as ValidateFunction<AccountBalances>,
+    validate: (await import('./schemas/account-balances.schema.js')).validate10 as unknown as ValidateFunction<AccountBalances>,
     get schema() {
         return AccountBalances.validate.schema
     },
@@ -216,7 +225,8 @@ export interface CardTransactionReversal {
 }
 
 export const CardTransactionReversal = {
-    validate: require('./schemas/card-transaction-reversal.schema.js') as ValidateFunction<CardTransactionReversal>,
+    validate: (await import('./schemas/card-transaction-reversal.schema.js'))
+        .validate10 as unknown as ValidateFunction<CardTransactionReversal>,
     get schema() {
         return CardTransactionReversal.validate.schema
     },
@@ -287,7 +297,8 @@ export interface CardTransactionInput {
 }
 
 export const CardTransactionInput = {
-    validate: require('./schemas/card-transaction-input.schema.js') as ValidateFunction<CardTransactionInput>,
+    validate: (await import('./schemas/card-transaction-input.schema.js'))
+        .validate10 as unknown as ValidateFunction<CardTransactionInput>,
     get schema() {
         return CardTransactionInput.validate.schema
     },
@@ -359,7 +370,8 @@ export interface CardTransactionOutput {
 }
 
 export const CardTransactionOutput = {
-    validate: require('./schemas/card-transaction-output.schema.js') as ValidateFunction<CardTransactionOutput>,
+    validate: (await import('./schemas/card-transaction-output.schema.js'))
+        .validate10 as unknown as ValidateFunction<CardTransactionOutput>,
     get schema() {
         return CardTransactionOutput.validate.schema
     },
@@ -373,6 +385,10 @@ export const CardTransactionOutput = {
  * The authorization hold corresponding to a card token
  */
 export interface AuthorizationHold {
+    /**
+     * The custom expiration period for the hold which overwrites mcc and default expiration periods
+     */
+    customExpirationPeriod?: number
     /**
      * The amount of money to be held as a result of the authorization hold request.
      */
@@ -398,6 +414,10 @@ export interface AuthorizationHold {
      * The reference token of the card.
      */
     cardToken?: string
+    /**
+     * The date to consider as start date when calculating the number of days passed until expiration
+     */
+    referenceDateForExpiration?: string
     /**
      * The key of the account linked with the authorization hold.
      */
@@ -433,7 +453,8 @@ export interface AuthorizationHold {
 }
 
 export const AuthorizationHold = {
-    validate: require('./schemas/authorization-hold.schema.js') as ValidateFunction<AuthorizationHold>,
+    validate: (await import('./schemas/authorization-hold.schema.js'))
+        .validate10 as unknown as ValidateFunction<AuthorizationHold>,
     get schema() {
         return AuthorizationHold.validate.schema
     },

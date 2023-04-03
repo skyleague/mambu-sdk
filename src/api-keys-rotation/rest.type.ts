@@ -15,7 +15,7 @@ export interface ApiKey {
      */
     id?: string
     /**
-     * The api key
+     * The api key. Deprecated field, please use id instead.
      */
     apiKey?: string
     /**
@@ -25,7 +25,7 @@ export interface ApiKey {
 }
 
 export const ApiKey = {
-    validate: require('./schemas/api-key.schema.js') as ValidateFunction<ApiKey>,
+    validate: (await import('./schemas/api-key.schema.js')).validate10 as unknown as ValidateFunction<ApiKey>,
     get schema() {
         return ApiKey.validate.schema
     },
@@ -45,6 +45,10 @@ export const ApiKey = {
  */
 export interface ApiKeyRotationResult {
     /**
+     * The api key ID
+     */
+    id?: string
+    /**
      * The new apiKey resulted by rotating an existing one
      */
     apiKey?: string
@@ -55,7 +59,8 @@ export interface ApiKeyRotationResult {
 }
 
 export const ApiKeyRotationResult = {
-    validate: require('./schemas/api-key-rotation-result.schema.js') as ValidateFunction<ApiKeyRotationResult>,
+    validate: (await import('./schemas/api-key-rotation-result.schema.js'))
+        .validate10 as unknown as ValidateFunction<ApiKeyRotationResult>,
     get schema() {
         return ApiKeyRotationResult.validate.schema
     },
@@ -70,7 +75,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: require('./schemas/error-response.schema.js') as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },

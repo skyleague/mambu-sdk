@@ -6,18 +6,17 @@
 import got from 'got'
 import type { CancelableRequest, Got, Options, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
-import { IncomingHttpHeaders } from 'http'
+import type { IncomingHttpHeaders } from 'http'
 import {
     ApiConsumer,
     ApiKey,
     ApiKeyInput,
     ErrorResponse,
     GetAllResponse,
-    GetApiKeysByConsumerIdResponse,
     GetKeysByConsumerIdResponse,
     PatchRequest,
     SecretKey,
-} from './rest.type'
+} from './rest.type.js'
 
 /**
  * consumers
@@ -101,7 +100,7 @@ export class MambuApiConsumers {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 200: ApiConsumer,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -127,7 +126,7 @@ export class MambuApiConsumers {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -159,7 +158,7 @@ export class MambuApiConsumers {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -184,32 +183,7 @@ export class MambuApiConsumers {
                 responseType: 'json',
             }),
             {
-                204: { is: (x: unknown): x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Allows retrieval of the API Keys of an API Consumer
-     */
-    public async getApiKeysByConsumerId({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { apiConsumerId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`consumers/${path.apiConsumerId}/apikeys`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetApiKeysByConsumerIdResponse,
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -241,7 +215,7 @@ export class MambuApiConsumers {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: ApiKey,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -294,7 +268,7 @@ export class MambuApiConsumers {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: ApiConsumer,
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -346,7 +320,7 @@ export class MambuApiConsumers {
                 responseType: 'json',
             }),
             {
-                102: { is: (x: unknown): x is unknown => true },
+                102: { is: (_x: unknown): _x is unknown => true },
                 201: SecretKey,
                 400: ErrorResponse,
                 401: ErrorResponse,
