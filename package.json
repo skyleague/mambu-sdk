@@ -40,9 +40,9 @@
     "tslib": "^2.5.0"
   },
   "devDependencies": {
-    "@skyleague/axioms": "^1.15.0",
-    "@skyleague/node-standards": "1.22.0-beta-2172eaee.1",
-    "@skyleague/therefore": "1.25.0-beta-99ae9e1e.1",
+    "@skyleague/axioms": "^2.0.0",
+    "@skyleague/node-standards": "^2.2.0",
+    "@skyleague/therefore": "^2.0.0",
     "@types/split2": "^3.2.1",
     "camelcase": "^7.0.1",
     "got": "^12.6.0",
