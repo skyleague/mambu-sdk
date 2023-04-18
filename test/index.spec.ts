@@ -3,6 +3,7 @@ import type { streaming } from '../src/index.js'
 
 import { eitherToError } from '@skyleague/axioms'
 import nock from 'nock'
+import { expect, describe, afterEach, it } from 'vitest'
 
 const prefixUrl = 'http://www.example.com'
 
@@ -18,7 +19,7 @@ describe('streaming cient', () => {
         defaultAuth: ['apiKeyAuth'],
     })
 
-    test('gives valid response', async () => {
+    it('gives valid response', async () => {
         const subscription: streaming.Subscription = {
             event_types: ['foo.bar'],
             owning_application: 'example-service',
