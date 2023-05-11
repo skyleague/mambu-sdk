@@ -2,6 +2,10 @@
   "name": "@skyleague/mambu-sdk",
   "version": "1.0.0",
   "description": "TypeScript SDK generated from the Mambu API v2 spec.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skyleague/mambu-sdk.git"
+  },
   "license": "MIT",
   "author": "SkyLeague Technologies B.V. <technologies@skyleague.io> (https://skyleague.io)",
   "sideEffects": false,
