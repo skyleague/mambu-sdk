@@ -157,6 +157,25 @@ export const GetAuthorizationHold = {
     is: (o: unknown): o is GetAuthorizationHold => GetAuthorizationHold.validate(o) === true,
 } as const
 
+export type PatchAuthorizationHoldRequest = PatchOperation[]
+
+export const PatchAuthorizationHoldRequest = {
+    validate: (await import('./schemas/patch-authorization-hold-request.schema.js'))
+        .validate10 as unknown as ValidateFunction<PatchAuthorizationHoldRequest>,
+    get schema() {
+        return PatchAuthorizationHoldRequest.validate.schema
+    },
+    get errors() {
+        return PatchAuthorizationHoldRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PatchAuthorizationHoldRequest => PatchAuthorizationHoldRequest.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!PatchAuthorizationHoldRequest.validate(o)) {
+            throw new AjvValidator.ValidationError(PatchAuthorizationHoldRequest.errors ?? [])
+        }
+    },
+} as const
+
 /**
  * Account balances presented to inquirer such as card processor
  */
@@ -507,6 +526,30 @@ export interface CardAcceptor {
      * The Merchant Category Code of the card acceptor.
      */
     mcc?: number
+}
+
+/**
+ * A single change that needs to be made to a resource
+ */
+export interface PatchOperation {
+    /**
+     * The change to perform
+     */
+    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
+    /**
+     * The field to perform the operation on
+     */
+    path: string
+    /**
+     * The field from where a value should be moved, when using move
+     */
+    from?: string
+    /**
+     * The value of the field, can be null
+     */
+    value?: {
+        [k: string]: unknown | undefined
+    }
 }
 
 /**

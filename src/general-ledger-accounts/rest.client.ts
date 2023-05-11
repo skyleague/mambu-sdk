@@ -4,7 +4,7 @@
  */
 /* eslint-disable */
 import got from 'got'
-import type { CancelableRequest, Got, Options, Response } from 'got'
+import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import type { IncomingHttpHeaders } from 'http'
 import { CreateRequest, CreateResponse, ErrorResponse, GLAccount, GetAllResponse, PatchRequest } from './rest.type.js'
@@ -30,7 +30,7 @@ export class MambuGeneralLedgerAccounts {
         defaultAuth,
     }: {
         prefixUrl: string | 'http://localhost:8889/api' | 'https://localhost:8889/api'
-        options?: Options
+        options?: Options | OptionsInit
         auth: {
             basic?: [username: string, password: string] | (() => Promise<[username: string, password: string]>)
             apiKey?: string | (() => Promise<string>)

@@ -4,7 +4,7 @@
  */
 /* eslint-disable */
 import got from 'got'
-import type { CancelableRequest, Got, Options, Response } from 'got'
+import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import type { IncomingHttpHeaders } from 'http'
 import {
@@ -38,7 +38,7 @@ export class MambuGroups {
         defaultAuth,
     }: {
         prefixUrl: string | 'http://localhost:8889/api' | 'https://localhost:8889/api'
-        options?: Options
+        options?: Options | OptionsInit
         auth: {
             basic?: [username: string, password: string] | (() => Promise<[username: string, password: string]>)
             apiKey?: string | (() => Promise<string>)
@@ -111,6 +111,34 @@ export class MambuGroups {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Credit arrangements list retrieved
+     */
+    public async getCreditArrangementsByGroupIdOrKey({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { groupId: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`groups/${path.groupId}/creditarrangements`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetCreditArrangementsByGroupIdOrKeyResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }
@@ -214,34 +242,6 @@ export class MambuGroups {
             }),
             {
                 204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Credit arrangements list retrieved
-     */
-    public async getCreditArrangementsByGroupIdOrKey({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { groupId: string }
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`groups/${path.groupId}/creditarrangements`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetCreditArrangementsByGroupIdOrKeyResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

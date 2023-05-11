@@ -148,6 +148,21 @@ export const Group = {
     },
 } as const
 
+export type GetCreditArrangementsByGroupIdOrKeyResponse = CreditArrangement[]
+
+export const GetCreditArrangementsByGroupIdOrKeyResponse = {
+    validate: (await import('./schemas/get-credit-arrangements-by-group-id-or-key-response.schema.js'))
+        .validate10 as unknown as ValidateFunction<GetCreditArrangementsByGroupIdOrKeyResponse>,
+    get schema() {
+        return GetCreditArrangementsByGroupIdOrKeyResponse.validate.schema
+    },
+    get errors() {
+        return GetCreditArrangementsByGroupIdOrKeyResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetCreditArrangementsByGroupIdOrKeyResponse =>
+        GetCreditArrangementsByGroupIdOrKeyResponse.validate(o) === true,
+} as const
+
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
@@ -166,21 +181,6 @@ export const PatchRequest = {
     },
 } as const
 
-export type GetCreditArrangementsByGroupIdOrKeyResponse = CreditArrangement[]
-
-export const GetCreditArrangementsByGroupIdOrKeyResponse = {
-    validate: (await import('./schemas/get-credit-arrangements-by-group-id-or-key-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetCreditArrangementsByGroupIdOrKeyResponse>,
-    get schema() {
-        return GetCreditArrangementsByGroupIdOrKeyResponse.validate.schema
-    },
-    get errors() {
-        return GetCreditArrangementsByGroupIdOrKeyResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetCreditArrangementsByGroupIdOrKeyResponse =>
-        GetCreditArrangementsByGroupIdOrKeyResponse.validate(o) === true,
-} as const
-
 /**
  * Wrapper that holds a list of filtering criteria and a sorting criteria for Groups client directed query
  */
@@ -189,7 +189,7 @@ export interface GroupSearchCriteria {
     /**
      * The list of filtering criteria
      */
-    filterCriteria?: GroupFilterCriteria[]
+    filterCriteria: GroupFilterCriteria[]
 }
 
 export const GroupSearchCriteria = {
@@ -312,30 +312,6 @@ export interface Address {
      * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180
      */
     longitude?: number
-}
-
-/**
- * A single change that needs to be made to a resource
- */
-export interface PatchOperation {
-    /**
-     * The change to perform
-     */
-    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
-    /**
-     * The field to perform the operation on
-     */
-    path: string
-    /**
-     * The field from where a value should be moved, when using move
-     */
-    from?: string
-    /**
-     * The value of the field, can be null
-     */
-    value?: {
-        [k: string]: unknown | undefined
-    }
 }
 
 /**
@@ -613,6 +589,30 @@ export interface Currency {
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+}
+
+/**
+ * A single change that needs to be made to a resource
+ */
+export interface PatchOperation {
+    /**
+     * The change to perform
+     */
+    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
+    /**
+     * The field to perform the operation on
+     */
+    path: string
+    /**
+     * The field from where a value should be moved, when using move
+     */
+    from?: string
+    /**
+     * The value of the field, can be null
+     */
+    value?: {
+        [k: string]: unknown | undefined
+    }
 }
 
 /**

@@ -4,7 +4,7 @@
  */
 /* eslint-disable */
 import got from 'got'
-import type { CancelableRequest, Got, Options, Response } from 'got'
+import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import type { IncomingHttpHeaders } from 'http'
 import {
@@ -37,7 +37,7 @@ export class BaseMambuStreaming {
         defaultAuth,
     }: {
         prefixUrl?: string | 'http://MYTENANT.mambu.com/api/v1'
-        options?: Options
+        options?: Options | OptionsInit
         auth: {
             apiKeyAuth?: string | (() => Promise<string>)
         }

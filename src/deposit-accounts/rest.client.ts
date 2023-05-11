@@ -4,7 +4,7 @@
  */
 /* eslint-disable */
 import got from 'got'
-import type { CancelableRequest, Got, Options, Response } from 'got'
+import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import type { IncomingHttpHeaders } from 'http'
 import {
@@ -55,7 +55,7 @@ export class MambuDepositAccounts {
         defaultAuth,
     }: {
         prefixUrl: string | 'http://localhost:8889/api' | 'https://localhost:8889/api'
-        options?: Options
+        options?: Options | OptionsInit
         auth: {
             basic?: [username: string, password: string] | (() => Promise<[username: string, password: string]>)
             apiKey?: string | (() => Promise<string>)
@@ -558,40 +558,6 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Allows posting an action such as approve deposit account
-     */
-    public async changeState({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: DepositAccountAction
-        path: { depositAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(DepositAccountAction, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`deposits/${path.depositAccountId}:changeState`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                200: DepositAccount,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-                409: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Allows to change the interest rate for a deposit account
      */
     public async changeInterestRate({
@@ -616,6 +582,40 @@ export class MambuDepositAccounts {
             {
                 102: { is: (_x: unknown): _x is unknown => true },
                 204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+                409: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Allows posting an action such as approve deposit account
+     */
+    public async changeState({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: DepositAccountAction
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(DepositAccountAction, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`deposits/${path.depositAccountId}:changeState`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                200: DepositAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
