@@ -526,37 +526,6 @@ export const UndoMaturityAction = {
 } as const
 
 /**
- * Allows specifying the action details for a deposit account
- */
-export interface DepositAccountAction {
-    /**
-     * The action type to be applied
-     */
-    action: 'APPROVE' | 'UNDO_APPROVE' | 'LOCK' | 'UNLOCK' | 'CLOSE' | 'CLOSE_WITHDRAW' | 'CLOSE_REJECT' | 'CLOSE_WRITE_OFF'
-    /**
-     * The notes related to the action performed
-     */
-    notes?: string
-}
-
-export const DepositAccountAction = {
-    validate: (await import('./schemas/deposit-account-action.schema.js'))
-        .validate10 as unknown as ValidateFunction<DepositAccountAction>,
-    get schema() {
-        return DepositAccountAction.validate.schema
-    },
-    get errors() {
-        return DepositAccountAction.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is DepositAccountAction => DepositAccountAction.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!DepositAccountAction.validate(o)) {
-            throw new AjvValidator.ValidationError(DepositAccountAction.errors ?? [])
-        }
-    },
-} as const
-
-/**
  * Allows to change the interest rate for a deposit account
  */
 export interface ChangeInterestRateAction {
@@ -587,6 +556,37 @@ export const ChangeInterestRateAction = {
     assert: (o: unknown) => {
         if (!ChangeInterestRateAction.validate(o)) {
             throw new AjvValidator.ValidationError(ChangeInterestRateAction.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Allows specifying the action details for a deposit account
+ */
+export interface DepositAccountAction {
+    /**
+     * The action type to be applied
+     */
+    action: 'APPROVE' | 'UNDO_APPROVE' | 'LOCK' | 'UNLOCK' | 'CLOSE' | 'CLOSE_WITHDRAW' | 'CLOSE_REJECT' | 'CLOSE_WRITE_OFF'
+    /**
+     * The notes related to the action performed
+     */
+    notes?: string
+}
+
+export const DepositAccountAction = {
+    validate: (await import('./schemas/deposit-account-action.schema.js'))
+        .validate10 as unknown as ValidateFunction<DepositAccountAction>,
+    get schema() {
+        return DepositAccountAction.validate.schema
+    },
+    get errors() {
+        return DepositAccountAction.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is DepositAccountAction => DepositAccountAction.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!DepositAccountAction.validate(o)) {
+            throw new AjvValidator.ValidationError(DepositAccountAction.errors ?? [])
         }
     },
 } as const

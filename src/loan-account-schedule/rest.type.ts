@@ -54,6 +54,25 @@ export const ErrorResponse = {
     },
 } as const
 
+export type EditScheduleRequest = Installment[]
+
+export const EditScheduleRequest = {
+    validate: (await import('./schemas/edit-schedule-request.schema.js'))
+        .validate10 as unknown as ValidateFunction<EditScheduleRequest>,
+    get schema() {
+        return EditScheduleRequest.validate.schema
+    },
+    get errors() {
+        return EditScheduleRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is EditScheduleRequest => EditScheduleRequest.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!EditScheduleRequest.validate(o)) {
+            throw new AjvValidator.ValidationError(EditScheduleRequest.errors ?? [])
+        }
+    },
+} as const
+
 export type PreviewTranchesOnScheduleRequest = LoanTranche[]
 
 export const PreviewTranchesOnScheduleRequest = {

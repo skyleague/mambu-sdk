@@ -4,10 +4,16 @@
  */
 /* eslint-disable */
 import got from 'got'
-import type { CancelableRequest, Got, Options, Response } from 'got'
+import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import type { IncomingHttpHeaders } from 'http'
-import { ErrorResponse, LoanAccountSchedule, PreviewLoanAccountSchedule, PreviewTranchesOnScheduleRequest } from './rest.type.js'
+import {
+    EditScheduleRequest,
+    ErrorResponse,
+    LoanAccountSchedule,
+    PreviewLoanAccountSchedule,
+    PreviewTranchesOnScheduleRequest,
+} from './rest.type.js'
 
 /**
  * loans/schedule
@@ -30,7 +36,7 @@ export class MambuLoanAccountSchedule {
         defaultAuth,
     }: {
         prefixUrl: string | 'http://localhost:8889/api' | 'https://localhost:8889/api'
-        options?: Options
+        options?: Options | OptionsInit
         auth: {
             basic?: [username: string, password: string] | (() => Promise<[username: string, password: string]>)
             apiKey?: string | (() => Promise<string>)
@@ -58,6 +64,36 @@ export class MambuLoanAccountSchedule {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans/${path.loanAccountId}/schedule`, {
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: LoanAccountSchedule,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Allows to update the entire loan account schedule by provided loan account id or encodedKey with the provided list of installments
+     */
+    public async editSchedule({
+        body,
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: EditScheduleRequest
+        path: { loanAccountId: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(EditScheduleRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).put(`loans/${path.loanAccountId}/schedule`, {
+                json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),

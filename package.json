@@ -40,13 +40,13 @@
     "tslib": "^2.5.0"
   },
   "devDependencies": {
-    "@skyleague/axioms": "^2.0.2",
-    "@skyleague/node-standards": "^3.0.0",
-    "@skyleague/therefore": "^2.0.2",
-    "@types/split2": "^3.2.1",
+    "@skyleague/axioms": "^2.0.3",
+    "@skyleague/node-standards": "^3.6.0",
+    "@skyleague/therefore": "^2.1.2",
+    "@types/split2": "^4.2.0",
     "camelcase": "^7.0.1",
     "got": "^12.6.0",
-    "nock": "^13.3.0",
+    "nock": "^13.3.1",
     "typescript": "^5.0.4"
   },
   "peerDependencies": {
@@ -57,6 +57,7 @@
   },
   "publishConfig": {
     "access": "public",
+    "provenance": true,
     "registry": "https://registry.npmjs.org"
   },
   "node-standards": {

@@ -227,7 +227,7 @@ export interface ClientSearchCriteria {
     /**
      * The list of filtering criteria
      */
-    filterCriteria?: ClientFilterCriteria[]
+    filterCriteria: ClientFilterCriteria[]
 }
 
 export const ClientSearchCriteria = {
