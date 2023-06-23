@@ -32,6 +32,7 @@ export interface BulkProcessStatus {
         | 'ERROR'
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
+        | 'RECOVERABLE_ERROR'
 }
 
 export const BulkProcessStatus = {

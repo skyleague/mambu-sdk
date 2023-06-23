@@ -688,6 +688,10 @@ export interface FeeLoanTransactionInput {
      */
     predefinedFeeKey?: string
     /**
+     * The date of the first repayment for the loan account (as Organization Time)
+     */
+    firstRepaymentDate?: string
+    /**
      * The external id of the repayment transaction, customizable, unique
      */
     externalId?: string

@@ -51,7 +51,9 @@ for (const item of clients.items) {
         },
         explicitContentNegotiation: true,
     })
-    const clientName = item.label.replace(/[_\s]/g, '-').toLowerCase()
+    let clientName = item.label.replace(/[_\s]/g, '-').toLowerCase()
+    clientName = clientName.includes('a-p-i') ? clientName.replace('a-p-i', 'api') : clientName
+
     node.value.filePath = `${clientName}/rest`
     exports[camelCase(`mambu_${clientName}`)] = node
 }

@@ -7,26 +7,16 @@ import got from 'got'
 import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import type { IncomingHttpHeaders } from 'http'
-import {
-    ApiConsumer,
-    ApiKey,
-    ApiKeyInput,
-    ErrorResponse,
-    GetAllResponse,
-    GetKeysByConsumerIdResponse,
-    PatchRequest,
-    SecretKey,
-} from './rest.type.js'
+import { ApiKey, ApiKeyRotationResult, ErrorResponse } from './rest.type.js'
 
 /**
- * consumers
+ * apikey/rotation
  */
 export class MambuApiConsumers {
     public client: Got
 
     public auth: {
-        basic?: [username: string, password: string] | (() => Promise<[username: string, password: string]>)
-        apiKey?: string | (() => Promise<string>)
+        secretkey?: string | (() => Promise<string>)
     }
 
     public availableAuth: Set<string>
@@ -41,8 +31,7 @@ export class MambuApiConsumers {
         prefixUrl: string | 'http://localhost:8889/api' | 'https://localhost:8889/api'
         options?: Options | OptionsInit
         auth: {
-            basic?: [username: string, password: string] | (() => Promise<[username: string, password: string]>)
-            apiKey?: string | (() => Promise<string>)
+            secretkey?: string | (() => Promise<string>)
         }
         defaultAuth?: string[][] | string[]
     }) {
@@ -53,279 +42,30 @@ export class MambuApiConsumers {
     }
 
     /**
-     * Allows retrieval of a single API Consumer via id or encoded key
+     * Rotate API key
      */
-    public async getById({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { apiConsumerId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`consumers/${path.apiConsumerId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: ApiConsumer,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Update an existing API Consumer
-     */
-    public async update({
+    public async rotateKey({
         body,
-        path,
         headers,
-        auth = [['apiKey'], ['basic']],
+        auth = [[]],
     }: {
-        body: ApiConsumer
-        path: { apiConsumerId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        body: ApiKey
+        headers: { secretkey: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(ApiConsumer, body)
+        this.validateRequestBody(ApiKey, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).put(`consumers/${path.apiConsumerId}`, {
+            this.buildClient(auth).post(`apikey/rotation`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                200: ApiConsumer,
+                200: ApiKeyRotationResult,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Delete an existing API Consumer
-     */
-    public async delete({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { apiConsumerId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).delete(`consumers/${path.apiConsumerId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Partially update an existing API Consumer
-     */
-    public async patch({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: PatchRequest
-        path: { apiConsumerId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PatchRequest, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).patch(`consumers/${path.apiConsumerId}`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Delete an API key by it's id.
-     */
-    public async deleteApiKeyForConsumer({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { apiConsumerId: string; apiKeyId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).delete(`consumers/${path.apiConsumerId}/apikeys/${path.apiKeyId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create a new API key for the API Consumer.
-     */
-    public async createApiKeyForConsumer({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: ApiKeyInput
-        path: { apiConsumerId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ApiKeyInput, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`consumers/${path.apiConsumerId}/apikeys`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: ApiKey,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Allows retrieval of API Consumers
-     */
-    public async getAll({
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: { query?: { offset?: string; limit?: string; paginationDetails?: string }; auth?: string[][] | string[] } = {}) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`consumers`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetAllResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create a new API Consumer
-     */
-    public async create({
-        body,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: ApiConsumer
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ApiConsumer, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`consumers`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: ApiConsumer,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Allows retrieval of the API Keys of an API Consumer
-     */
-    public async getKeysByConsumerId({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { apiConsumerId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`consumers/${path.apiConsumerId}/keys`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetKeysByConsumerIdResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create a new Secret key for the API Consumer.
-     */
-    public async createSecretKeyForConsumer({
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { apiConsumerId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).post(`consumers/${path.apiConsumerId}/secretkeys`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: SecretKey,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
             }
         )
     }
@@ -367,31 +107,14 @@ export class MambuApiConsumers {
         }
     }
 
-    protected buildBasicClient(client: Got) {
+    protected buildSecretkeyClient(client: Got) {
         return client.extend({
             hooks: {
                 beforeRequest: [
                     async (options) => {
-                        const basic = this.auth.basic
-                        if (basic !== undefined) {
-                            const [username, password] = typeof basic === 'function' ? await basic() : basic
-                            options.username = username
-                            options.password = password
-                        }
-                    },
-                ],
-            },
-        })
-    }
-
-    protected buildApiKeyClient(client: Got) {
-        return client.extend({
-            hooks: {
-                beforeRequest: [
-                    async (options) => {
-                        const apiKey = this.auth.apiKey
-                        const key = typeof apiKey === 'function' ? await apiKey() : apiKey
-                        options.headers['apiKey'] = key
+                        const secretkey = this.auth.secretkey
+                        const key = typeof secretkey === 'function' ? await secretkey() : secretkey
+                        options.headers['secretkey'] = key
                     },
                 ],
             },
@@ -403,10 +126,8 @@ export class MambuApiConsumers {
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
         for (const chosen of auth[0] ?? []) {
-            if (chosen === 'basic') {
-                client = this.buildBasicClient(client)
-            } else if (chosen === 'apiKey') {
-                client = this.buildApiKeyClient(client)
+            if (chosen === 'secretkey') {
+                client = this.buildSecretkeyClient(client)
             }
         }
         return client

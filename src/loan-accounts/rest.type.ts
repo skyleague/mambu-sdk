@@ -753,6 +753,7 @@ export interface CollateralAssetsReevaluationResponse {
         | 'ERROR'
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
+        | 'RECOVERABLE_ERROR'
 }
 
 export const CollateralAssetsReevaluationResponse = {
@@ -3162,6 +3163,7 @@ export interface GetAuthorizationHold {
      * The external reference ID to be used to reference the account hold in subsequent requests.
      */
     externalReferenceId: string
+    balances?: AccountBalances
     /**
      * The original amount of money to be held as a result of the authorization hold request.
      */
@@ -3190,6 +3192,36 @@ export interface GetAuthorizationHold {
      * The authorization hold status.
      */
     status?: 'PENDING' | 'REVERSED' | 'SETTLED' | 'EXPIRED'
+}
+
+/**
+ * Account balances presented to inquirer such as card processor
+ */
+export interface AccountBalances {
+    /**
+     * The unique account identifier
+     */
+    accountId?: string
+    /**
+     * The current balance of a deposit account or principal balance of a revolving credit
+     */
+    totalBalance?: number
+    /**
+     * The card type either DEBIT or CREDIT
+     */
+    cardType?: 'DEBIT' | 'CREDIT'
+    /**
+     * The overdraft limit of a deposit account or the loan amount in case of a credit account
+     */
+    creditLimit?: number
+    /**
+     * Currency code used for the account
+     */
+    currencyCode?: string
+    /**
+     * The available balance of a deposit or credit account
+     */
+    availableBalance?: number
 }
 
 /**

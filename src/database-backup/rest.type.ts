@@ -59,6 +59,7 @@ export interface TriggerDatabaseBackupResponse {
         | 'ERROR'
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
+        | 'RECOVERABLE_ERROR'
 }
 
 export const TriggerDatabaseBackupResponse = {

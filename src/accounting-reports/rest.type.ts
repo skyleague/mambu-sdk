@@ -32,6 +32,7 @@ export interface AccountingReport {
         | 'ERROR'
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
+        | 'RECOVERABLE_ERROR'
 }
 
 export const AccountingReport = {
@@ -136,6 +137,7 @@ export interface AccountingReportGenerationResponse {
         | 'ERROR'
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
+        | 'RECOVERABLE_ERROR'
 }
 
 export const AccountingReportGenerationResponse = {

@@ -90,7 +90,7 @@ export interface MambuFunction {
     /**
      * Mambu function state
      */
-    state?: 'CREATE_PENDING' | 'UPDATE_PENDING' | 'ACTIVE' | 'FAILED' | 'REMOVING' | 'REMOVED'
+    state?: 'CREATE_PENDING' | 'UPDATE_PENDING' | 'ACTIVE' | 'FAILED'
     /**
      * Mambu function version
      */

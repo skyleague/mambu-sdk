@@ -115,6 +115,7 @@ export interface GetAuthorizationHold {
      * The external reference ID to be used to reference the account hold in subsequent requests.
      */
     externalReferenceId: string
+    balances?: AccountBalances
     /**
      * The original amount of money to be held as a result of the authorization hold request.
      */
@@ -365,6 +366,7 @@ export interface CardTransactionOutput {
      * The external reference ID to be used to reference the card transaction in subsequent requests.
      */
     externalReferenceId: string
+    balances?: AccountBalances
     /**
      * The date of the first repayment for the loan account (as Organization Time)
      */
@@ -445,6 +447,7 @@ export interface AuthorizationHold {
      * The external reference ID to be used to reference the account hold in subsequent requests.
      */
     externalReferenceId: string
+    balances?: AccountBalances
     /**
      * The original amount of money to be held as a result of the authorization hold request.
      */

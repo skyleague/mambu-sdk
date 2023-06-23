@@ -24,6 +24,7 @@ export interface TriggerHourlyAndEndOfDayProcessingResponse {
         | 'ERROR'
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
+        | 'RECOVERABLE_ERROR'
 }
 
 export const TriggerHourlyAndEndOfDayProcessingResponse = {
