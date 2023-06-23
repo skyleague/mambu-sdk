@@ -32,6 +32,7 @@ export interface BackgroundProcess {
         | 'ERROR'
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
+        | 'RECOVERABLE_ERROR'
     /**
      * The type of the background process
      */

@@ -44,7 +44,7 @@ export class MambuUserRoles {
     }
 
     /**
-     * Allows retrieval of a single user role via id or encoded key
+     * Get user role
      */
     public async getById({
         path,
@@ -72,7 +72,7 @@ export class MambuUserRoles {
     }
 
     /**
-     * Update an existing user role
+     * Update user role
      */
     public async update({
         body,
@@ -105,7 +105,7 @@ export class MambuUserRoles {
     }
 
     /**
-     * Delete a role via id or encoded key
+     * Delete user role
      */
     public async delete({ path, auth = [['apiKey'], ['basic']] }: { path: { roleId: string }; auth?: string[][] | string[] }) {
         return this.awaitResponse(
@@ -124,7 +124,7 @@ export class MambuUserRoles {
     }
 
     /**
-     * Partially update an existing user role
+     * Partially update user role
      */
     public async patch({
         body,
@@ -154,7 +154,7 @@ export class MambuUserRoles {
     }
 
     /**
-     * Allows retrieval of user roles using various query parameters
+     * Get user roles
      */
     public async getAll({
         query,
@@ -179,7 +179,7 @@ export class MambuUserRoles {
     }
 
     /**
-     * Create a new user role
+     * Create user role
      */
     public async create({
         body,

@@ -257,6 +257,10 @@ export interface DepositProductPredefinedFee {
      */
     creationDate?: string
     /**
+     * External function
+     */
+    amountCalculationFunctionName?: string
+    /**
      * A list of accounting rules defined for this fee. If null, product default rules are selected.
      */
     accountingRules?: DepositGLAccountingRule[]

@@ -553,6 +553,7 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -736,6 +737,7 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }

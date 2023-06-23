@@ -43,7 +43,7 @@ export class MambuUserRolesConfiguration {
     }
 
     /**
-     * Allows retrieval of the user roles configuration.
+     * Get user roles configuration
      */
     public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
@@ -60,7 +60,7 @@ export class MambuUserRolesConfiguration {
     }
 
     /**
-     * Allows updating the current user roles configuration.
+     * Update user roles configuration
      */
     public async update({
         headers,
@@ -82,7 +82,7 @@ export class MambuUserRolesConfiguration {
     }
 
     /**
-     * Allows retrieval of the user roles configuration template.
+     * Get user roles configuration template
      */
     public async getTemplate({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(

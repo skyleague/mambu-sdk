@@ -24,6 +24,7 @@ export interface DataImportResponse {
         | 'ERROR'
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
+        | 'RECOVERABLE_ERROR'
     /**
      * Import key
      */
@@ -80,6 +81,7 @@ export interface DataImportStatus {
         | 'ERROR'
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
+        | 'RECOVERABLE_ERROR'
     /**
      * List of errors
      */
