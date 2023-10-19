@@ -51,7 +51,7 @@ export class MambuDepositProducts {
     }
 
     /**
-     * Perform batch update action for the specified deposit product
+     * Perform a batch update action on the specified deposit product
      */
     public async batchUpdate({
         body,
@@ -84,7 +84,7 @@ export class MambuDepositProducts {
     }
 
     /**
-     * Allows retrieval of a list of deposit products
+     * Get deposit products
      */
     public async getAll({
         query,
@@ -109,7 +109,7 @@ export class MambuDepositProducts {
     }
 
     /**
-     * Create a new deposit product
+     * Create deposit product
      */
     public async create({
         body,
@@ -139,7 +139,7 @@ export class MambuDepositProducts {
     }
 
     /**
-     * Allows retrieval of a single deposit product via id or encoded key
+     * Get deposit product
      */
     public async getById({
         path,
@@ -167,7 +167,7 @@ export class MambuDepositProducts {
     }
 
     /**
-     * Update an existing deposit product
+     * Update deposit product
      */
     public async update({
         body,
@@ -198,7 +198,7 @@ export class MambuDepositProducts {
     }
 
     /**
-     * Delete a deposit product
+     * Delete deposit product
      */
     public async delete({
         path,
@@ -224,7 +224,7 @@ export class MambuDepositProducts {
     }
 
     /**
-     * Partially update an existing deposit product
+     * Partially update deposit product
      */
     public async patch({
         body,
@@ -261,7 +261,7 @@ export class MambuDepositProducts {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

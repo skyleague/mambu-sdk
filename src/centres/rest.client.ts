@@ -44,7 +44,7 @@ export class MambuCentres {
     }
 
     /**
-     * Allows retrieval of a single centre via id or encoded key
+     * Get centre
      */
     public async getById({
         path,
@@ -72,7 +72,7 @@ export class MambuCentres {
     }
 
     /**
-     * Allows retrieval of centres using various query parameters
+     * Get centres
      */
     public async getAll({
         query,
@@ -105,7 +105,7 @@ export class MambuCentres {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

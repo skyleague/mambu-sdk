@@ -89,7 +89,7 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Allows retrieval of credit arrangements using various query parameters
+     * Get credit arrangements
      */
     public async getAll({
         query,
@@ -114,7 +114,7 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Create a new credit arrangement
+     * Create credit arrangement
      */
     public async create({
         body,
@@ -144,7 +144,7 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Allows posting an action such as change credit arrangement state
+     * Change credit arrangement state
      */
     public async changeState({
         body,
@@ -177,7 +177,7 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Client Directed Query. Allows you to search credit arrangements by various criteria
+     * Search credit arrangements
      */
     public async search({
         body,
@@ -240,7 +240,7 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Allows retrieval of a consolidated credit arrangement schedule by provided credit arrangement id or encodedKey
+     * Get credit arrangement schedule
      */
     public async getSchedule({
         path,
@@ -268,7 +268,7 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Allows retrieval of a single credit arrangement via id or encoded key
+     * Get credit arrangement
      */
     public async getById({
         path,
@@ -296,7 +296,7 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Update an existing credit arrangement
+     * Update credit arrangement
      */
     public async update({
         body,
@@ -326,7 +326,7 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Delete a credit arrangement
+     * Delete credit arrangement
      */
     public async delete({
         path,
@@ -351,7 +351,7 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Partially update an existing credit arrangement
+     * Partially update credit arrangement
      */
     public async patch({
         body,
@@ -381,7 +381,7 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Allows retrieval of all the loan and deposit accounts linked to the credit arrangement
+     * Get all loan and deposit accounts linked to credit arrangement
      */
     public async getAllAccounts({
         path,
@@ -411,7 +411,7 @@ export class MambuCreditArrangements {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

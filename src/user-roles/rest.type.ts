@@ -3,42 +3,42 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * The user role
+ * Represents a user role.
  */
 export interface Role {
     /**
-     * Notes about the role
+     * The notes about the role.
      */
     notes?: string
     access?: BaseUserAccess
     /**
-     * The last time the user was modified, as UTC
+     * The last time the role was modified in UTC.
      */
     lastModifiedDate?: string
     /**
-     * The unique name of the role
+     * The unique name of the role.
      */
     name: string
     /**
-     * The encoded key of the entity, generated, globally unique
+     * The encoded key of the entity, generated automatically, globally unique.
      */
     encodedKey?: string
     /**
-     * Id of the role, unique, can be generated and customized
+     * The ID of the role, which can be generated and customized, but must be unique.
      */
     id?: string
     /**
-     * Date when the user was created, as UTC
+     * The date when the role was created in UTC.
      */
     creationDate?: string
 }
 
 export const Role = {
-    validate: (await import('./schemas/role.schema.js')).validate10 as unknown as ValidateFunction<Role>,
+    validate: (await import('./schemas/role.schema.js')).validate as ValidateFunction<Role>,
     get schema() {
         return Role.validate.schema
     },
@@ -48,7 +48,7 @@ export const Role = {
     is: (o: unknown): o is Role => Role.validate(o) === true,
     assert: (o: unknown) => {
         if (!Role.validate(o)) {
-            throw new AjvValidator.ValidationError(Role.errors ?? [])
+            throw new ValidationError(Role.errors ?? [])
         }
     },
 } as const
@@ -58,7 +58,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -68,7 +68,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -76,7 +76,7 @@ export const ErrorResponse = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -86,7 +86,7 @@ export const PatchRequest = {
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
+            throw new ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
@@ -94,7 +94,7 @@ export const PatchRequest = {
 export type GetAllResponse = Role[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -105,39 +105,39 @@ export const GetAllResponse = {
 } as const
 
 /**
- * Wrapper containing the available user permissions and access rights
+ * Represents the user permissions and access rights.
  */
 export interface BaseUserAccess {
     /**
-     * Mambu access allows the user to log in to Mambu via the regular web user interface, using their login credentials. If an user does not have this access right, login to Mambu via the web user interface will not be possible.
+     * TRUE` if the user can log in to the Mambu UI using their login credentials, `FALSE` otherwise.
      */
     mambuAccess?: boolean
     /**
-     * Whether the user is an administrator in Mambu. The administrators in mambu are having full permissions for all entities and for Mambu settings.
+     * `TRUE` if the user has the administrator user type, `FALSE` otherwise. Administrators (admins) have all permissions and can perform any action in Mambu.
      */
     administratorAccess?: boolean
     /**
-     * API access allows the user to authenticate and interact with Mambu using Mambu's APIs, this means that most of the time such an user is not an actual person, but a piece of software that is programmed to interact with Mambu. The API user would still require the right user permissions, depending on what it is required to do in the system, and transactions posted by that user are kept in the logs in the same way as user actions from regular users.
+     * `TRUE` if the user can authenticate and interact with Mambu APIs, `FALSE` otherwise. The user may still require additional permissions for specific API requests.
      */
     apiAccess?: boolean
     /**
-     * Permissions for the user. The non-admin users are authorized to do actions based a set of permissions in order to access Mambu features. Note that not all this permissions are used for validating API calls, some are used only for UI validations
+     * Permissions for the user. The non-admin users are authorized to do actions based a set of permissions in order to access Mambu features. Permissions may be relevant for the API and/or the Mambu UI.
      */
     permissions?: Local0[]
     /**
-     * Flag indicating the user is part of the Delivery team
+     * `TRUE` if the user is part of the Mambu delivery team, `FALSE` otherwise.
      */
     deliveryAccess?: boolean
     /**
-     * Whether the user is a credit officer or not. Credit Officers have the option of having clients and groups assigned to them, this relationship allows for better reporting and client management.
+     * `TRUE` if the user has the credit officer user type, `FALSE` otherwise. Credit officers have the option of having clients and groups assigned to them.
      */
     creditOfficerAccess?: boolean
     /**
-     * Flag indicating the user is in charge with the Mambu technical support.
+     * `TRUE` if the user can provide Mambu technical support, `FALSE` otherwise.
      */
     supportAccess?: boolean
     /**
-     * Whether the user is a teller or not. Tellers have access to the teller module, special tellering permissions give them access to the different actions available on this module, such as opening/closing tills, posting transactions on a till, adding and removing cash from a till etc.
+     * `TRUE` if the user has the teller user type, `FALSE` otherwise. Tellers have access to the teller module and specific tellering permissions, which allow them to take actions such as opening or closing tills, posting transactions on a till, and adding and removing cash from a till.
      */
     tellerAccess?: boolean
 }
@@ -175,8 +175,11 @@ type Local0 =
     | 'EDIT_TRANSACTION_CHANNELS'
     | 'DELETE_TRANSACTION_CHANNELS'
     | 'MANAGE_HOLIDAYS'
+    | 'MANAGE_INDEX_RATES'
     | 'MANAGE_EOD_PROCESSING'
     | 'MANAGE_INTERNAL_CONTROLS'
+    | 'MANAGE_CURRENCIES'
+    | 'MANAGE_AUTHORIZATION_HOLDS_SETUP'
     | 'MANAGE_RISK_LEVELS'
     | 'VIEW_LOAN_PRODUCT_DETAILS'
     | 'CREATE_LOAN_PRODUCT'
@@ -319,6 +322,10 @@ type Local0 =
     | 'CREATE_REPORTS'
     | 'EDIT_REPORTS'
     | 'DELETE_REPORTS'
+    | 'VIEW_JASPER_REPORTS'
+    | 'CREATE_JASPER_REPORTS'
+    | 'EDIT_JASPER_REPORTS'
+    | 'DELETE_JASPER_REPORTS'
     | 'VIEW_CHART_OF_ACCOUNTS'
     | 'MANAGE_ACCOUNTS'
     | 'VIEW_JOURNAL_ENTRIES'
@@ -377,6 +384,33 @@ type Local0 =
     | 'CREATE_MAMBU_FUNCTIONS'
     | 'EDIT_MAMBU_FUNCTIONS'
     | 'DELETE_MAMBU_FUNCTIONS'
+    | 'VIEW_CURRENT_USER_DETAILS'
+    | 'VIEW_PROFIT_SHARING_CLASSES'
+    | 'CREATE_PROFIT_SHARING_CLASSES'
+    | 'EDIT_PROFIT_SHARING_CLASSES'
+    | 'DELETE_PROFIT_SHARING_CLASSES'
+    | 'VIEW_PROFIT_SHARING_POOLS'
+    | 'CREATE_PROFIT_SHARING_POOLS'
+    | 'EDIT_PROFIT_SHARING_POOLS'
+    | 'DELETE_PROFIT_SHARING_POOLS'
+    | 'VIEW_PROFIT_SHARING_INCOME_CATEGORIES'
+    | 'CREATE_PROFIT_SHARING_INCOME_CATEGORIES'
+    | 'EDIT_PROFIT_SHARING_INCOME_CATEGORIES'
+    | 'DELETE_PROFIT_SHARING_INCOME_CATEGORIES'
+    | 'VIEW_PROFIT_SHARING_PROPOSALS'
+    | 'EDIT_PROFIT_SHARING_PROPOSALS'
+    | 'CREATE_PROFIT_SHARING_PROPOSALS'
+    | 'APPROVE_PROFIT_SHARING_PROPOSALS'
+    | 'ADJUST_PROFIT_SHARING_PROPOSALS'
+    | 'VIEW_PROFIT_SHARING_SYSTEM_OPTIONS'
+    | 'CREATE_PROFIT_SHARING_SYSTEM_OPTIONS'
+    | 'EDIT_PROFIT_SHARING_SYSTEM_OPTIONS'
+    | 'DELETE_PROFIT_SHARING_SYSTEM_OPTIONS'
+    | 'VIEW_PROFIT_SHARING_DEPOSIT_PRODUCTS'
+    | 'EDIT_PROFIT_SHARING_DEPOSIT_PRODUCT_LINK'
+    | 'VIEW_PROFIT_SHARING_ACCOUNTS_SETTINGS'
+    | 'CREATE_PROFIT_SHARING_ACCOUNT_SETTINGS'
+    | 'EDIT_PROFIT_SHARING_ACCOUNT_SETTINGS'
 
 export interface RestError {
     errorCode?: number

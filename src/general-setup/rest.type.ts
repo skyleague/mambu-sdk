@@ -3,8 +3,8 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 type GeneralSetupAssignmentConstraintsArray = 'BRANCH' | 'CENTRE' | 'CREDIT_OFFICER' | 'GROUP'
 
@@ -19,65 +19,65 @@ type GeneralSetupEnabledComponentsArray =
     | 'CREDIT_OFFICERS'
 
 /**
- * Represents the general setup for an organization which can be modified by the organization's users
+ * Represents the general setup for an organization.
  */
 export interface GeneralSetup {
     /**
-     * The pattern for generating client IDs
+     * The pattern for generating individual client IDs.
      */
     clientIdFormat?: string
     /**
-     * The key of the GL Account which will be used for inter-branch transfers
+     * The key of the general ledger (GL) account which will be used for inter-branch transfers.
      */
     interBranchTransferGLAccountKey?: string
     /**
-     * The list of required assignments for Clients and Groups
+     * The list of required assignments for clients and groups.
      */
     assignmentConstraints?: GeneralSetupAssignmentConstraintsArray[]
     /**
-     * The maximum allowed ID document attachments
+     * The maximum allowed ID document attachments.
      */
     maxAllowedIdDocumentAttachments?: number
     /**
-     * Symbol used to mark the border between the integral and the fractional parts of a decimal numeral
+     * The symbol used to mark the border between the integral and the fractional parts of a decimal numeral.
      */
     decimalSeparator?: 'COMMA' | 'POINT'
     /**
-     * The maximum group size allowed; null values causes ignoring of the limit
+     * The maximum group size allowed. A null value means the limit is ignored.
      */
     maxGroupSizeLimit?: number
     /**
-     * Specifies whether the other id documents are enabled or not.
+     * `TRUE` if other ID documents are enabled, `FALSE` otherwise.
      */
     otherIdDocumentsEnabled?: boolean
     /**
-     * The group size limitation type
+     * The group size limitation type.
      */
     groupSizeLimitType?: 'HARD' | 'WARNING' | 'NONE'
     /**
-     * The EOD processing settings whether are automatic, runs every midnight or manual, runs when the client initiates the action from the interface.
+     * The end of day (EOD) processing settings. The `AUTOMATIC` EOD processing runs every midnight. The `MANUAL` EOD processing runs when the client initiates the action from the Mambu UI.
      */
     eodProcessingMethod?: 'AUTOMATIC' | 'MANUAL'
     /**
-     * The client default state
+     * The client default state.
      */
     defaultClientState?: 'PENDING_APPROVAL' | 'INACTIVE' | 'ACTIVE' | 'EXITED' | 'BLACKLISTED' | 'REJECTED'
     /**
-     * The maximum allowed journal entry attachments
+     * The maximum allowed journal entry attachments.
      */
     maxAllowedJournalEntryDocumentAttachments?: number
     /**
-     * The date (dd-MM-yyyy) or date time (dd-MM-yyyy HH:mm:ss) formats
+     * The date (dd-MM-yyyy) or date time (dd-MM-yyyy HH:mm:ss) formats.
      */
     dateFormats?: {
         [k: string]: string
     }
     /**
-     * Specifies whether separate users are required for approval and disbursal
+     * `TRUE` if separate users are required for approval and disbursal, `FALSE` otherwise.
      */
     approvalDisbursalTwoManRuleEnabled?: boolean
     /**
-     * The maximum of days we allow users to undo of close obligations met for an loan account
+     * The maximum number of days users are allowed to undo of close obligations met for a loan account.
      */
     maxAllowedUndoClosurePeriod?: number
     /**
@@ -85,89 +85,89 @@ export interface GeneralSetup {
      */
     overdraftInterestEodBalanceDate?: string
     /**
-     * The maximum exposure is a hard cap of how much a client can have in outstanding loans with the organization at any time
+     * The maximum exposure a client can have in outstanding loans at any time.
      */
     exposureType?: 'UNLIMITED' | 'SUM_OF_LOANS' | 'SUM_OF_LOANS_MINUS_SAVINGS'
     /**
-     * The unique pattern after which all the till IDs should be created
+     * The unique pattern after which all the till IDs should be created.
      */
     tillIdFormat?: string
     /**
-     * The client role used as default
+     * The client role used as default.
      */
     defaultClientRoleKey?: string
     /**
-     * The accounting cut off time
+     * The accounting cut off time.
      */
     accountingCutOffTime?: string
     /**
-     * The encoded key of the general setup, auto generated, unique
+     * The encoded key of the general setup, which is auto generated, and unique.
      */
     encodedKey?: string
     /**
-     * The minimum group size allowed; null values causes ignoring of the limit
+     * The minimum group size allowed. A null value means the limit is ignored.
      */
     minGroupSizeLimit?: number
     /**
-     * The number of days that are required before an account can be written off
+     * The number of days that are required before an account can be written off.
      */
     arrearsDaysBeforeWriteOff?: number
     /**
-     * The interval (number of days) between the execution of automated accounting closures. If this number is 0, automated closure is performed
+     * The interval (number of days) between the execution of automated accounting closures. If this number is 0, automated closure is performed.
      */
     automatedAccountingClosuresInterval?: number
     /**
-     * The list of duplicate client constraints that are available in the administration and can be performed
+     * The list of duplicate client constraints that are available in the administration and can be performed.
      */
     duplicateClientChecks?: DuplicateFieldConstraint[]
     /**
-     * The list of all the enabled components for the current tenant
+     * The list of all the enabled components for the current tenant.
      */
     enabledComponents?: GeneralSetupEnabledComponentsArray[]
     /**
-     * The line of credit default state
+     * The line of credit default state.
      */
     defaultLineOfCreditState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
     /**
-     * The transaction channel that it be used as default
+     * The transaction channel that is used as the default.
      */
     defaultTransactionChannelKey?: string
     /**
-     * The maximum exposure amount
+     * The maximum exposure amount.
      */
     exposureAmount?: number
     /**
-     * The dashboard configuration
+     * The dashboard configuration.
      */
     dashboardConfigurations?: DashboardConfiguration[]
     /**
-     * The pattern for generating group client IDs
+     * The pattern for generating group client IDs.
      */
     groupIdFormat?: string
     /**
-     * The action to be taken when the duplicate client validation fails
+     * The action to be taken when the duplicate client validation fails.
      */
     duplicateClientConstraintAction?: 'NONE' | 'WARNING' | 'ERROR'
     /**
-     * The constraint on whether clients can belong to more than one group or not
+     * The constraint on whether clients can belong to more than one group or not.
      */
     multipleGroupMemberships?: 'UNLIMITED' | 'ONE_GROUP'
     /**
-     * The group role used as default
+     * The group role used as default.
      */
     defaultGroupRoleKey?: string
     /**
-     * The option that shows if multiple loans are allowed or not
+     * The option that shows if multiple loans are allowed or not.
      */
     multipleLoans?: 'UNLIMITED' | 'ONE_LOAN'
     /**
-     * The unique pattern after which all the lines of credit IDs should be created
+     * The unique pattern after which all the lines of credit IDs should be created.
      */
     lineOfCreditIdFormat?: string
 }
 
 export const GeneralSetup = {
-    validate: (await import('./schemas/general-setup.schema.js')).validate10 as unknown as ValidateFunction<GeneralSetup>,
+    validate: (await import('./schemas/general-setup.schema.js')).validate as ValidateFunction<GeneralSetup>,
     get schema() {
         return GeneralSetup.validate.schema
     },
@@ -182,7 +182,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -192,7 +192,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const

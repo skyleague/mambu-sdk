@@ -44,7 +44,7 @@ export class MambuUsers {
     }
 
     /**
-     * Allows retrieval of a single user via id or encoded key
+     * Get user
      */
     public async getById({
         path,
@@ -72,7 +72,7 @@ export class MambuUsers {
     }
 
     /**
-     * Update an existing User
+     * Update user
      */
     public async update({
         body,
@@ -105,7 +105,7 @@ export class MambuUsers {
     }
 
     /**
-     * Delete an existing User
+     * Delete user
      */
     public async delete({ path, auth = [['apiKey'], ['basic']] }: { path: { userId: string }; auth?: string[][] | string[] }) {
         return this.awaitResponse(
@@ -124,7 +124,7 @@ export class MambuUsers {
     }
 
     /**
-     * Partially update an existing User
+     * Partially update user
      */
     public async patch({
         body,
@@ -156,7 +156,7 @@ export class MambuUsers {
     }
 
     /**
-     * Allows retrieval of users using various query parameters
+     * Get users
      */
     public async getAll({
         query,
@@ -188,7 +188,7 @@ export class MambuUsers {
     }
 
     /**
-     * Create a new UI User
+     * Create user
      */
     public async create({
         body,
@@ -224,7 +224,7 @@ export class MambuUsers {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

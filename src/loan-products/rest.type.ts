@@ -3,15 +3,15 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * The response representation of a LoanProduct.
+ * Represents a loan product.
  */
 export interface LoanProduct {
     /**
-     * Some notes/a description about the loan product
+     * The notes or description of the loan product.
      */
     notes?: string
     availabilitySettings?: ProductAvailabilitySettings
@@ -19,61 +19,61 @@ export interface LoanProduct {
     taxSettings?: TaxSettings
     redrawSettings?: ProductRedrawSettings
     /**
-     * Indicates the type of loan product.
+     * The type of the loan product.
      */
     type: 'FIXED_TERM_LOAN' | 'DYNAMIC_TERM_LOAN' | 'INTEREST_FREE_LOAN' | 'TRANCHED_LOAN' | 'REVOLVING_CREDIT'
     arrearsSettings?: ProductArrearsSettings
     newAccountSettings?: NewAccountSettings
     interestSettings?: ProductInterestSettings
     /**
-     * The encoded key of the loan product, auto generated, unique
+     * The encoded key of the loan product, it is auto generated, and unique.
      */
     encodedKey?: string
     currency?: Currency
     /**
-     * The id of the loan product, can be generated and customized, unique
+     * The ID of the loan product, can be generated and customized, and must be unique.
      */
     id: string
     /**
-     * Indicates the current state of the product
+     * The current state of the loan product.
      */
     state?: 'ACTIVE' | 'INACTIVE'
     penaltySettings?: ProductPenaltySettings
     /**
-     * Adjust the interest for the first repayment when the first repayment period is different than the repayment frequency
+     * `TRUE` if it is possible to adjust the interest for the first repayment when the first repayment period is different than the repayment frequency, `FALSE` otherwise.
      */
     adjustInterestForFirstInstallment?: boolean
     /**
-     * The last date the loan product was updated
+     * The last date the loan product was updated.
      */
     lastModifiedDate?: string
     feesSettings?: FeesSettings
     accountLinkSettings?: AccountLinkSettings
     securitySettings?: SecuritySettings
     /**
-     * Template documents of the product.
+     * The template documents of the loan product.
      */
     templates?: DocumentTemplate[]
     gracePeriodSettings?: GracePeriodSettings
     offsetSettings?: OffsetSettings
     /**
-     * The date this loan product was created
+     * The date the loan product was created.
      */
     creationDate?: string
     creditArrangementSettings: CreditArrangementSettings
     /**
-     * Whether a payment could be customly allocated on the account, ignoring the default repayment allocation order
+     * `TRUE` if an additional payment may be allocated on the account, ignoring the default repayment allocation order, `FALSE` otherwise.
      */
     allowCustomRepaymentAllocation?: boolean
     scheduleSettings?: LoanProductScheduleSettings
     accountingSettings?: AccountingSettings
     /**
-     * The name of the loan product
+     * The name of the loan product.
      */
     name: string
     loanAmountSettings?: LoanAmountSettings
     /**
-     * Indicates the category the loan product belongs to.
+     * The category of the loan product.
      */
     category?: 'PERSONAL_LENDING' | 'PURCHASE_FINANCING' | 'RETAIL_MORTGAGES' | 'SME_LENDING' | 'COMMERCIAL' | 'UNCATEGORIZED'
     internalControls?: InternalControls
@@ -81,7 +81,7 @@ export interface LoanProduct {
 }
 
 export const LoanProduct = {
-    validate: (await import('./schemas/loan-product.schema.js')).validate10 as unknown as ValidateFunction<LoanProduct>,
+    validate: (await import('./schemas/loan-product.schema.js')).validate as ValidateFunction<LoanProduct>,
     get schema() {
         return LoanProduct.validate.schema
     },
@@ -91,7 +91,7 @@ export const LoanProduct = {
     is: (o: unknown): o is LoanProduct => LoanProduct.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanProduct.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanProduct.errors ?? [])
+            throw new ValidationError(LoanProduct.errors ?? [])
         }
     },
 } as const
@@ -101,7 +101,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -111,7 +111,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -119,7 +119,7 @@ export const ErrorResponse = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -129,7 +129,7 @@ export const PatchRequest = {
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
+            throw new ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
@@ -137,7 +137,7 @@ export const PatchRequest = {
 export type GetAllResponse = LoanProduct[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -1239,7 +1239,7 @@ export interface RoundingSettings {
  */
 export interface AccountingSettings {
     /**
-     * A list of accounting rules for the product.
+     * A list of accounting rules for a product.
      */
     accountingMethod: 'NONE' | 'CASH' | 'ACCRUAL'
     /**
@@ -1251,7 +1251,7 @@ export interface AccountingSettings {
      */
     accountingRules?: GLAccountingRule[]
     /**
-     * A list of accounting rules for the product.
+     * A list of accounting rules for a product.
      */
     interestAccruedAccountingMethod?: 'NONE' | 'DAILY' | 'END_OF_MONTH'
 }

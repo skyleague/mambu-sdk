@@ -3,8 +3,8 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
  * Holds information about the response of the data import action
@@ -32,8 +32,7 @@ export interface DataImportResponse {
 }
 
 export const DataImportResponse = {
-    validate: (await import('./schemas/data-import-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<DataImportResponse>,
+    validate: (await import('./schemas/data-import-response.schema.js')).validate as ValidateFunction<DataImportResponse>,
     get schema() {
         return DataImportResponse.validate.schema
     },
@@ -48,7 +47,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -58,7 +57,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -93,8 +92,7 @@ export interface DataImportStatus {
 }
 
 export const DataImportStatus = {
-    validate: (await import('./schemas/data-import-status.schema.js'))
-        .validate10 as unknown as ValidateFunction<DataImportStatus>,
+    validate: (await import('./schemas/data-import-status.schema.js')).validate as ValidateFunction<DataImportStatus>,
     get schema() {
         return DataImportStatus.validate.schema
     },
@@ -115,8 +113,7 @@ export interface DataImportAction {
 }
 
 export const DataImportAction = {
-    validate: (await import('./schemas/data-import-action.schema.js'))
-        .validate10 as unknown as ValidateFunction<DataImportAction>,
+    validate: (await import('./schemas/data-import-action.schema.js')).validate as ValidateFunction<DataImportAction>,
     get schema() {
         return DataImportAction.validate.schema
     },
@@ -126,7 +123,7 @@ export const DataImportAction = {
     is: (o: unknown): o is DataImportAction => DataImportAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!DataImportAction.validate(o)) {
-            throw new AjvValidator.ValidationError(DataImportAction.errors ?? [])
+            throw new ValidationError(DataImportAction.errors ?? [])
         }
     },
 } as const

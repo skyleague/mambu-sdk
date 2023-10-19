@@ -51,7 +51,7 @@ export class MambuCommunications {
     }
 
     /**
-     * Allows retrieval of a single communication message via encoded key
+     * Get communication message
      */
     public async getByEncodedKey({
         path,
@@ -79,7 +79,7 @@ export class MambuCommunications {
     }
 
     /**
-     * Allows sending a new communication message. The message can be either SMS or Email.
+     * Send communication message
      */
     public async send({
         body,
@@ -109,7 +109,7 @@ export class MambuCommunications {
     }
 
     /**
-     * Allows resending communication messages asynchronously by date. The messages can be either SMS, Email or Webhook
+     * Resend failed communication message(s) asynchronously by date
      */
     public async enqueueByDate({
         body,
@@ -140,7 +140,7 @@ export class MambuCommunications {
     }
 
     /**
-     * Client Directed Query. Allows searching communication messages by various criteria
+     * Searching communication messages
      */
     public async search({
         body,
@@ -170,7 +170,7 @@ export class MambuCommunications {
     }
 
     /**
-     * Allows resending of one or multiple failed communication messages. The messages can be either SMS, Email or Webhook
+     * Resend failed communication message(s)
      */
     public async resend({
         body,
@@ -201,7 +201,7 @@ export class MambuCommunications {
     }
 
     /**
-     * Allows resending communication messages asynchronously by keys. The messages can be either SMS, Email or Webhook
+     * Resend failed communication message(s) asynchronously using keys
      */
     public async enqueueByKeys({
         body,
@@ -238,7 +238,7 @@ export class MambuCommunications {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

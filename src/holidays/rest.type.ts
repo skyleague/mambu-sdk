@@ -3,39 +3,48 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
-
-type HolidaysNonWorkingDaysArray = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
+import { ValidationError } from 'ajv'
 
 /**
- * Represents the holidays of the organization.
+ * Represents the holiday.
  */
-export interface Holidays {
+export interface Holiday {
     /**
-     * The general holidays of the organization.
+     * The date the holiday takes place.
      */
-    holidays?: Holiday[]
+    date?: string
     /**
-     * The non working days of the organization.
+     * `TRUE` if a holiday is annually recurring, `FALSE` otherwise.
      */
-    nonWorkingDays?: HolidaysNonWorkingDaysArray[]
+    isAnnuallyRecurring?: boolean
+    /**
+     * The name of the holiday.
+     */
+    name?: string
+    /**
+     * The encoded key of the entity, generated, globally unique
+     */
+    encodedKey?: string
+    /**
+     * The ID of the holiday.
+     */
+    id?: number
+    /**
+     * The date when the holiday was created.
+     */
+    creationDate?: string
 }
 
-export const Holidays = {
-    validate: (await import('./schemas/holidays.schema.js')).validate10 as unknown as ValidateFunction<Holidays>,
+export const Holiday = {
+    validate: (await import('./schemas/holiday.schema.js')).validate as ValidateFunction<Holiday>,
     get schema() {
-        return Holidays.validate.schema
+        return Holiday.validate.schema
     },
     get errors() {
-        return Holidays.validate.errors ?? undefined
+        return Holiday.validate.errors ?? undefined
     },
-    is: (o: unknown): o is Holidays => Holidays.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Holidays.validate(o)) {
-            throw new AjvValidator.ValidationError(Holidays.errors ?? [])
-        }
-    },
+    is: (o: unknown): o is Holiday => Holiday.validate(o) === true,
 } as const
 
 export interface ErrorResponse {
@@ -43,7 +52,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -53,40 +62,41 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
 
-/**
- * Holiday Date Transfer Object
- */
-export interface Holiday {
-    /**
-     * holiday date
-     */
-    date?: string
-    /**
-     * if is annually recurring
-     */
-    isAnnuallyRecurring?: boolean
-    /**
-     * holiday name
-     */
-    name?: string
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * holiday id
-     */
-    id?: number
-    /**
-     * holiday creation date
-     */
-    creationDate?: string
-}
+export type CreateRequest = Holiday[]
+
+export const CreateRequest = {
+    validate: (await import('./schemas/create-request.schema.js')).validate as ValidateFunction<CreateRequest>,
+    get schema() {
+        return CreateRequest.validate.schema
+    },
+    get errors() {
+        return CreateRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CreateRequest => CreateRequest.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!CreateRequest.validate(o)) {
+            throw new ValidationError(CreateRequest.errors ?? [])
+        }
+    },
+} as const
+
+export type CreateResponse = Holiday[]
+
+export const CreateResponse = {
+    validate: (await import('./schemas/create-response.schema.js')).validate as ValidateFunction<CreateResponse>,
+    get schema() {
+        return CreateResponse.validate.schema
+    },
+    get errors() {
+        return CreateResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CreateResponse => CreateResponse.validate(o) === true,
+} as const
 
 export interface RestError {
     errorCode?: number

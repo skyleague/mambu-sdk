@@ -44,7 +44,7 @@ export class MambuAccountingInterestAccrual {
     }
 
     /**
-     * Allows search of interest accrual breakdown entries by various criteria
+     * Allows search of interest accrual breakdown entries by various criteria.
      */
     public async search({
         body,
@@ -80,7 +80,7 @@ export class MambuAccountingInterestAccrual {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

@@ -3,59 +3,59 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * Represents a human task that can be assigned by a user to another. When a Task is created, it's set to status OPEN
+ * Represents a human task that can be assigned by one user to another. When a task is created, it's status is set to `OPEN`.
  */
 export interface Task {
     /**
-     * The last date at which the task was modified
+     * The last date when the task was modified.
      */
     lastModifiedDate?: string
     /**
-     * The key of the user that created this task. The value is not editable and it is populated at task creation with the current user key
+     * The key of the user that created this task. The value is not editable and it is populated at task creation with the current user key.
      */
     createdByUserKey?: string
     /**
-     * The due date of the task, at which the task has to be completed
+     * The due date when the task has to be completed.
      */
     dueDate: string
     /**
-     * Description of the task
+     * The description of the task.
      */
     description?: string
     /**
-     * The date at which the task was created
+     * The date when the task was created.
      */
     creationDate?: string
     /**
-     * Title of the task
+     * The title of the task.
      */
     title?: string
     /**
-     * Who is the link of this task. If null, means nobody is linked to this task
+     * The individual linked to this task. If null, it means nobody is linked to this task.
      */
     taskLinkKey?: string
     /**
-     * Name of the user who created the task
+     * The name of the user who created the task.
      */
     createdByFullName?: string
     /**
-     * The encoded key of the task, auto generated, unique
+     * The encoded key of the task, which is auto generated, and must be unique.
      */
     encodedKey?: string
     /**
-     * The id of the task, uniquely generated for the task
+     * The ID of the task, which is uniquely generated for the task.
      */
     id?: number
     /**
-     * Key of the user this task is assigned to
+     * The key of the user this task is assigned to.
      */
     assignedUserKey?: string
     /**
-     * The type of the owner represented by the task link key
+     * The type of the owner represented by the task link key.
      */
     taskLinkType?:
         | 'CLIENT'
@@ -71,17 +71,17 @@ export interface Task {
         | 'LINE_OF_CREDIT'
         | 'GL_JOURNAL_ENTRY'
     /**
-     * The status of this task, a new task is always OPEN
+     * The status of this task, a new task always has an `OPEN` status.
      */
     status?: 'OPEN' | 'COMPLETED'
     /**
-     * What template key was used to create the task
+     * The template key used to create the task.
      */
     templateKey?: string
 }
 
 export const Task = {
-    validate: (await import('./schemas/task.schema.js')).validate10 as unknown as ValidateFunction<Task>,
+    validate: (await import('./schemas/task.schema.js')).validate as ValidateFunction<Task>,
     get schema() {
         return Task.validate.schema
     },
@@ -91,7 +91,7 @@ export const Task = {
     is: (o: unknown): o is Task => Task.validate(o) === true,
     assert: (o: unknown) => {
         if (!Task.validate(o)) {
-            throw new AjvValidator.ValidationError(Task.errors ?? [])
+            throw new ValidationError(Task.errors ?? [])
         }
     },
 } as const
@@ -101,7 +101,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -111,7 +111,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -119,7 +119,7 @@ export const ErrorResponse = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -129,7 +129,7 @@ export const PatchRequest = {
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
+            throw new ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
@@ -137,7 +137,7 @@ export const PatchRequest = {
 export type GetAllResponse = Task[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },

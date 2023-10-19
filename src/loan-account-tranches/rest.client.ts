@@ -44,7 +44,7 @@ export class MambuLoanAccountTranches {
     }
 
     /**
-     * Allows the retrieval of loan account tranches list
+     * Get loan account tranches list
      */
     public async getTranches({
         path,
@@ -68,7 +68,7 @@ export class MambuLoanAccountTranches {
     }
 
     /**
-     * Allows to update the loan account tranches list for the provided loan account id or encodedKey
+     * Update loan account tranches list
      */
     public async editTranches({
         body,
@@ -104,7 +104,7 @@ export class MambuLoanAccountTranches {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

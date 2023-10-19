@@ -3,8 +3,8 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
  * Represents the input for a withdrawal transaction.
@@ -44,7 +44,7 @@ export interface WithdrawalDepositTransactionInput {
 
 export const WithdrawalDepositTransactionInput = {
     validate: (await import('./schemas/withdrawal-deposit-transaction-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<WithdrawalDepositTransactionInput>,
+        .validate as ValidateFunction<WithdrawalDepositTransactionInput>,
     get schema() {
         return WithdrawalDepositTransactionInput.validate.schema
     },
@@ -54,7 +54,7 @@ export const WithdrawalDepositTransactionInput = {
     is: (o: unknown): o is WithdrawalDepositTransactionInput => WithdrawalDepositTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!WithdrawalDepositTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(WithdrawalDepositTransactionInput.errors ?? [])
+            throw new ValidationError(WithdrawalDepositTransactionInput.errors ?? [])
         }
     },
 } as const
@@ -64,7 +64,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -74,7 +74,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -216,8 +216,7 @@ export interface DepositTransaction {
 }
 
 export const DepositTransaction = {
-    validate: (await import('./schemas/deposit-transaction.schema.js'))
-        .validate10 as unknown as ValidateFunction<DepositTransaction>,
+    validate: (await import('./schemas/deposit-transaction.schema.js')).validate as ValidateFunction<DepositTransaction>,
     get schema() {
         return DepositTransaction.validate.schema
     },
@@ -227,7 +226,7 @@ export const DepositTransaction = {
     is: (o: unknown): o is DepositTransaction => DepositTransaction.validate(o) === true,
     assert: (o: unknown) => {
         if (!DepositTransaction.validate(o)) {
-            throw new AjvValidator.ValidationError(DepositTransaction.errors ?? [])
+            throw new ValidationError(DepositTransaction.errors ?? [])
         }
     },
 } as const
@@ -256,7 +255,7 @@ export interface FeeAppliedDepositTransactionInput {
 
 export const FeeAppliedDepositTransactionInput = {
     validate: (await import('./schemas/fee-applied-deposit-transaction-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<FeeAppliedDepositTransactionInput>,
+        .validate as ValidateFunction<FeeAppliedDepositTransactionInput>,
     get schema() {
         return FeeAppliedDepositTransactionInput.validate.schema
     },
@@ -266,13 +265,13 @@ export const FeeAppliedDepositTransactionInput = {
     is: (o: unknown): o is FeeAppliedDepositTransactionInput => FeeAppliedDepositTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!FeeAppliedDepositTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(FeeAppliedDepositTransactionInput.errors ?? [])
+            throw new ValidationError(FeeAppliedDepositTransactionInput.errors ?? [])
         }
     },
 } as const
 
 /**
- * Represents the request payload for seizing a block amount on a deposit account
+ * Represents the information for seizing a block amount on a deposit account.
  */
 export interface SeizeBlockAmount {
     /**
@@ -298,8 +297,7 @@ export interface SeizeBlockAmount {
 }
 
 export const SeizeBlockAmount = {
-    validate: (await import('./schemas/seize-block-amount.schema.js'))
-        .validate10 as unknown as ValidateFunction<SeizeBlockAmount>,
+    validate: (await import('./schemas/seize-block-amount.schema.js')).validate as ValidateFunction<SeizeBlockAmount>,
     get schema() {
         return SeizeBlockAmount.validate.schema
     },
@@ -309,7 +307,7 @@ export const SeizeBlockAmount = {
     is: (o: unknown): o is SeizeBlockAmount => SeizeBlockAmount.validate(o) === true,
     assert: (o: unknown) => {
         if (!SeizeBlockAmount.validate(o)) {
-            throw new AjvValidator.ValidationError(SeizeBlockAmount.errors ?? [])
+            throw new ValidationError(SeizeBlockAmount.errors ?? [])
         }
     },
 } as const
@@ -326,7 +324,7 @@ export interface BulkDepositTransactionsInput {
 
 export const BulkDepositTransactionsInput = {
     validate: (await import('./schemas/bulk-deposit-transactions-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<BulkDepositTransactionsInput>,
+        .validate as ValidateFunction<BulkDepositTransactionsInput>,
     get schema() {
         return BulkDepositTransactionsInput.validate.schema
     },
@@ -336,7 +334,7 @@ export const BulkDepositTransactionsInput = {
     is: (o: unknown): o is BulkDepositTransactionsInput => BulkDepositTransactionsInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!BulkDepositTransactionsInput.validate(o)) {
-            throw new AjvValidator.ValidationError(BulkDepositTransactionsInput.errors ?? [])
+            throw new ValidationError(BulkDepositTransactionsInput.errors ?? [])
         }
     },
 } as const
@@ -357,7 +355,7 @@ export interface DepositTransactionAdjustmentDetails {
 
 export const DepositTransactionAdjustmentDetails = {
     validate: (await import('./schemas/deposit-transaction-adjustment-details.schema.js'))
-        .validate10 as unknown as ValidateFunction<DepositTransactionAdjustmentDetails>,
+        .validate as ValidateFunction<DepositTransactionAdjustmentDetails>,
     get schema() {
         return DepositTransactionAdjustmentDetails.validate.schema
     },
@@ -367,7 +365,7 @@ export const DepositTransactionAdjustmentDetails = {
     is: (o: unknown): o is DepositTransactionAdjustmentDetails => DepositTransactionAdjustmentDetails.validate(o) === true,
     assert: (o: unknown) => {
         if (!DepositTransactionAdjustmentDetails.validate(o)) {
-            throw new AjvValidator.ValidationError(DepositTransactionAdjustmentDetails.errors ?? [])
+            throw new ValidationError(DepositTransactionAdjustmentDetails.errors ?? [])
         }
     },
 } as const
@@ -376,7 +374,7 @@ export type GetDepositTransactionDocumentResponse = string
 
 export const GetDepositTransactionDocumentResponse = {
     validate: (await import('./schemas/get-deposit-transaction-document-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetDepositTransactionDocumentResponse>,
+        .validate as ValidateFunction<GetDepositTransactionDocumentResponse>,
     get schema() {
         return GetDepositTransactionDocumentResponse.validate.schema
     },
@@ -420,7 +418,7 @@ export interface TransferDepositTransactionInput {
 
 export const TransferDepositTransactionInput = {
     validate: (await import('./schemas/transfer-deposit-transaction-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<TransferDepositTransactionInput>,
+        .validate as ValidateFunction<TransferDepositTransactionInput>,
     get schema() {
         return TransferDepositTransactionInput.validate.schema
     },
@@ -430,7 +428,7 @@ export const TransferDepositTransactionInput = {
     is: (o: unknown): o is TransferDepositTransactionInput => TransferDepositTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!TransferDepositTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(TransferDepositTransactionInput.errors ?? [])
+            throw new ValidationError(TransferDepositTransactionInput.errors ?? [])
         }
     },
 } as const
@@ -438,7 +436,7 @@ export const TransferDepositTransactionInput = {
 export type GetAllResponse = DepositTransaction[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -490,7 +488,7 @@ export interface DepositTransactionInput {
 
 export const DepositTransactionInput = {
     validate: (await import('./schemas/deposit-transaction-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<DepositTransactionInput>,
+        .validate as ValidateFunction<DepositTransactionInput>,
     get schema() {
         return DepositTransactionInput.validate.schema
     },
@@ -500,7 +498,7 @@ export const DepositTransactionInput = {
     is: (o: unknown): o is DepositTransactionInput => DepositTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!DepositTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(DepositTransactionInput.errors ?? [])
+            throw new ValidationError(DepositTransactionInput.errors ?? [])
         }
     },
 } as const
@@ -509,7 +507,7 @@ export type EditTransactionDetailsRequest = PatchOperation[]
 
 export const EditTransactionDetailsRequest = {
     validate: (await import('./schemas/edit-transaction-details-request.schema.js'))
-        .validate10 as unknown as ValidateFunction<EditTransactionDetailsRequest>,
+        .validate as ValidateFunction<EditTransactionDetailsRequest>,
     get schema() {
         return EditTransactionDetailsRequest.validate.schema
     },
@@ -519,7 +517,7 @@ export const EditTransactionDetailsRequest = {
     is: (o: unknown): o is EditTransactionDetailsRequest => EditTransactionDetailsRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!EditTransactionDetailsRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(EditTransactionDetailsRequest.errors ?? [])
+            throw new ValidationError(EditTransactionDetailsRequest.errors ?? [])
         }
     },
 } as const
@@ -537,7 +535,7 @@ export interface DepositTransactionSearchCriteria {
 
 export const DepositTransactionSearchCriteria = {
     validate: (await import('./schemas/deposit-transaction-search-criteria.schema.js'))
-        .validate10 as unknown as ValidateFunction<DepositTransactionSearchCriteria>,
+        .validate as ValidateFunction<DepositTransactionSearchCriteria>,
     get schema() {
         return DepositTransactionSearchCriteria.validate.schema
     },
@@ -547,7 +545,7 @@ export const DepositTransactionSearchCriteria = {
     is: (o: unknown): o is DepositTransactionSearchCriteria => DepositTransactionSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
         if (!DepositTransactionSearchCriteria.validate(o)) {
-            throw new AjvValidator.ValidationError(DepositTransactionSearchCriteria.errors ?? [])
+            throw new ValidationError(DepositTransactionSearchCriteria.errors ?? [])
         }
     },
 } as const
@@ -555,7 +553,7 @@ export const DepositTransactionSearchCriteria = {
 export type SearchResponse = DepositTransaction[]
 
 export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
+    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -1075,7 +1073,7 @@ export interface PatchOperation {
  */
 export interface DepositTransactionSortingCriteria {
     /**
-     * Contains the field that can be used as sorting selection. Can be native (one from the provided list) or otherwise can specify a custom field using the format [customFieldSetId].[customFieldId].
+     * The field to use to sort the selection. The field can be an enumerated value or a custom field using the format [customFieldSetId].[customFieldId].
      */
     field:
         | 'id'
@@ -1098,7 +1096,7 @@ export interface DepositTransactionSortingCriteria {
         | 'affectedAmounts.feesAmount'
         | 'accountBalances.totalBalance'
     /**
-     * The sorting order: ASC or DESC. The default order is DESC.
+     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
      */
     order?: 'ASC' | 'DESC'
 }
@@ -1108,7 +1106,7 @@ export interface DepositTransactionSortingCriteria {
  */
 export interface DepositTransactionFilterCriteria {
     /**
-     * Contains the actual searching fields that can be native (one from the provided list) or otherwise can specify a custom field using the format [customFieldSetId].[customFieldId].
+     * The fields to search can be the enumerated values or a custom field using the format [customFieldSetId].[customFieldId].
      * |Field with limited capabilities          |Data Type |Operators   |
      * |-----------------------------------------|----------|------------|
      * |originalTransactionKey                   |KEY       |EQUALS, IN  |
@@ -1162,7 +1160,7 @@ export interface DepositTransactionFilterCriteria {
         | 'terms.overdraftInterestSettings.interestRate'
         | 'terms.overdraftInterestSettings.indexInterestRate'
     /**
-     * The value to match the searching criteria
+     * The value to match the searching criteria.
      */
     value?: string
     /**
@@ -1211,11 +1209,11 @@ export interface DepositTransactionFilterCriteria {
         | 'EMPTY'
         | 'NOT_EMPTY'
     /**
-     * The second value to match the searching criteria, when using BETWEEN, together with value
+     * The second value to match the searching criteria, when the `BETWEEN` operator is used.
      */
     secondValue?: string
     /**
-     * List of values when operator is IN.
+     * List of values when the `IN` operator is used.
      */
     values?: string[]
 }

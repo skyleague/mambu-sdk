@@ -44,7 +44,7 @@ export class MambuClientDocuments {
     }
 
     /**
-     * Retrieve metadata regarding all documents for a specific client
+     * Get all client documents
      */
     public async getDocumentsByClientId({
         path,
@@ -72,7 +72,7 @@ export class MambuClientDocuments {
     }
 
     /**
-     * Allows retrieval of a single document metadata via id or encoded key
+     * Get client document
      */
     public async getClientDocumentById({
         path,
@@ -97,7 +97,7 @@ export class MambuClientDocuments {
     }
 
     /**
-     * Create a new client document
+     * Create client document
      */
     public async createDocument({
         path,
@@ -124,7 +124,7 @@ export class MambuClientDocuments {
     }
 
     /**
-     * Download a single client document
+     * Download client document
      */
     public async getClientDocumentFileById({
         path,
@@ -144,7 +144,7 @@ export class MambuClientDocuments {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

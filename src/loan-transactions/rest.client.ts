@@ -61,7 +61,7 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Client Directed Query. Allows you to search loan transactions for loan accounts by various criteria
+     * Search loan transactions
      */
     public async search({
         body,
@@ -92,7 +92,7 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Lock a loan account's income sources (e.g. interest, fees, penalties)
+     * Lock loan account income sources (interest, fees, penalties)
      */
     public async applyLock({
         body,
@@ -125,7 +125,7 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Unlock a loan account's income sources (e.g. interest, fees, penalties)
+     * Unlock loan account income sources (interest, fees, penalties)
      */
     public async applyUnlock({
         body,
@@ -158,7 +158,7 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Make a repayment transaction on a loan
+     * Make repayment transaction on loan account
      */
     public async makeRepayment({
         body,
@@ -191,7 +191,7 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Adjustment of loan transactions. Note that adjusting fees is still in beta and known issues will be fixed start of Q2/2019
+     * Adjust loan transaction
      */
     public async adjust({
         body,
@@ -257,7 +257,7 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Allows retrieval of a single loan transaction via id or encoded key
+     * Get loan transaction
      */
     public async getById({
         path,
@@ -285,7 +285,7 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Allows retrieval of all transactions for all versions of loan account via id or encoded key
+     * Get loan transactions for all loan account versions
      */
     public async getTransactionsForAllVersions({
         path,
@@ -313,7 +313,7 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Make a withdrawal from redraw balance
+     * Make withdrawal from redraw balance
      */
     public async makeWithdrawal({
         body,
@@ -346,7 +346,7 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Make a payment in redraw balance for a loan
+     * Make payment in redraw balance for loan account
      */
     public async applyPaymentMade({
         body,
@@ -412,7 +412,7 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Allows retrieval of all transactions for a loan account via id or encoded key
+     * Get loan transactions
      */
     public async getAll({
         path,
@@ -479,7 +479,7 @@ export class MambuLoanTransactions {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

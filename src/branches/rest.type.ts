@@ -3,35 +3,35 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * Branch Date Transfer Object
+ * Represents a branch.
  */
 export interface Branch {
     /**
-     * branch email address
+     * The branch email address.
      */
     emailAddress?: string
     /**
-     * list of branch addresses
+     * The list of branch addresses.
      */
     addresses?: Address[]
     /**
-     * branch phone number, as a string
+     * The branch phone number.
      */
     phoneNumber?: string
     /**
-     * notes about this branch
+     * The notes or description attached to this object.
      */
     notes?: string
     /**
-     * last date when the branch was modified
+     * The last date when the branch was modified.
      */
     lastModifiedDate?: string
     /**
-     * branch name
+     * The branch name.
      */
     name: string
     /**
@@ -39,25 +39,25 @@ export interface Branch {
      */
     encodedKey?: string
     /**
-     * branch ID, unique
+     * The branch ID, which must be unique.
      */
     id: string
     /**
-     * branch state
+     * The branch state.
      */
     state?: 'ACTIVE' | 'INACTIVE'
     /**
-     * creation date of the branch
+     * The creation date of the branch.
      */
     creationDate?: string
     /**
-     * list of branch holidays
+     * The list of branch holidays.
      */
     branchHolidays?: Holiday[]
 }
 
 export const Branch = {
-    validate: (await import('./schemas/branch.schema.js')).validate10 as unknown as ValidateFunction<Branch>,
+    validate: (await import('./schemas/branch.schema.js')).validate as ValidateFunction<Branch>,
     get schema() {
         return Branch.validate.schema
     },
@@ -67,7 +67,7 @@ export const Branch = {
     is: (o: unknown): o is Branch => Branch.validate(o) === true,
     assert: (o: unknown) => {
         if (!Branch.validate(o)) {
-            throw new AjvValidator.ValidationError(Branch.errors ?? [])
+            throw new ValidationError(Branch.errors ?? [])
         }
     },
 } as const
@@ -77,7 +77,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -87,7 +87,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -95,7 +95,7 @@ export const ErrorResponse = {
 export type GetAllResponse = Branch[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -106,69 +106,69 @@ export const GetAllResponse = {
 } as const
 
 /**
- * Address Data Transfer Object
+ * Represents an address.
  */
 export interface Address {
     /**
-     * The country
+     * The country.
      */
     country?: string
     /**
-     * Address parent key, the object owning this address, client, centre, branch
+     * The address parent key indicating the object owning this address. For example: client, centre, or branch.
      */
     parentKey?: string
     /**
-     * The city for this address
+     * The city for the address.
      */
     city?: string
     /**
-     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90
+     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
      */
     latitude?: number
     /**
-     * The post code
+     * The post code.
      */
     postcode?: string
     /**
-     * Index of this address in the list of addresses
+     * The index of this address in the list of addresses.
      */
     indexInList?: number
     /**
-     * Address encoded key, unique, generated
+     * The address encoded key, which is unique and generated.
      */
     encodedKey?: string
     /**
-     * The region that is part of the address
+     * The region for the address.
      */
     region?: string
     /**
-     * The second line for the address, in case the first one doesn't fit the information, this is completely optional
+     * The second line of the address.
      */
     line2?: string
     /**
-     * The first line of the address
+     * The first line of the address.
      */
     line1?: string
     /**
-     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180
+     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
      */
     longitude?: number
 }
 
 /**
- * Holiday Date Transfer Object
+ * Represents the holiday.
  */
 export interface Holiday {
     /**
-     * holiday date
+     * The date the holiday takes place.
      */
     date?: string
     /**
-     * if is annually recurring
+     * `TRUE` if a holiday is annually recurring, `FALSE` otherwise.
      */
     isAnnuallyRecurring?: boolean
     /**
-     * holiday name
+     * The name of the holiday.
      */
     name?: string
     /**
@@ -176,11 +176,11 @@ export interface Holiday {
      */
     encodedKey?: string
     /**
-     * holiday id
+     * The ID of the holiday.
      */
     id?: number
     /**
-     * holiday creation date
+     * The date when the holiday was created.
      */
     creationDate?: string
 }

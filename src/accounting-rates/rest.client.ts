@@ -44,7 +44,7 @@ export class MambuAccountingRates {
     }
 
     /**
-     * Allows retrieval of Accounting Rates using various query parameters
+     * Get accounting rates
      */
     public async getAll({
         path,
@@ -72,7 +72,7 @@ export class MambuAccountingRates {
     }
 
     /**
-     * Create Accounting Rates
+     * Create accounting rates
      */
     public async create({
         body,
@@ -111,7 +111,7 @@ export class MambuAccountingRates {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

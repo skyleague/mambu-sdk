@@ -44,7 +44,7 @@ export class MambuLoanProducts {
     }
 
     /**
-     * Allows retrieval of a single loan product via id or encoded key
+     * Get loan product
      */
     public async getById({
         path,
@@ -72,7 +72,7 @@ export class MambuLoanProducts {
     }
 
     /**
-     * Update an existing loan product
+     * Update loan product
      */
     public async update({
         body,
@@ -102,7 +102,7 @@ export class MambuLoanProducts {
     }
 
     /**
-     * Delete a loan product
+     * Delete loan product
      */
     public async delete({
         path,
@@ -127,7 +127,7 @@ export class MambuLoanProducts {
     }
 
     /**
-     * Partially update an existing loan product
+     * Partially update loan product
      */
     public async patch({
         body,
@@ -157,7 +157,7 @@ export class MambuLoanProducts {
     }
 
     /**
-     * Allows retrieval of all loan products in paginated or non-paginated manner
+     * Get loan products
      */
     public async getAll({
         query,
@@ -182,7 +182,7 @@ export class MambuLoanProducts {
     }
 
     /**
-     * Create a new loan product
+     * Create loan product
      */
     public async create({
         body,
@@ -218,7 +218,7 @@ export class MambuLoanProducts {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

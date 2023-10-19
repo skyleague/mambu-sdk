@@ -50,7 +50,7 @@ export class MambuStreaming extends BaseMambuStreaming {
             )
             req.on('error', reject)
         })
-        response.finally(() => stream.end())
+        void response.finally(() => stream.end())
 
         for await (const chunk of stream.pipe(split2())) {
             const batch = JSON.parse((chunk as Buffer).toString()) as unknown

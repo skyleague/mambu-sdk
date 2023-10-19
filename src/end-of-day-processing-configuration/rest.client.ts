@@ -43,7 +43,7 @@ export class MambuEndOfDayProcessingConfiguration {
     }
 
     /**
-     * Retrieve the end of day processing configuration.
+     * Get end of day processing configuration
      */
     public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
@@ -60,7 +60,7 @@ export class MambuEndOfDayProcessingConfiguration {
     }
 
     /**
-     * Allows the update of the end of day processing configuration.
+     * Update end of day processing configuration
      */
     public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
@@ -80,7 +80,7 @@ export class MambuEndOfDayProcessingConfiguration {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

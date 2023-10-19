@@ -3,8 +3,8 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
  * Subscription is a high level consumption unit. Subscriptions allow applications to easily scale the number of clients by managing consumed event offsets and distributing load between instances. The key properties that identify a subscription are `owning_application`, `event_types` and `consumer_group`. It is not possible to have two different subscriptions with these properties being the same.
@@ -45,7 +45,7 @@ export interface Subscription {
 }
 
 export const Subscription = {
-    validate: (await import('./schemas/subscription.schema.js')).validate10 as unknown as ValidateFunction<Subscription>,
+    validate: (await import('./schemas/subscription.schema.js')).validate as ValidateFunction<Subscription>,
     get schema() {
         return Subscription.validate.schema
     },
@@ -55,7 +55,7 @@ export const Subscription = {
     is: (o: unknown): o is Subscription => Subscription.validate(o) === true,
     assert: (o: unknown) => {
         if (!Subscription.validate(o)) {
-            throw new AjvValidator.ValidationError(Subscription.errors ?? [])
+            throw new ValidationError(Subscription.errors ?? [])
         }
     },
 } as const
@@ -84,7 +84,7 @@ export interface Problem {
 }
 
 export const Problem = {
-    validate: (await import('./schemas/problem.schema.js')).validate10 as unknown as ValidateFunction<Problem>,
+    validate: (await import('./schemas/problem.schema.js')).validate as ValidateFunction<Problem>,
     get schema() {
         return Problem.validate.schema
     },
@@ -94,7 +94,7 @@ export const Problem = {
     is: (o: unknown): o is Problem => Problem.validate(o) === true,
     assert: (o: unknown) => {
         if (!Problem.validate(o)) {
-            throw new AjvValidator.ValidationError(Problem.errors ?? [])
+            throw new ValidationError(Problem.errors ?? [])
         }
     },
 } as const
@@ -117,7 +117,7 @@ export interface SubscriptionEventStreamBatch {
 
 export const SubscriptionEventStreamBatch = {
     validate: (await import('./schemas/subscription-event-stream-batch.schema.js'))
-        .validate10 as unknown as ValidateFunction<SubscriptionEventStreamBatch>,
+        .validate as ValidateFunction<SubscriptionEventStreamBatch>,
     get schema() {
         return SubscriptionEventStreamBatch.validate.schema
     },
@@ -163,7 +163,7 @@ export interface CommitSubscriptionCursorsRequest {
 
 export const CommitSubscriptionCursorsRequest = {
     validate: (await import('./schemas/commit-subscription-cursors-request.schema.js'))
-        .validate10 as unknown as ValidateFunction<CommitSubscriptionCursorsRequest>,
+        .validate as ValidateFunction<CommitSubscriptionCursorsRequest>,
     get schema() {
         return CommitSubscriptionCursorsRequest.validate.schema
     },
@@ -173,7 +173,7 @@ export const CommitSubscriptionCursorsRequest = {
     is: (o: unknown): o is CommitSubscriptionCursorsRequest => CommitSubscriptionCursorsRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!CommitSubscriptionCursorsRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(CommitSubscriptionCursorsRequest.errors ?? [])
+            throw new ValidationError(CommitSubscriptionCursorsRequest.errors ?? [])
         }
     },
 } as const
@@ -184,7 +184,7 @@ export interface CommitSubscriptionCursorsResponse200 {
 
 export const CommitSubscriptionCursorsResponse200 = {
     validate: (await import('./schemas/commit-subscription-cursors-response200.schema.js'))
-        .validate10 as unknown as ValidateFunction<CommitSubscriptionCursorsResponse200>,
+        .validate as ValidateFunction<CommitSubscriptionCursorsResponse200>,
     get schema() {
         return CommitSubscriptionCursorsResponse200.validate.schema
     },
@@ -211,7 +211,7 @@ export interface DeleteSubscriptionBySubscriptionIdResponse404 {
 
 export const DeleteSubscriptionBySubscriptionIdResponse404 = {
     validate: (await import('./schemas/delete-subscription-by-subscription-id-response404.schema.js'))
-        .validate10 as unknown as ValidateFunction<DeleteSubscriptionBySubscriptionIdResponse404>,
+        .validate as ValidateFunction<DeleteSubscriptionBySubscriptionIdResponse404>,
     get schema() {
         return DeleteSubscriptionBySubscriptionIdResponse404.validate.schema
     },
@@ -231,7 +231,7 @@ export interface GetSubscriptionStatsResponse {
 
 export const GetSubscriptionStatsResponse = {
     validate: (await import('./schemas/get-subscription-stats-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetSubscriptionStatsResponse>,
+        .validate as ValidateFunction<GetSubscriptionStatsResponse>,
     get schema() {
         return GetSubscriptionStatsResponse.validate.schema
     },

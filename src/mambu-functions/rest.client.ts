@@ -7,10 +7,10 @@ import got from 'got'
 import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import type { IncomingHttpHeaders } from 'http'
-import { ErrorResponse, GetAllResponse, MambuFunction, MambuFunctionCreate, MambuFunctionUpdate } from './rest.type.js'
+import { ErrorResponse, MambuFunctionSecretCreate } from './rest.type.js'
 
 /**
- * mambu-functions
+ * mambu-functions-secrets
  */
 export class MambuMambuFunctions {
     public client: Got
@@ -44,138 +44,30 @@ export class MambuMambuFunctions {
     }
 
     /**
-     * Allows retrieval of functions using various query parameters
-     */
-    public async getAll({
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; ['Extension Point ID']?: string }
-        auth?: string[][] | string[]
-    } = {}) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`mambu-functions`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetAllResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create a new Mambu Function
+     * Create a new Mambu Function Secret
      */
     public async create({
         body,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: MambuFunctionCreate
+        body: MambuFunctionSecretCreate
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(MambuFunctionCreate, body)
+        this.validateRequestBody(MambuFunctionSecretCreate, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`mambu-functions`, {
+            this.buildClient(auth).post(`mambu-functions-secrets`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                201: MambuFunction,
+                201: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Allows retrieval of a single function via name
-     */
-    public async getByName({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { functionName: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`mambu-functions/${path.functionName}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: MambuFunction,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Update an existing Mambu Function
-     */
-    public async update({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: MambuFunctionUpdate
-        path: { functionName: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(MambuFunctionUpdate, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).put(`mambu-functions/${path.functionName}`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                200: MambuFunction,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Delete an existing Mambu Function
-     */
-    public async delete({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { functionName: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).delete(`mambu-functions/${path.functionName}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
             }
         )
     }
@@ -187,7 +79,7 @@ export class MambuMambuFunctions {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

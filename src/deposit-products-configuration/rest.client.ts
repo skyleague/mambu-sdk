@@ -43,7 +43,7 @@ export class MambuDepositProductsConfiguration {
     }
 
     /**
-     * Allows retrieval of the deposit products configuration.
+     * Get configuration for all deposit products
      */
     public async get({
         query,
@@ -64,7 +64,7 @@ export class MambuDepositProductsConfiguration {
     }
 
     /**
-     * Allows updating the deposit products configuration.
+     * Update all deposit products configuration
      */
     public async update({
         headers,
@@ -88,7 +88,7 @@ export class MambuDepositProductsConfiguration {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

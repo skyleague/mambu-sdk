@@ -3,31 +3,31 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * A Centre is a common meeting area that credit officers and the individual and group clients go to. Each centre is assigned to a branch (a branch can have multiple centres) and might have a specific meeting day and location.
+ * Represents a centre. A centre is a common meeting area that credit officers and the individual and group clients go to. Each centre is assigned to a branch (a branch can have multiple centres) and might have a specific meeting day and location.
  */
 export interface Centre {
     /**
-     * The addresses of this centre
+     * The addresses of this centre.
      */
     addresses?: Address[]
     /**
-     * Extra notes about this centre
+     * The notes or description attached to this object.
      */
     notes?: string
     /**
-     * The last time the centre was modified
+     * The last time the centre was modified.
      */
     lastModifiedDate?: string
     /**
-     * Name of the centre
+     * The name of the centre.
      */
     name?: string
     /**
-     * Day of the week when repayments are collected, influences repayments schedule, upon update all repayments are update to this day of the week
+     * The day of the week when repayments are collected. This influences the repayments schedule, upon update all repayments are updated to this day of the week.
      */
     meetingDay?: string
     /**
@@ -35,25 +35,25 @@ export interface Centre {
      */
     encodedKey?: string
     /**
-     * Id of the centre, unique, can be generated and customized
+     * The ID of the centre, which must be unique, and can be generated and customized.
      */
     id?: string
     /**
-     * The state of the centre
+     * The state of the centre.
      */
     state?: 'ACTIVE' | 'INACTIVE'
     /**
-     * Date the centre was created
+     * The date the centre was created.
      */
     creationDate?: string
     /**
-     * Encoded key of the branch this centre is assigned to
+     * The encoded key of the branch this centre is assigned to.
      */
     assignedBranchKey?: string
 }
 
 export const Centre = {
-    validate: (await import('./schemas/centre.schema.js')).validate10 as unknown as ValidateFunction<Centre>,
+    validate: (await import('./schemas/centre.schema.js')).validate as ValidateFunction<Centre>,
     get schema() {
         return Centre.validate.schema
     },
@@ -68,7 +68,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -78,7 +78,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -86,7 +86,7 @@ export const ErrorResponse = {
 export type GetAllResponse = Centre[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -97,51 +97,51 @@ export const GetAllResponse = {
 } as const
 
 /**
- * Address Data Transfer Object
+ * Represents an address.
  */
 export interface Address {
     /**
-     * The country
+     * The country.
      */
     country?: string
     /**
-     * Address parent key, the object owning this address, client, centre, branch
+     * The address parent key indicating the object owning this address. For example: client, centre, or branch.
      */
     parentKey?: string
     /**
-     * The city for this address
+     * The city for the address.
      */
     city?: string
     /**
-     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90
+     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
      */
     latitude?: number
     /**
-     * The post code
+     * The post code.
      */
     postcode?: string
     /**
-     * Index of this address in the list of addresses
+     * The index of this address in the list of addresses.
      */
     indexInList?: number
     /**
-     * Address encoded key, unique, generated
+     * The address encoded key, which is unique and generated.
      */
     encodedKey?: string
     /**
-     * The region that is part of the address
+     * The region for the address.
      */
     region?: string
     /**
-     * The second line for the address, in case the first one doesn't fit the information, this is completely optional
+     * The second line of the address.
      */
     line2?: string
     /**
-     * The first line of the address
+     * The first line of the address.
      */
     line1?: string
     /**
-     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180
+     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
      */
     longitude?: number
 }

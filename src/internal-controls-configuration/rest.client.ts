@@ -43,7 +43,7 @@ export class MambuInternalControlsConfiguration {
     }
 
     /**
-     * Allows the retrieval of the internal controls configuration.
+     * Get internal controls configuration
      */
     public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
@@ -61,7 +61,7 @@ export class MambuInternalControlsConfiguration {
     }
 
     /**
-     * Update the current internal controls configuration
+     * Update internal controls configuration
      */
     public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
@@ -81,7 +81,7 @@ export class MambuInternalControlsConfiguration {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

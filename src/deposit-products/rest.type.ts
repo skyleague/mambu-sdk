@@ -3,11 +3,11 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * Allows specifying the batch update action details for a deposit product
+ * Specify the batch update action details for a deposit product.
  */
 export interface DepositProductAction {
     /**
@@ -17,8 +17,7 @@ export interface DepositProductAction {
 }
 
 export const DepositProductAction = {
-    validate: (await import('./schemas/deposit-product-action.schema.js'))
-        .validate10 as unknown as ValidateFunction<DepositProductAction>,
+    validate: (await import('./schemas/deposit-product-action.schema.js')).validate as ValidateFunction<DepositProductAction>,
     get schema() {
         return DepositProductAction.validate.schema
     },
@@ -28,13 +27,13 @@ export const DepositProductAction = {
     is: (o: unknown): o is DepositProductAction => DepositProductAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!DepositProductAction.validate(o)) {
-            throw new AjvValidator.ValidationError(DepositProductAction.errors ?? [])
+            throw new ValidationError(DepositProductAction.errors ?? [])
         }
     },
 } as const
 
 /**
- * Represents a response for executing batch update action for a deposit product
+ * Represents the response returned after a batch update action for a deposit product.
  */
 export interface DepositProductActionResponse {
     /**
@@ -45,7 +44,7 @@ export interface DepositProductActionResponse {
 
 export const DepositProductActionResponse = {
     validate: (await import('./schemas/deposit-product-action-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<DepositProductActionResponse>,
+        .validate as ValidateFunction<DepositProductActionResponse>,
     get schema() {
         return DepositProductActionResponse.validate.schema
     },
@@ -60,7 +59,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -70,7 +69,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -78,7 +77,7 @@ export const ErrorResponse = {
 export type GetAllResponse = DepositProduct[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -154,7 +153,7 @@ export interface DepositProduct {
 }
 
 export const DepositProduct = {
-    validate: (await import('./schemas/deposit-product.schema.js')).validate10 as unknown as ValidateFunction<DepositProduct>,
+    validate: (await import('./schemas/deposit-product.schema.js')).validate as ValidateFunction<DepositProduct>,
     get schema() {
         return DepositProduct.validate.schema
     },
@@ -164,7 +163,7 @@ export const DepositProduct = {
     is: (o: unknown): o is DepositProduct => DepositProduct.validate(o) === true,
     assert: (o: unknown) => {
         if (!DepositProduct.validate(o)) {
-            throw new AjvValidator.ValidationError(DepositProduct.errors ?? [])
+            throw new ValidationError(DepositProduct.errors ?? [])
         }
     },
 } as const
@@ -172,7 +171,7 @@ export const DepositProduct = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -182,7 +181,7 @@ export const PatchRequest = {
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
+            throw new ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
@@ -656,6 +655,10 @@ export interface DepositProductInterestSettings {
      */
     collectInterestWhenLocked?: boolean
     /**
+     * The date when the accounts under this product, will no longer have interest gains provided
+     */
+    interestGainsProvidedEndDate?: string
+    /**
      * The balance which is used for the Interest calculation
      */
     interestCalculationBalance?: 'MINIMUM' | 'AVERAGE' | 'END_OF_DAY' | 'MINIMUM_TO_END_OF_DAY' | 'FRENCH_INTEREST_ACCRUAL'
@@ -671,6 +674,10 @@ export interface DepositProductInterestSettings {
      * How many days in a year should be used for interest calculations
      */
     daysInYear?: 'ACTUAL_365_FIXED' | 'ACTUAL_360' | 'ACTUAL_ACTUAL_ISDA' | 'E30_360' | 'E30_42_365' | 'BUS_252'
+    /**
+     * The date when the accounts of this product will start to have interest gains provided. Starting with this date 0 interest rate is enforced on the accounts of this product.
+     */
+    interestGainsProvidedStartDate?: string
     interestPaymentSettings?: InterestPaymentSettings
 }
 
@@ -808,7 +815,7 @@ export interface MonthAndDay {
  */
 export interface DepositProductAccountingSettings {
     /**
-     * A list of accounting rules for the product.
+     * A list of accounting rules for a product.
      */
     accountingMethod: 'NONE' | 'CASH' | 'ACCRUAL'
     /**
@@ -816,7 +823,7 @@ export interface DepositProductAccountingSettings {
      */
     accountingRules?: DepositGLAccountingRule[]
     /**
-     * A list of accounting rules for the product.
+     * A list of accounting rules for a product.
      */
     interestAccruedAccountingMethod?: 'NONE' | 'DAILY' | 'END_OF_MONTH'
 }
@@ -931,7 +938,7 @@ export interface DepositProductOverdraftInterestRateSettings {
 }
 
 /**
- * Used or TIERED interest rates, holds the values to define how the interest is computed
+ * Used for TIERED interest rates, holds the values to define how the interest is computed
  */
 export interface DepositProductOverdraftInterestRateTier {
     /**

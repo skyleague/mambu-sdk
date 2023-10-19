@@ -3,8 +3,8 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
  * Holds information regarding the documents uploaded as attachments
@@ -73,7 +73,7 @@ export interface Document {
 }
 
 export const Document = {
-    validate: (await import('./schemas/document.schema.js')).validate10 as unknown as ValidateFunction<Document>,
+    validate: (await import('./schemas/document.schema.js')).validate as ValidateFunction<Document>,
     get schema() {
         return Document.validate.schema
     },
@@ -88,7 +88,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -98,7 +98,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -107,7 +107,7 @@ export type GetDocumentsByEntityIdResponse = Document[]
 
 export const GetDocumentsByEntityIdResponse = {
     validate: (await import('./schemas/get-documents-by-entity-id-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetDocumentsByEntityIdResponse>,
+        .validate as ValidateFunction<GetDocumentsByEntityIdResponse>,
     get schema() {
         return GetDocumentsByEntityIdResponse.validate.schema
     },

@@ -44,7 +44,7 @@ export class MambuTasks {
     }
 
     /**
-     * Allows retrieval of a single task via id or encoded key
+     * Get task
      */
     public async getById({ path, auth = [['apiKey'], ['basic']] }: { path: { taskId: string }; auth?: string[][] | string[] }) {
         return this.awaitResponse(
@@ -63,7 +63,7 @@ export class MambuTasks {
     }
 
     /**
-     * Update an existing task
+     * Update task
      */
     public async update({
         body,
@@ -93,7 +93,7 @@ export class MambuTasks {
     }
 
     /**
-     * Delete an existing task
+     * Delete task
      */
     public async delete({ path, auth = [['apiKey'], ['basic']] }: { path: { taskId: string }; auth?: string[][] | string[] }) {
         return this.awaitResponse(
@@ -112,7 +112,7 @@ export class MambuTasks {
     }
 
     /**
-     * Partially update an existing task
+     * Partially update task
      */
     public async patch({
         body,
@@ -142,7 +142,7 @@ export class MambuTasks {
     }
 
     /**
-     * Allows retrieval of tasks using various query parameters
+     * Gets tasks
      */
     public async getAll({
         query,
@@ -176,7 +176,7 @@ export class MambuTasks {
     }
 
     /**
-     * Create a new task. The status will be set as OPEN.
+     * Create task
      */
     public async create({
         body,
@@ -212,7 +212,7 @@ export class MambuTasks {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

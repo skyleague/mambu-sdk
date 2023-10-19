@@ -44,7 +44,7 @@ export class MambuDocuments {
     }
 
     /**
-     * Create a new document
+     * Create document
      */
     public async createDocument({
         headers,
@@ -67,7 +67,7 @@ export class MambuDocuments {
     }
 
     /**
-     * Allows downloading a document via id or encoded key.
+     * Download document
      */
     public async downloadDocumentById({
         path,
@@ -86,7 +86,7 @@ export class MambuDocuments {
     }
 
     /**
-     * Allows deleting document via id or encoded key.
+     * Delete document
      */
     public async deleteDocumentById({
         path,
@@ -111,7 +111,7 @@ export class MambuDocuments {
     }
 
     /**
-     * Retrieve metadata regarding all documents for a specific entity
+     * Get all documents' metadata
      */
     public async getDocumentsByEntityId({
         query,
@@ -138,7 +138,7 @@ export class MambuDocuments {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

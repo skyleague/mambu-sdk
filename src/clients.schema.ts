@@ -14,7 +14,7 @@ const client = got.extend({ prefixUrl: baseUrl })
 const clients = await client.get('resources').json<Clients>()
 
 const exports: Record<string, unknown> = {}
-for (const item of clients.items) {
+for (const item of clients.items.filter((i) => !i.jsonPath.includes('{'))) {
     const openapi = await client.get(item.jsonPath).json<OpenapiV3>()
 
     const node = await $restclient(openapi, {

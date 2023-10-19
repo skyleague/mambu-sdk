@@ -3,30 +3,30 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * Represents a request for triggering a database backup
+ * Represents a request for triggering a database backup.
  */
 export interface TriggerDatabaseBackupRequest {
     /**
-     * If provided, needs to be a valid URL. It will be a webhook call that will be later executed when the backup is completed.
+     * If provided, it needs to be a valid URL. It will be a webhook call that will later execute when the backup is complete.
      */
     callback?: string
     /**
-     * If provided, it needs to be a list of tables that exist in the database schema since it will include those tables in the backup. If not provided, all tables wil be included.
+     * If provided, it needs to be a list of tables that exist in the database schema. The backup will only include the specified tables. If not provided, the backup will include all tables.
      */
     tables?: string[]
     /**
-     * If provided, it needs to be a date time from which the backup should include data. If not provided, all time data will be included.
+     * If provided, it needs to be a date time from which the backup should include data. If not provided, the backup will include all the data.
      */
     createBackupFromDate?: string
 }
 
 export const TriggerDatabaseBackupRequest = {
     validate: (await import('./schemas/trigger-database-backup-request.schema.js'))
-        .validate10 as unknown as ValidateFunction<TriggerDatabaseBackupRequest>,
+        .validate as ValidateFunction<TriggerDatabaseBackupRequest>,
     get schema() {
         return TriggerDatabaseBackupRequest.validate.schema
     },
@@ -36,7 +36,7 @@ export const TriggerDatabaseBackupRequest = {
     is: (o: unknown): o is TriggerDatabaseBackupRequest => TriggerDatabaseBackupRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!TriggerDatabaseBackupRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(TriggerDatabaseBackupRequest.errors ?? [])
+            throw new ValidationError(TriggerDatabaseBackupRequest.errors ?? [])
         }
     },
 } as const
@@ -64,7 +64,7 @@ export interface TriggerDatabaseBackupResponse {
 
 export const TriggerDatabaseBackupResponse = {
     validate: (await import('./schemas/trigger-database-backup-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<TriggerDatabaseBackupResponse>,
+        .validate as ValidateFunction<TriggerDatabaseBackupResponse>,
     get schema() {
         return TriggerDatabaseBackupResponse.validate.schema
     },
@@ -79,7 +79,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -89,7 +89,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const

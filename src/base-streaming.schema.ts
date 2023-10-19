@@ -24,7 +24,7 @@ export const baseMambuStreaming = got
             )) {
                 const operation = op as Operation
                 if (operation.operationId === '"get-subscriptions-subscription_id-events') {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-dynamic-delete
                     delete path[method]
                 } else if (operation.operationId === 'post-subscriptions-subscription_id-cursors') {
                     operation.operationId = 'commitSubscriptionCursors'

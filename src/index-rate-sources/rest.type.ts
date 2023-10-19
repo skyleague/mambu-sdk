@@ -3,20 +3,21 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
-export type GetAllResponse = IndexRateSource[]
+export type GetAllIndexRateSourcesResponse = IndexRateSource[]
 
-export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+export const GetAllIndexRateSourcesResponse = {
+    validate: (await import('./schemas/get-all-index-rate-sources-response.schema.js'))
+        .validate as ValidateFunction<GetAllIndexRateSourcesResponse>,
     get schema() {
-        return GetAllResponse.validate.schema
+        return GetAllIndexRateSourcesResponse.validate.schema
     },
     get errors() {
-        return GetAllResponse.validate.errors ?? undefined
+        return GetAllIndexRateSourcesResponse.validate.errors ?? undefined
     },
-    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    is: (o: unknown): o is GetAllIndexRateSourcesResponse => GetAllIndexRateSourcesResponse.validate(o) === true,
 } as const
 
 export interface ErrorResponse {
@@ -24,7 +25,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -34,39 +35,47 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
 
 /**
- * An index rate source used for dynamic interest rates e.g. EURIBOR
+ * Represents an index rate source.
  */
 export interface IndexRateSource {
     /**
-     * The name of the index rate source
-     */
-    name?: string
-    /**
-     * The encoded key of the index rate source, auto generated, unique
-     */
-    encodedKey?: string
-    /**
-     * The id of the index rate source, can be generated and customized, unique
-     */
-    id?: string
-    /**
-     * Any custom text to be associated with the index rate source
+     * The notes about the the index rate source.
      */
     notes?: string
     /**
-     * The type of this index rate source
+     * The last date this rate source was modified
+     */
+    lastModifiedDate?: string
+    /**
+     * The name of the index rate source.
+     */
+    name?: string
+    /**
+     * The encoded key of the index rate source, which is auto generated, and unique.
+     */
+    encodedKey?: string
+    /**
+     * The ID of the index rate source, which can be generated and customized, and must be unique.
+     */
+    id?: string
+    /**
+     * The type of index rate source.
      */
     type?: 'INTEREST_RATE' | 'TAX_RATE' | 'WITHHOLDING_TAX_RATE' | 'PRINCIPAL_TAX_RATE'
+    /**
+     * The creation date of the index rate source
+     */
+    creationDate?: string
 }
 
 export const IndexRateSource = {
-    validate: (await import('./schemas/index-rate-source.schema.js')).validate10 as unknown as ValidateFunction<IndexRateSource>,
+    validate: (await import('./schemas/index-rate-source.schema.js')).validate as ValidateFunction<IndexRateSource>,
     get schema() {
         return IndexRateSource.validate.schema
     },
@@ -76,60 +85,61 @@ export const IndexRateSource = {
     is: (o: unknown): o is IndexRateSource => IndexRateSource.validate(o) === true,
     assert: (o: unknown) => {
         if (!IndexRateSource.validate(o)) {
-            throw new AjvValidator.ValidationError(IndexRateSource.errors ?? [])
+            throw new ValidationError(IndexRateSource.errors ?? [])
         }
     },
 } as const
 
-export type GetAll1Response = IndexRate[]
+export type GetAllIndexRatesResponse = IndexRate[]
 
-export const GetAll1Response = {
-    validate: (await import('./schemas/get-all1-response.schema.js')).validate10 as unknown as ValidateFunction<GetAll1Response>,
+export const GetAllIndexRatesResponse = {
+    validate: (await import('./schemas/get-all-index-rates-response.schema.js'))
+        .validate as ValidateFunction<GetAllIndexRatesResponse>,
     get schema() {
-        return GetAll1Response.validate.schema
+        return GetAllIndexRatesResponse.validate.schema
     },
     get errors() {
-        return GetAll1Response.validate.errors ?? undefined
+        return GetAllIndexRatesResponse.validate.errors ?? undefined
     },
-    is: (o: unknown): o is GetAll1Response => GetAll1Response.validate(o) === true,
+    is: (o: unknown): o is GetAllIndexRatesResponse => GetAllIndexRatesResponse.validate(o) === true,
 } as const
 
 /**
- * An index rate object with a rate and a start date when it becomes valid
+ * Represents an index rate.
  */
 export interface IndexRate {
     /**
-     * Any custom text to be associated with this index rate
+     * The notes or description attached to this object.
      */
     notes?: string
     /**
-     * The percentage value of the index rate
+     * The percentage value of the index rate.
      */
     rate?: number
     /**
-     * The interest index rate source to which this rate is associated
+     * The index rate source that the index rate belongs to.
      */
     assignedIndexRateSourceKey?: string
     /**
-     * The encoded key of the index rate, auto generated, unique
+     * The encoded key of the index rate, which is auto generated, and unique.
      */
     encodedKey?: string
     /**
-     * The id of the index rate, can be generated and customized, unique
+     * The ID of the index rate, which can be generated and customized, and must be unique.
      */
     id?: string
     /**
-     * The user key
+     * The key for the user that last modified the index rate.
      */
     userKey?: string
     /**
-     * The date when this index rate starts being the active rate for its source
+     * The date when the index rate starts being the active rate for its source.
      */
     startDate?: string
 }
 
 export const IndexRate = {
-    validate: (await import('./schemas/index-rate.schema.js')).validate10 as unknown as ValidateFunction<IndexRate>,
+    validate: (await import('./schemas/index-rate.schema.js')).validate as ValidateFunction<IndexRate>,
     get schema() {
         return IndexRate.validate.schema
     },
@@ -139,7 +149,7 @@ export const IndexRate = {
     is: (o: unknown): o is IndexRate => IndexRate.validate(o) === true,
     assert: (o: unknown) => {
         if (!IndexRate.validate(o)) {
-            throw new AjvValidator.ValidationError(IndexRate.errors ?? [])
+            throw new ValidationError(IndexRate.errors ?? [])
         }
     },
 } as const

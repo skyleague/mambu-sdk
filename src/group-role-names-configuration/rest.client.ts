@@ -43,7 +43,7 @@ export class MambuGroupRoleNamesConfiguration {
     }
 
     /**
-     * Retrieves the group role names configuration.
+     * Get group role names configuration
      */
     public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
@@ -60,7 +60,7 @@ export class MambuGroupRoleNamesConfiguration {
     }
 
     /**
-     * Updates the group role names configuration.
+     * Update group role names configuration
      */
     public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
@@ -80,7 +80,7 @@ export class MambuGroupRoleNamesConfiguration {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`
