@@ -43,7 +43,7 @@ export class MambuLoanProductsConfiguration {
     }
 
     /**
-     * Allows retrieval of the loan products configuration.
+     * Allows you to get or update the loan products configuration.
      */
     public async get({
         query,
@@ -65,7 +65,7 @@ export class MambuLoanProductsConfiguration {
     }
 
     /**
-     * Allows updating the loan products configuration.
+     * Update loan products configuration
      */
     public async update({
         headers,
@@ -89,7 +89,7 @@ export class MambuLoanProductsConfiguration {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

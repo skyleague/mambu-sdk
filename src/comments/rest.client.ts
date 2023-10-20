@@ -44,7 +44,7 @@ export class MambuComments {
     }
 
     /**
-     * Allows you to retrieve the comments for an entity
+     * Get comments for an entity
      */
     public async getComments({
         query,
@@ -70,7 +70,7 @@ export class MambuComments {
     }
 
     /**
-     * Create a new comment for an entity
+     * Create a new comment for an entity.
      */
     public async createComment({
         body,
@@ -106,7 +106,7 @@ export class MambuComments {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

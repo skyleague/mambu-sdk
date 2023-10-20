@@ -69,7 +69,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Delete a card associated to the provided account via its reference token
+     * Represents the information needed to delete a card associated to an account using its reference token.
      */
     public async deleteCard({
         path,
@@ -94,7 +94,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Retrieves the withholding taxes related to a deposit account
+     * Get deposit account withholding tax history
      */
     public async getWithholdingTaxHistory({
         path,
@@ -122,7 +122,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Allows retrieval of a deposit account document (populated template) by provided deposit account id and template id
+     * Get deposit account document
      */
     public async getDepositAccountDocument({
         path,
@@ -150,7 +150,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Allows retrieval of all cards associated with the account
+     * Get cards associated with an account
      */
     public async getAllCards({
         path,
@@ -175,7 +175,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Create and associate a new card to the provided account
+     * Represents the information needed to create and associate a new card to an account.
      */
     public async createCard({
         body,
@@ -209,7 +209,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Starts the maturity period for the specified deposit account
+     * Represents information to start the maturity period for the specified deposit account.
      */
     public async startMaturity({
         body,
@@ -243,7 +243,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Retrieves authorization holds related to a deposit account, ordered from newest to oldest by creation date
+     * Get authorization holds related to a deposit account, ordered from newest to oldest by creation date
      */
     public async getAllAuthorizationHolds({
         path,
@@ -271,7 +271,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Creates an authorization hold corresponding to a given account.
+     * Create an authorization hold corresponding to a given account
      */
     public async createAuthorizationHold({
         body,
@@ -305,7 +305,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Allows retrieval of all loan accounts that are funded by the deposit account with the given id or encoded key.
+     * Get all loan accounts funded by the deposit account with the given ID or encoded key
      */
     public async getFundedLoans({
         path,
@@ -330,7 +330,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Allows retrieval of deposit accounts using various query parameters. It's possible to look up deposits by their state, branch, centre or by a credit officer to which the deposits are assigned.
+     * Get deposit accounts
      */
     public async getAll({
         query,
@@ -367,7 +367,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Creates a new deposit account
+     * Create deposit account
      */
     public async create({
         body,
@@ -398,7 +398,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Allows to change the withholding tax for a deposit account
+     * Change deposit account withholding tax rate
      */
     public async changeWithholdingTax({
         body,
@@ -431,7 +431,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Allows download of a deposit account document as PDF by provided deposit account id and template id
+     * Download deposit account document PDF
      */
     public async getPdfDocument({
         path,
@@ -457,7 +457,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Apply accrued interest
+     * Represents information to apply accrued interest.
      */
     public async applyInterest({
         body,
@@ -525,7 +525,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Undo the maturity period for the specified deposit account
+     * Represents the action to undo the maturity period for the specified deposit account.
      */
     public async undoMaturity({
         body,
@@ -559,7 +559,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Allows to change the interest rate for a deposit account
+     * Change deposit account interest rate
      */
     public async changeInterestRate({
         body,
@@ -593,7 +593,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Allows posting an action such as approve deposit account
+     * Represents the information to post an action, such as approving a deposit account.
      */
     public async changeState({
         body,
@@ -627,7 +627,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Allows to unblock a previously blocked fund for a deposit account
+     * Unblock a previously blocked fund for a deposit account
      */
     public async unblockFund({
         path,
@@ -684,7 +684,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Allows retrieval of a single deposit account via id or encoded key
+     * Get deposit account
      */
     public async getById({
         path,
@@ -712,7 +712,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Update an existing deposit account
+     * Update deposit account
      */
     public async update({
         body,
@@ -743,7 +743,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Delete an inactive deposit account via id or encoded key
+     * Delete inactive deposit account
      */
     public async delete({
         path,
@@ -769,7 +769,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Partially update a deposit account
+     * Partially update deposit account
      */
     public async patch({
         body,
@@ -800,7 +800,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Allows retrieval of all block funds for a deposit account
+     * Get all block funds for a deposit account
      */
     public async getAllBlocks({
         path,
@@ -828,7 +828,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Create a block fund for the provided account
+     * Create a block fund for the account
      */
     public async createBlockFund({
         body,
@@ -862,7 +862,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Allows retrieval of a single account authorization hold via external reference id
+     * Get account authorization hold
      */
     public async getAuthorizationHoldById({
         path,
@@ -890,7 +890,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Reverses an account authorization hold.
+     * Reverse account authorization hold
      */
     public async reverseAuthorizationHold({
         path,
@@ -919,7 +919,7 @@ export class MambuDepositAccounts {
     }
 
     /**
-     * Allows retrieval of deposit accounts using search parameters.
+     * Search deposit accounts
      */
     public async search({
         body,
@@ -980,7 +980,7 @@ export class MambuDepositAccounts {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

@@ -3,13 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 export type GetAllResponse = Group[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -24,7 +24,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -34,13 +34,13 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
 
 /**
- * Represents a group of clients. A group is a type of client composed of at least two members who also need to have an individual profile in Mambu.
+ * Represents a group. A group is a type of client that can represent a non-physical person such as a company client or a grouping of individual clients. A group can have its own accounts and can optionally have individual clients as members, in which case they also need to have an individual profile in Mambu.
  */
 export interface Group {
     /**
@@ -71,69 +71,69 @@ export interface Group {
         | 'ITALIAN'
         | 'PHRASE'
     /**
-     * The addresses associated with this group information like street, city etc.
+     * The addresses associated with this group.
      */
     addresses?: Address[]
     /**
-     * Extra notes about this group
+     * Extra notes about this group.
      */
     notes?: string
     /**
-     * The last date the group was updated
+     * The last date the group was updated.
      */
     lastModifiedDate?: string
     /**
-     * The home phone number associated with the group
+     * The home phone number associated with the group.
      */
     homePhone?: string
     /**
-     * The date this group was created
+     * The date the group was created.
      */
     creationDate?: string
     /**
-     * Key of the branch this group is assigned to
+     * Key of the branch this group is assigned to.
      */
     assignedBranchKey?: string
     /**
-     * Number of paid and closed (with 'obligations met') accounts for this client, when the closing operation is reverted, this is reduced
+     * Number of paid and closed (with 'obligations met') accounts for this client. When the closing operation is reverted, this is reduced.
      */
     loanCycle?: number
     /**
-     * Key of the centre this group is assigned to
+     * Key of the centre this group is assigned to.
      */
     assignedCentreKey?: string
     /**
-     * The name of the group
+     * The name of the group.
      */
     groupName: string
     /**
-     * The e-mail address associated with the group
+     * The email address associated with the group.
      */
     emailAddress?: string
     /**
-     * The mobile phone number associated with the group
+     * The mobile phone number associated with the group.
      */
     mobilePhone?: string
     /**
-     * A role which describes the intended use of a group in the system
+     * A role which describes the intended use of a group in the system.
      */
     groupRoleKey?: string
     /**
-     * The encoded key of the group, auto generated, unique
+     * The encoded key of the group, which is auto generated, and must be unique.
      */
     encodedKey?: string
     /**
-     * The id of the group, can be generated and customized, unique
+     * The ID of the group, which can be generated and customized, but must be unique.
      */
     id?: string
     /**
-     * Key of the user this group is assigned to
+     * Key of the user this group is assigned to.
      */
     assignedUserKey?: string
 }
 
 export const Group = {
-    validate: (await import('./schemas/group.schema.js')).validate10 as unknown as ValidateFunction<Group>,
+    validate: (await import('./schemas/group.schema.js')).validate as ValidateFunction<Group>,
     get schema() {
         return Group.validate.schema
     },
@@ -143,7 +143,7 @@ export const Group = {
     is: (o: unknown): o is Group => Group.validate(o) === true,
     assert: (o: unknown) => {
         if (!Group.validate(o)) {
-            throw new AjvValidator.ValidationError(Group.errors ?? [])
+            throw new ValidationError(Group.errors ?? [])
         }
     },
 } as const
@@ -152,7 +152,7 @@ export type GetCreditArrangementsByGroupIdOrKeyResponse = CreditArrangement[]
 
 export const GetCreditArrangementsByGroupIdOrKeyResponse = {
     validate: (await import('./schemas/get-credit-arrangements-by-group-id-or-key-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetCreditArrangementsByGroupIdOrKeyResponse>,
+        .validate as ValidateFunction<GetCreditArrangementsByGroupIdOrKeyResponse>,
     get schema() {
         return GetCreditArrangementsByGroupIdOrKeyResponse.validate.schema
     },
@@ -166,7 +166,7 @@ export const GetCreditArrangementsByGroupIdOrKeyResponse = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -176,7 +176,7 @@ export const PatchRequest = {
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
+            throw new ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
@@ -193,8 +193,7 @@ export interface GroupSearchCriteria {
 }
 
 export const GroupSearchCriteria = {
-    validate: (await import('./schemas/group-search-criteria.schema.js'))
-        .validate10 as unknown as ValidateFunction<GroupSearchCriteria>,
+    validate: (await import('./schemas/group-search-criteria.schema.js')).validate as ValidateFunction<GroupSearchCriteria>,
     get schema() {
         return GroupSearchCriteria.validate.schema
     },
@@ -204,7 +203,7 @@ export const GroupSearchCriteria = {
     is: (o: unknown): o is GroupSearchCriteria => GroupSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
         if (!GroupSearchCriteria.validate(o)) {
-            throw new AjvValidator.ValidationError(GroupSearchCriteria.errors ?? [])
+            throw new ValidationError(GroupSearchCriteria.errors ?? [])
         }
     },
 } as const
@@ -212,7 +211,7 @@ export const GroupSearchCriteria = {
 export type SearchResponse = Group[]
 
 export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
+    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -229,162 +228,162 @@ export interface RestError {
 }
 
 /**
- * A group member is person that uses the services of the bank and is member of a group. Group members may have associated information such as their client key and a list of roles they have within the group
+ * Represents a group member. A group member is person that uses the services of the bank and is member of a group. Group members may have associated information, such as their client key and a list of roles they have within the group.
  */
 export interface GroupMember {
     /**
-     * The encoded key of the client assigned as member of the group
+     * The encoded key of the client assigned as member of the group.
      */
     clientKey: string
     /**
-     * The roles associated with this group member
+     * The group role name associated with a group member.
      */
     roles?: GroupRole[]
 }
 
 /**
- * A group role is the role of a group member within the group (i.e. Money Collector). One member could have many roles within a group.
+ * Represents a group role. A group role, or group role name, is the role of a group member within the group - for example, money collector. One member could have many roles within a group.
  */
 export interface GroupRole {
     /**
-     * The group role name
+     * The group role name.
      */
     roleName?: string
     /**
-     * The encoded key of the group role, auto generated, unique
+     * The encoded key of the group role name, which is auto generated, and unique.
      */
     encodedKey?: string
     /**
-     * The group role name key
+     * The group role name key.
      */
     groupRoleNameKey: string
     /**
-     * The group role name id
+     * The group role name ID.
      */
     roleNameId?: string
 }
 
 /**
- * Address Data Transfer Object
+ * Represents an address.
  */
 export interface Address {
     /**
-     * The country
+     * The country.
      */
     country?: string
     /**
-     * Address parent key, the object owning this address, client, centre, branch
+     * The address parent key indicating the object owning this address. For example: client, centre, or branch.
      */
     parentKey?: string
     /**
-     * The city for this address
+     * The city for the address.
      */
     city?: string
     /**
-     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90
+     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
      */
     latitude?: number
     /**
-     * The post code
+     * The post code.
      */
     postcode?: string
     /**
-     * Index of this address in the list of addresses
+     * The index of this address in the list of addresses.
      */
     indexInList?: number
     /**
-     * Address encoded key, unique, generated
+     * The address encoded key, which is unique and generated.
      */
     encodedKey?: string
     /**
-     * The region that is part of the address
+     * The region for the address.
      */
     region?: string
     /**
-     * The second line for the address, in case the first one doesn't fit the information, this is completely optional
+     * The second line of the address.
      */
     line2?: string
     /**
-     * The first line of the address
+     * The first line of the address.
      */
     line1?: string
     /**
-     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180
+     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
      */
     longitude?: number
 }
 
 /**
- * A maximum amount a client (individual, group or company) can take in loans and overdrafts.
+ * Represents a credit arrangement.
  */
 export interface CreditArrangement {
     /**
-     * The available amount of the credit arrangement
+     * The available amount of the credit arrangement.
      */
     availableCreditAmount?: number
     /**
-     * The maximum credit amount the client can be exposed to
+     * The maximum credit amount the client can be exposed to.
      */
     amount: number
     /**
-     * The notes/description of credit arrangement
+     * The notes or description of the credit arrangement.
      */
     notes?: string
     /**
-     * The last date when credit arrangement was modified
+     * The last date when the credit arrangement was modified.
      */
     lastModifiedDate?: string
     /**
-     * The encodedKey of the client or group (a.k.a holder)
+     * The encoded key of the credit arrangement holder (individual client or group).
      */
     holderKey?: string
     /**
-     * The consumed amount of the credit arrangement (calculated as the difference between the amount and available amount
+     * The consumed amount of the credit arrangement, which is calculated as the difference between the amount and available amount.
      */
     consumedCreditAmount?: number
     /**
-     * The date when credit arrangement was created
+     * The date when the credit arrangement was created.
      */
     creationDate?: string
     /**
-     * The date when credit arrangement was approved
+     * The date when the credit arrangement was approved.
      */
     approvedDate?: string
     /**
-     * The substate of credit arrangement can be Withdrawn or Rejected when state is Closed
+     * The substate of credit arrangement.
      */
     subState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
     /**
-     * The date when credit arrangement was closed
+     * The date when the credit arrangement was closed.
      */
     closedDate?: string
     /**
-     * The type of exposure limit calculation method used
+     * The type of exposure limit calculation method used for the credit arrangement.
      */
     exposureLimitType?: 'APPROVED_AMOUNT' | 'OUTSTANDING_AMOUNT'
     /**
-     * The encoded key of credit arrangement, auto generated, unique
+     * The encoded key of the credit arrangement, it is auto generated, and unique.
      */
     encodedKey?: string
     /**
-     * The date when credit arrangement expires
+     * The date when the credit arrangement expires.
      */
     expireDate: string
     currency?: Currency
     /**
-     * The id of credit arrangement, can be generated and customized, unique
+     * The ID of credit arrangement, can be generated and customized, and must be unique.
      */
     id?: string
     /**
-     * The state of credit arrangement can be Pending Approval, Approved, Active or Closed
+     * The state of the credit arrangement.
      */
     state?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
     /**
-     * The type of the credit arrangement holder (client or group)
+     * The type of the credit arrangement holder (individual client or group).
      */
     holderType: 'CLIENT' | 'GROUP'
     /**
-     * The start date from which the credit arrangement becomes active
+     * The start date from which the credit arrangement became active.
      */
     startDate: string
 }
@@ -620,7 +619,7 @@ export interface PatchOperation {
  */
 export interface GroupSortingCriteria {
     /**
-     * Contains the field that can be used as sorting selection. Can be native (one from the provided list) or otherwise can specify a custom field using the format [customFieldSetId].[customFieldId].
+     * The field to sort by. It can be a native field (one from the provided list) or otherwise can specify a custom field definitionusing the format [customFieldSetId].[customFieldId].
      */
     field:
         | 'encodedKey'
@@ -633,7 +632,7 @@ export interface GroupSortingCriteria {
         | 'totalBalance'
         | 'loanCycle'
     /**
-     * The sorting order: ASC or DESC. The default order is DESC.
+     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
      */
     order?: 'ASC' | 'DESC'
 }
@@ -643,7 +642,7 @@ export interface GroupSortingCriteria {
  */
 export interface GroupFilterCriteria {
     /**
-     * Contains the actual searching fields that can be native (one from the provided list) or otherwise can specify a custom field using the format [customFieldSetId].[customFieldId].
+     * The fields to perform the search. They can be native (one from the provided list) or otherwise can specify a custom field definition using the format [customFieldSetId].[customFieldId].
      */
     field:
         | 'encodedKey'
@@ -662,7 +661,7 @@ export interface GroupFilterCriteria {
         | 'numberOfMembers'
         | 'loanCycle'
     /**
-     * The value to match the searching criteria
+     * The value to match the searching criteria.
      */
     value?: string
     /**
@@ -711,11 +710,11 @@ export interface GroupFilterCriteria {
         | 'EMPTY'
         | 'NOT_EMPTY'
     /**
-     * The second value to match the searching criteria, when using BETWEEN, together with value
+     * The second value to match the searching criteria, when the `BETWEEN` operator is used.
      */
     secondValue?: string
     /**
-     * List of values when operator is IN.
+     * List of values when the `IN` operator is used.
      */
     values?: string[]
 }

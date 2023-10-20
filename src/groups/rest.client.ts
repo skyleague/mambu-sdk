@@ -52,7 +52,7 @@ export class MambuGroups {
     }
 
     /**
-     * Allows retrieval of groups using various query parameters
+     * Get groups
      */
     public async getAll({
         query,
@@ -86,7 +86,7 @@ export class MambuGroups {
     }
 
     /**
-     * Create a new group
+     * Create group
      */
     public async create({
         body,
@@ -116,7 +116,7 @@ export class MambuGroups {
     }
 
     /**
-     * Credit arrangements list retrieved
+     * Credit arrangements list returned.
      */
     public async getCreditArrangementsByGroupIdOrKey({
         path,
@@ -144,7 +144,7 @@ export class MambuGroups {
     }
 
     /**
-     * Allows retrieval of a single group via id or encoded key
+     * Get group
      */
     public async getById({
         path,
@@ -172,7 +172,7 @@ export class MambuGroups {
     }
 
     /**
-     * Update an existing group
+     * Update group
      */
     public async update({
         body,
@@ -202,7 +202,7 @@ export class MambuGroups {
     }
 
     /**
-     * Delete a group
+     * Delete group
      */
     public async delete({ path, auth = [['apiKey'], ['basic']] }: { path: { groupId: string }; auth?: string[][] | string[] }) {
         return this.awaitResponse(
@@ -221,7 +221,7 @@ export class MambuGroups {
     }
 
     /**
-     * Partially update an existing group
+     * Partially update group
      */
     public async patch({
         body,
@@ -251,7 +251,7 @@ export class MambuGroups {
     }
 
     /**
-     * Allows you to search groups by various criteria
+     * Search groups
      */
     public async search({
         body,
@@ -287,7 +287,7 @@ export class MambuGroups {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

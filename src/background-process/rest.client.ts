@@ -44,7 +44,7 @@ export class MambuBackgroundProcess {
     }
 
     /**
-     * Allows to change the state of background process by its encoded key.
+     * Cancel manual or automatic end of day (EOD) processes using the encoded key
      */
     public async update({
         body,
@@ -73,7 +73,7 @@ export class MambuBackgroundProcess {
     }
 
     /**
-     * Allows retrieval of details of the latest background process by the specified type.
+     * Get the latest manual or automatic end of day (EOD) process by specifying the type
      */
     public async getLatestByType({
         query,
@@ -95,7 +95,7 @@ export class MambuBackgroundProcess {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

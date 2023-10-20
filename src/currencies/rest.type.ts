@@ -3,13 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 export type GetAllResponse = CurrencyDetails[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -24,7 +24,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -34,55 +34,55 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
 
 /**
- * Model representation of a currency.
+ * Represents a currency.
  */
 export interface CurrencyDetails {
     /**
-     * Currency symbol.
+     * The currency symbol.
      */
     symbol: string
     /**
-     * Currency code. Cannot be changed once currency is created.
+     * The currency code, which cannot be changed once the currency is created.
      */
     code: string
     /**
-     * Number of digits that are supported for given currency.
+     * The number of digits that are supported for a given currency.
      */
     digitsAfterDecimal?: number
     /**
-     * The last date this currency was modified. It's updated automatically, read only field not required for update operations.
+     * The last date this currency was modified. It's updated automatically and it's a read-only field not required for update operations.
      */
     lastModifiedDate?: string
     /**
-     * Currency symbol position.
+     * The currency symbol position.
      */
     currencySymbolPosition: 'BEFORE_NUMBER' | 'AFTER_NUMBER'
     /**
-     * Currency name.
+     * The name of the currency.
      */
     name: string
     /**
-     * Indicates the type of the currency.
+     * The type of the currency.
      */
     type: 'FIAT_CURRENCY' | 'CRYPTOCURRENCY' | 'NON_TRADITIONAL_CURRENCY'
     /**
-     * The date this currency was created. Cannot be changed, read only field not required for update operations.
+     * The date this currency was created. It cannot be changed and it's a read-only field not required for update operations.
      */
     creationDate?: string
     /**
-     * Flag indicating if the given currency is the base currency. Cannot be changed, read only field not required for update operations.
+     * `TRUE` if the currency is the base currency, `FALSE` otherwise. It cannot be changed and it's a read-only field not required for update operations.
      */
     baseCurrency: boolean
 }
 
 export const CurrencyDetails = {
-    validate: (await import('./schemas/currency-details.schema.js')).validate10 as unknown as ValidateFunction<CurrencyDetails>,
+    validate: (await import('./schemas/currency-details.schema.js')).validate as ValidateFunction<CurrencyDetails>,
     get schema() {
         return CurrencyDetails.validate.schema
     },
@@ -92,7 +92,7 @@ export const CurrencyDetails = {
     is: (o: unknown): o is CurrencyDetails => CurrencyDetails.validate(o) === true,
     assert: (o: unknown) => {
         if (!CurrencyDetails.validate(o)) {
-            throw new AjvValidator.ValidationError(CurrencyDetails.errors ?? [])
+            throw new ValidationError(CurrencyDetails.errors ?? [])
         }
     },
 } as const

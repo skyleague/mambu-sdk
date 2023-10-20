@@ -3,13 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 export type GetAllResponse = TransactionChannel[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -24,7 +24,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -34,22 +34,22 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
 
 /**
- * A transaction channel which can be selected and used.
+ * Represents a transaction channel.
  */
 export interface TransactionChannel {
     depositConstraints: Constraint
     /**
-     * Flag specifying whether the transaction channel is the default used or not
+     * `TRUE` if the transaction channel is set as the default, `FALSE` otherwise.
      */
     isDefault?: boolean
     /**
-     * The name of the transaction channel
+     * The name of the transaction channel.
      */
     name: string
     /**
@@ -57,31 +57,30 @@ export interface TransactionChannel {
      */
     encodedKey?: string
     /**
-     * The id of the transaction channel
+     * The ID of the transaction channel.
      */
     id: string
     /**
-     * The state of the transaction channel
+     * The state of the transaction channel.
      */
     state?: 'ACTIVE' | 'INACTIVE'
     /**
-     * The GL account associated with the transaction channel
+     * The general ledger (GL) account associated with the transaction channel.
      */
     glAccount: string
     /**
-     * Boolean flag specifying if the transaction channel is available for all users or not
+     * `TRUE` if the transaction channel is available for all users, `FALSE` otherwise.
      */
     availableForAll?: boolean
     loanConstraints: Constraint
     /**
-     * The usage rights that describe the transaction channel
+     * The usage rights that describe the transaction channel.
      */
     usageRights?: string[]
 }
 
 export const TransactionChannel = {
-    validate: (await import('./schemas/transaction-channel.schema.js'))
-        .validate10 as unknown as ValidateFunction<TransactionChannel>,
+    validate: (await import('./schemas/transaction-channel.schema.js')).validate as ValidateFunction<TransactionChannel>,
     get schema() {
         return TransactionChannel.validate.schema
     },
@@ -91,7 +90,7 @@ export const TransactionChannel = {
     is: (o: unknown): o is TransactionChannel => TransactionChannel.validate(o) === true,
     assert: (o: unknown) => {
         if (!TransactionChannel.validate(o)) {
-            throw new AjvValidator.ValidationError(TransactionChannel.errors ?? [])
+            throw new ValidationError(TransactionChannel.errors ?? [])
         }
     },
 } as const

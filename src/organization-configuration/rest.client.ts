@@ -43,7 +43,7 @@ export class MambuOrganizationConfiguration {
     }
 
     /**
-     * Allows retrieval of organization configuration details.
+     * Get organization details configuration
      */
     public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
@@ -62,7 +62,7 @@ export class MambuOrganizationConfiguration {
     }
 
     /**
-     * Updates the existing organization configuration.
+     * Update organization details configuration
      */
     public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
@@ -81,7 +81,7 @@ export class MambuOrganizationConfiguration {
     }
 
     /**
-     * Allows retrieval of organization configuration template.
+     * Get organization details configuration template
      */
     public async getTemplate({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
@@ -101,7 +101,7 @@ export class MambuOrganizationConfiguration {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

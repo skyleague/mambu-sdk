@@ -43,7 +43,7 @@ export class MambuCustomFieldsConfiguration {
     }
 
     /**
-     * Allows retrieval of the custom fields configuration template.
+     * Get custom field definitions configuration template
      */
     public async getTemplate({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
@@ -60,7 +60,7 @@ export class MambuCustomFieldsConfiguration {
     }
 
     /**
-     * Allows retrieval of the custom fields configuration.
+     * Get custom field definitions configuration
      */
     public async get({
         query,
@@ -81,7 +81,7 @@ export class MambuCustomFieldsConfiguration {
     }
 
     /**
-     * Allows updating the current custom fields configuration.
+     * Update custom field definitions configuration
      */
     public async update({
         headers,
@@ -105,7 +105,7 @@ export class MambuCustomFieldsConfiguration {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

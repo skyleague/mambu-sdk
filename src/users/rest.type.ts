@@ -3,37 +3,37 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * In order to have access to mobile Mambu, Mambu provides a name and password that can be used for logging in or for accessing the APIs. This model contains the user information, but it hides certain fields like password for security reasons.
+ * Represents a user.
  */
 export interface User {
     /**
-     * The user last name
+     * The last name of the user.
      */
     lastName?: string
     access: UserAccess
     /**
-     * Additional information for the user.
+     * The additional information for the user.
      */
     notes?: string
     role?: RoleIdentifier
     /**
-     * The last time the user logged in, as UTC
+     * The last time the user logged in in UTC.
      */
     lastLoggedInDate?: string
     /**
-     * The last time the user was modified, as UTC
+     * The last time the user was modified in UTC.
      */
     lastModifiedDate?: string
     /**
-     * The user home phone number, can also contain characters
+     * The user's home phone number, which can also contain characters.
      */
     homePhone?: string
     /**
-     * The user language, the user interface will be displayed in the selected language
+     * The Mambu display language for the user. The Mambu UI will be displayed in the selected language. Please note: for portuguese, you must use the incorrect spelling `PORTUGESE`.
      */
     language?:
         | 'ENGLISH'
@@ -52,11 +52,11 @@ export interface User {
         | 'ITALIAN'
         | 'PHRASE'
     /**
-     * Date when the user was created, as UTC
+     * The date the user was created in UTC.
      */
     creationDate?: string
     /**
-     * The user title
+     * The user title.
      */
     title?: string
     /**
@@ -64,19 +64,19 @@ export interface User {
      */
     assignedBranchKey?: string
     /**
-     * The user first name
+     * The first name of the user.
      */
     firstName: string
     /**
-     * The user mobile phone number, can also contain characters
+     * The user's mobile phone number, which can also contain characters.
      */
     mobilePhone?: string
     /**
-     * The user current state
+     * The current state of the user.
      */
     userState?: 'ACTIVE' | 'INACTIVE' | 'LOCKED'
     /**
-     * For additional security two-factor authentication can be added to users. When this setting is enabled, users will be sent an SMS on their registered mobile number, which they will need to enter in the Mambu login screen, in addition to their password..
+     * `TRUE` if the user has two-factor authentication setup, `FALSE` otherwise. If two-factor authentication is enabled, a user will be sent an SMS to their registered mobile number, which they will need to enter in the Mambu login screen, in addition to their password.
      */
     twoFactorAuthentication?: boolean
     /**
@@ -84,27 +84,27 @@ export interface User {
      */
     encodedKey?: string
     /**
-     * Id of the user, unique, generated, should not be confused with the username field
+     * The ID of the user, which is generated automatically, but must be unique.
      */
     id?: string
     /**
-     * Map of specifying user transaction limits.
+     * The user transaction limits.
      */
     transactionLimits?: {
         [k: string]: number
     }
     /**
-     * The user email address. Used by Mambu for sending automated notifications or for password retrieval
+     * The user email address. Used by Mambu for sending automated notifications or for getting passwords.
      */
     email?: string
     /**
-     * Mambu login user name
+     * The Mambu login user name.
      */
     username: string
 }
 
 export const User = {
-    validate: (await import('./schemas/user.schema.js')).validate10 as unknown as ValidateFunction<User>,
+    validate: (await import('./schemas/user.schema.js')).validate as ValidateFunction<User>,
     get schema() {
         return User.validate.schema
     },
@@ -114,7 +114,7 @@ export const User = {
     is: (o: unknown): o is User => User.validate(o) === true,
     assert: (o: unknown) => {
         if (!User.validate(o)) {
-            throw new AjvValidator.ValidationError(User.errors ?? [])
+            throw new ValidationError(User.errors ?? [])
         }
     },
 } as const
@@ -124,7 +124,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -134,7 +134,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -142,7 +142,7 @@ export const ErrorResponse = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -152,7 +152,7 @@ export const PatchRequest = {
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
+            throw new ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
@@ -160,7 +160,7 @@ export const PatchRequest = {
 export type GetAllResponse = User[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -175,21 +175,21 @@ export const GetAllResponse = {
  */
 export interface UserRequest {
     /**
-     * The user last name
+     * The last name of the user.
      */
     lastName?: string
     access: UserAccess
     /**
-     * Additional information for the user.
+     * The additional information for the user.
      */
     notes?: string
     role?: RoleIdentifier
     /**
-     * The user home phone number, can also contain characters
+     * The user's home phone number, which can also contain characters.
      */
     homePhone?: string
     /**
-     * The user language, the user interface will be displayed in the selected language
+     * The Mambu display language for the user. The Mambu UI will be displayed in the selected language. Please note: for portuguese, you must use the incorrect spelling `PORTUGESE`.
      */
     language?:
         | 'ENGLISH'
@@ -208,7 +208,7 @@ export interface UserRequest {
         | 'ITALIAN'
         | 'PHRASE'
     /**
-     * The user title
+     * The user title.
      */
     title?: string
     /**
@@ -216,7 +216,7 @@ export interface UserRequest {
      */
     assignedBranchKey?: string
     /**
-     * The user first name
+     * The first name of the user.
      */
     firstName: string
     /**
@@ -224,11 +224,11 @@ export interface UserRequest {
      */
     password: string
     /**
-     * The user mobile phone number, can also contain characters
+     * The user's mobile phone number, which can also contain characters.
      */
     mobilePhone?: string
     /**
-     * For additional security two-factor authentication can be added to users. When this setting is enabled, users will be sent an SMS on their registered mobile number, which they will need to enter in the Mambu login screen, in addition to their password..
+     * `TRUE` if the user has two-factor authentication setup, `FALSE` otherwise. If two-factor authentication is enabled, a user will be sent an SMS to their registered mobile number, which they will need to enter in the Mambu login screen, in addition to their password.
      */
     twoFactorAuthentication?: boolean
     /**
@@ -236,23 +236,23 @@ export interface UserRequest {
      */
     encodedKey?: string
     /**
-     * Map of specifying user transaction limits.
+     * The user transaction limits.
      */
     transactionLimits?: {
         [k: string]: number
     }
     /**
-     * The user email address. Used by Mambu for sending automated notifications or for password retrieval
+     * The user email address. Used by Mambu for sending automated notifications or for getting passwords.
      */
     email?: string
     /**
-     * Mambu login user name
+     * The Mambu login user name.
      */
     username: string
 }
 
 export const UserRequest = {
-    validate: (await import('./schemas/user_request.schema.js')).validate10 as unknown as ValidateFunction<UserRequest>,
+    validate: (await import('./schemas/user_request.schema.js')).validate as ValidateFunction<UserRequest>,
     get schema() {
         return UserRequest.validate.schema
     },
@@ -262,57 +262,57 @@ export const UserRequest = {
     is: (o: unknown): o is UserRequest => UserRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!UserRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(UserRequest.errors ?? [])
+            throw new ValidationError(UserRequest.errors ?? [])
         }
     },
 } as const
 
 /**
- * Wrapper containing the available user permissions and access rights
+ * Represents the user permissions and access rights.
  */
 export interface UserAccess {
     /**
-     * Flag specific to Credit Officers determining the access to entities assigned to other Credit Officers (eg clients, accounts)
+     * `TRUE` if a credit officer user can access entities (for example, clients or accounts) assigned to other credit officers, `FALSE` otherwise.
      */
     canManageEntitiesAssignedToOtherOfficers: boolean
     /**
-     * Mambu access allows the user to log in to Mambu via the regular web user interface, using their login credentials. If an user does not have this access right, login to Mambu via the web user interface will not be possible.
+     * TRUE` if the user can log in to the Mambu UI using their login credentials, `FALSE` otherwise.
      */
     mambuAccess?: boolean
     /**
-     * Whether the user is an administrator in Mambu. The administrators in mambu are having full permissions for all entities and for Mambu settings.
+     * `TRUE` if the user has the administrator user type, `FALSE` otherwise. Administrators (admins) have all permissions and can perform any action in Mambu.
      */
     administratorAccess?: boolean
     /**
-     * API access allows the user to authenticate and interact with Mambu using Mambu's APIs, this means that most of the time such an user is not an actual person, but a piece of software that is programmed to interact with Mambu. The API user would still require the right user permissions, depending on what it is required to do in the system, and transactions posted by that user are kept in the logs in the same way as user actions from regular users.
+     * `TRUE` if the user can authenticate and interact with Mambu APIs, `FALSE` otherwise. The user may still require additional permissions for specific API requests.
      */
     apiAccess?: boolean
     /**
-     * Permissions for the user. The non-admin users are authorized to do actions based a set of permissions in order to access Mambu features. Note that not all this permissions are used for validating API calls, some are used only for UI validations
+     * Permissions for the user. The non-admin users are authorized to do actions based a set of permissions in order to access Mambu features. Permissions may be relevant for the API and/or the Mambu UI.
      */
     permissions?: Local0[]
     /**
-     * Flag indicating the user is part of the Delivery team
+     * `TRUE` if the user is part of the Mambu delivery team, `FALSE` otherwise.
      */
     deliveryAccess?: boolean
     /**
-     * Whether the user is a credit officer or not. Credit Officers have the option of having clients and groups assigned to them, this relationship allows for better reporting and client management.
+     * `TRUE` if the user has the credit officer user type, `FALSE` otherwise. Credit officers have the option of having clients and groups assigned to them.
      */
     creditOfficerAccess?: boolean
     /**
-     * Whether the user permissions apply to all branches or only for some branches
+     * `TRUE` if the user has access to all branches, `FALSE` if the user only has access to specific branches.
      */
     canManageAllBranches: boolean
     /**
-     * The list of branches that can be managed by current user. If the user has the canManageAllBranches true, this list is not taken in consideration.
+     * The list of branches that can be managed by the user. If the user has the `canManageAllBranches` property set to `TRUE`, this list does not apply.
      */
     managedBranches?: UserManagedBranch[]
     /**
-     * Flag indicating the user is in charge with the Mambu technical support.
+     * `TRUE` if the user can provide Mambu technical support, `FALSE` otherwise.
      */
     supportAccess?: boolean
     /**
-     * Whether the user is a teller or not. Tellers have access to the teller module, special tellering permissions give them access to the different actions available on this module, such as opening/closing tills, posting transactions on a till, adding and removing cash from a till etc.
+     * `TRUE` if the user has the teller user type, `FALSE` otherwise. Tellers have access to the teller module and specific tellering permissions, which allow them to take actions such as opening or closing tills, posting transactions on a till, and adding and removing cash from a till.
      */
     tellerAccess?: boolean
 }
@@ -350,8 +350,11 @@ type Local0 =
     | 'EDIT_TRANSACTION_CHANNELS'
     | 'DELETE_TRANSACTION_CHANNELS'
     | 'MANAGE_HOLIDAYS'
+    | 'MANAGE_INDEX_RATES'
     | 'MANAGE_EOD_PROCESSING'
     | 'MANAGE_INTERNAL_CONTROLS'
+    | 'MANAGE_CURRENCIES'
+    | 'MANAGE_AUTHORIZATION_HOLDS_SETUP'
     | 'MANAGE_RISK_LEVELS'
     | 'VIEW_LOAN_PRODUCT_DETAILS'
     | 'CREATE_LOAN_PRODUCT'
@@ -494,6 +497,10 @@ type Local0 =
     | 'CREATE_REPORTS'
     | 'EDIT_REPORTS'
     | 'DELETE_REPORTS'
+    | 'VIEW_JASPER_REPORTS'
+    | 'CREATE_JASPER_REPORTS'
+    | 'EDIT_JASPER_REPORTS'
+    | 'DELETE_JASPER_REPORTS'
     | 'VIEW_CHART_OF_ACCOUNTS'
     | 'MANAGE_ACCOUNTS'
     | 'VIEW_JOURNAL_ENTRIES'
@@ -552,27 +559,54 @@ type Local0 =
     | 'CREATE_MAMBU_FUNCTIONS'
     | 'EDIT_MAMBU_FUNCTIONS'
     | 'DELETE_MAMBU_FUNCTIONS'
+    | 'VIEW_CURRENT_USER_DETAILS'
+    | 'VIEW_PROFIT_SHARING_CLASSES'
+    | 'CREATE_PROFIT_SHARING_CLASSES'
+    | 'EDIT_PROFIT_SHARING_CLASSES'
+    | 'DELETE_PROFIT_SHARING_CLASSES'
+    | 'VIEW_PROFIT_SHARING_POOLS'
+    | 'CREATE_PROFIT_SHARING_POOLS'
+    | 'EDIT_PROFIT_SHARING_POOLS'
+    | 'DELETE_PROFIT_SHARING_POOLS'
+    | 'VIEW_PROFIT_SHARING_INCOME_CATEGORIES'
+    | 'CREATE_PROFIT_SHARING_INCOME_CATEGORIES'
+    | 'EDIT_PROFIT_SHARING_INCOME_CATEGORIES'
+    | 'DELETE_PROFIT_SHARING_INCOME_CATEGORIES'
+    | 'VIEW_PROFIT_SHARING_PROPOSALS'
+    | 'EDIT_PROFIT_SHARING_PROPOSALS'
+    | 'CREATE_PROFIT_SHARING_PROPOSALS'
+    | 'APPROVE_PROFIT_SHARING_PROPOSALS'
+    | 'ADJUST_PROFIT_SHARING_PROPOSALS'
+    | 'VIEW_PROFIT_SHARING_SYSTEM_OPTIONS'
+    | 'CREATE_PROFIT_SHARING_SYSTEM_OPTIONS'
+    | 'EDIT_PROFIT_SHARING_SYSTEM_OPTIONS'
+    | 'DELETE_PROFIT_SHARING_SYSTEM_OPTIONS'
+    | 'VIEW_PROFIT_SHARING_DEPOSIT_PRODUCTS'
+    | 'EDIT_PROFIT_SHARING_DEPOSIT_PRODUCT_LINK'
+    | 'VIEW_PROFIT_SHARING_ACCOUNTS_SETTINGS'
+    | 'CREATE_PROFIT_SHARING_ACCOUNT_SETTINGS'
+    | 'EDIT_PROFIT_SHARING_ACCOUNT_SETTINGS'
 
 /**
- * Branch that can be managed by the user or API Consumer
+ * Represents a branch that can be managed by the user or API consumer.
  */
 export interface UserManagedBranch {
     /**
-     * The encoded key of the branch, generated
+     * The encoded key of the branch, it is automatically generated.
      */
     branchKey?: string
 }
 
 /**
- * The user role identifier
+ * Represents the role identifier.
  */
 export interface RoleIdentifier {
     /**
-     * The encoded key of the entity, generated, globally unique
+     * The encoded key of the entity, generated automatically, globally unique.
      */
     encodedKey?: string
     /**
-     * Id of the role, unique, can be generated and customized
+     * The ID of the role, which can be generated and customized, but must be unique.
      */
     id?: string
 }

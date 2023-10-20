@@ -7,10 +7,10 @@ import got from 'got'
 import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import type { IncomingHttpHeaders } from 'http'
-import { ErrorResponse, Holidays } from './rest.type.js'
+import { CreateRequest, CreateResponse, ErrorResponse, Holiday } from './rest.type.js'
 
 /**
- * organization/holidays
+ * organization/holidays/general
  */
 export class MambuHolidays {
     public client: Got
@@ -44,41 +44,83 @@ export class MambuHolidays {
     }
 
     /**
-     * Allows retrieval of the general holidays.
+     * Get holiday
      */
-    public async get({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
+    public async getByIdentifier({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { holidayIdentifier: string }
+        auth?: string[][] | string[]
+    }) {
         return this.awaitResponse(
-            this.buildClient(auth).get(`organization/holidays`, {
+            this.buildClient(auth).get(`organization/holidays/general/${path.holidayIdentifier}`, {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                200: Holidays,
+                200: Holiday,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+                404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
 
     /**
-     * Allows update of the general holidays.
+     * Delete holiday
      */
-    public async update({ body, auth = [['apiKey'], ['basic']] }: { body: Holidays; auth?: string[][] | string[] }) {
-        this.validateRequestBody(Holidays, body)
-
+    public async delete({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { holidayIdentifier: string }
+        auth?: string[][] | string[]
+    }) {
         return this.awaitResponse(
-            this.buildClient(auth).put(`organization/holidays`, {
-                json: body,
+            this.buildClient(auth).delete(`organization/holidays/general/${path.holidayIdentifier}`, {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                200: Holidays,
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+                409: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Create holidays
+     */
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CreateRequest
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(CreateRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`organization/holidays/general`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: CreateResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
             }
         )
     }
@@ -90,7 +132,7 @@ export class MambuHolidays {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

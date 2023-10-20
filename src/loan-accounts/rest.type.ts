@@ -3,21 +3,34 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
-export type GetLoanAccountDocumentResponse = string
+/**
+ * Represents a single loan account schedule structure.
+ */
+export interface LoanAccountSchedule {
+    /**
+     * The loan account schedule installments list.
+     */
+    installments?: Installment[]
+    currency?: Currency
+}
 
-export const GetLoanAccountDocumentResponse = {
-    validate: (await import('./schemas/get-loan-account-document-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetLoanAccountDocumentResponse>,
+export const LoanAccountSchedule = {
+    validate: (await import('./schemas/loan-account-schedule.schema.js')).validate as ValidateFunction<LoanAccountSchedule>,
     get schema() {
-        return GetLoanAccountDocumentResponse.validate.schema
+        return LoanAccountSchedule.validate.schema
     },
     get errors() {
-        return GetLoanAccountDocumentResponse.validate.errors ?? undefined
+        return LoanAccountSchedule.validate.errors ?? undefined
     },
-    is: (o: unknown): o is GetLoanAccountDocumentResponse => GetLoanAccountDocumentResponse.validate(o) === true,
+    is: (o: unknown): o is LoanAccountSchedule => LoanAccountSchedule.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!LoanAccountSchedule.validate(o)) {
+            throw new ValidationError(LoanAccountSchedule.errors ?? [])
+        }
+    },
 } as const
 
 export interface ErrorResponse {
@@ -25,7 +38,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -35,1165 +48,46 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
 
-export type UpdateLoanAccountFundingSourcesRequest = InvestorFund[]
+export type EditScheduleRequest = Installment[]
 
-export const UpdateLoanAccountFundingSourcesRequest = {
-    validate: (await import('./schemas/update-loan-account-funding-sources-request.schema.js'))
-        .validate10 as unknown as ValidateFunction<UpdateLoanAccountFundingSourcesRequest>,
+export const EditScheduleRequest = {
+    validate: (await import('./schemas/edit-schedule-request.schema.js')).validate as ValidateFunction<EditScheduleRequest>,
     get schema() {
-        return UpdateLoanAccountFundingSourcesRequest.validate.schema
+        return EditScheduleRequest.validate.schema
     },
     get errors() {
-        return UpdateLoanAccountFundingSourcesRequest.validate.errors ?? undefined
+        return EditScheduleRequest.validate.errors ?? undefined
     },
-    is: (o: unknown): o is UpdateLoanAccountFundingSourcesRequest => UpdateLoanAccountFundingSourcesRequest.validate(o) === true,
+    is: (o: unknown): o is EditScheduleRequest => EditScheduleRequest.validate(o) === true,
     assert: (o: unknown) => {
-        if (!UpdateLoanAccountFundingSourcesRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(UpdateLoanAccountFundingSourcesRequest.errors ?? [])
+        if (!EditScheduleRequest.validate(o)) {
+            throw new ValidationError(EditScheduleRequest.errors ?? [])
         }
     },
 } as const
 
-export type UpdateLoanAccountFundingSourcesResponse = InvestorFund[]
+export type PreviewTranchesOnScheduleRequest = LoanTranche[]
 
-export const UpdateLoanAccountFundingSourcesResponse = {
-    validate: (await import('./schemas/update-loan-account-funding-sources-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<UpdateLoanAccountFundingSourcesResponse>,
+export const PreviewTranchesOnScheduleRequest = {
+    validate: (await import('./schemas/preview-tranches-on-schedule-request.schema.js'))
+        .validate as ValidateFunction<PreviewTranchesOnScheduleRequest>,
     get schema() {
-        return UpdateLoanAccountFundingSourcesResponse.validate.schema
+        return PreviewTranchesOnScheduleRequest.validate.schema
     },
     get errors() {
-        return UpdateLoanAccountFundingSourcesResponse.validate.errors ?? undefined
+        return PreviewTranchesOnScheduleRequest.validate.errors ?? undefined
     },
-    is: (o: unknown): o is UpdateLoanAccountFundingSourcesResponse =>
-        UpdateLoanAccountFundingSourcesResponse.validate(o) === true,
-} as const
-
-export type CreateLoanAccountFundingSourcesRequest = InvestorFund[]
-
-export const CreateLoanAccountFundingSourcesRequest = {
-    validate: (await import('./schemas/create-loan-account-funding-sources-request.schema.js'))
-        .validate10 as unknown as ValidateFunction<CreateLoanAccountFundingSourcesRequest>,
-    get schema() {
-        return CreateLoanAccountFundingSourcesRequest.validate.schema
-    },
-    get errors() {
-        return CreateLoanAccountFundingSourcesRequest.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CreateLoanAccountFundingSourcesRequest => CreateLoanAccountFundingSourcesRequest.validate(o) === true,
+    is: (o: unknown): o is PreviewTranchesOnScheduleRequest => PreviewTranchesOnScheduleRequest.validate(o) === true,
     assert: (o: unknown) => {
-        if (!CreateLoanAccountFundingSourcesRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(CreateLoanAccountFundingSourcesRequest.errors ?? [])
+        if (!PreviewTranchesOnScheduleRequest.validate(o)) {
+            throw new ValidationError(PreviewTranchesOnScheduleRequest.errors ?? [])
         }
     },
-} as const
-
-export type CreateLoanAccountFundingSourcesResponse = InvestorFund[]
-
-export const CreateLoanAccountFundingSourcesResponse = {
-    validate: (await import('./schemas/create-loan-account-funding-sources-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<CreateLoanAccountFundingSourcesResponse>,
-    get schema() {
-        return CreateLoanAccountFundingSourcesResponse.validate.schema
-    },
-    get errors() {
-        return CreateLoanAccountFundingSourcesResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CreateLoanAccountFundingSourcesResponse =>
-        CreateLoanAccountFundingSourcesResponse.validate(o) === true,
-} as const
-
-/**
- * Allows specifying the action details for an action performed on a loan account
- */
-export interface LoanActionDetails {
-    /**
-     * The notes for the action performed on the loan account
-     */
-    notes?: string
-}
-
-export const LoanActionDetails = {
-    validate: (await import('./schemas/loan-action-details.schema.js'))
-        .validate10 as unknown as ValidateFunction<LoanActionDetails>,
-    get schema() {
-        return LoanActionDetails.validate.schema
-    },
-    get errors() {
-        return LoanActionDetails.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanActionDetails => LoanActionDetails.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!LoanActionDetails.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanActionDetails.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Allows specifying the input for loan account pay off
- */
-export interface LoanAccountPayOffInput {
-    transactionDetails?: TransactionDetails
-    /**
-     * External id for Repayment transaction
-     */
-    externalId?: string
-    /**
-     * Extra notes for Repayment transaction logged for Pay Off action
-     */
-    notes?: string
-    payOffAdjustableAmounts?: PayOffAdjustableAmounts
-}
-
-export const LoanAccountPayOffInput = {
-    validate: (await import('./schemas/loan-account-pay-off-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<LoanAccountPayOffInput>,
-    get schema() {
-        return LoanAccountPayOffInput.validate.schema
-    },
-    get errors() {
-        return LoanAccountPayOffInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanAccountPayOffInput => LoanAccountPayOffInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!LoanAccountPayOffInput.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanAccountPayOffInput.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents the request payload for performing a periodic payment change action
- */
-export interface ChangePeriodicPaymentLoanAccountInput {
-    /**
-     * The new periodic payment to be available on the account
-     */
-    periodicPayment: number
-    /**
-     * The date when to change the periodic payment (as Organization Time)
-     */
-    valueDate: string
-    /**
-     * The notes for the change periodic payment action performed on the loan account
-     */
-    notes?: string
-}
-
-export const ChangePeriodicPaymentLoanAccountInput = {
-    validate: (await import('./schemas/change-periodic-payment-loan-account-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<ChangePeriodicPaymentLoanAccountInput>,
-    get schema() {
-        return ChangePeriodicPaymentLoanAccountInput.validate.schema
-    },
-    get errors() {
-        return ChangePeriodicPaymentLoanAccountInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ChangePeriodicPaymentLoanAccountInput => ChangePeriodicPaymentLoanAccountInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ChangePeriodicPaymentLoanAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(ChangePeriodicPaymentLoanAccountInput.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * The request structure for performing the refinance loan account action
- */
-export interface RefinanceLoanAccountAction {
-    /**
-     * Keep same account ID option
-     */
-    keepSameAccountId?: boolean
-    loanAccount: RefinanceLoanAccount
-    writeOffAmounts?: RefinanceWriteOffAmounts
-    /**
-     * The top-up amount
-     */
-    topUpAmount: number
-}
-
-export const RefinanceLoanAccountAction = {
-    validate: (await import('./schemas/refinance-loan-account-action.schema.js'))
-        .validate10 as unknown as ValidateFunction<RefinanceLoanAccountAction>,
-    get schema() {
-        return RefinanceLoanAccountAction.validate.schema
-    },
-    get errors() {
-        return RefinanceLoanAccountAction.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is RefinanceLoanAccountAction => RefinanceLoanAccountAction.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!RefinanceLoanAccountAction.validate(o)) {
-            throw new AjvValidator.ValidationError(RefinanceLoanAccountAction.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents the amount that your organization lends to a customer. An account associated to a borrower with terms and conditions defined by a loan product. In a loan account Mambu stores all the information related to disbursements, repayments, interest rates and withdrawals.
- */
-export interface LoanAccount {
-    /**
-     * The state of the loan account
-     */
-    accountState?: 'PARTIAL_APPLICATION' | 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'ACTIVE_IN_ARREARS' | 'CLOSED'
-    prepaymentSettings?: PrepaymentSettings
-    /**
-     * The migration event encoded key associated with this loan account. If this account was imported, track which 'migration event' they came from.
-     */
-    migrationEventKey?: string
-    /**
-     * Date when the loan account was set to last standing, or null if never set (as Organization Time)
-     */
-    lastSetToArrearsDate?: string
-    /**
-     * Extra notes about this loan account.
-     */
-    notes?: string
-    disbursementDetails?: DisbursementDetails
-    redrawSettings?: LoanAccountRedrawSettings
-    /**
-     * A list with manual fees planned on the installments of this loan account.
-     */
-    plannedInstallmentFees?: PlannedInstallmentFee[]
-    /**
-     * The number of days in arrears
-     */
-    daysInArrears?: number
-    /**
-     * This field holds a second state for the account. Beside the account state, we might need to hold sometimes a different information to actually represent the correct life-cycle step in which the account is at that moment. The account behaves as the main state implies, but it  can have either some limitations either some extra behavior rules. For example, even if the account is Active, it can also be Locked in the same time which impliessome limitations over the actions which can be performed with the account.
-     */
-    accountSubState?:
-        | 'PARTIALLY_DISBURSED'
-        | 'LOCKED'
-        | 'LOCKED_CAPPING'
-        | 'REFINANCED'
-        | 'RESCHEDULED'
-        | 'WITHDRAWN'
-        | 'REPAID'
-        | 'REJECTED'
-        | 'WRITTEN_OFF'
-        | 'TERMINATED'
-    /**
-     * The name of the loan account.
-     */
-    loanName?: string
-    /**
-     * The date this loan account was terminated
-     */
-    terminationDate?: string
-    interestSettings?: InterestSettings
-    /**
-     * A list of assets associated with the current loan account
-     */
-    assets?: Asset[]
-    /**
-     * The last interest review date. Indicates the date the interest was reviewed last time. Stored as Organization Time.
-     */
-    lastInterestReviewDate?: string
-    /**
-     * The id of the loan, can be generated and customized, unique
-     */
-    id?: string
-    /**
-     * Key of the user this loan is assigned to
-     */
-    assignedUserKey?: string
-    /**
-     * Locked account total due type
-     */
-    lockedAccountTotalDueType?: 'BALANCE_AMOUNT' | 'DUE_AMOUNT_ON_LATE_INSTALLMENTS'
-    /**
-     * Shows whether the future payments are allowed or not for this account (repayment transactions with entry date set in the future)
-     */
-    futurePaymentsAcceptance?: 'NO_FUTURE_PAYMENTS' | 'ACCEPT_FUTURE_PAYMENTS' | 'ACCEPT_OVERPAYMENTS'
-    /**
-     * Key of the original rescheduled/refinanced account
-     */
-    originalAccountKey?: string
-    /**
-     * A list with operations which are locked when the account is in sub-state AccountState.LOCKED.
-     */
-    lockedOperations?: ('APPLY_INTEREST' | 'APPLY_FEES' | 'APPLY_PENALTIES')[]
-    /**
-     * The accrued interest. Represents the amount of interest that has been accrued in the account.
-     */
-    accruedInterest?: number
-    /**
-     * The accrued penalty, represents the amount of penalty that has been accrued in the account.
-     */
-    accruedPenalty?: number
-    /**
-     * The date this loan account was created
-     */
-    creationDate?: string
-    /**
-     * Adjust the interest for the first repayment when the first repayment period is different than the repayment frequency
-     */
-    modifyInterestForFirstInstallment?: boolean
-    /**
-     * Key of the centre this account is assigned to
-     */
-    assignedCentreKey?: string
-    /**
-     * A list of disbursement tranches available for the current loan account.
-     */
-    tranches?: LoanTranche[]
-    /**
-     * The date this loan account was approved
-     */
-    approvedDate?: string
-    /**
-     * The tax rate.
-     */
-    taxRate?: number
-    /**
-     * The last tax rate review date. Indicates When/if the account had last tax rate checked (as Organization Time).
-     */
-    lastTaxRateReviewDate?: string
-    /**
-     * The interest from arrears accrued. Represents the amount of interest from arrears that has been accrued in the account.
-     */
-    interestFromArrearsAccrued?: number
-    scheduleSettings: ScheduleSettings
-    /**
-     * The number of days late
-     */
-    daysLate?: number
-    /**
-     * The payment method. Represents the interest payment method that determines whether the payments are made Horizontally (on the Repayments) or Vertically (on the Loan Account)
-     */
-    paymentMethod?: 'HORIZONTAL' | 'VERTICAL'
-    /**
-     * The encodedKey of the client (a.k.a account holder)
-     */
-    accountHolderKey: string
-    /**
-     * Overdue payments recalculation method copied from the loan product on which this account is based
-     */
-    latePaymentsRecalculationMethod?: 'OVERDUE_INSTALLMENTS_INCREASE' | 'LAST_INSTALLMENT_INCREASE'
-    /**
-     * A list of funds associated with the current loan account
-     */
-    fundingSources?: InvestorFund[]
-    /**
-     * The type of the account holder (i.e CLIENT)
-     */
-    accountHolderType: 'CLIENT' | 'GROUP'
-    /**
-     * The arrears tolerance (period or day of month) depending on the product settings
-     */
-    arrearsTolerancePeriod?: number
-    /**
-     * The last interest applied date. Indicates when/if the account had last interest applied (stored to interest balance) (as Organization Time)
-     */
-    lastInterestAppliedDate?: string
-    /**
-     * Key pointing to where this account was rescheduled/refinanced to. only not null if rescheduled
-     */
-    rescheduledAccountKey?: string
-    /**
-     * The Payment Holidays interest accrued. Represents the amount of interest that has been accrued during Payment Holidays in the account.
-     */
-    paymentHolidaysAccruedInterest?: number
-    /**
-     * The encoded key of the transaction that activated this account
-     */
-    activationTransactionKey?: string
-    /**
-     * The interest that is accrued in the current billing cycle.
-     */
-    interestAccruedInBillingCycle?: number
-    /**
-     * Key of the branch this loan account is assigned to. Loan account's branch is set to unassigned if no branch field is set
-     */
-    assignedBranchKey?: string
-    balances?: Balances
-    /**
-     * The key to the line of credit where this account is registered to.
-     */
-    creditArrangementKey?: string
-    /**
-     * The value of the interest booked by the organization from the accounts funded by investors. Null if the funds are not enable
-     */
-    interestCommission?: number
-    /**
-     * The encoded key of the loan account, auto generated, unique
-     */
-    encodedKey?: string
-    currency?: Currency
-    /**
-     * When/if the account had last been evaluated for interest, principal, fees and penalties calculations (as Organization Time)
-     */
-    lastAccountAppraisalDate?: string
-    penaltySettings?: PenaltySettings
-    /**
-     * The encodedKey of the settlement account
-     */
-    settlementAccountKey?: string
-    /**
-     * The last date the loan was updated
-     */
-    lastModifiedDate?: string
-    principalPaymentSettings?: PrincipalPaymentAccountSettings
-    /**
-     * Holds the date when the account was set for the last time in the LOCKED state. If null, the account is not locked anymore. Stored as Organization Time
-     */
-    lastLockedDate?: string
-    /**
-     * The loan amount
-     */
-    loanAmount: number
-    /**
-     * The date this loan was closed
-     */
-    closedDate?: string
-    /**
-     * The key to the type of product that this account is based on.
-     */
-    productTypeKey: string
-    /**
-     * DEPRECATED - Will always be false.
-     */
-    allowOffset?: boolean
-    /**
-     * A list of guarantees associated with the current loan account
-     */
-    guarantors?: Guarantor[]
-    accountArrearsSettings?: AccountArrearsSettings
-}
-
-export const LoanAccount = {
-    validate: (await import('./schemas/loan-account.schema.js')).validate10 as unknown as ValidateFunction<LoanAccount>,
-    get schema() {
-        return LoanAccount.validate.schema
-    },
-    get errors() {
-        return LoanAccount.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanAccount => LoanAccount.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!LoanAccount.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanAccount.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents the payload request to preview the pay off due amounts in a future date
- */
-export interface PreviewPayOffDueAmountsInAFutureDateInput {
-    /**
-     * The date until which the amounts due for pay off should be calculated
-     */
-    valueDate: string
-}
-
-export const PreviewPayOffDueAmountsInAFutureDateInput = {
-    validate: (await import('./schemas/preview-pay-off-due-amounts-in-a-future-date-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<PreviewPayOffDueAmountsInAFutureDateInput>,
-    get schema() {
-        return PreviewPayOffDueAmountsInAFutureDateInput.validate.schema
-    },
-    get errors() {
-        return PreviewPayOffDueAmountsInAFutureDateInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PreviewPayOffDueAmountsInAFutureDateInput =>
-        PreviewPayOffDueAmountsInAFutureDateInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PreviewPayOffDueAmountsInAFutureDateInput.validate(o)) {
-            throw new AjvValidator.ValidationError(PreviewPayOffDueAmountsInAFutureDateInput.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents a wrapper over a set of due amounts representing pay off due amounts in a future date
- */
-export interface PreviewPayOffDueAmountsInAFutureDateWrapper {
-    /**
-     * The penalty balance due when pay off the account in a future date
-     */
-    penaltyBalance?: number
-    /**
-     * The interest balance due when pay off the account in a future date
-     */
-    interestBalance?: number
-    /**
-     * The principal balance due when pay off the account in a future date
-     */
-    principalBalance?: number
-    /**
-     * The fee balance due when pay off the account in a future date
-     */
-    feeBalance?: number
-    /**
-     * The total balance due when pay off the account in a future date
-     */
-    totalBalance?: number
-}
-
-export const PreviewPayOffDueAmountsInAFutureDateWrapper = {
-    validate: (await import('./schemas/preview-pay-off-due-amounts-in-a-future-date-wrapper.schema.js'))
-        .validate10 as unknown as ValidateFunction<PreviewPayOffDueAmountsInAFutureDateWrapper>,
-    get schema() {
-        return PreviewPayOffDueAmountsInAFutureDateWrapper.validate.schema
-    },
-    get errors() {
-        return PreviewPayOffDueAmountsInAFutureDateWrapper.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PreviewPayOffDueAmountsInAFutureDateWrapper =>
-        PreviewPayOffDueAmountsInAFutureDateWrapper.validate(o) === true,
-} as const
-
-/**
- * The request payload for performing a reschedule loan account action
- */
-export interface RescheduleLoanAccountAction {
-    /**
-     * Keep same account ID option
-     */
-    keepSameAccountId?: boolean
-    loanAccount: RescheduleLoanAccount
-    writeOffAmounts?: RescheduleWriteOffAmounts
-}
-
-export const RescheduleLoanAccountAction = {
-    validate: (await import('./schemas/reschedule-loan-account-action.schema.js'))
-        .validate10 as unknown as ValidateFunction<RescheduleLoanAccountAction>,
-    get schema() {
-        return RescheduleLoanAccountAction.validate.schema
-    },
-    get errors() {
-        return RescheduleLoanAccountAction.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is RescheduleLoanAccountAction => RescheduleLoanAccountAction.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!RescheduleLoanAccountAction.validate(o)) {
-            throw new AjvValidator.ValidationError(RescheduleLoanAccountAction.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents the request payload for performing an arrears settings change action
- */
-export interface ChangeArrearsSettingsInput {
-    /**
-     * The new arrears tolerance period to be available on the account
-     */
-    arrearsTolerancePeriod: number
-    /**
-     * The notes for the change arrears settings action performed on the loan account
-     */
-    notes?: string
-    /**
-     * The date when to change the arrears settings
-     */
-    entryDate: string
-}
-
-export const ChangeArrearsSettingsInput = {
-    validate: (await import('./schemas/change-arrears-settings-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<ChangeArrearsSettingsInput>,
-    get schema() {
-        return ChangeArrearsSettingsInput.validate.schema
-    },
-    get errors() {
-        return ChangeArrearsSettingsInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ChangeArrearsSettingsInput => ChangeArrearsSettingsInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ChangeArrearsSettingsInput.validate(o)) {
-            throw new AjvValidator.ValidationError(ChangeArrearsSettingsInput.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * The planned installment fees encoded keys list
- */
-export interface PlannedFeeKeys {
-    /**
-     * The list of encoded keys of the planned installment fees.
-     */
-    encodedKeys: string[]
-}
-
-export const PlannedFeeKeys = {
-    validate: (await import('./schemas/planned-fee-keys.schema.js')).validate10 as unknown as ValidateFunction<PlannedFeeKeys>,
-    get schema() {
-        return PlannedFeeKeys.validate.schema
-    },
-    get errors() {
-        return PlannedFeeKeys.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PlannedFeeKeys => PlannedFeeKeys.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PlannedFeeKeys.validate(o)) {
-            throw new AjvValidator.ValidationError(PlannedFeeKeys.errors ?? [])
-        }
-    },
-} as const
-
-export type ApplyPlannedFeesResponse = LoanTransaction[]
-
-export const ApplyPlannedFeesResponse = {
-    validate: (await import('./schemas/apply-planned-fees-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<ApplyPlannedFeesResponse>,
-    get schema() {
-        return ApplyPlannedFeesResponse.validate.schema
-    },
-    get errors() {
-        return ApplyPlannedFeesResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ApplyPlannedFeesResponse => ApplyPlannedFeesResponse.validate(o) === true,
-} as const
-
-/**
- * Represents the request payload for performing an interest rate change action
- */
-export interface ChangeInterestRateLoanAccountInput {
-    /**
-     * The new interest rate to be available on the account
-     */
-    interestRate?: number
-    /**
-     * The new interest spread to be available on the account
-     */
-    interestSpread?: number
-    /**
-     * The date when to change the interest rate (as Organization Time)
-     */
-    valueDate: string
-    /**
-     * The notes for the change interest rate action performed on the loan account
-     */
-    notes?: string
-}
-
-export const ChangeInterestRateLoanAccountInput = {
-    validate: (await import('./schemas/change-interest-rate-loan-account-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<ChangeInterestRateLoanAccountInput>,
-    get schema() {
-        return ChangeInterestRateLoanAccountInput.validate.schema
-    },
-    get errors() {
-        return ChangeInterestRateLoanAccountInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ChangeInterestRateLoanAccountInput => ChangeInterestRateLoanAccountInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ChangeInterestRateLoanAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(ChangeInterestRateLoanAccountInput.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents the input for the collateral assets reevaluation background task.
- */
-export interface CollateralAssetFilter {
-    /**
-     * Assets of the loan accounts that will be filtered by the product keys in the background process
-     */
-    productKeys?: string[]
-    /**
-     * Assets of the loan accounts that will be filtered by the branch keys in the background process
-     */
-    branchKeys?: string[]
-    /**
-     * Assets of the loan accounts that will be filtered by the currency codes in the background process
-     */
-    currencies?: string[]
-}
-
-export const CollateralAssetFilter = {
-    validate: (await import('./schemas/collateral-asset-filter.schema.js'))
-        .validate10 as unknown as ValidateFunction<CollateralAssetFilter>,
-    get schema() {
-        return CollateralAssetFilter.validate.schema
-    },
-    get errors() {
-        return CollateralAssetFilter.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CollateralAssetFilter => CollateralAssetFilter.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!CollateralAssetFilter.validate(o)) {
-            throw new AjvValidator.ValidationError(CollateralAssetFilter.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Holds the information about collateral assets reevaluation status.
- */
-export interface CollateralAssetsReevaluationResponse {
-    /**
-     * The encoded key of the collateral assets reevaluation task
-     */
-    bulkProcessKey?: string
-    /**
-     * The collateral assets reevaluation status
-     */
-    status?:
-        | 'QUEUED'
-        | 'IN_PROGRESS'
-        | 'COMPLETE'
-        | 'NOT_FOUND'
-        | 'CANCEL'
-        | 'TO_BE_CANCELED'
-        | 'TIMED_OUT'
-        | 'ERROR'
-        | 'TRANSIENT_ERROR'
-        | 'OVERRIDDEN'
-        | 'RECOVERABLE_ERROR'
-}
-
-export const CollateralAssetsReevaluationResponse = {
-    validate: (await import('./schemas/collateral-assets-reevaluation-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<CollateralAssetsReevaluationResponse>,
-    get schema() {
-        return CollateralAssetsReevaluationResponse.validate.schema
-    },
-    get errors() {
-        return CollateralAssetsReevaluationResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CollateralAssetsReevaluationResponse => CollateralAssetsReevaluationResponse.validate(o) === true,
-} as const
-
-/**
- * Represents the request payload for performing change due dates settings action
- */
-export interface ChangeDueDatesSettingsInput {
-    /**
-     * The date when to change the due dates settings
-     */
-    valueDate?: string
-    /**
-     * The notes for the change due dates settings action performed on the loan account
-     */
-    notes?: string
-    /**
-     * The date when to change the due dates settings - deprecated, use valueDate instead
-     */
-    entryDate?: string
-    /**
-     * The new fixed days of month to be used on the account
-     */
-    fixedDaysOfMonth: number[]
-}
-
-export const ChangeDueDatesSettingsInput = {
-    validate: (await import('./schemas/change-due-dates-settings-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<ChangeDueDatesSettingsInput>,
-    get schema() {
-        return ChangeDueDatesSettingsInput.validate.schema
-    },
-    get errors() {
-        return ChangeDueDatesSettingsInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ChangeDueDatesSettingsInput => ChangeDueDatesSettingsInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ChangeDueDatesSettingsInput.validate(o)) {
-            throw new AjvValidator.ValidationError(ChangeDueDatesSettingsInput.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Wrapper that holds a list of filtering criteria and a sorting criteria for Loan account directed query
- */
-export interface LoanAccountSearchCriteria {
-    sortingCriteria?: LoanAccountSortingCriteria
-    /**
-     * The list of filtering criteria
-     */
-    filterCriteria?: LoanAccountFilterCriteria[]
-}
-
-export const LoanAccountSearchCriteria = {
-    validate: (await import('./schemas/loan-account-search-criteria.schema.js'))
-        .validate10 as unknown as ValidateFunction<LoanAccountSearchCriteria>,
-    get schema() {
-        return LoanAccountSearchCriteria.validate.schema
-    },
-    get errors() {
-        return LoanAccountSearchCriteria.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanAccountSearchCriteria => LoanAccountSearchCriteria.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!LoanAccountSearchCriteria.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanAccountSearchCriteria.errors ?? [])
-        }
-    },
-} as const
-
-export type SearchResponse = LoanAccount[]
-
-export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
-    get schema() {
-        return SearchResponse.validate.schema
-    },
-    get errors() {
-        return SearchResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
-} as const
-
-export type PatchFundingSourceRequest = PatchOperation[]
-
-export const PatchFundingSourceRequest = {
-    validate: (await import('./schemas/patch-funding-source-request.schema.js'))
-        .validate10 as unknown as ValidateFunction<PatchFundingSourceRequest>,
-    get schema() {
-        return PatchFundingSourceRequest.validate.schema
-    },
-    get errors() {
-        return PatchFundingSourceRequest.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PatchFundingSourceRequest => PatchFundingSourceRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchFundingSourceRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchFundingSourceRequest.errors ?? [])
-        }
-    },
-} as const
-
-export type GetAllPlannedFeesResponse = PlannedInstallmentFee[]
-
-export const GetAllPlannedFeesResponse = {
-    validate: (await import('./schemas/get-all-planned-fees-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetAllPlannedFeesResponse>,
-    get schema() {
-        return GetAllPlannedFeesResponse.validate.schema
-    },
-    get errors() {
-        return GetAllPlannedFeesResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAllPlannedFeesResponse => GetAllPlannedFeesResponse.validate(o) === true,
-} as const
-
-export type UpdatePlannedFeesRequest = PlannedInstallmentFee[]
-
-export const UpdatePlannedFeesRequest = {
-    validate: (await import('./schemas/update-planned-fees-request.schema.js'))
-        .validate10 as unknown as ValidateFunction<UpdatePlannedFeesRequest>,
-    get schema() {
-        return UpdatePlannedFeesRequest.validate.schema
-    },
-    get errors() {
-        return UpdatePlannedFeesRequest.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is UpdatePlannedFeesRequest => UpdatePlannedFeesRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!UpdatePlannedFeesRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(UpdatePlannedFeesRequest.errors ?? [])
-        }
-    },
-} as const
-
-export type UpdatePlannedFeesResponse = PlannedInstallmentFee[]
-
-export const UpdatePlannedFeesResponse = {
-    validate: (await import('./schemas/update-planned-fees-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<UpdatePlannedFeesResponse>,
-    get schema() {
-        return UpdatePlannedFeesResponse.validate.schema
-    },
-    get errors() {
-        return UpdatePlannedFeesResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is UpdatePlannedFeesResponse => UpdatePlannedFeesResponse.validate(o) === true,
-} as const
-
-export type CreatePlannedFeesRequest = PlannedInstallmentFee[]
-
-export const CreatePlannedFeesRequest = {
-    validate: (await import('./schemas/create-planned-fees-request.schema.js'))
-        .validate10 as unknown as ValidateFunction<CreatePlannedFeesRequest>,
-    get schema() {
-        return CreatePlannedFeesRequest.validate.schema
-    },
-    get errors() {
-        return CreatePlannedFeesRequest.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CreatePlannedFeesRequest => CreatePlannedFeesRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!CreatePlannedFeesRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(CreatePlannedFeesRequest.errors ?? [])
-        }
-    },
-} as const
-
-export type CreatePlannedFeesResponse = PlannedInstallmentFee[]
-
-export const CreatePlannedFeesResponse = {
-    validate: (await import('./schemas/create-planned-fees-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<CreatePlannedFeesResponse>,
-    get schema() {
-        return CreatePlannedFeesResponse.validate.schema
-    },
-    get errors() {
-        return CreatePlannedFeesResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CreatePlannedFeesResponse => CreatePlannedFeesResponse.validate(o) === true,
-} as const
-
-export type PatchRequest = PatchOperation[]
-
-export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
-    get schema() {
-        return PatchRequest.validate.schema
-    },
-    get errors() {
-        return PatchRequest.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
-        }
-    },
-} as const
-
-export type GetAllAuthorizationHoldsResponse = GetAuthorizationHold[]
-
-export const GetAllAuthorizationHoldsResponse = {
-    validate: (await import('./schemas/get-all-authorization-holds-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetAllAuthorizationHoldsResponse>,
-    get schema() {
-        return GetAllAuthorizationHoldsResponse.validate.schema
-    },
-    get errors() {
-        return GetAllAuthorizationHoldsResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAllAuthorizationHoldsResponse => GetAllAuthorizationHoldsResponse.validate(o) === true,
-} as const
-
-export type GetAllCardsResponse = Card[]
-
-export const GetAllCardsResponse = {
-    validate: (await import('./schemas/get-all-cards-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetAllCardsResponse>,
-    get schema() {
-        return GetAllCardsResponse.validate.schema
-    },
-    get errors() {
-        return GetAllCardsResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAllCardsResponse => GetAllCardsResponse.validate(o) === true,
-} as const
-
-/**
- * A card which can be associated to an account (deposit / loan). Cards consist only in card references (tokens). Card details are not stored by Mambu.
- */
-export interface Card {
-    /**
-     * The reference token of the card
-     */
-    referenceToken: string
-}
-
-export const Card = {
-    validate: (await import('./schemas/card.schema.js')).validate10 as unknown as ValidateFunction<Card>,
-    get schema() {
-        return Card.validate.schema
-    },
-    get errors() {
-        return Card.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Card => Card.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Card.validate(o)) {
-            throw new AjvValidator.ValidationError(Card.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents the request payload for performing a repayment value change action
- */
-export interface ChangeRepaymentValueLoanAccountInput {
-    /**
-     * Fixed amount for being used for the repayments principal due
-     */
-    amount?: number
-    /**
-     * Date when to change the repayment value (as Organization Time)
-     */
-    valueDate: string
-    /**
-     * Notes for the repayment value change action performed on the loan account
-     */
-    notes?: string
-    /**
-     * Percentage of principal amount used for the repayments principal due
-     */
-    percentage?: number
-}
-
-export const ChangeRepaymentValueLoanAccountInput = {
-    validate: (await import('./schemas/change-repayment-value-loan-account-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<ChangeRepaymentValueLoanAccountInput>,
-    get schema() {
-        return ChangeRepaymentValueLoanAccountInput.validate.schema
-    },
-    get errors() {
-        return ChangeRepaymentValueLoanAccountInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ChangeRepaymentValueLoanAccountInput => ChangeRepaymentValueLoanAccountInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ChangeRepaymentValueLoanAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(ChangeRepaymentValueLoanAccountInput.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents a request for applying the accrued interest
- */
-export interface ApplyInterestInput {
-    /**
-     * The amount of the Payment Holidays interest to apply
-     */
-    paymentHolidaysInterestAmount?: number
-    /**
-     * The date up to which interest is to be posted
-     */
-    interestApplicationDate: string
-    /**
-     * Additional information for this action
-     */
-    notes?: string
-    /**
-     * Whether the interest amount to apply should be the regular one or the one accrued during the Payment Holidays. If nothing specified it will be the regular one.
-     */
-    isPaymentHolidaysInterest?: boolean
-}
-
-export const ApplyInterestInput = {
-    validate: (await import('./schemas/apply-interest-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<ApplyInterestInput>,
-    get schema() {
-        return ApplyInterestInput.validate.schema
-    },
-    get errors() {
-        return ApplyInterestInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ApplyInterestInput => ApplyInterestInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ApplyInterestInput.validate(o)) {
-            throw new AjvValidator.ValidationError(ApplyInterestInput.errors ?? [])
-        }
-    },
-} as const
-
-export type GetAllResponse = LoanAccount[]
-
-export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
-    get schema() {
-        return GetAllResponse.validate.schema
-    },
-    get errors() {
-        return GetAllResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
-} as const
-
-/**
- * Represents the request payload for the terminate a loan account action
- */
-export interface TerminateLoanAccountInput {
-    /**
-     * The date when terminate the loan account
-     */
-    valueDate: string
-    /**
-     * The notes for the terminate action performed on the loan account
-     */
-    notes?: string
-}
-
-export const TerminateLoanAccountInput = {
-    validate: (await import('./schemas/terminate-loan-account-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<TerminateLoanAccountInput>,
-    get schema() {
-        return TerminateLoanAccountInput.validate.schema
-    },
-    get errors() {
-        return TerminateLoanAccountInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is TerminateLoanAccountInput => TerminateLoanAccountInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!TerminateLoanAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(TerminateLoanAccountInput.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Allows specifying the action details for a loan account
- */
-export interface LoanAccountAction {
-    /**
-     * The action type to be applied
-     */
-    action:
-        | 'REQUEST_APPROVAL'
-        | 'SET_INCOMPLETE'
-        | 'APPROVE'
-        | 'UNDO_APPROVE'
-        | 'REJECT'
-        | 'WITHDRAW'
-        | 'CLOSE'
-        | 'UNDO_REJECT'
-        | 'UNDO_WITHDRAW'
-        | 'UNDO_CLOSE'
-    /**
-     * The notes related to the action performed
-     */
-    notes?: string
-}
-
-export const LoanAccountAction = {
-    validate: (await import('./schemas/loan-account-action.schema.js'))
-        .validate10 as unknown as ValidateFunction<LoanAccountAction>,
-    get schema() {
-        return LoanAccountAction.validate.schema
-    },
-    get errors() {
-        return LoanAccountAction.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanAccountAction => LoanAccountAction.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!LoanAccountAction.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanAccountAction.errors ?? [])
-        }
-    },
-} as const
-
-export type GetByIdWitVersionsResponse = LoanAccount[]
-
-export const GetByIdWitVersionsResponse = {
-    validate: (await import('./schemas/get-by-id-wit-versions-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetByIdWitVersionsResponse>,
-    get schema() {
-        return GetByIdWitVersionsResponse.validate.schema
-    },
-    get errors() {
-        return GetByIdWitVersionsResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetByIdWitVersionsResponse => GetByIdWitVersionsResponse.validate(o) === true,
 } as const
 
 /**
@@ -1231,7 +125,7 @@ export interface PreviewLoanAccountSchedule {
 
 export const PreviewLoanAccountSchedule = {
     validate: (await import('./schemas/preview-loan-account-schedule.schema.js'))
-        .validate10 as unknown as ValidateFunction<PreviewLoanAccountSchedule>,
+        .validate as ValidateFunction<PreviewLoanAccountSchedule>,
     get schema() {
         return PreviewLoanAccountSchedule.validate.schema
     },
@@ -1241,606 +135,160 @@ export const PreviewLoanAccountSchedule = {
     is: (o: unknown): o is PreviewLoanAccountSchedule => PreviewLoanAccountSchedule.validate(o) === true,
     assert: (o: unknown) => {
         if (!PreviewLoanAccountSchedule.validate(o)) {
-            throw new AjvValidator.ValidationError(PreviewLoanAccountSchedule.errors ?? [])
+            throw new ValidationError(PreviewLoanAccountSchedule.errors ?? [])
         }
     },
 } as const
 
 /**
- * Represents a single loan account schedule structure.
+ * Represents a single installment details structure.
  */
-export interface LoanAccountSchedule {
+export interface Installment {
+    penalty?: InstallmentAllocationElementTaxableAmount
     /**
-     * The loan account schedule installments' list.
+     * The installment due date.
      */
-    installments?: Installment[]
-    currency?: Currency
-}
-
-export const LoanAccountSchedule = {
-    validate: (await import('./schemas/loan-account-schedule.schema.js'))
-        .validate10 as unknown as ValidateFunction<LoanAccountSchedule>,
-    get schema() {
-        return LoanAccountSchedule.validate.schema
-    },
-    get errors() {
-        return LoanAccountSchedule.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanAccountSchedule => LoanAccountSchedule.validate(o) === true,
-} as const
-
-export interface RestError {
-    errorCode?: number
-    errorSource?: string
-    errorReason?: string
-}
-
-/**
- * Contains the details about an investor fund including fields like encoded key, guarantor type, amount and guarantor key
- */
-export interface InvestorFund {
+    dueDate?: string
+    fee?: InstallmentFee
     /**
-     * The amount used by the client for the guaranty
+     * The installment repaid date.
      */
-    amount: number
+    repaidDate?: string
+    principal?: InstallmentAllocationElementAmount
     /**
-     * The constraint minimum value
+     * The order number of an installment among all the installments generated for a loan. Loan installments are put in ascending order by due date. The order number only applies to the content of a particular JSON response therefore it is not unique.
      */
-    interestCommission?: number
+    number?: string
     /**
-     * The key of the deposit account used by the guarantor (populated when the guaranty type is GUARANTOR). It can be null.
+     * The installment last paid date.
      */
-    depositAccountKey?: string
+    lastPaidDate?: string
     /**
-     * The name of a value the client guarantees with (populated when the guaranty type is ASSET)
+     * The parent account key of the installment.
      */
-    assetName?: string
+    parentAccountKey?: string
+    interest?: InstallmentAllocationElementTaxableAmount
     /**
-     * The encoded key of the entity, generated, globally unique
+     * The breakdown of the fee amounts that have been applied to the loan account.
+     */
+    feeDetails?: InstallmentFeeDetails[]
+    /**
+     * The encoded key of the installment, which is auto generated, and unique.
      */
     encodedKey?: string
     /**
-     * Investor fund unique identifier. All versions of an investor fund will have same id.
+     * The installment state.
+     */
+    state?: 'PENDING' | 'LATE' | 'PAID' | 'PARTIALLY_PAID' | 'GRACE'
+    /**
+     * `TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.
+     */
+    isPaymentHoliday?: boolean
+}
+
+/**
+ * Represents an installment allocation element taxable amount structure.
+ */
+export interface InstallmentAllocationElementTaxableAmount {
+    amount?: Amount
+    tax?: Amount
+}
+
+/**
+ * Represents a simple installment amount structure.
+ */
+export interface Amount {
+    /**
+     * The paid amount.
+     */
+    paid?: number
+    /**
+     * The due amount.
+     */
+    due?: number
+    /**
+     * The expected amount, which is sum of paid and due amounts.
+     */
+    expected?: number
+}
+
+/**
+ * Represents an installment fee structure.
+ */
+export interface InstallmentFee {
+    amount?: FeeAmount
+    tax?: Amount
+}
+
+/**
+ * Represents a fee amount.
+ */
+export interface FeeAmount {
+    /**
+     * The paid amount.
+     */
+    paid?: number
+    /**
+     * The due amount.
+     */
+    due?: number
+    /**
+     * The expected amount, which is sum of paid and due amounts.
+     */
+    expected?: number
+    /**
+     * The expected amount, which is the sum of unapplied fee and planned fee due amounts.
+     */
+    expectedUnapplied?: number
+}
+
+/**
+ * Represents an installment allocation element amount structure.
+ */
+export interface InstallmentAllocationElementAmount {
+    amount?: Amount
+}
+
+/**
+ * Represents fee details for an installment.
+ */
+export interface InstallmentFeeDetails {
+    /**
+     * The name of the fee
+     */
+    name?: string
+    amount?: AmountWithReduced
+    tax?: AmountWithReduced
+    /**
+     * The encoded key of the predefined fee, auto generated, unique
+     */
+    encodedKey?: string
+    /**
+     * The id of the fee, provided by the client
      */
     id?: string
-    /**
-     * The key of the client/group used as the guarantor.
-     */
-    guarantorKey: string
-    /**
-     * The type of the guarantor (client/group)
-     */
-    guarantorType: 'CLIENT' | 'GROUP'
-    /**
-     * Percentage of loan shares this investor owns
-     */
-    sharePercentage?: number
 }
 
 /**
- * Contains the details about transaction including fields like transaction channel key and channel id
+ * Represents a simple installment amount structure.
  */
-export interface TransactionDetails {
+export interface AmountWithReduced {
     /**
-     * The id of the transaction channel associated with the transaction details.
+     * The paid amount.
      */
-    transactionChannelId?: string
+    paid?: number
     /**
-     * The encoded key of the transaction channel associated with the transaction details.
+     * The reduced amount.
      */
-    transactionChannelKey?: string
-}
-
-/**
- * Adjustable amounts to be paid for Pay Off action
- */
-export interface PayOffAdjustableAmounts {
+    reduced?: number
     /**
-     * The fee amount to be paid for Pay Off action
+     * The due amount.
      */
-    feesPaid?: number
+    due?: number
     /**
-     * The penalty amount to be paid for Pay Off action
+     * The expected amount, which is sum of paid and due amounts.
      */
-    penaltyPaid?: number
-    /**
-     * The interest amount to be paid for Pay Off action
-     */
-    interestPaid?: number
-}
-
-/**
- * The new loan account settings, allowed on the loan account refinance
- */
-export interface RefinanceLoanAccount {
-    disbursementDetails: RefinanceDisbursementDetails
-    /**
-     * The loan account notes
-     */
-    notes?: string
-    principalPaymentSettings?: RestructurePrincipalPaymentAccountSettings
-    /**
-     * The name of the new loan account.
-     */
-    loanName?: string
-    interestSettings?: RestructureInterestSettings
-    scheduleSettings?: RestructureScheduleSettings
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * The key of the loan product that this account is based on
-     */
-    productTypeKey: string
-    /**
-     * Id of the new loan account.
-     */
-    id?: string
-    /**
-     * The guarantees associated with the refinanced loan account
-     */
-    guarantors?: Guarantor[]
-    accountArrearsSettings?: RestructureAccountArrearsSettings
-    penaltySettings?: RestructurePenaltySettings
-}
-
-/**
- * The disbursement details, allowed on the loan account refinance
- */
-export interface RefinanceDisbursementDetails {
-    /**
-     * The date of the expected disbursement
-     */
-    expectedDisbursementDate?: string
-    /**
-     * List of fees that should be applied at the disbursement time.
-     */
-    fees?: CustomPredefinedFee[]
-    /**
-     * The date of the expected first payment
-     */
-    firstRepaymentDate: string
-}
-
-/**
- * The custom predefined fees, they may be used as the expected predefined fees that will be applied on the disbursement.
- */
-export interface CustomPredefinedFee {
-    /**
-     * The encoded key of the predefined fee
-     */
-    predefinedFeeEncodedKey?: string
-    /**
-     * The encoded key of the custom predefined fee, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The amount of the custom fee.
-     */
-    amount?: number
-    /**
-     * The percentage of the custom fee.
-     */
-    percentage?: number
-}
-
-/**
- * The principal payment account settings, allowed on the loan account restructure
- */
-export interface RestructurePrincipalPaymentAccountSettings {
-    /**
-     * Fixed principal payment amount
-     */
-    amount?: number
-    /**
-     * Principal payment percentage
-     */
-    percentage?: number
-}
-
-/**
- * The interest settings, allowed on the loan account restructure
- */
-export interface RestructureInterestSettings {
-    /**
-     * The interest rate for the restructured loan account
-     */
-    interestRate?: number
-    /**
-     * The interest spread for the restructured loan account
-     */
-    interestSpread?: number
-    /**
-     * Adjustable interest rates settings for loan account
-     */
-    accountInterestRateSettings?: AccountInterestRateSettings[]
-}
-
-/**
- * Adjustable interest rates settings for loan account
- */
-export interface AccountInterestRateSettings {
-    /**
-     * Interest rate review frequency measurement unit. Valid only for index interest rate.
-     */
-    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
-    /**
-     * Interest rate value.
-     */
-    interestRate?: number
-    /**
-     * Interest spread value.
-     */
-    interestSpread?: number
-    /**
-     * Interest calculation method: fixed or indexed(interest spread + active organization index interest rate)
-     */
-    interestRateSource: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE'
-    /**
-     * Interest rate review frequency unit count. Valid only for index interest rate.
-     */
-    interestRateReviewCount?: number
-    /**
-     * Index rate source key.
-     */
-    indexSourceKey?: string
-    /**
-     * Maximum value allowed for index based interest rate. Valid only for index interest rate.
-     */
-    interestRateCeilingValue?: number
-    /**
-     * The encoded key of the interest rate settings, auto generated, unique
-     */
-    encodedKey?: string
-    /**
-     * Date since an interest rate is valid
-     */
-    validFrom: string
-    /**
-     * Minimum value allowed for index based interest rate. Valid only for index interest rate.
-     */
-    interestRateFloorValue?: number
-}
-
-/**
- * The schedule settings, allowed on the loan account restructure
- */
-export interface RestructureScheduleSettings {
-    /**
-     * The grace period
-     */
-    gracePeriod?: number
-    /**
-     * The period of time, within which the payments frequency is set
-     */
-    repaymentPeriodUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS'
-    /**
-     * The periodic payment
-     */
-    periodicPayment?: number
-    previewSchedule?: RevolvingAccountSettings
-    billingCycleDays?: BillingCycleDays
-    /**
-     * The days of the month, when the repayment due dates should be
-     */
-    fixedDaysOfMonth?: number[]
-    /**
-     * The number of installments
-     */
-    repaymentInstallments?: number
-    /**
-     * The payments frequency per set period of time
-     */
-    repaymentPeriodCount?: number
-}
-
-/**
- * The number of previewed instalments for an account
- */
-export interface RevolvingAccountSettings {
-    /**
-     * The number of previewed instalments
-     */
-    numberOfPreviewedInstalments?: number
-}
-
-/**
- * Defines the billing cycles settings for a loan account
- */
-export interface BillingCycleDays {
-    /**
-     * The billing cycle start days in case it is enabled
-     */
-    days?: number[]
-}
-
-/**
- * Guarantor, holds information about a client guaranty entry. It can be defined based on another client which guarantees (including or not a savings account whether it is a client of the organization using Mambu or not) or based on a value the client holds (an asset)
- */
-export interface Guarantor {
-    /**
-     * The amount used by the client for the guaranty
-     */
-    amount: number
-    /**
-     * The key of the deposit account used by the guarantor (populated when the guaranty type is GUARANTOR). It can be null.
-     */
-    depositAccountKey?: string
-    /**
-     * The name of a value the client guarantees with (populated when the guaranty type is ASSET)
-     */
-    assetName?: string
-    /**
-     * The encoded key of the security, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The key of the client/group used as the guarantor.
-     */
-    guarantorKey: string
-    /**
-     * The type of the guarantor (client/group)
-     */
-    guarantorType: 'CLIENT' | 'GROUP'
-}
-
-/**
- * The arrears settings, allowed on the loan account restructure
- */
-export interface RestructureAccountArrearsSettings {
-    /**
-     * The arrears tolerance amount
-     */
-    tolerancePercentageOfOutstandingPrincipal?: number
-    /**
-     * The arrears tolerance period value
-     */
-    tolerancePeriod?: number
-}
-
-/**
- * The penalty settings, allowed on the loan account restructure.
- */
-export interface RestructurePenaltySettings {
-    /**
-     * The penalty rate
-     */
-    penaltyRate?: number
-}
-
-/**
- * The write-off amounts, allowed on the loan account refinance
- */
-export interface RefinanceWriteOffAmounts {
-    /**
-     * Interest write-off amount
-     */
-    interest?: number
-    /**
-     * Penalty write-off amount
-     */
-    penalty?: number
-    /**
-     * Fee write-off amount
-     */
-    fee?: number
-}
-
-/**
- * The prepayment settings, holds all prepayment properties.
- */
-export interface PrepaymentSettings {
-    /**
-     * The elements recalculation method, indicates how the declining balance with equal installments repayments are recalculated.
-     */
-    elementsRecalculationMethod?: 'PRINCIPAL_EXPECTED_FIXED' | 'TOTAL_EXPECTED_FIXED'
-    /**
-     * Installment status for the case when principal is paid off (copied from loan product).
-     */
-    principalPaidInstallmentStatus?: 'PARTIALLY_PAID' | 'PAID' | 'ORIGINAL_TOTAL_EXPECTED_PAID'
-    /**
-     * Prepayment recalculation method copied from the loan product on which this account is based.
-     */
-    prepaymentRecalculationMethod?:
-        | 'NO_RECALCULATION'
-        | 'RESCHEDULE_REMAINING_REPAYMENTS'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_NUMBER_OF_TERMS'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_PRINCIPAL_AMOUNT'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_TOTAL_REPAYMENT_AMOUNT'
-        | 'REDUCE_AMOUNT_PER_INSTALLMENT'
-        | 'REDUCE_NUMBER_OF_INSTALLMENTS'
-        | 'REDUCE_NUMBER_OF_INSTALLMENTS_NEW'
-    /**
-     * Apply interest on prepayment method copied from loan product on which this account is based.
-     */
-    applyInterestOnPrepaymentMethod?: 'AUTOMATIC' | 'MANUAL'
-}
-
-/**
- * The the disbursement details it holds the information related to the disbursement details as disbursement date, first repayment date, disbursement fees.
- */
-export interface DisbursementDetails {
-    transactionDetails?: LoanTransactionDetails
-    /**
-     * The date of the expected disbursement.Stored as Organization Time.
-     */
-    expectedDisbursementDate?: string
-    /**
-     * List of fees that should be applied at the disbursement time.
-     */
-    fees?: CustomPredefinedFee[]
-    /**
-     * The date of the expected first repayment. Stored as Organization Time.
-     */
-    firstRepaymentDate?: string
-    /**
-     * The activation date, the date when the disbursement actually took place.
-     */
-    disbursementDate?: string
-    /**
-     * The encoded key of the disbursement details, auto generated, unique
-     */
-    encodedKey?: string
-}
-
-/**
- * Contains the details about the loan transaction including fields like encoded key, transaction channel key and channel id.
- */
-export interface LoanTransactionDetails {
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * Whether the transaction was transferred between loans or deposit accounts
-     */
-    internalTransfer?: boolean
-    /**
-     * The encoded key of the transaction channel associated with the transaction details.
-     */
-    transactionChannelKey?: string
-    /**
-     * The id of the transaction channel associated with the transaction details.
-     */
-    transactionChannelId?: string
-    /**
-     * In case of a transaction to a deposit account this represent the deposit account key to which the transaction was made.
-     */
-    targetDepositAccountKey?: string
-}
-
-/**
- * The redraw settings for a loan account.
- */
-export interface LoanAccountRedrawSettings {
-    /**
-     * Indicates whether withdrawing amounts that reduce the next due instalment repayment is restricted or not
-     */
-    restrictNextDueWithdrawal: boolean
-}
-
-/**
- * The planned fee details holds the information related to the installment key, predefined fee key and amount
- */
-export interface PlannedInstallmentFee {
-    /**
-     * The number of the installment on which the predefined fee is planned. It is used only in the case when fees are created at the same time with the loan account creation or during preview schedule, before account creation, otherwise this should be empty and installmentKey will be used to identify an installment.
-     */
-    installmentNumber?: number
-    /**
-     * The amount of the planned fee.
-     */
-    amount?: number
-    /**
-     * The date when a planned fee should be applied, overriding installment's due date. It should match the interval of the installment. If it belong to first installment, it should be between disbursement date and installment due date.
-     */
-    applyOnDate?: string
-    /**
-     * The encoded key of the predefined fee which is planned.
-     */
-    predefinedFeeKey: string
-    /**
-     * The encoded key of the planned installment fee, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The encoded key of the installment on which the predefined fee is planned.
-     */
-    installmentKey?: string
-}
-
-/**
- * The interest settings, holds all the properties regarding interests for the loan account.
- */
-export interface InterestSettings {
-    /**
-     * The interest rate review unit. Defines the interest rate update frequency measurement unit.
-     */
-    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
-    /**
-     * The interest rate. Represents the interest rate for the loan account. The interest on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.
-     */
-    interestRate?: number
-    /**
-     * The interest rate source. Represents the interest calculation method: fixed or (interest spread + active organization index interest rate)
-     */
-    interestRateSource?: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE'
-    /**
-     * The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.
-     */
-    interestApplicationMethod?: 'AFTER_DISBURSEMENT' | 'REPAYMENT_DUE_DATE'
-    /**
-     * The interest change frequency. Holds the possible values for how often is interest charged on loan or deposit accounts
-     */
-    interestChargeFrequency?: 'ANNUALIZED' | 'EVERY_MONTH' | 'EVERY_FOUR_WEEKS' | 'EVERY_WEEK' | 'EVERY_DAY' | 'EVERY_X_DAYS'
-    /**
-     * The possible values for how we compute and apply the interest
-     */
-    interestType?: 'SIMPLE_INTEREST' | 'CAPITALIZED_INTEREST' | 'COMPOUNDING_INTEREST'
-    /**
-     * The accrue interest after maturity. If the product support this option, specify if the interest should be accrued after the account maturity date.
-     */
-    accrueInterestAfterMaturity?: boolean
-    /**
-     * The interest balance calculation method. Represents the option which determines the way the balance for the account's interest is computed.
-     */
-    interestBalanceCalculationMethod?: 'ONLY_PRINCIPAL' | 'PRINCIPAL_AND_INTEREST'
-    /**
-     * Interest to be added to active organization index interest rate in order to find out actual interest rate
-     */
-    interestSpread?: number
-    /**
-     * The interest calculation method. Holds the type of interest calculation method.
-     */
-    interestCalculationMethod?: 'FLAT' | 'DECLINING_BALANCE' | 'DECLINING_BALANCE_DISCOUNTED'
-    /**
-     * Interest rate update frequency unit count.
-     */
-    interestRateReviewCount?: number
-    /**
-     * Indicates whether late interest is accrued for this loan account
-     */
-    accrueLateInterest?: boolean
-    /**
-     * Adjustable interest rates settings for loan account
-     */
-    accountInterestRateSettings?: AccountInterestRateSettings[]
-}
-
-/**
- * Asset, holds information about a client asset entry.
- */
-export interface Asset {
-    /**
-     * The amount used by the client for the guaranty
-     */
-    amount: number
-    /**
-     * The original amount used by the client for a collateral asset
-     */
-    originalAmount?: number
-    /**
-     * The key of the deposit account used by the guarantor (populated when the guaranty type is GUARANTOR). It can be null.
-     */
-    depositAccountKey?: string
-    /**
-     * The name of a value the client guarantees with (populated when the guaranty type is ASSET)
-     */
-    assetName: string
-    /**
-     * The encoded key of the security, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The key of the client/group used as the guarantor.
-     */
-    guarantorKey?: string
-    /**
-     * The type of the guarantor (client/group)
-     */
-    guarantorType?: 'CLIENT' | 'GROUP'
-    originalCurrency?: Currency
+    expected?: number
 }
 
 /**
@@ -2045,6 +493,12 @@ export interface Currency {
         | 'NON_FIAT'
 }
 
+export interface RestError {
+    errorCode?: number
+    errorSource?: string
+    errorReason?: string
+}
+
 /**
  * In some cases organizations may approve loans but not disburse the full amount initially. They would like to spread the disbursement (and risk) over time. Likewise for the client, they may not need the full loan amount up front. They may want to have a loan to buy some equipment for their business but will make one purchase today and another purchase in a few months.  In these cases, they don't need the full amount and wouldn't want to pay interest on cash they don't need yet. A solution for this matter is the usage of disbursement in tranches. This class holds the information required for one of this tranche.
  */
@@ -2069,6 +523,28 @@ export interface LoanTranche {
 }
 
 /**
+ * The custom predefined fees, they may be used as the expected predefined fees that will be applied on the disbursement.
+ */
+export interface CustomPredefinedFee {
+    /**
+     * The encoded key of the predefined fee
+     */
+    predefinedFeeEncodedKey?: string
+    /**
+     * The encoded key of the custom predefined fee, auto generated, unique.
+     */
+    encodedKey?: string
+    /**
+     * The amount of the custom fee.
+     */
+    amount?: number
+    /**
+     * The percentage of the custom fee.
+     */
+    percentage?: number
+}
+
+/**
  * The disbursement details regarding a loan tranche.
  */
 export interface TrancheDisbursementDetails {
@@ -2080,1148 +556,6 @@ export interface TrancheDisbursementDetails {
      * The key of the disbursement transaction logged when this tranche was disbursed. This field will be null until the tranche disbursement
      */
     disbursementTransactionKey?: string
-}
-
-/**
- * The schedule settings, holds all schedule properties.
- */
-export interface ScheduleSettings {
-    /**
-     * The grace period. Represents the grace period for loan repayment - in number of installments.
-     */
-    gracePeriod: number
-    /**
-     * The periodic payment amount for the accounts which have balloon payments or Reduce Number of Installments and Optimized Payments
-     */
-    periodicPayment?: number
-    /**
-     * The repayment schedule method. Represents the method that determines whether the schedule will be fixed all over the loan account's life cycle or will be dynamically recomputed when required.
-     */
-    repaymentScheduleMethod?: 'NONE' | 'FIXED' | 'DYNAMIC'
-    /**
-     * A list of periodic payments for the current loan account.
-     */
-    paymentPlan?: PeriodicPayment[]
-    /**
-     * The short handling method. Determines how to handle the short months, if they select a fixed day of month > 28. Will be null if no such date is selected and also for the Interval methodology. Only available if the Repayment Methodology is FIXED_DAYS_OF_MONTH.
-     */
-    shortMonthHandlingMethod?: 'LAST_DAY_IN_MONTH' | 'FIRST_DAY_OF_NEXT_MONTH'
-    /**
-     * The repayment installments. Represents how many installments are required to pay back the loan.
-     */
-    repaymentInstallments?: number
-    /**
-     * The grace period type. Representing the type of grace period which is possible for a loan account.
-     */
-    gracePeriodType?: 'NONE' | 'PAY_INTEREST_ONLY' | 'INTEREST_FORGIVENESS'
-    /**
-     * The principal repayment interval. Indicates the interval of repayments that the principal has to be paid.
-     */
-    principalRepaymentInterval?: number
-    /**
-     * Flag used when the repayments schedule for the current account was determined by the user, by editing the due dates or the principal due
-     */
-    hasCustomSchedule?: boolean
-    /**
-     * The repayment period unit. Represents the frequency of loan repayment.
-     */
-    repaymentPeriodUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS'
-    previewSchedule?: RevolvingAccountSettings
-    /**
-     * Specifies the days of the month when the repayment due dates should be. Only available if the Repayment Methodology is FIXED_DAYS_OF_MONTH.
-     */
-    fixedDaysOfMonth?: number[]
-    billingCycle?: BillingCycleDays
-    /**
-     * The schedule due dates method. Represents the methodology used by this account to compute the due dates of the repayments.
-     */
-    scheduleDueDatesMethod?: 'INTERVAL' | 'FIXED_DAYS_OF_MONTH'
-    /**
-     * The repayment period count. Represents how often the loan is to be repaid: stored based on the type repayment option.
-     */
-    repaymentPeriodCount?: number
-    /**
-     * The default first repayment due date offset, indicates how many days the first repayment due date should be extended(all other due dates from the schedule are relative to first repayment due date - they will also be affected by the offset)
-     */
-    defaultFirstRepaymentDueDateOffset?: number
-}
-
-/**
- * For fixed term loans there is the possibility to define a payment plan. A payment plan consists of multiple periodic payments. This class holds information about a periodic payment.
- */
-export interface PeriodicPayment {
-    /**
-     * The installment's position up to which the PMT will be used
-     */
-    toInstallment: number
-    /**
-     * The encoded key of the periodic payment, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The PMT value used in periodic payment
-     */
-    amount: number
-}
-
-/**
- * The loan account balance details.
- */
-export interface Balances {
-    /**
-     * The interest from arrears paid, indicates total interest from arrears paid into the account.
-     */
-    interestFromArrearsPaid?: number
-    /**
-     * The principal due, indicates how much principal it's due at this moment.
-     */
-    principalDue?: number
-    /**
-     * The interest balance. Represents the total interest owned by the client, from now on (total interest accrued for account - interest paid).
-     */
-    interestBalance?: number
-    /**
-     * The sum of all the authorization hold amounts on this account.
-     */
-    holdBalance?: number
-    /**
-     * The principal paid, holds the value of the total paid into the account.
-     */
-    principalPaid?: number
-    /**
-     * The penalty due. Represents the total penalty amount due for the account.
-     */
-    penaltyDue?: number
-    /**
-     * The fees balance. Represents the total fees expected to be paid on this account at a given moment.
-     */
-    feesBalance?: number
-    /**
-     * The penalty balance. Represents the total penalty expected to be paid on this account at a given moment.
-     */
-    penaltyBalance?: number
-    /**
-     * The total redraw amount owned by the client, from now on.
-     */
-    redrawBalance?: number
-    /**
-     * The interest from arrears balance. Indicates interest from arrears owned by the client, from now on. (total interest from arrears accrued for account - interest from arrears paid).
-     */
-    interestFromArrearsBalance?: number
-    /**
-     * The total principal owned by the client, from now on (principal disbursed - principal paid).
-     */
-    principalBalance?: number
-    /**
-     * The interest due. Indicates how much interest it's due for the account at this moment.
-     */
-    interestDue?: number
-    /**
-     * The Penalty paid. Represents the total penalty amount paid for the account.
-     */
-    penaltyPaid?: number
-    /**
-     * The fees paid. Represents the total fees paid for the account.
-     */
-    feesPaid?: number
-    /**
-     * The interest from arrears due. Indicates how much interest from arrears it's due for the account at this moment.
-     */
-    interestFromArrearsDue?: number
-    /**
-     * The fees due. Representing the total fees due for the account.
-     */
-    feesDue?: number
-    /**
-     * The interest paid, indicates total interest paid into the account.
-     */
-    interestPaid?: number
-}
-
-/**
- * The penalty settings, holds all the fields regarding penalties
- */
-export interface PenaltySettings {
-    /**
-     * The last penalty calculation method, represents on what amount are the penalties calculated.
-     */
-    loanPenaltyCalculationMethod?: 'NONE' | 'OVERDUE_BALANCE' | 'OVERDUE_BALANCE_AND_INTEREST' | 'OUTSTANDING_PRINCIPAL'
-    /**
-     * The penalty rate, represents the rate (in percent) which is charged as a penalty.
-     */
-    penaltyRate?: number
-}
-
-/**
- * The principal payment account settings, holds the required information for the principal payment process of an account.
- */
-export interface PrincipalPaymentAccountSettings {
-    /**
-     * Boolean flag, if true, the interest will be included along with the principal in the repayment floor amount, for a revolving credit account
-     */
-    includeInterestInFloorAmount?: boolean
-    /**
-     * The method of total due payment for revolving credit
-     */
-    totalDuePayment?:
-        | 'FLAT'
-        | 'OUTSTANDING_PRINCIPAL_PERCENTAGE'
-        | 'PRINCIPAL_PERCENTAGE_LAST_DISB'
-        | 'TOTAL_BALANCE_PERCENTAGE'
-        | 'TOTAL_BALANCE_FLAT'
-        | 'TOTAL_PRINCIPAL_PERCENTAGE'
-    /**
-     * Fixed amount for being used for the repayments principal due.
-     */
-    amount?: number
-    /**
-     * The minimum principal due amount a repayment made with this settings can have
-     */
-    principalFloorValue?: number
-    /**
-     * The method of principal payment for revolving credit.
-     */
-    principalPaymentMethod?:
-        | 'FLAT'
-        | 'OUTSTANDING_PRINCIPAL_PERCENTAGE'
-        | 'PRINCIPAL_PERCENTAGE_LAST_DISB'
-        | 'TOTAL_BALANCE_PERCENTAGE'
-        | 'TOTAL_BALANCE_FLAT'
-        | 'TOTAL_PRINCIPAL_PERCENTAGE'
-    /**
-     * Percentage of principal amount used for the repayments principal due.
-     */
-    percentage?: number
-    /**
-     * Boolean flag, if true, the fees will be included along with the principal in the repayment floor amount, for a revolving credit account
-     */
-    includeFeesInFloorAmount?: boolean
-    /**
-     * The encoded key of the principal payment base settings, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The minimum total due amount a repayment made with this settings can have
-     */
-    totalDueAmountFloor?: number
-    /**
-     * The maximum principal due amount a repayment made with this settings can have
-     */
-    principalCeilingValue?: number
-}
-
-/**
- * The account arrears settings, holds the required information for the arrears settings of an account.
- */
-export interface AccountArrearsSettings {
-    /**
-     * Defines monthly arrears tolerance day value.
-     */
-    monthlyToleranceDay?: number
-    /**
-     * The tolerance floor amount.
-     */
-    toleranceFloorAmount?: number
-    /**
-     * Shows whether the non working days are taken in consideration or not when applying penaltees/late fees or when setting an account into arrears
-     */
-    nonWorkingDaysMethod?: 'INCLUDED' | 'EXCLUDED'
-    /**
-     * Defines the arrears tolerance amount.
-     */
-    tolerancePercentageOfOutstandingPrincipal?: number
-    /**
-     * Defines the arrears tolerance period value.
-     */
-    tolerancePeriod?: number
-    /**
-     * The encoded key of the arrears base settings, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * Defines the tolerance calculation method
-     */
-    toleranceCalculationMethod?: 'ARREARS_TOLERANCE_PERIOD' | 'MONTHLY_ARREARS_TOLERANCE_DAY'
-    /**
-     * The arrears date calculation method.
-     */
-    dateCalculationMethod?:
-        | 'ACCOUNT_FIRST_WENT_TO_ARREARS'
-        | 'LAST_LATE_REPAYMENT'
-        | 'ACCOUNT_FIRST_BREACHED_MATERIALITY_THRESHOLD'
-}
-
-/**
- * The new loan account settings, allowed on the loan account reschedule
- */
-export interface RescheduleLoanAccount {
-    disbursementDetails: RescheduleDisbursementDetails
-    /**
-     * Notes for the rescheduled loan account
-     */
-    notes?: string
-    principalPaymentSettings?: RestructurePrincipalPaymentAccountSettings
-    /**
-     * The name of the new loan account.
-     */
-    loanName?: string
-    interestSettings?: RestructureInterestSettings
-    scheduleSettings?: RestructureScheduleSettings
-    /**
-     * The interest commission
-     */
-    interestCommission?: number
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * The key of the loan product that this account is based on
-     */
-    productTypeKey: string
-    /**
-     * Id of the new loan account.
-     */
-    id?: string
-    /**
-     * The guarantees associated with the rescheduled loan account
-     */
-    guarantors?: Guarantor[]
-    accountArrearsSettings?: RestructureAccountArrearsSettings
-    penaltySettings?: RestructurePenaltySettings
-}
-
-/**
- * The disbursement details, allowed on the loan account restructure
- */
-export interface RescheduleDisbursementDetails {
-    /**
-     * The date of the expected first payment
-     */
-    firstRepaymentDate: string
-}
-
-/**
- * The write-off amounts, allowed on the loan account reschedule
- */
-export interface RescheduleWriteOffAmounts {
-    /**
-     * Principal write-off amount
-     */
-    principal?: number
-    /**
-     * Interest write-off amount
-     */
-    interest?: number
-    /**
-     * Penalty write-off amount
-     */
-    penalty?: number
-    /**
-     * Fee write-off amount
-     */
-    fee?: number
-}
-
-/**
- * Represents the action performed on an Loan Account after which the account's amount changes its value.
- */
-export interface LoanTransaction {
-    /**
-     * The migration event encoded key associated with this loan account. If this account was imported, track which 'migration event' they came from
-     */
-    migrationEventKey?: string
-    transactionDetails?: TransactionDetails
-    /**
-     * All the amounts that have been applied or paid within this transaction and involved predefined fees
-     */
-    fees?: Fee[]
-    /**
-     * Extra notes about this loan transaction
-     */
-    notes?: string
-    affectedAmounts?: LoanAffectedAmounts
-    cardTransaction?: CardTransaction
-    taxes?: Taxes
-    /**
-     * The till key associated with this transaction
-     */
-    tillKey?: string
-    /**
-     * The key of the loan transaction where the adjustment for this transaction was made (if any adjustment was involved)
-     */
-    adjustmentTransactionKey?: string
-    /**
-     * The type of the loan transaction
-     */
-    type?:
-        | 'IMPORT'
-        | 'DISBURSEMENT'
-        | 'DISBURSEMENT_ADJUSTMENT'
-        | 'WRITE_OFF'
-        | 'WRITE_OFF_ADJUSTMENT'
-        | 'REPAYMENT'
-        | 'PAYMENT_MADE'
-        | 'WITHDRAWAL_REDRAW'
-        | 'WITHDRAWAL_REDRAW_ADJUSTMENT'
-        | 'FEE_APPLIED'
-        | 'FEE_CHARGED'
-        | 'FEES_DUE_REDUCED'
-        | 'FEE_ADJUSTMENT'
-        | 'PENALTY_APPLIED'
-        | 'PENALTY_ADJUSTMENT'
-        | 'PENALTIES_DUE_REDUCED'
-        | 'REPAYMENT_ADJUSTMENT'
-        | 'PAYMENT_MADE_ADJUSTMENT'
-        | 'INTEREST_RATE_CHANGED'
-        | 'TAX_RATE_CHANGED'
-        | 'PENALTY_RATE_CHANGED'
-        | 'INTEREST_APPLIED'
-        | 'INTEREST_APPLIED_ADJUSTMENT'
-        | 'INTEREST_DUE_REDUCED'
-        | 'PENALTY_REDUCTION_ADJUSTMENT'
-        | 'FEE_REDUCTION_ADJUSTMENT'
-        | 'INTEREST_REDUCTION_ADJUSTMENT'
-        | 'DEFERRED_INTEREST_APPLIED'
-        | 'DEFERRED_INTEREST_APPLIED_ADJUSTMENT'
-        | 'DEFERRED_INTEREST_PAID'
-        | 'DEFERRED_INTEREST_PAID_ADJUSTMENT'
-        | 'INTEREST_LOCKED'
-        | 'FEE_LOCKED'
-        | 'PENALTY_LOCKED'
-        | 'INTEREST_UNLOCKED'
-        | 'FEE_UNLOCKED'
-        | 'PENALTY_UNLOCKED'
-        | 'REDRAW_TRANSFER'
-        | 'REDRAW_REPAYMENT'
-        | 'REDRAW_TRANSFER_ADJUSTMENT'
-        | 'REDRAW_REPAYMENT_ADJUSTMENT'
-        | 'TRANSFER'
-        | 'TRANSFER_ADJUSTMENT'
-        | 'BRANCH_CHANGED'
-        | 'TERMS_CHANGED'
-        | 'CARD_TRANSACTION_REVERSAL'
-        | 'CARD_TRANSACTION_REVERSAL_ADJUSTMENT'
-        | 'DUE_DATE_CHANGED'
-        | 'DUE_DATE_CHANGED_ADJUSTMENT'
-        | 'ACCOUNT_TERMINATED'
-        | 'ACCOUNT_TERMINATED_ADJUSTMENT'
-    /**
-     * The branch where the transaction was performed
-     */
-    branchKey?: string
-    terms?: LoanTerms
-    transferDetails?: TransferDetails
-    /**
-     * The key of the parent loan transaction
-     */
-    parentLoanTransactionKey?: string
-    /**
-     * The list of custom amounts which the user has paid within this transaction
-     */
-    customPaymentAmounts?: CustomPaymentAmount[]
-    /**
-     * The encoded key of the loan transaction, auto generated, unique
-     */
-    encodedKey?: string
-    currency?: Currency
-    /**
-     * The id of the loan transaction, can be generated and customized, unique
-     */
-    id?: string
-    /**
-     * The currency in which this transaction was posted. The amounts are stored in the base currency, but the user could have enter it in a foreign currency
-     */
-    originalCurrencyCode?: string
-    /**
-     * The encodedKey of the transaction that was adjusted as part of this one. Available only for adjustment transactions
-     */
-    originalTransactionKey?: string
-    /**
-     * The amount that was added/removed on loan account
-     */
-    amount?: number
-    /**
-     * The center where the transaction was performed
-     */
-    centreKey?: string
-    /**
-     * The external id of the loan transaction, customizable, unique
-     */
-    externalId?: string
-    /**
-     * Date of the entry (eg date of repayment or disbursal, etc.) (as Organization Time)
-     */
-    valueDate?: string
-    /**
-     * The date when this loan transaction was created
-     */
-    creationDate?: string
-    /**
-     * The user that performed the transaction
-     */
-    userKey?: string
-    /**
-     * The key of the parent loan account
-     */
-    parentAccountKey?: string
-    /**
-     * The amount that was posted in a foreign currency. This amount was converted using the exchange rate available at entry date and set into the amount field
-     */
-    originalAmount?: number
-    accountBalances?: TransactionBalances
-    /**
-     * The date when corresponding JE is booked
-     */
-    bookingDate?: string
-    /**
-     * Prepayment recalculation method of this loan transaction
-     */
-    prepaymentRecalculationMethod?:
-        | 'NO_RECALCULATION'
-        | 'RESCHEDULE_REMAINING_REPAYMENTS'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_NUMBER_OF_TERMS'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_PRINCIPAL_AMOUNT'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_TOTAL_REPAYMENT_AMOUNT'
-        | 'REDUCE_AMOUNT_PER_INSTALLMENT'
-        | 'REDUCE_NUMBER_OF_INSTALLMENTS'
-        | 'REDUCE_NUMBER_OF_INSTALLMENTS_NEW'
-    /**
-     * The specific installment encoded key associated to this loan transaction
-     */
-    installmentEncodedKey?: string
-}
-
-/**
- * An amount of predefined fee that was applied or paid on an account.
- */
-export interface Fee {
-    /**
-     * The name of the predefined fee
-     */
-    name?: string
-    /**
-     * The amount of the fee that was applied/paid in the transaction for the given predefined fee.
-     */
-    amount?: number
-    /**
-     * Shows the event that will trigger a fee
-     */
-    trigger?:
-        | 'MANUAL'
-        | 'MANUAL_PLANNED'
-        | 'DISBURSEMENT'
-        | 'CAPITALIZED_DISBURSEMENT'
-        | 'UPFRONT_DISBURSEMENT'
-        | 'LATE_REPAYMENT'
-        | 'PAYMENT_DUE'
-        | 'PAYMENT_DUE_APPLIED_ON_DUE_DATES'
-        | 'ARBITRARY'
-        | 'IOF'
-    /**
-     * The amount of the taxes on fee that was applied/paid in the transaction.
-     */
-    taxAmount?: number
-    /**
-     * The encoded key of the predefined fee, auto generated, unique
-     */
-    predefinedFeeKey: string
-}
-
-/**
- * The amounts affected after completing the loan transaction
- */
-export interface LoanAffectedAmounts {
-    /**
-     * How much fees was added/removed in account, within this transaction.
-     */
-    feesAmount?: number
-    /**
-     * How much interest is given to the investors, within this transaction (only for p2p products)
-     */
-    fundersInterestAmount?: number
-    /**
-     * How much interest is given to the organization, within this transaction (only for p2p products)
-     */
-    organizationCommissionAmount?: number
-    /**
-     * How much interest pre-paid was added/removed in account, within this transaction (including taxes).
-     */
-    deferredInterestAmount?: number
-    /**
-     * How much interest was added/removed in account, within this transaction (including taxes). If there is any deferred interest amount set in this transaction, that amount should be included in this field.
-     */
-    interestAmount?: number
-    /**
-     * How much Payment Holidays interest was added/removed in account, within this transaction (including taxes).
-     */
-    paymentHolidaysInterestAmount?: number
-    /**
-     * How much penalties was added/removed in account, within this transaction.
-     */
-    penaltyAmount?: number
-    /**
-     * How much principal was added/removed in account, within this transaction.
-     */
-    principalAmount?: number
-    /**
-     * How much interest from arrears was added/removed in account, within this transaction (including taxes).
-     */
-    interestFromArrearsAmount?: number
-}
-
-/**
- * A card transaction entry which will have a corresponding a financial transaction performed.
- */
-export interface CardTransaction {
-    /**
-     * The external reference ID to be used to reference the card transaction in subsequent requests.
-     */
-    externalReferenceId: string
-    /**
-     * The amount of money to be withdrawn in the financial transaction.
-     */
-    amount: number
-    /**
-     * Whether the given request should be accepted without balance validations.
-     */
-    advice: boolean
-    /**
-     * The external authorization hold reference ID, which relates this card transaction to a previous authorization hold.
-     */
-    externalAuthorizationReferenceId?: string
-    cardAcceptor?: CardAcceptor
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * The formatted time at which the user made this card transaction.
-     */
-    userTransactionTime?: string
-    /**
-     * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
-     */
-    currencyCode?: string
-    /**
-     * The reference token of the card.
-     */
-    cardToken?: string
-}
-
-/**
- * The details of the card acceptor (merchant) in a transaction hold.
- */
-export interface CardAcceptor {
-    /**
-     * The ZIP code of the location in which the card acceptor has the business.
-     */
-    zip?: string
-    /**
-     * The country in which the card acceptor has the business.
-     */
-    country?: string
-    /**
-     * The city in which the card acceptor has the business.
-     */
-    city?: string
-    /**
-     * The street in which the card acceptor has the business.
-     */
-    street?: string
-    /**
-     * The name of the card acceptor.
-     */
-    name?: string
-    /**
-     * The state in which the card acceptor has the business.
-     */
-    state?: string
-    /**
-     * The Merchant Category Code of the card acceptor.
-     */
-    mcc?: number
-}
-
-/**
- * The taxes applied within a transaction.
- */
-export interface Taxes {
-    /**
-     * The amount of taxes on the interest from arrears that were applied/paid in account, within this transaction.
-     */
-    taxOnInterestFromArrearsAmount?: number
-    /**
-     * How much taxes on the fees that were paid in this transaction were added/removed in account, within this transaction.
-     */
-    taxOnFeesAmount?: number
-    /**
-     * The tax rate that was set or changed in this transaction.
-     */
-    taxRate?: number
-    /**
-     * The amount of taxes on the Payment Holidays interest that were added/removed in account, within this transaction.
-     */
-    taxOnPaymentHolidaysInterest?: number
-    /**
-     * How much taxes on the interest that was paid in this transaction were added/removed in account, within this transaction.
-     */
-    taxOnInterestAmount?: number
-    /**
-     * How much taxes on the penalties that were paid in this transaction were added/removed in account, within this transaction.
-     */
-    taxOnPenaltyAmount?: number
-    /**
-     * How much taxes on the interest that was pre-paid were added/removed in account, within this transaction. If there is any deferred tax on interest amount set in this transaction, that amount should be included in this field.
-     */
-    deferredTaxOnInterestAmount?: number
-}
-
-/**
- * The loan transaction terms
- */
-export interface LoanTerms {
-    interestSettings?: TransactionInterestSettings
-    /**
-     * The periodic payment value logged when changing it for a Balloon Payments account
-     */
-    periodicPayment?: number
-    /**
-     * The principal payment flat amount logged when changing it for a Revolving Credit account
-     */
-    principalPaymentAmount?: number
-    /**
-     * The principal payment percentage value logged when changing it for a Revolving Credit account
-     */
-    principalPaymentPercentage?: number
-}
-
-/**
- * The interest settings, holds all the properties regarding interests for the loan account.
- */
-export interface TransactionInterestSettings {
-    /**
-     * The interest rate. Represents the interest rate for the loan account. The interest on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.
-     */
-    interestRate?: number
-    /**
-     * The value of the index interest rate
-     */
-    indexInterestRate?: number
-}
-
-/**
- * Represents the transfer details, such as the linked transaction key
- */
-export interface TransferDetails {
-    /**
-     * The key of the related loan transaction
-     */
-    linkedLoanTransactionKey?: string
-    /**
-     * The key of the related deposit transaction
-     */
-    linkedDepositTransactionKey?: string
-}
-
-/**
- * Custom payment amount for a specific element type
- */
-export interface CustomPaymentAmount {
-    /**
-     * The amount of the taxes paid in the transaction for the given type.
-     */
-    taxOnAmount?: number
-    /**
-     * The amount of the payment paid in the transaction for the given type.
-     */
-    amount: number
-    /**
-     * The encodedKey of the predefined fee to be paid.
-     */
-    predefinedFeeKey?: string
-    /**
-     * The type of the custom payment
-     */
-    customPaymentAmountType:
-        | 'PRINCIPAL'
-        | 'INTEREST'
-        | 'MANUAL_FEE'
-        | 'UPFRONT_DISBURSEMENT_FEE'
-        | 'LATE_REPAYMENT_FEE'
-        | 'PAYMENT_DUE_FEE'
-        | 'PENALTY'
-}
-
-/**
- * The balances changed within a transaction.
- */
-export interface TransactionBalances {
-    /**
-     * The account redraw balance captured after the transaction update.
-     */
-    redrawBalance?: number
-    /**
-     * The account redraw balance captured after the transaction update.
-     */
-    principalBalance?: number
-    /**
-     * The running balance still owed for the loan.
-     */
-    totalBalance?: number
-    /**
-     * The difference between principal balance and redraw balance after each transaction performed on the loan account.
-     */
-    expectedPrincipalRedraw?: number
-    /**
-     * Captures the advance (prepaid) amount.
-     */
-    advancePosition?: number
-    /**
-     * Captures the arrears position amount for the account in arrears.
-     */
-    arrearsPosition?: number
-}
-
-/**
- * The sorting criteria used for Loan accounts directed query
- */
-export interface LoanAccountSortingCriteria {
-    /**
-     * Contains the field that can be used as sorting selection. Can be native (one from the provided list) or otherwise can specify a custom field using the format [customFieldSetId].[customFieldId].
-     */
-    field:
-        | 'encodedKey'
-        | 'loanName'
-        | 'id'
-        | 'accountHolderId'
-        | 'recipient'
-        | 'creationDate'
-        | 'approvedDate'
-        | 'lastModifiedDate'
-        | 'lastSetToArrearsDate'
-        | 'lastLockedDate'
-        | 'closedDate'
-        | 'daysInArrears'
-        | 'daysLate'
-        | 'loanAmount'
-        | 'tranches.amount'
-        | 'numInstallments'
-        | 'accruedInterest'
-        | 'accruedPenalty'
-        | 'penaltySettings.penaltyRate'
-        | 'arrearsTolerancePeriod'
-        | 'interestSettings.interestSpread'
-        | 'totalPaid'
-        | 'totalBalance'
-        | 'totalDue'
-        | 'firstRepaymentDate'
-        | 'lastPaymentDate'
-        | 'lastPaymentAmount'
-        | 'expectedMaturity'
-        | 'rescheduledAccountKey'
-        | 'refinancedAccountId'
-        | 'originalAccountKey'
-        | 'taxRate'
-        | 'taxPaid'
-        | 'taxDue'
-        | 'settlementAccountKey'
-        | 'interestCommission'
-        | 'numberOfFunds'
-        | 'fundsEnabled'
-        | 'availableAmount'
-        | 'wasRescheduled'
-        | 'wasRefinanced'
-        | 'expectedPrincipalRedraw'
-        | 'balances.principalDue'
-        | 'balances.principalPaid'
-        | 'balances.principalBalance'
-        | 'balances.interestDue'
-        | 'balances.interestPaid'
-        | 'balance.interestBalance'
-        | 'balances.redrawBalance'
-        | 'balances.feesDue'
-        | 'balances.feesBalance'
-        | 'balances.feesPaid'
-        | 'balances.penaltyDue'
-        | 'balances.penaltyPaid'
-        | 'balances.penaltyBalance'
-        | 'fundingSources.amount'
-        | 'fundingSources.sharePercentage'
-    /**
-     * The sorting order: ASC or DESC. The default order is DESC.
-     */
-    order?: 'ASC' | 'DESC'
-}
-
-/**
- * Wrapper that holds a list of filtering criteria and a sorting criteria for Loan account directed query
- */
-export interface LoanAccountFilterCriteria {
-    /**
-     * Contains the actual searching fields that can be native (one from the provided list) or otherwise can specify a custom field using the format [customFieldSetId].[customFieldId].
-     */
-    field:
-        | 'accountHolderKey'
-        | 'productTypeKey'
-        | 'loanRiskLevelKey'
-        | 'encodedKey'
-        | 'loanName'
-        | 'id'
-        | 'accountHolderId'
-        | 'recipient'
-        | 'creationDate'
-        | 'approvedDate'
-        | 'lastModifiedDate'
-        | 'lastSetToArrearsDate'
-        | 'lastLockedDate'
-        | 'closedDate'
-        | 'daysInArrears'
-        | 'daysLate'
-        | 'accountSubState'
-        | 'accountState'
-        | 'loanAmount'
-        | 'numInstallments'
-        | 'balances.principalDue'
-        | 'balances.principalPaid'
-        | 'balances.principalBalance'
-        | 'balances.interestDue'
-        | 'balances.interestPaid'
-        | 'balance.interestBalance'
-        | 'accruedInterest'
-        | 'balances.feesDue'
-        | 'balances.feesBalance'
-        | 'balances.feesPaid'
-        | 'penaltySettings.loanPenaltyCalculationMethod'
-        | 'balances.penaltyDue'
-        | 'balances.penaltyPaid'
-        | 'balances.penaltyBalance'
-        | 'accruedPenalty'
-        | 'penaltySettings.penaltyRate'
-        | 'arrearsTolerancePeriod'
-        | 'interestSettings.interestRate'
-        | 'interestSettings.interestSpread'
-        | 'totalPaid'
-        | 'totalBalance'
-        | 'totalDue'
-        | 'firstRepaymentDate'
-        | 'lastPaymentDate'
-        | 'lastPaymentAmount'
-        | 'expectedMaturityDate'
-        | 'rescheduledAccountKey'
-        | 'refinancedAccountId'
-        | 'originalAccountKey'
-        | 'taxRate'
-        | 'taxPaid'
-        | 'taxDue'
-        | 'settlementAccountKey'
-        | 'interestCommission'
-        | 'fundingSources.amount'
-        | 'fundingSources.sharePercentage'
-        | 'numberOfFunds'
-        | 'fundsEnabled'
-        | 'availableAmount'
-        | 'wasRescheduled'
-        | 'wasRefinanced'
-        | 'prepaymentSettings.prepaymentRecalculationMethod'
-        | 'prepaymentSettings.applyInterestOnPrepaymentMethod'
-        | 'latePaymentsRecalculationMethod'
-        | 'balances.redrawBalance'
-        | 'expectedPrincipalRedraw'
-        | 'tranches.parentAccountKey'
-        | 'tranches.disbursementDetails.disbursementTransactionKey'
-        | 'tranches.amount'
-        | 'tranches.disbursementDetails.expectedDisbursementDate'
-        | 'disbursementDetails.expectedDisbursementDate'
-        | 'disbursementDetails.disbursementDate'
-        | 'lastAccountAppraisalDate'
-    /**
-     * The value to match the searching criteria
-     */
-    value?: string
-    /**
-     * | **Operator**                | **Affected values**  | **Available for**                                                    |
-     * |---------------               |----------------------|----------------------------------------------------------------------|
-     * | EQUALS                       | ONE_VALUE            | BIG_DECIMAL,BOOLEAN,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY        |
-     * | EQUALS_CASE_SENSITIVE        | ONE_VALUE            | BIG_DECIMAL,BOOLEAN,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY 		  |
-     * | MORE_THAN                    | ONE_VALUE            | BIG_DECIMAL,NUMBER,MONEY                                             |
-     * | LESS_THAN                    | ONE_VALUE            | BIG_DECIMAL,NUMBER,MONEY                                             |
-     * | BETWEEN                      | TWO_VALUES           | BIG_DECIMAL,NUMBER,MONEY,DATE,DATE_TIME                              |
-     * | ON                           | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | AFTER                        | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | BEFORE                       | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | BEFORE_INCLUSIVE             | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | STARTS_WITH                  | ONE_VALUE            | STRING                                                               |
-     * | STARTS_WITH_CASE_SENSITIVE   | ONE_VALUE            | STRING                                                               |
-     * | IN                           | LIST                 | ENUM,KEY                                                             |
-     * | TODAY                        | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | THIS_WEEK                    | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | THIS_MONTH                   | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | THIS_YEAR                    | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | LAST_DAYS                    | ONE_VALUE            | NUMBER                                                               |
-     * | EMPTY                        | NO_VALUE             | BIG_DECIMAL,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY,DATE,DATE_TIME |
-     * | NOT_EMPTY                    | NO_VALUE             | BIG_DECIMAL,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY,DATE,DATE_TIME |
-     */
-    operator:
-        | 'EQUALS'
-        | 'EQUALS_CASE_SENSITIVE'
-        | 'DIFFERENT_THAN'
-        | 'MORE_THAN'
-        | 'LESS_THAN'
-        | 'BETWEEN'
-        | 'ON'
-        | 'AFTER'
-        | 'AFTER_INCLUSIVE'
-        | 'BEFORE'
-        | 'BEFORE_INCLUSIVE'
-        | 'STARTS_WITH'
-        | 'STARTS_WITH_CASE_SENSITIVE'
-        | 'IN'
-        | 'TODAY'
-        | 'THIS_WEEK'
-        | 'THIS_MONTH'
-        | 'THIS_YEAR'
-        | 'LAST_DAYS'
-        | 'EMPTY'
-        | 'NOT_EMPTY'
-    /**
-     * The second value to match the searching criteria, when using BETWEEN, together with value
-     */
-    secondValue?: string
-    /**
-     * List of values when operator is IN.
-     */
-    values?: string[]
-}
-
-/**
- * A single change that needs to be made to a resource
- */
-export interface PatchOperation {
-    /**
-     * The change to perform
-     */
-    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
-    /**
-     * The field to perform the operation on
-     */
-    path: string
-    /**
-     * The field from where a value should be moved, when using move
-     */
-    from?: string
-    /**
-     * The value of the field, can be null
-     */
-    value?: {
-        [k: string]: unknown | undefined
-    }
-}
-
-/**
- * Details for retrieving a authorization hold. Deprecated due to encodedKey field.
- */
-export interface GetAuthorizationHold {
-    /**
-     * The custom expiration period for the hold which overwrites mcc and default expiration periods
-     */
-    customExpirationPeriod?: number
-    /**
-     * The amount of money to be held as a result of the authorization hold request.
-     */
-    amount: number
-    /**
-     * Whether the given request should be accepted without balance validations.
-     */
-    advice: boolean
-    cardAcceptor?: CardAcceptor
-    /**
-     * Indicates the source of the authorization hold, the default values is CARD.
-     */
-    source?: 'CARD' | 'ACCOUNT'
-    /**
-     * The organization time when the authorization hold was created
-     */
-    creationDate?: string
-    /**
-     * Indicates whether the authorization hold amount is credited or debited.If not provided, the default values is DBIT.
-     */
-    creditDebitIndicator?: 'DBIT' | 'CRDT'
-    /**
-     * The reference token of the card.
-     */
-    cardToken?: string
-    /**
-     * The date to consider as start date when calculating the number of days passed until expiration
-     */
-    referenceDateForExpiration?: string
-    /**
-     * The key of the account linked with the authorization hold.
-     */
-    accountKey?: string
-    /**
-     * The external reference ID to be used to reference the account hold in subsequent requests.
-     */
-    externalReferenceId: string
-    balances?: AccountBalances
-    /**
-     * The original amount of money to be held as a result of the authorization hold request.
-     */
-    originalAmount?: number
-    /**
-     * The exchange rate for the original currency.
-     */
-    exchangeRate?: number
-    /**
-     * The internal ID of the authorization hold, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The formatted time at which the user made this authorization hold.
-     */
-    userTransactionTime?: string
-    /**
-     * The original currency in which the hold was created.
-     */
-    originalCurrency?: string
-    /**
-     * The ISO currency code in which the hold was created. The amounts are stored in the base currency, but the user could have enter it in a foreign currency.
-     */
-    currencyCode?: string
-    /**
-     * The authorization hold status.
-     */
-    status?: 'PENDING' | 'REVERSED' | 'SETTLED' | 'EXPIRED'
-}
-
-/**
- * Account balances presented to inquirer such as card processor
- */
-export interface AccountBalances {
-    /**
-     * The unique account identifier
-     */
-    accountId?: string
-    /**
-     * The current balance of a deposit account or principal balance of a revolving credit
-     */
-    totalBalance?: number
-    /**
-     * The card type either DEBIT or CREDIT
-     */
-    cardType?: 'DEBIT' | 'CREDIT'
-    /**
-     * The overdraft limit of a deposit account or the loan amount in case of a credit account
-     */
-    creditLimit?: number
-    /**
-     * Currency code used for the account
-     */
-    currencyCode?: string
-    /**
-     * The available balance of a deposit or credit account
-     */
-    availableBalance?: number
 }
 
 /**
@@ -3240,6 +574,52 @@ export interface InterestSettingsForSchedulePreview {
      * The interest settings details for schedule preview.
      */
     accountInterestRateSettings?: AccountInterestRateSettings[]
+}
+
+/**
+ * Adjustable interest rates settings for loan account
+ */
+export interface AccountInterestRateSettings {
+    /**
+     * Interest rate review frequency measurement unit. Valid only for index interest rate.
+     */
+    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
+    /**
+     * Interest rate value.
+     */
+    interestRate?: number
+    /**
+     * Interest spread value.
+     */
+    interestSpread?: number
+    /**
+     * Interest calculation method: fixed or indexed(interest spread + active organization index interest rate)
+     */
+    interestRateSource: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE'
+    /**
+     * Interest rate review frequency unit count. Valid only for index interest rate.
+     */
+    interestRateReviewCount?: number
+    /**
+     * Index rate source key.
+     */
+    indexSourceKey?: string
+    /**
+     * Maximum value allowed for index based interest rate. Valid only for index interest rate.
+     */
+    interestRateCeilingValue?: number
+    /**
+     * The encoded key of the interest rate settings, auto generated, unique
+     */
+    encodedKey?: string
+    /**
+     * Date since an interest rate is valid
+     */
+    validFrom: string
+    /**
+     * Minimum value allowed for index based interest rate. Valid only for index interest rate.
+     */
+    interestRateFloorValue?: number
 }
 
 /**
@@ -3313,152 +693,31 @@ export interface PeriodicPaymentForSchedulePreview {
 }
 
 /**
- * Represents a single installment details structure.
+ * The planned fee details holds the information related to the installment key, predefined fee key and amount
  */
-export interface Installment {
-    penalty?: InstallmentAllocationElementTaxableAmount
+export interface PlannedInstallmentFee {
     /**
-     * The installment due date.
+     * The number of the installment on which the predefined fee is planned. It is used only in the case when fees are created at the same time with the loan account creation or during preview schedule, before account creation, otherwise this should be empty and installmentKey will be used to identify an installment.
      */
-    dueDate?: string
-    fee?: InstallmentFee
+    installmentNumber?: number
     /**
-     * The installment repaid date.
+     * The amount of the planned fee.
      */
-    repaidDate?: string
-    principal?: InstallmentAllocationElementAmount
+    amount?: number
     /**
-     * The order number of an installment among all the installments generated for a loan. Loan installments are put in ascending order by due date.
+     * The date when a planned fee should be applied, overriding installment's due date. It should match the interval of the installment. If it belong to first installment, it should be between disbursement date and installment due date.
      */
-    number?: string
+    applyOnDate?: string
     /**
-     * The installment last paid date.
+     * The encoded key of the predefined fee which is planned.
      */
-    lastPaidDate?: string
+    predefinedFeeKey: string
     /**
-     * The parent account key of the installment
-     */
-    parentAccountKey?: string
-    interest?: InstallmentAllocationElementTaxableAmount
-    /**
-     * The breakdown of the fees amounts that have been applied for the loan account.
-     */
-    feeDetails?: InstallmentFeeDetails[]
-    /**
-     * The encoded key of the installment, auto generated, unique.
+     * The encoded key of the planned installment fee, auto generated, unique.
      */
     encodedKey?: string
     /**
-     * The installment state.
+     * The encoded key of the installment on which the predefined fee is planned.
      */
-    state?: 'PENDING' | 'LATE' | 'PAID' | 'PARTIALLY_PAID' | 'GRACE'
-    /**
-     * Whether the payment holiday is offered for the installment.
-     */
-    isPaymentHoliday?: boolean
-}
-
-/**
- * Represents an installment allocation element taxable amount structure.
- */
-export interface InstallmentAllocationElementTaxableAmount {
-    amount?: Amount
-    tax?: Amount
-}
-
-/**
- * Represents a simple installment amount structure.
- */
-export interface Amount {
-    /**
-     * The paid amount.
-     */
-    paid?: number
-    /**
-     * The due amount.
-     */
-    due?: number
-    /**
-     * The expected amount, which is sum of paid and due amounts.
-     */
-    expected?: number
-}
-
-/**
- * Represents an installment fee structure.
- */
-export interface InstallmentFee {
-    amount?: FeeAmount
-    tax?: Amount
-}
-
-/**
- * Represents a fee amount.
- */
-export interface FeeAmount {
-    /**
-     * The paid amount.
-     */
-    paid?: number
-    /**
-     * The due amount.
-     */
-    due?: number
-    /**
-     * The expected amount, which is sum of paid and due amounts.
-     */
-    expected?: number
-    /**
-     * The expected amount, which is the sum of unapplied fee and planned fee due amounts.
-     */
-    expectedUnapplied?: number
-}
-
-/**
- * Represents an installment allocation element amount structure.
- */
-export interface InstallmentAllocationElementAmount {
-    amount?: Amount
-}
-
-/**
- * Represents fee details for an installment.
- */
-export interface InstallmentFeeDetails {
-    /**
-     * The name of the fee
-     */
-    name?: string
-    amount?: AmountWithReduced
-    tax?: AmountWithReduced
-    /**
-     * The encoded key of the predefined fee, auto generated, unique
-     */
-    encodedKey?: string
-    /**
-     * The id of the fee, provided by the client
-     */
-    id?: string
-}
-
-/**
- * Represents a simple installment amount structure.
- */
-export interface AmountWithReduced {
-    /**
-     * The paid amount.
-     */
-    paid?: number
-    /**
-     * The reduced amount.
-     */
-    reduced?: number
-    /**
-     * The due amount.
-     */
-    due?: number
-    /**
-     * The expected amount, which is sum of paid and due amounts.
-     */
-    expected?: number
+    installmentKey?: string
 }

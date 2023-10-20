@@ -3,23 +3,23 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * Wrapper that holds a list of filtering criteria and a sorting criteria for Loan transaction client directed query
+ * Represents the filtering and sorting criteria when searching loan transactions.
  */
 export interface LoanTransactionSearchCriteria {
     sortingCriteria?: LoanTransactionSortingCriteria
     /**
-     * The list of filtering criteria
+     * The list of filtering criteria.
      */
     filterCriteria?: LoanTransactionFilterCriteria[]
 }
 
 export const LoanTransactionSearchCriteria = {
     validate: (await import('./schemas/loan-transaction-search-criteria.schema.js'))
-        .validate10 as unknown as ValidateFunction<LoanTransactionSearchCriteria>,
+        .validate as ValidateFunction<LoanTransactionSearchCriteria>,
     get schema() {
         return LoanTransactionSearchCriteria.validate.schema
     },
@@ -29,7 +29,7 @@ export const LoanTransactionSearchCriteria = {
     is: (o: unknown): o is LoanTransactionSearchCriteria => LoanTransactionSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanTransactionSearchCriteria.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanTransactionSearchCriteria.errors ?? [])
+            throw new ValidationError(LoanTransactionSearchCriteria.errors ?? [])
         }
     },
 } as const
@@ -37,7 +37,7 @@ export const LoanTransactionSearchCriteria = {
 export type SearchResponse = LoanTransaction[]
 
 export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
+    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -52,7 +52,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -62,32 +62,31 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
 
 /**
- * Represents the request payload for locking an account
+ * Represents the information for locking an account.
  */
 export interface LockLoanAccountInput {
     /**
-     * Locked account total due type
+     * The locked account total due type.
      */
     lockedAccountTotalDueType?: 'BALANCE_AMOUNT' | 'DUE_AMOUNT_ON_LATE_INSTALLMENTS'
     /**
-     * Extra notes about the current locking of account
+     * The notes about the account locking operation.
      */
     notes?: string
     /**
-     * The list of operations to lock
+     * A list with operations which are locked when the account is in substate AccountState.LOCKED. Allowed options are `APPLY_INTEREST`, `APPLY_PENALTIES`, and `APPLY_FEES`.
      */
     lockedOperations?: ('APPLY_INTEREST' | 'APPLY_FEES' | 'APPLY_PENALTIES')[]
 }
 
 export const LockLoanAccountInput = {
-    validate: (await import('./schemas/lock-loan-account-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<LockLoanAccountInput>,
+    validate: (await import('./schemas/lock-loan-account-input.schema.js')).validate as ValidateFunction<LockLoanAccountInput>,
     get schema() {
         return LockLoanAccountInput.validate.schema
     },
@@ -97,7 +96,7 @@ export const LockLoanAccountInput = {
     is: (o: unknown): o is LockLoanAccountInput => LockLoanAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!LockLoanAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(LockLoanAccountInput.errors ?? [])
+            throw new ValidationError(LockLoanAccountInput.errors ?? [])
         }
     },
 } as const
@@ -114,7 +113,7 @@ export interface LockLoanTransactionsWrapper {
 
 export const LockLoanTransactionsWrapper = {
     validate: (await import('./schemas/lock-loan-transactions-wrapper.schema.js'))
-        .validate10 as unknown as ValidateFunction<LockLoanTransactionsWrapper>,
+        .validate as ValidateFunction<LockLoanTransactionsWrapper>,
     get schema() {
         return LockLoanTransactionsWrapper.validate.schema
     },
@@ -124,7 +123,7 @@ export const LockLoanTransactionsWrapper = {
     is: (o: unknown): o is LockLoanTransactionsWrapper => LockLoanTransactionsWrapper.validate(o) === true,
     assert: (o: unknown) => {
         if (!LockLoanTransactionsWrapper.validate(o)) {
-            throw new AjvValidator.ValidationError(LockLoanTransactionsWrapper.errors ?? [])
+            throw new ValidationError(LockLoanTransactionsWrapper.errors ?? [])
         }
     },
 } as const
@@ -141,7 +140,7 @@ export interface UnlockLoanAccountInput {
 
 export const UnlockLoanAccountInput = {
     validate: (await import('./schemas/unlock-loan-account-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<UnlockLoanAccountInput>,
+        .validate as ValidateFunction<UnlockLoanAccountInput>,
     get schema() {
         return UnlockLoanAccountInput.validate.schema
     },
@@ -151,7 +150,7 @@ export const UnlockLoanAccountInput = {
     is: (o: unknown): o is UnlockLoanAccountInput => UnlockLoanAccountInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!UnlockLoanAccountInput.validate(o)) {
-            throw new AjvValidator.ValidationError(UnlockLoanAccountInput.errors ?? [])
+            throw new ValidationError(UnlockLoanAccountInput.errors ?? [])
         }
     },
 } as const
@@ -209,7 +208,7 @@ export interface RepaymentLoanTransactionInput {
 
 export const RepaymentLoanTransactionInput = {
     validate: (await import('./schemas/repayment-loan-transaction-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<RepaymentLoanTransactionInput>,
+        .validate as ValidateFunction<RepaymentLoanTransactionInput>,
     get schema() {
         return RepaymentLoanTransactionInput.validate.schema
     },
@@ -219,41 +218,41 @@ export const RepaymentLoanTransactionInput = {
     is: (o: unknown): o is RepaymentLoanTransactionInput => RepaymentLoanTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!RepaymentLoanTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(RepaymentLoanTransactionInput.errors ?? [])
+            throw new ValidationError(RepaymentLoanTransactionInput.errors ?? [])
         }
     },
 } as const
 
 /**
- * Represents the action performed on an Loan Account after which the account's amount changes its value.
+ * Represents the action performed on a loan account after which the account's amount changes its value.
  */
 export interface LoanTransaction {
     /**
-     * The migration event encoded key associated with this loan account. If this account was imported, track which 'migration event' they came from
+     * The migration event encoded key associated with the loan account. If the account was imported, track which 'migration event' it came from.
      */
     migrationEventKey?: string
     transactionDetails?: TransactionDetails
     /**
-     * All the amounts that have been applied or paid within this transaction and involved predefined fees
+     * The amounts that have been applied or paid as part of this transaction and involved predefined fees.
      */
     fees?: Fee[]
     /**
-     * Extra notes about this loan transaction
+     * The notes or description for the loan transaction.
      */
     notes?: string
     affectedAmounts?: LoanAffectedAmounts
     cardTransaction?: CardTransaction
     taxes?: Taxes
     /**
-     * The till key associated with this transaction
+     * The till key associated with the transaction.
      */
     tillKey?: string
     /**
-     * The key of the loan transaction where the adjustment for this transaction was made (if any adjustment was involved)
+     * The key of the loan transaction where the adjustment for the transaction was made (if any adjustment was involved).
      */
     adjustmentTransactionKey?: string
     /**
-     * The type of the loan transaction
+     * The type of loan transaction.
      */
     type?:
         | 'IMPORT'
@@ -308,75 +307,75 @@ export interface LoanTransaction {
         | 'ACCOUNT_TERMINATED'
         | 'ACCOUNT_TERMINATED_ADJUSTMENT'
     /**
-     * The branch where the transaction was performed
+     * The branch where the transaction was performed.
      */
     branchKey?: string
     terms?: LoanTerms
     transferDetails?: TransferDetails
     /**
-     * The key of the parent loan transaction
+     * The key of the parent loan transaction.
      */
     parentLoanTransactionKey?: string
     /**
-     * The list of custom amounts which the user has paid within this transaction
+     * The list of custom amounts which the user has paid as part of this transaction.
      */
     customPaymentAmounts?: CustomPaymentAmount[]
     /**
-     * The encoded key of the loan transaction, auto generated, unique
+     * The encoded key of the loan transaction, which is auto generated, and must be unique.
      */
     encodedKey?: string
     currency?: Currency
     /**
-     * The id of the loan transaction, can be generated and customized, unique
+     * The ID of the loan transaction, can be generated and customized, and must be unique.
      */
     id?: string
     /**
-     * The currency in which this transaction was posted. The amounts are stored in the base currency, but the user could have enter it in a foreign currency
+     * The currency in which this transaction was posted. The amounts are stored in the base currency, but the user may enter it in a foreign currency.
      */
     originalCurrencyCode?: string
     /**
-     * The encodedKey of the transaction that was adjusted as part of this one. Available only for adjustment transactions
+     * The encoded key of the transaction that was adjusted as part of this one. Available only for adjustment transactions.
      */
     originalTransactionKey?: string
     /**
-     * The amount that was added/removed on loan account
+     * The amount that was added or removed on the loan account.
      */
     amount?: number
     /**
-     * The center where the transaction was performed
+     * The center where the transaction was performed.
      */
     centreKey?: string
     /**
-     * The external id of the loan transaction, customizable, unique
+     * The external ID of the loan transaction, it is customizable, and must be unique.
      */
     externalId?: string
     /**
-     * Date of the entry (eg date of repayment or disbursal, etc.) (as Organization Time)
+     * The date of the entry in the organization time format and timezone.
      */
     valueDate?: string
     /**
-     * The date when this loan transaction was created
+     * The date when this loan transaction was created.
      */
     creationDate?: string
     /**
-     * The user that performed the transaction
+     * The user that performed the transaction.
      */
     userKey?: string
     /**
-     * The key of the parent loan account
+     * The key of the parent loan account.
      */
     parentAccountKey?: string
     /**
-     * The amount that was posted in a foreign currency. This amount was converted using the exchange rate available at entry date and set into the amount field
+     * The amount that was posted in a foreign currency. This amount was converted using the exchange rate available at entry date and set into the amount field.
      */
     originalAmount?: number
     accountBalances?: TransactionBalances
     /**
-     * The date when corresponding JE is booked
+     * The date when the corresponding journal entry is booked.
      */
     bookingDate?: string
     /**
-     * Prepayment recalculation method of this loan transaction
+     * The prepayment recalculation method of the loan transaction.
      */
     prepaymentRecalculationMethod?:
         | 'NO_RECALCULATION'
@@ -388,13 +387,13 @@ export interface LoanTransaction {
         | 'REDUCE_NUMBER_OF_INSTALLMENTS'
         | 'REDUCE_NUMBER_OF_INSTALLMENTS_NEW'
     /**
-     * The specific installment encoded key associated to this loan transaction
+     * The specific installment encoded key associated to the loan transaction.
      */
     installmentEncodedKey?: string
 }
 
 export const LoanTransaction = {
-    validate: (await import('./schemas/loan-transaction.schema.js')).validate10 as unknown as ValidateFunction<LoanTransaction>,
+    validate: (await import('./schemas/loan-transaction.schema.js')).validate as ValidateFunction<LoanTransaction>,
     get schema() {
         return LoanTransaction.validate.schema
     },
@@ -404,7 +403,7 @@ export const LoanTransaction = {
     is: (o: unknown): o is LoanTransaction => LoanTransaction.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanTransaction.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanTransaction.errors ?? [])
+            throw new ValidationError(LoanTransaction.errors ?? [])
         }
     },
 } as const
@@ -429,7 +428,7 @@ export interface LoanTransactionAdjustmentDetails {
 
 export const LoanTransactionAdjustmentDetails = {
     validate: (await import('./schemas/loan-transaction-adjustment-details.schema.js'))
-        .validate10 as unknown as ValidateFunction<LoanTransactionAdjustmentDetails>,
+        .validate as ValidateFunction<LoanTransactionAdjustmentDetails>,
     get schema() {
         return LoanTransactionAdjustmentDetails.validate.schema
     },
@@ -439,7 +438,7 @@ export const LoanTransactionAdjustmentDetails = {
     is: (o: unknown): o is LoanTransactionAdjustmentDetails => LoanTransactionAdjustmentDetails.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanTransactionAdjustmentDetails.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanTransactionAdjustmentDetails.errors ?? [])
+            throw new ValidationError(LoanTransactionAdjustmentDetails.errors ?? [])
         }
     },
 } as const
@@ -490,7 +489,7 @@ export interface DisbursementLoanTransactionInput {
 
 export const DisbursementLoanTransactionInput = {
     validate: (await import('./schemas/disbursement-loan-transaction-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<DisbursementLoanTransactionInput>,
+        .validate as ValidateFunction<DisbursementLoanTransactionInput>,
     get schema() {
         return DisbursementLoanTransactionInput.validate.schema
     },
@@ -500,7 +499,7 @@ export const DisbursementLoanTransactionInput = {
     is: (o: unknown): o is DisbursementLoanTransactionInput => DisbursementLoanTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!DisbursementLoanTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(DisbursementLoanTransactionInput.errors ?? [])
+            throw new ValidationError(DisbursementLoanTransactionInput.errors ?? [])
         }
     },
 } as const
@@ -509,7 +508,7 @@ export type GetTransactionsForAllVersionsResponse = LoanTransaction[]
 
 export const GetTransactionsForAllVersionsResponse = {
     validate: (await import('./schemas/get-transactions-for-all-versions-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetTransactionsForAllVersionsResponse>,
+        .validate as ValidateFunction<GetTransactionsForAllVersionsResponse>,
     get schema() {
         return GetTransactionsForAllVersionsResponse.validate.schema
     },
@@ -552,7 +551,7 @@ export interface WithdrawalRedrawTransactionInput {
 
 export const WithdrawalRedrawTransactionInput = {
     validate: (await import('./schemas/withdrawal-redraw-transaction-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<WithdrawalRedrawTransactionInput>,
+        .validate as ValidateFunction<WithdrawalRedrawTransactionInput>,
     get schema() {
         return WithdrawalRedrawTransactionInput.validate.schema
     },
@@ -562,7 +561,7 @@ export const WithdrawalRedrawTransactionInput = {
     is: (o: unknown): o is WithdrawalRedrawTransactionInput => WithdrawalRedrawTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!WithdrawalRedrawTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(WithdrawalRedrawTransactionInput.errors ?? [])
+            throw new ValidationError(WithdrawalRedrawTransactionInput.errors ?? [])
         }
     },
 } as const
@@ -600,7 +599,7 @@ export interface PaymentMadeTransactionInput {
 
 export const PaymentMadeTransactionInput = {
     validate: (await import('./schemas/payment-made-transaction-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<PaymentMadeTransactionInput>,
+        .validate as ValidateFunction<PaymentMadeTransactionInput>,
     get schema() {
         return PaymentMadeTransactionInput.validate.schema
     },
@@ -610,7 +609,7 @@ export const PaymentMadeTransactionInput = {
     is: (o: unknown): o is PaymentMadeTransactionInput => PaymentMadeTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!PaymentMadeTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(PaymentMadeTransactionInput.errors ?? [])
+            throw new ValidationError(PaymentMadeTransactionInput.errors ?? [])
         }
     },
 } as const
@@ -639,7 +638,7 @@ export interface RedrawRepaymentTransactionInputDTO {
 
 export const RedrawRepaymentTransactionInputDTO = {
     validate: (await import('./schemas/redraw-repayment-transaction-input-dto.schema.js'))
-        .validate10 as unknown as ValidateFunction<RedrawRepaymentTransactionInputDTO>,
+        .validate as ValidateFunction<RedrawRepaymentTransactionInputDTO>,
     get schema() {
         return RedrawRepaymentTransactionInputDTO.validate.schema
     },
@@ -649,7 +648,7 @@ export const RedrawRepaymentTransactionInputDTO = {
     is: (o: unknown): o is RedrawRepaymentTransactionInputDTO => RedrawRepaymentTransactionInputDTO.validate(o) === true,
     assert: (o: unknown) => {
         if (!RedrawRepaymentTransactionInputDTO.validate(o)) {
-            throw new AjvValidator.ValidationError(RedrawRepaymentTransactionInputDTO.errors ?? [])
+            throw new ValidationError(RedrawRepaymentTransactionInputDTO.errors ?? [])
         }
     },
 } as const
@@ -657,7 +656,7 @@ export const RedrawRepaymentTransactionInputDTO = {
 export type GetAllResponse = LoanTransaction[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -707,7 +706,7 @@ export interface FeeLoanTransactionInput {
 
 export const FeeLoanTransactionInput = {
     validate: (await import('./schemas/fee-loan-transaction-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<FeeLoanTransactionInput>,
+        .validate as ValidateFunction<FeeLoanTransactionInput>,
     get schema() {
         return FeeLoanTransactionInput.validate.schema
     },
@@ -717,13 +716,13 @@ export const FeeLoanTransactionInput = {
     is: (o: unknown): o is FeeLoanTransactionInput => FeeLoanTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!FeeLoanTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(FeeLoanTransactionInput.errors ?? [])
+            throw new ValidationError(FeeLoanTransactionInput.errors ?? [])
         }
     },
 } as const
 
 /**
- * The sorting criteria used for Loan transactions client directed query
+ * The sorting criteria used for when searching loan transactions.
  */
 export interface LoanTransactionSortingCriteria {
     /**
@@ -761,7 +760,7 @@ export interface LoanTransactionSortingCriteria {
         | 'affectedAmounts.fundersInterestAmount'
         | 'taxes.taxRate'
     /**
-     * The sorting order: ASC or DESC. The default order is DESC.
+     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
      */
     order?: 'ASC' | 'DESC'
 }
@@ -771,7 +770,7 @@ export interface LoanTransactionSortingCriteria {
  */
 export interface LoanTransactionFilterCriteria {
     /**
-     * Contains the actual searching fields that can be native (one from the provided list) or otherwise can specify a custom field using the format [customFieldSetId].[customFieldId].
+     * Contains the actual searching fields that can be native (one from the provided list) or otherwise can specify a custom field definition using the format [customFieldSetId].[customFieldId].
      * |Field with limited capabilities          |Data Type |Operators   |
      * |-----------------------------------------|----------|------------|
      * |originalTransactionKey                   |KEY       |EQUALS, IN  |
@@ -826,7 +825,7 @@ export interface LoanTransactionFilterCriteria {
         | 'adjustmentTransactionID'
         | 'originalTransactionID'
     /**
-     * The value to match the searching criteria
+     * The value to match the searching criteria.
      */
     value?: string
     /**
@@ -875,11 +874,11 @@ export interface LoanTransactionFilterCriteria {
         | 'EMPTY'
         | 'NOT_EMPTY'
     /**
-     * The second value to match the searching criteria, when using BETWEEN, together with value
+     * The second value to match the searching criteria, when the `BETWEEN` operator is used.
      */
     secondValue?: string
     /**
-     * List of values when operator is IN.
+     * List of values when the `IN` operator is used.
      */
     values?: string[]
 }

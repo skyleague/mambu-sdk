@@ -3,51 +3,51 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * The response representation of a GLAccount.
+ * Represents a general ledger account.
  */
 export interface GLAccount {
     /**
-     * The data migration event key if this GL Account was created as a part of a data migration event.
+     * The data migration event key if the general ledger account was created as a part of a data migration event.
      */
     migrationEventKey?: string
     /**
-     * Indicates when the last modification occurred. Stored as UTC.
+     * The last modification date and time, which is stored as UTC.
      */
     lastModifiedDate?: string
     /**
-     * General ledger code used to identify different account types. Also used for grouping and categorizing accounts. For instance an account code of '3201' is considered a subtype of account of '3200'.
+     * The general ledger code used to identify different account types. Also used for grouping and categorizing accounts. For example: an account code of '3201' is considered a subtype of '3200'.
      */
     glCode?: string
     /**
-     * Categorization of GL Account by their usage (detail - where transactions are logged, or headers, for reporting and organization purposes).
+     * The usage type of the general ledger account. `DETAIL` accounts are used to stores transaction balances. `HEADER` accounts are used to organise and group detail accounts for reporting purposes.
      */
     usage?: 'DETAIL' | 'HEADER'
     /**
-     * Description of the GL Account.
+     * A description of the general ledger account.
      */
     description?: string
     /**
-     * Indicates the creation date for this account. Stored as UTC.
+     * The creation date for this account, which is stored as UTC.
      */
     creationDate?: string
     /**
-     * Type of the GL Account
+     * The general ledger account type.
      */
     type?: 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE'
     /**
-     * Indicates whether manual Journal Entries are allowed or not
+     * `TRUE` if manual journal entries are allowed, `FALSE` otherwise.
      */
     allowManualJournalEntries?: boolean
     /**
-     * Indicates the balance of the GL Account. This field is populated only for GET /glaccounts endpoint.
+     * The balance of the general ledger account, which is only populated for the GET /glaccounts endpoint.
      */
     balance?: number
     /**
-     * Name of the GL Account
+     * The name of the general ledger account.
      */
     name?: string
     /**
@@ -56,17 +56,17 @@ export interface GLAccount {
     encodedKey?: string
     currency?: Currency
     /**
-     * Indicates whether to strip trailing zeros.
+     * `TRUE` if trailing zeros are stripped, `FALSE` otherwise.
      */
     stripTrailingZeros?: boolean
     /**
-     * Whether the Account is activated and may be used.
+     * `TRUE` if the account is activated and may be used, `FALSE` otherwise.
      */
     activated?: boolean
 }
 
 export const GLAccount = {
-    validate: (await import('./schemas/gl-account.schema.js')).validate10 as unknown as ValidateFunction<GLAccount>,
+    validate: (await import('./schemas/gl-account.schema.js')).validate as ValidateFunction<GLAccount>,
     get schema() {
         return GLAccount.validate.schema
     },
@@ -81,7 +81,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -91,7 +91,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -99,7 +99,7 @@ export const ErrorResponse = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -109,7 +109,7 @@ export const PatchRequest = {
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
+            throw new ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
@@ -117,7 +117,7 @@ export const PatchRequest = {
 export type GetAllResponse = GLAccount[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -130,7 +130,7 @@ export const GetAllResponse = {
 export type CreateRequest = GLAccountInput[]
 
 export const CreateRequest = {
-    validate: (await import('./schemas/create-request.schema.js')).validate10 as unknown as ValidateFunction<CreateRequest>,
+    validate: (await import('./schemas/create-request.schema.js')).validate as ValidateFunction<CreateRequest>,
     get schema() {
         return CreateRequest.validate.schema
     },
@@ -140,7 +140,7 @@ export const CreateRequest = {
     is: (o: unknown): o is CreateRequest => CreateRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!CreateRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(CreateRequest.errors ?? [])
+            throw new ValidationError(CreateRequest.errors ?? [])
         }
     },
 } as const
@@ -148,7 +148,7 @@ export const CreateRequest = {
 export type CreateResponse = GLAccount[]
 
 export const CreateResponse = {
-    validate: (await import('./schemas/create-response.schema.js')).validate10 as unknown as ValidateFunction<CreateResponse>,
+    validate: (await import('./schemas/create-response.schema.js')).validate as ValidateFunction<CreateResponse>,
     get schema() {
         return CreateResponse.validate.schema
     },
@@ -395,32 +395,32 @@ export interface PatchOperation {
  */
 export interface GLAccountInput {
     /**
-     * General ledger code used to identify different account types. Also used for grouping and categorizing accounts. For instance an account code of '3201' is considered a subtype of account of '3200'
+     * The general ledger code used to identify different account types. Also used for grouping and categorizing accounts. For example: an account code of '3201' is considered a subtype of '3200'.
      */
     glCode: string
     /**
-     * Categorization of GL Account by their usage (detail - where transactions are logged, or headers, for reporting and organization purposes)
+     * `DETAIL` for general ledger accounts that log transactions, and `HEADER` for general ledger accounts used for reporting and organizational purposes.
      */
     usage: 'DETAIL' | 'HEADER'
     /**
-     * Name of the GL Account
+     * The name of the general ledger account.
      */
     name: string
     /**
-     * Description of the GL Account
+     * The description of the general ledger account.
      */
     description?: string
     currency?: Currency
     /**
-     * Indicates whether to strip trailing zeros (Only for Header Accounts)
+     * `TRUE` to strip trailing zeros, `FALSE` otherwise. Only available for Header Accounts.
      */
     stripTrailingZeros?: boolean
     /**
-     * Type of the GL Account
+     * The general ledger account type.
      */
     type: 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE'
     /**
-     * Indicates whether manual Journal Entries are allowed or not (Only available for Detail Accounts)
+     * `TRUE` if manual journal entries are allowed, `FALSE` otherwise. This is only available for Detail Accounts.
      */
     allowManualJournalEntries?: boolean
 }

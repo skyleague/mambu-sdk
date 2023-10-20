@@ -3,13 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 export type GetAllResponse = Installment[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -24,7 +24,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -34,7 +34,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -55,7 +55,7 @@ export interface Installment {
     repaidDate?: string
     principal?: InstallmentAllocationElementAmount
     /**
-     * The order number of an installment among all the installments generated for a loan. Loan installments are put in ascending order by due date.
+     * The order number of an installment among all the installments generated for a loan. Loan installments are put in ascending order by due date. The order number only applies to the content of a particular JSON response therefore it is not unique.
      */
     number?: string
     /**
@@ -63,16 +63,16 @@ export interface Installment {
      */
     lastPaidDate?: string
     /**
-     * The parent account key of the installment
+     * The parent account key of the installment.
      */
     parentAccountKey?: string
     interest?: InstallmentAllocationElementTaxableAmount
     /**
-     * The breakdown of the fees amounts that have been applied for the loan account.
+     * The breakdown of the fee amounts that have been applied to the loan account.
      */
     feeDetails?: InstallmentFeeDetails[]
     /**
-     * The encoded key of the installment, auto generated, unique.
+     * The encoded key of the installment, which is auto generated, and unique.
      */
     encodedKey?: string
     /**
@@ -80,7 +80,7 @@ export interface Installment {
      */
     state?: 'PENDING' | 'LATE' | 'PAID' | 'PARTIALLY_PAID' | 'GRACE'
     /**
-     * Whether the payment holiday is offered for the installment.
+     * `TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.
      */
     isPaymentHoliday?: boolean
 }

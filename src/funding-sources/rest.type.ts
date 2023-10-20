@@ -3,8 +3,8 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
  * Allows specifying sell function source action details
@@ -18,7 +18,7 @@ export interface SellFundingSourceAction {
 
 export const SellFundingSourceAction = {
     validate: (await import('./schemas/sell-funding-source-action.schema.js'))
-        .validate10 as unknown as ValidateFunction<SellFundingSourceAction>,
+        .validate as ValidateFunction<SellFundingSourceAction>,
     get schema() {
         return SellFundingSourceAction.validate.schema
     },
@@ -28,7 +28,7 @@ export const SellFundingSourceAction = {
     is: (o: unknown): o is SellFundingSourceAction => SellFundingSourceAction.validate(o) === true,
     assert: (o: unknown) => {
         if (!SellFundingSourceAction.validate(o)) {
-            throw new AjvValidator.ValidationError(SellFundingSourceAction.errors ?? [])
+            throw new ValidationError(SellFundingSourceAction.errors ?? [])
         }
     },
 } as const
@@ -36,7 +36,7 @@ export const SellFundingSourceAction = {
 export type SellResponse = DepositTransaction[]
 
 export const SellResponse = {
-    validate: (await import('./schemas/sell-response.schema.js')).validate10 as unknown as ValidateFunction<SellResponse>,
+    validate: (await import('./schemas/sell-response.schema.js')).validate as ValidateFunction<SellResponse>,
     get schema() {
         return SellResponse.validate.schema
     },
@@ -51,7 +51,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -61,7 +61,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const

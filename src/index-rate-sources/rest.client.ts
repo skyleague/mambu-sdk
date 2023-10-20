@@ -7,7 +7,13 @@ import got from 'got'
 import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import type { IncomingHttpHeaders } from 'http'
-import { ErrorResponse, GetAll1Response, GetAllResponse, IndexRate, IndexRateSource } from './rest.type.js'
+import {
+    ErrorResponse,
+    GetAllIndexRateSourcesResponse,
+    GetAllIndexRatesResponse,
+    IndexRate,
+    IndexRateSource,
+} from './rest.type.js'
 
 /**
  * indexratesources
@@ -44,16 +50,16 @@ export class MambuIndexRateSources {
     }
 
     /**
-     * Allows retrieval of all index rate sources
+     * Get index rate sources
      */
-    public async getAll({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
+    public async getAllIndexRateSources({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
             this.buildClient(auth).get(`indexratesources`, {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                200: GetAllResponse,
+                200: GetAllIndexRateSourcesResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -62,9 +68,9 @@ export class MambuIndexRateSources {
     }
 
     /**
-     * Create a new index rate source
+     * Create index rate source
      */
-    public async create({
+    public async createIndexRateSource({
         body,
         headers,
         auth = [['apiKey'], ['basic']],
@@ -92,9 +98,9 @@ export class MambuIndexRateSources {
     }
 
     /**
-     * Delete an index rate by encoded key
+     * Delete index rate
      */
-    public async delete1({
+    public async deleteIndexRate({
         path,
         auth = [['apiKey'], ['basic']],
     }: {
@@ -117,9 +123,9 @@ export class MambuIndexRateSources {
     }
 
     /**
-     * Allows retrieval of all index rate sources
+     * Get index rate sources
      */
-    public async getById({
+    public async getIndexRateSourceById({
         path,
         auth = [['apiKey'], ['basic']],
     }: {
@@ -142,9 +148,9 @@ export class MambuIndexRateSources {
     }
 
     /**
-     * Delete an index rate source by encoded key
+     * Delete index rate source
      */
-    public async delete({
+    public async deleteIndexRateSource({
         path,
         auth = [['apiKey'], ['basic']],
     }: {
@@ -167,9 +173,9 @@ export class MambuIndexRateSources {
     }
 
     /**
-     * Allows retrieval of all index rates for a source
+     * Get index rates for a source
      */
-    public async getAll1({
+    public async getAllIndexRates({
         path,
         auth = [['apiKey'], ['basic']],
     }: {
@@ -182,7 +188,7 @@ export class MambuIndexRateSources {
                 responseType: 'json',
             }),
             {
-                200: GetAll1Response,
+                200: GetAllIndexRatesResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -191,9 +197,9 @@ export class MambuIndexRateSources {
     }
 
     /**
-     * Create a new index rate
+     * Create index rate
      */
-    public async create1({
+    public async createIndexRate({
         body,
         path,
         headers,
@@ -229,7 +235,7 @@ export class MambuIndexRateSources {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

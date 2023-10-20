@@ -3,8 +3,8 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
  * A request to decrease/increase the amount of an authorization hold.
@@ -34,7 +34,7 @@ export interface AuthorizationHoldAmountAdjustmentRequest {
 
 export const AuthorizationHoldAmountAdjustmentRequest = {
     validate: (await import('./schemas/authorization-hold-amount-adjustment-request.schema.js'))
-        .validate10 as unknown as ValidateFunction<AuthorizationHoldAmountAdjustmentRequest>,
+        .validate as ValidateFunction<AuthorizationHoldAmountAdjustmentRequest>,
     get schema() {
         return AuthorizationHoldAmountAdjustmentRequest.validate.schema
     },
@@ -45,7 +45,7 @@ export const AuthorizationHoldAmountAdjustmentRequest = {
         AuthorizationHoldAmountAdjustmentRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!AuthorizationHoldAmountAdjustmentRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(AuthorizationHoldAmountAdjustmentRequest.errors ?? [])
+            throw new ValidationError(AuthorizationHoldAmountAdjustmentRequest.errors ?? [])
         }
     },
 } as const
@@ -55,7 +55,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -65,7 +65,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -147,8 +147,7 @@ export interface GetAuthorizationHold {
 }
 
 export const GetAuthorizationHold = {
-    validate: (await import('./schemas/get-authorization-hold.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetAuthorizationHold>,
+    validate: (await import('./schemas/get-authorization-hold.schema.js')).validate as ValidateFunction<GetAuthorizationHold>,
     get schema() {
         return GetAuthorizationHold.validate.schema
     },
@@ -162,7 +161,7 @@ export type PatchAuthorizationHoldRequest = PatchOperation[]
 
 export const PatchAuthorizationHoldRequest = {
     validate: (await import('./schemas/patch-authorization-hold-request.schema.js'))
-        .validate10 as unknown as ValidateFunction<PatchAuthorizationHoldRequest>,
+        .validate as ValidateFunction<PatchAuthorizationHoldRequest>,
     get schema() {
         return PatchAuthorizationHoldRequest.validate.schema
     },
@@ -172,7 +171,50 @@ export const PatchAuthorizationHoldRequest = {
     is: (o: unknown): o is PatchAuthorizationHoldRequest => PatchAuthorizationHoldRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchAuthorizationHoldRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchAuthorizationHoldRequest.errors ?? [])
+            throw new ValidationError(PatchAuthorizationHoldRequest.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * A full or partial reversal of a card transaction.
+ */
+export interface CardTransactionReversal {
+    /**
+     * The external reference ID to be used to reference the card reversal transaction in subsequent requests.
+     */
+    externalReferenceId: string
+    /**
+     * The encoded key of the entity, generated, globally unique
+     */
+    encodedKey?: string
+    /**
+     * The amount of money to be credited in the client's account from the original card transaction.
+     */
+    amount: number
+    /**
+     * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
+     */
+    currencyCode?: string
+    /**
+     * The ID of the channel through which the payment is done. If the value is not present, the value from the source card transaction is copied.
+     */
+    transactionChannelId?: string
+}
+
+export const CardTransactionReversal = {
+    validate: (await import('./schemas/card-transaction-reversal.schema.js'))
+        .validate as ValidateFunction<CardTransactionReversal>,
+    get schema() {
+        return CardTransactionReversal.validate.schema
+    },
+    get errors() {
+        return CardTransactionReversal.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CardTransactionReversal => CardTransactionReversal.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!CardTransactionReversal.validate(o)) {
+            throw new ValidationError(CardTransactionReversal.errors ?? [])
         }
     },
 } as const
@@ -208,7 +250,7 @@ export interface AccountBalances {
 }
 
 export const AccountBalances = {
-    validate: (await import('./schemas/account-balances.schema.js')).validate10 as unknown as ValidateFunction<AccountBalances>,
+    validate: (await import('./schemas/account-balances.schema.js')).validate as ValidateFunction<AccountBalances>,
     get schema() {
         return AccountBalances.validate.schema
     },
@@ -216,49 +258,6 @@ export const AccountBalances = {
         return AccountBalances.validate.errors ?? undefined
     },
     is: (o: unknown): o is AccountBalances => AccountBalances.validate(o) === true,
-} as const
-
-/**
- * A full or partial reversal of a card transaction.
- */
-export interface CardTransactionReversal {
-    /**
-     * The external reference ID to be used to reference the card reversal transaction in subsequent requests.
-     */
-    externalReferenceId: string
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * The amount of money to be credited in the client's account from the original card transaction.
-     */
-    amount: number
-    /**
-     * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
-     */
-    currencyCode?: string
-    /**
-     * The ID of the channel through which the payment is done. If the value is not present, the value from the source card transaction is copied.
-     */
-    transactionChannelId?: string
-}
-
-export const CardTransactionReversal = {
-    validate: (await import('./schemas/card-transaction-reversal.schema.js'))
-        .validate10 as unknown as ValidateFunction<CardTransactionReversal>,
-    get schema() {
-        return CardTransactionReversal.validate.schema
-    },
-    get errors() {
-        return CardTransactionReversal.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CardTransactionReversal => CardTransactionReversal.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!CardTransactionReversal.validate(o)) {
-            throw new AjvValidator.ValidationError(CardTransactionReversal.errors ?? [])
-        }
-    },
 } as const
 
 /**
@@ -314,11 +313,14 @@ export interface CardTransactionInput {
      * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
      */
     currencyCode?: string
+    /**
+     * Whether the given request should be a partial clearing or not.
+     */
+    partial?: boolean
 }
 
 export const CardTransactionInput = {
-    validate: (await import('./schemas/card-transaction-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<CardTransactionInput>,
+    validate: (await import('./schemas/card-transaction-input.schema.js')).validate as ValidateFunction<CardTransactionInput>,
     get schema() {
         return CardTransactionInput.validate.schema
     },
@@ -328,7 +330,7 @@ export const CardTransactionInput = {
     is: (o: unknown): o is CardTransactionInput => CardTransactionInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!CardTransactionInput.validate(o)) {
-            throw new AjvValidator.ValidationError(CardTransactionInput.errors ?? [])
+            throw new ValidationError(CardTransactionInput.errors ?? [])
         }
     },
 } as const
@@ -388,11 +390,14 @@ export interface CardTransactionOutput {
      * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
      */
     currencyCode?: string
+    /**
+     * Whether the given request should be a partial clearing or not.
+     */
+    partial?: boolean
 }
 
 export const CardTransactionOutput = {
-    validate: (await import('./schemas/card-transaction-output.schema.js'))
-        .validate10 as unknown as ValidateFunction<CardTransactionOutput>,
+    validate: (await import('./schemas/card-transaction-output.schema.js')).validate as ValidateFunction<CardTransactionOutput>,
     get schema() {
         return CardTransactionOutput.validate.schema
     },
@@ -475,8 +480,7 @@ export interface AuthorizationHold {
 }
 
 export const AuthorizationHold = {
-    validate: (await import('./schemas/authorization-hold.schema.js'))
-        .validate10 as unknown as ValidateFunction<AuthorizationHold>,
+    validate: (await import('./schemas/authorization-hold.schema.js')).validate as ValidateFunction<AuthorizationHold>,
     get schema() {
         return AuthorizationHold.validate.schema
     },
@@ -486,7 +490,7 @@ export const AuthorizationHold = {
     is: (o: unknown): o is AuthorizationHold => AuthorizationHold.validate(o) === true,
     assert: (o: unknown) => {
         if (!AuthorizationHold.validate(o)) {
-            throw new AjvValidator.ValidationError(AuthorizationHold.errors ?? [])
+            throw new ValidationError(AuthorizationHold.errors ?? [])
         }
     },
 } as const

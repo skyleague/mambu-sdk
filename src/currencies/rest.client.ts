@@ -44,7 +44,7 @@ export class MambuCurrencies {
     }
 
     /**
-     * Retrieves all currencies.
+     * Get all currencies
      */
     public async getAll({
         query,
@@ -69,7 +69,7 @@ export class MambuCurrencies {
     }
 
     /**
-     * Create a new currency.
+     * Create currency
      */
     public async create({
         body,
@@ -99,7 +99,7 @@ export class MambuCurrencies {
     }
 
     /**
-     * Retrieves a currency by code.
+     * Get currency by code
      */
     public async get({ path, auth = [['apiKey'], ['basic']] }: { path: { currencyCode: string }; auth?: string[][] | string[] }) {
         return this.awaitResponse(
@@ -117,7 +117,7 @@ export class MambuCurrencies {
     }
 
     /**
-     * Updates a currency by code
+     * Update currency by code
      */
     public async update({
         body,
@@ -147,7 +147,7 @@ export class MambuCurrencies {
     }
 
     /**
-     * Deletes a currency by code.
+     * Delete currency by code
      */
     public async delete({
         path,
@@ -178,7 +178,7 @@ export class MambuCurrencies {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

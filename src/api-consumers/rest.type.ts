@@ -3,29 +3,29 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * Representation of an API Consumer's API Key
+ * Represents an API key of an API consumer.
  */
 export interface ApiKey {
     /**
-     * The api key ID
+     * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
      */
     id?: string
     /**
-     * The api key. Deprecated field, please use id instead.
+     * A six character cleartext prefix of the API key. The prefix is not guaranteed to be unique. You must base any identification process on the API key ID, not the prefix.
      */
     apiKey?: string
     /**
-     * The time to live for the rotated key
+     * The time to live (TTL) for the API key in seconds.
      */
     expirationTime?: number
 }
 
 export const ApiKey = {
-    validate: (await import('./schemas/api-key.schema.js')).validate10 as unknown as ValidateFunction<ApiKey>,
+    validate: (await import('./schemas/api-key.schema.js')).validate as ValidateFunction<ApiKey>,
     get schema() {
         return ApiKey.validate.schema
     },
@@ -35,32 +35,31 @@ export const ApiKey = {
     is: (o: unknown): o is ApiKey => ApiKey.validate(o) === true,
     assert: (o: unknown) => {
         if (!ApiKey.validate(o)) {
-            throw new AjvValidator.ValidationError(ApiKey.errors ?? [])
+            throw new ValidationError(ApiKey.errors ?? [])
         }
     },
 } as const
 
 /**
- * Represents the result of an apikey rotation, by providing the new apiKey and the new secretKey
+ * Represents the result of an API key rotation.
  */
 export interface ApiKeyRotationResult {
     /**
-     * The api key ID
+     * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
      */
     id?: string
     /**
-     * The new apiKey resulted by rotating an existing one
+     * The new API key created after rotating an existing API key.
      */
     apiKey?: string
     /**
-     * The new secretKey resulted by rotating an existing apiKey
+     * The new secret key created after rotating an existing API key.
      */
     secretKey?: string
 }
 
 export const ApiKeyRotationResult = {
-    validate: (await import('./schemas/api-key-rotation-result.schema.js'))
-        .validate10 as unknown as ValidateFunction<ApiKeyRotationResult>,
+    validate: (await import('./schemas/api-key-rotation-result.schema.js')).validate as ValidateFunction<ApiKeyRotationResult>,
     get schema() {
         return ApiKeyRotationResult.validate.schema
     },
@@ -75,7 +74,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -85,7 +84,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const

@@ -59,7 +59,7 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Create a new withdrawal transaction
+     * Create withdrawal transaction
      */
     public async makeWithdrawalAsync({
         body,
@@ -92,7 +92,7 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Create a new withdrawal transaction
+     * Create withdrawal transaction
      */
     public async makeWithdrawal({
         body,
@@ -126,7 +126,7 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Apply a fee on deposit account
+     * Apply a fee on a deposit account
      */
     public async applyFee({
         body,
@@ -160,7 +160,7 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Seize a block amount on deposit account
+     * Seize a block amount on a deposit account
      */
     public async makeSeizure({
         body,
@@ -194,7 +194,7 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Create a bulk of deposit transactions
+     * Create bulk deposit transactions.
      */
     public async makeBulkDeposits({
         body,
@@ -224,7 +224,7 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Allows the adjustment of a deposit transaction. The adjustment of a single transaction may bulk adjust multiple transactions
+     * Adjust a deposit transaction, which may bulk adjust multiple transactions
      */
     public async adjust({
         body,
@@ -258,7 +258,7 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Allows to retrieve a deposit transaction document (populated template) by provided transaction id and template id.
+     * Get deposit transaction document
      */
     public async getDepositTransactionDocument({
         path,
@@ -283,7 +283,7 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Create a new transfer transaction
+     * Create transfer transaction
      */
     public async makeTransfer({
         body,
@@ -317,7 +317,7 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Allows retrieval of all transactions for a deposit account via id or encoded key
+     * Get deposit transactions
      */
     public async getAll({
         path,
@@ -344,7 +344,7 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Create new deposit transaction for account
+     * Create deposit transaction
      */
     public async makeDepositAsync({
         body,
@@ -377,7 +377,7 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Allows retrieval of a single deposit transaction via id or encoded key
+     * Get deposit transaction
      */
     public async getById({
         path,
@@ -435,7 +435,7 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Client Directed Query. Allows you to search deposit transactions for deposit accounts by various criteria
+     * Search deposit transactions for deposit accounts by various criteria
      */
     public async search({
         body,
@@ -465,7 +465,7 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Create new deposit transaction for account
+     * Create deposit transaction
      */
     public async makeDeposit({
         body,
@@ -505,7 +505,7 @@ export class MambuDepositTransactions {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

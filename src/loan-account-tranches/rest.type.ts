@@ -3,14 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 export type GetTranchesResponse = LoanTranche[]
 
 export const GetTranchesResponse = {
-    validate: (await import('./schemas/get-tranches-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetTranchesResponse>,
+    validate: (await import('./schemas/get-tranches-response.schema.js')).validate as ValidateFunction<GetTranchesResponse>,
     get schema() {
         return GetTranchesResponse.validate.schema
     },
@@ -25,7 +24,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -35,7 +34,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -43,8 +42,7 @@ export const ErrorResponse = {
 export type EditTranchesRequest = LoanTranche[]
 
 export const EditTranchesRequest = {
-    validate: (await import('./schemas/edit-tranches-request.schema.js'))
-        .validate10 as unknown as ValidateFunction<EditTranchesRequest>,
+    validate: (await import('./schemas/edit-tranches-request.schema.js')).validate as ValidateFunction<EditTranchesRequest>,
     get schema() {
         return EditTranchesRequest.validate.schema
     },
@@ -54,7 +52,7 @@ export const EditTranchesRequest = {
     is: (o: unknown): o is EditTranchesRequest => EditTranchesRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!EditTranchesRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(EditTranchesRequest.errors ?? [])
+            throw new ValidationError(EditTranchesRequest.errors ?? [])
         }
     },
 } as const
@@ -62,8 +60,7 @@ export const EditTranchesRequest = {
 export type EditTranchesResponse = LoanTranche[]
 
 export const EditTranchesResponse = {
-    validate: (await import('./schemas/edit-tranches-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<EditTranchesResponse>,
+    validate: (await import('./schemas/edit-tranches-response.schema.js')).validate as ValidateFunction<EditTranchesResponse>,
     get schema() {
         return EditTranchesResponse.validate.schema
     },

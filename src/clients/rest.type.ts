@@ -3,23 +3,23 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * A person that uses the services of the bank. Clients may have associated information such as their address, custom fields or identification documents
+ * Represents a client.
  */
 export interface Client {
     /**
-     * The last name, surname or family name of the client
+     * The last name, surname, or family name of the client.
      */
     lastName: string
     /**
-     * The migration event encoded key associated with this client.
+     * The migration event encoded key associated with a client.
      */
     migrationEventKey?: string
     /**
-     * The client's language of use in Mambu
+     * The client's preferred language. This will determine the language for the reports, schedules, and account statements you generate for the client.
      */
     preferredLanguage?:
         | 'ENGLISH'
@@ -38,122 +38,122 @@ export interface Client {
         | 'ITALIAN'
         | 'PHRASE'
     /**
-     * The addresses associated with this client information like street, city etc.
+     * The addresses associated with this client.
      */
     addresses?: Address[]
     /**
-     * Extra notes about this client
+     * The additional notes about a client.
      */
     notes?: string
     /**
-     * Gender of the person, male or female
+     * The client's gender, the options are male or female.
      */
     gender?: 'MALE' | 'FEMALE'
     /**
-     * The groups to which this client belongs
+     * The groups to which this client belongs.
      */
     groupKeys?: string[]
     /**
-     * The client's second mobile phone number
+     * The client's second mobile phone number.
      */
     mobilePhone2?: string
     /**
-     * Number of paid and closed (with 'obligations met') accounts for this client's group, when the closing operation is reverted, this is reduced
+     * Number of paid and closed (with 'obligations met') accounts for a client's group; when the closing operation is reverted, this is reduced.
      */
     groupLoanCycle?: number
     portalSettings?: PortalSettings
     /**
-     * Encoded key of the branch this client is assigned to
+     * The encoded key of the branch a client is assigned to.
      */
     assignedBranchKey?: string
     /**
-     * Number of paid and closed (with 'obligations met') accounts for this client, when the closing operation is reverted, this is reduced
+     * Number of paid and closed (with 'obligations met') accounts for a client; when the closing operation is reverted, this is reduced.
      */
     loanCycle?: number
     /**
-     * The client's email address
+     * The client's email address.
      */
     emailAddress?: string
     /**
-     * The encoded key of the client, auto generated, unique
+     * The encoded key of the client, which is unique and generated.
      */
     encodedKey?: string
     /**
-     * The id of the client, can be generated and customized, unique
+     * The ID of the client, which can be generated and customized - but must be unique.
      */
     id?: string
     /**
-     * The state of a client shows his workflow status, if he is waiting approval or is rejected or blacklisted
+     * The state of a client. It shows where the client is in the client life cycle.
      */
     state?: 'PENDING_APPROVAL' | 'INACTIVE' | 'ACTIVE' | 'EXITED' | 'BLACKLISTED' | 'REJECTED'
     /**
-     * Encoded key of the user this client is assigned to
+     * The encoded key of the user a client is assigned to.
      */
     assignedUserKey?: string
     /**
-     * A role which describes the intended use of a client in the system
+     * A role which describes the intended use of a client in the system.
      */
     clientRoleKey?: string
     /**
-     * The last date this client was modified
+     * The last date a client was modified.
      */
     lastModifiedDate?: string
     /**
-     * The client's home phone number
+     * The client's home phone number.
      */
     homePhone?: string
     /**
-     * The date this client was created
+     * The date a client was created.
      */
     creationDate?: string
     /**
-     * The date when this client was born
+     * The client's date of birth.
      */
     birthDate?: string
     /**
-     * Encoded key of the centre this client is assigned to
+     * The encoded key of the centre a client is assigned to.
      */
     assignedCentreKey?: string
     /**
-     * date when client was approved
+     * The date when a client was approved.
      */
     approvedDate?: string
     /**
-     * The first name, personal name, given name or forename of the client
+     * The first name, personal name, given name, or forename of the client.
      */
     firstName: string
     /**
-     * The identification documents of this person
+     * The identification documents for this client.
      */
     idDocuments?: IdentificationDocument[]
     /**
-     * Encoded key of this clients profile picture
+     * The encoded key of a client's profile picture.
      */
     profilePictureKey?: string
     /**
-     * Encoded key of the users profile signature
+     * The encoded key of the client's profile signature.
      */
     profileSignatureKey?: string
     /**
-     * The client's mobile phone number
+     * The client's mobile phone number.
      */
     mobilePhone?: string
     /**
-     * date when client was closed
+     * The date when the client state was changed to closed.
      */
     closedDate?: string
     /**
-     * The middle name of the client, if she/he has one
+     * The middle name of the client.
      */
     middleName?: string
     /**
-     * The date when client was set as active for the first time
+     * The date when a client was set as active for the first time.
      */
     activationDate?: string
 }
 
 export const Client = {
-    validate: (await import('./schemas/client.schema.js')).validate10 as unknown as ValidateFunction<Client>,
+    validate: (await import('./schemas/client.schema.js')).validate as ValidateFunction<Client>,
     get schema() {
         return Client.validate.schema
     },
@@ -163,7 +163,7 @@ export const Client = {
     is: (o: unknown): o is Client => Client.validate(o) === true,
     assert: (o: unknown) => {
         if (!Client.validate(o)) {
-            throw new AjvValidator.ValidationError(Client.errors ?? [])
+            throw new ValidationError(Client.errors ?? [])
         }
     },
 } as const
@@ -173,7 +173,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -183,7 +183,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -191,7 +191,7 @@ export const ErrorResponse = {
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate10 as unknown as ValidateFunction<PatchRequest>,
+    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -201,7 +201,7 @@ export const PatchRequest = {
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PatchRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PatchRequest.errors ?? [])
+            throw new ValidationError(PatchRequest.errors ?? [])
         }
     },
 } as const
@@ -209,7 +209,7 @@ export const PatchRequest = {
 export type GetAllResponse = Client[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -231,8 +231,7 @@ export interface ClientSearchCriteria {
 }
 
 export const ClientSearchCriteria = {
-    validate: (await import('./schemas/client-search-criteria.schema.js'))
-        .validate10 as unknown as ValidateFunction<ClientSearchCriteria>,
+    validate: (await import('./schemas/client-search-criteria.schema.js')).validate as ValidateFunction<ClientSearchCriteria>,
     get schema() {
         return ClientSearchCriteria.validate.schema
     },
@@ -242,7 +241,7 @@ export const ClientSearchCriteria = {
     is: (o: unknown): o is ClientSearchCriteria => ClientSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
         if (!ClientSearchCriteria.validate(o)) {
-            throw new AjvValidator.ValidationError(ClientSearchCriteria.errors ?? [])
+            throw new ValidationError(ClientSearchCriteria.errors ?? [])
         }
     },
 } as const
@@ -250,7 +249,7 @@ export const ClientSearchCriteria = {
 export type SearchResponse = Client[]
 
 export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
+    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -261,57 +260,57 @@ export const SearchResponse = {
 } as const
 
 /**
- * Describes the role of a client/group in the system
+ * Represents a client or group role.
  */
 export interface ClientRole {
     /**
-     * The type of the client for which this role was created
+     * The type of the client for which this role was created.
      */
     clientType?: 'CLIENT' | 'GROUP'
     /**
-     * Indicates whether identification documents must be provided for the client to be created
+     * `TRUE` if identification documents must be provided for the client to be created, `FALSE` otherwise. Does not apply for groups.
      */
     requireID?: boolean
     /**
-     * Indicates whether the clients under this type can be used as guarantors
+     * `TRUE` if clients with this client role can be used as guarantors, `FALSE` otherwise.
      */
     canGuarantee?: boolean
     /**
-     * Indicates whether the Mambu default address section will be available
+     * `TRUE` if the Mambu default address section is available, `FALSE` otherwise.
      */
     useDefaultAddress?: boolean
     /**
-     * The name of the client role
+     * The name of the client role.
      */
     name?: string
     /**
-     * Indicates whether new accounts for this client type can be created
+     * `TRUE` if new accounts for this client type can be created, `FALSE` otherwise.
      */
     canOpenAccounts?: boolean
     /**
-     * Text description for this client role
+     * The text description for this client role.
      */
     description?: string
     /**
-     * The encoded key of the client, auto generated, unique
+     * The encoded key of the client, which is unique and generated.
      */
     encodedKey?: string
     /**
-     * The ID of the client role, can be generated and customized, unique
+     * The ID of the client role, which can be generated and customized - but must be unique.
      */
     id?: string
     /**
-     * The creation date of the client role
+     * The creation date of the client role.
      */
     creationDate?: string
     /**
-     * Indicates the pattern used in generating the client id
+     * The pattern used in generating the client ID.
      */
     idPattern?: string
 }
 
 export const ClientRole = {
-    validate: (await import('./schemas/client-role.schema.js')).validate10 as unknown as ValidateFunction<ClientRole>,
+    validate: (await import('./schemas/client-role.schema.js')).validate as ValidateFunction<ClientRole>,
     get schema() {
         return ClientRole.validate.schema
     },
@@ -325,7 +324,7 @@ export type GetCreditArrangementsByClientIdOrKeyResponse = CreditArrangement[]
 
 export const GetCreditArrangementsByClientIdOrKeyResponse = {
     validate: (await import('./schemas/get-credit-arrangements-by-client-id-or-key-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetCreditArrangementsByClientIdOrKeyResponse>,
+        .validate as ValidateFunction<GetCreditArrangementsByClientIdOrKeyResponse>,
     get schema() {
         return GetCreditArrangementsByClientIdOrKeyResponse.validate.schema
     },
@@ -337,57 +336,57 @@ export const GetCreditArrangementsByClientIdOrKeyResponse = {
 } as const
 
 /**
- * Address Data Transfer Object
+ * Represents an address.
  */
 export interface Address {
     /**
-     * The country
+     * The country.
      */
     country?: string
     /**
-     * Address parent key, the object owning this address, client, centre, branch
+     * The address parent key indicating the object owning this address. For example: client, centre, or branch.
      */
     parentKey?: string
     /**
-     * The city for this address
+     * The city for the address.
      */
     city?: string
     /**
-     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90
+     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
      */
     latitude?: number
     /**
-     * The post code
+     * The post code.
      */
     postcode?: string
     /**
-     * Index of this address in the list of addresses
+     * The index of this address in the list of addresses.
      */
     indexInList?: number
     /**
-     * Address encoded key, unique, generated
+     * The address encoded key, which is unique and generated.
      */
     encodedKey?: string
     /**
-     * The region that is part of the address
+     * The region for the address.
      */
     region?: string
     /**
-     * The second line for the address, in case the first one doesn't fit the information, this is completely optional
+     * The second line of the address.
      */
     line2?: string
     /**
-     * The first line of the address
+     * The first line of the address.
      */
     line1?: string
     /**
-     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180
+     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
      */
     longitude?: number
 }
 
 /**
- * Portal settings for an individual client
+ * Represents portal settings for an individual client.
  */
 export interface PortalSettings {
     /**
@@ -395,11 +394,11 @@ export interface PortalSettings {
      */
     encodedKey?: string
     /**
-     * State of the client's portal preferences
+     * The state of the client's portal preferences.
      */
     portalState?: 'ENABLED' | 'DISABLED'
     /**
-     * The last date the client logged in to the portal
+     * The last date the client logged in to the portal.
      */
     lastLoggedInDate?: string
 }
@@ -547,7 +546,7 @@ export interface PatchOperation {
  */
 export interface ClientSortingCriteria {
     /**
-     * Contains the field that can be used as sorting selection. Can be native (one from the provided list) or otherwise can specify a custom field using the format [customFieldSetId].[customFieldId].
+     * The field to sort by. It can be native (one from the provided list) or otherwise can specify a custom field definition using the format [customFieldSetId].[customFieldId].
      */
     field:
         | 'encodedKey'
@@ -573,7 +572,7 @@ export interface ClientSortingCriteria {
         | 'groupLoanCycle'
         | 'portalState'
     /**
-     * The sorting order: ASC or DESC. The default order is DESC.
+     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
      */
     order?: 'ASC' | 'DESC'
 }
@@ -583,7 +582,7 @@ export interface ClientSortingCriteria {
  */
 export interface ClientFilterCriteria {
     /**
-     * Contains the actual searching fields that can be native (one from the provided list) or otherwise can specify a custom field using the format [customFieldSetId].[customFieldId].
+     * The fields to perform the search. They can be native (one from the provided list) or otherwise can specify a custom field definition using the format [customFieldSetId].[customFieldId].
      */
     field:
         | 'encodedKey'
@@ -619,7 +618,7 @@ export interface ClientFilterCriteria {
         | 'preferredLanguage'
         | 'groupId'
     /**
-     * The value to match the searching criteria
+     * The value to match the searching criteria.
      */
     value?: string
     /**
@@ -668,86 +667,86 @@ export interface ClientFilterCriteria {
         | 'EMPTY'
         | 'NOT_EMPTY'
     /**
-     * The second value to match the searching criteria, when using BETWEEN, together with value
+     * The second value to match the searching criteria, when the `BETWEEN` operator is used.
      */
     secondValue?: string
     /**
-     * List of values when operator is IN.
+     * List of values when the `IN` operator is used.
      */
     values?: string[]
 }
 
 /**
- * A maximum amount a client (individual, group or company) can take in loans and overdrafts.
+ * Represents a credit arrangement.
  */
 export interface CreditArrangement {
     /**
-     * The available amount of the credit arrangement
+     * The available amount of the credit arrangement.
      */
     availableCreditAmount?: number
     /**
-     * The maximum credit amount the client can be exposed to
+     * The maximum credit amount the client can be exposed to.
      */
     amount: number
     /**
-     * The notes/description of credit arrangement
+     * The notes or description of the credit arrangement.
      */
     notes?: string
     /**
-     * The last date when credit arrangement was modified
+     * The last date when the credit arrangement was modified.
      */
     lastModifiedDate?: string
     /**
-     * The encodedKey of the client or group (a.k.a holder)
+     * The encoded key of the credit arrangement holder (individual client or group).
      */
     holderKey?: string
     /**
-     * The consumed amount of the credit arrangement (calculated as the difference between the amount and available amount
+     * The consumed amount of the credit arrangement, which is calculated as the difference between the amount and available amount.
      */
     consumedCreditAmount?: number
     /**
-     * The date when credit arrangement was created
+     * The date when the credit arrangement was created.
      */
     creationDate?: string
     /**
-     * The date when credit arrangement was approved
+     * The date when the credit arrangement was approved.
      */
     approvedDate?: string
     /**
-     * The substate of credit arrangement can be Withdrawn or Rejected when state is Closed
+     * The substate of credit arrangement.
      */
     subState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
     /**
-     * The date when credit arrangement was closed
+     * The date when the credit arrangement was closed.
      */
     closedDate?: string
     /**
-     * The type of exposure limit calculation method used
+     * The type of exposure limit calculation method used for the credit arrangement.
      */
     exposureLimitType?: 'APPROVED_AMOUNT' | 'OUTSTANDING_AMOUNT'
     /**
-     * The encoded key of credit arrangement, auto generated, unique
+     * The encoded key of the credit arrangement, it is auto generated, and unique.
      */
     encodedKey?: string
     /**
-     * The date when credit arrangement expires
+     * The date when the credit arrangement expires.
      */
     expireDate: string
     currency?: Currency
     /**
-     * The id of credit arrangement, can be generated and customized, unique
+     * The ID of credit arrangement, can be generated and customized, and must be unique.
      */
     id?: string
     /**
-     * The state of credit arrangement can be Pending Approval, Approved, Active or Closed
+     * The state of the credit arrangement.
      */
     state?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
     /**
-     * The type of the credit arrangement holder (client or group)
+     * The type of the credit arrangement holder (individual client or group).
      */
     holderType: 'CLIENT' | 'GROUP'
     /**
-     * The start date from which the credit arrangement becomes active
+     * The start date from which the credit arrangement became active.
      */
     startDate: string
 }

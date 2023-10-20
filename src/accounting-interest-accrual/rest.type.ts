@@ -3,23 +3,23 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * Wrapper that holds a list of filtering criteria and a sorting criteria for Interest Accrual Breakdown
+ * Represents the filtering criteria list and sorting criteria for searching interest accrual entries.
  */
 export interface InterestAccrualSearchCriteria {
     sortingCriteria?: InterestAccrualSortingCriteria
     /**
-     * The list of filtering criteria
+     * The list of filtering criteria.
      */
     filterCriteria?: InterestAccrualFilterCriteria[]
 }
 
 export const InterestAccrualSearchCriteria = {
     validate: (await import('./schemas/interest-accrual-search-criteria.schema.js'))
-        .validate10 as unknown as ValidateFunction<InterestAccrualSearchCriteria>,
+        .validate as ValidateFunction<InterestAccrualSearchCriteria>,
     get schema() {
         return InterestAccrualSearchCriteria.validate.schema
     },
@@ -29,7 +29,7 @@ export const InterestAccrualSearchCriteria = {
     is: (o: unknown): o is InterestAccrualSearchCriteria => InterestAccrualSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
         if (!InterestAccrualSearchCriteria.validate(o)) {
-            throw new AjvValidator.ValidationError(InterestAccrualSearchCriteria.errors ?? [])
+            throw new ValidationError(InterestAccrualSearchCriteria.errors ?? [])
         }
     },
 } as const
@@ -37,7 +37,7 @@ export const InterestAccrualSearchCriteria = {
 export type SearchResponse = InterestAccrualBreakdown[]
 
 export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate10 as unknown as ValidateFunction<SearchResponse>,
+    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -52,7 +52,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -62,17 +62,17 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
 
 /**
- * The sorting criteria used for Interest Accrual Breakdown
+ * The sorting criteria used for sorting interest accrual entries.
  */
 export interface InterestAccrualSortingCriteria {
     /**
-     * Contains the field that can be used as sorting criteria
+     * The field to use as the sorting criteria.
      */
     field:
         | 'entryId'
@@ -88,17 +88,17 @@ export interface InterestAccrualSortingCriteria {
         | 'foreignDebit'
         | 'foreignCurrencyCode'
     /**
-     * The sorting order: ASC or DESC. The default order is DESC.
+     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
      */
     order?: 'ASC' | 'DESC'
 }
 
 /**
- * The unit that composes the list used for Interest Accrual Breakdown searching
+ * Represents the filter criteria used for searching interest accrual entries.
  */
 export interface InterestAccrualFilterCriteria {
     /**
-     * Contains the actual searching fields
+     * Contains the fields to use for searching.
      */
     field:
         | 'entryId'
@@ -120,7 +120,7 @@ export interface InterestAccrualFilterCriteria {
         | 'foreignDebit'
         | 'foreignCurrencyCode'
     /**
-     * The value to match the searching criteria
+     * The value to match the searching criteria.
      */
     value?: string
     /**
@@ -169,101 +169,101 @@ export interface InterestAccrualFilterCriteria {
         | 'EMPTY'
         | 'NOT_EMPTY'
     /**
-     * The second value to match the searching criteria, when using BETWEEN, together with value
+     * The second value to match the searching criteria, when the `BETWEEN` operator is used.
      */
     secondValue?: string
     /**
-     * List of values when operator is IN.
+     * List of values when the `IN` operator is used.
      */
     values?: string[]
 }
 
 /**
- * Represents an interest accrual breakdown entry
+ * Represents an interest accrual breakdown entry.
  */
 export interface InterestAccrualBreakdown {
     /**
-     * Debit or Credit
+     * Debit or Credit.
      */
     entryType?: string
     /**
-     * The interest accrued amount for the account referred in this entry
+     * The interest accrued amount for the account in this entry.
      */
     amount?: number
     /**
-     * The name of GL Account
+     * The name of the general ledger account.
      */
     glAccountName?: string
     /**
-     * The id of the account's product
+     * The ID of the account's product.
      */
     productId?: string
     /**
-     * The id of GL Account
+     * The ID of the general ledger account.
      */
     glAccountId?: string
     /**
-     * The name for branch of the account
+     * The name of the account's branch
      */
     branchName?: string
     /**
-     * The encoded key of the account's product
+     * The encoded key of the account's product.
      */
     productKey?: string
     /**
-     * The creation datetime of the entry, in UTC
+     * The creation date and time of the entry in UTC.
      */
     creationDate?: string
     /**
-     * The Id of the Journal Entry transaction
+     * The journal entry transaction ID.
      */
     transactionId?: string
     /**
-     * The encoded key of the loan/deposit account for which the interest accrual amount is retrieved
+     * The encoded key of the loan or deposit account for which interest is accrued.
      */
     accountKey?: string
     /**
-     * Generated Id for the interest accrual per account entry
+     * The generated ID of the interest accrual per account entry.
      */
     entryId?: number
     foreignAmount?: ForeignAmount
     /**
-     * The encoded Key for branch of the account
+     * The encoded key of the account's branch.
      */
     branchKey?: string
     /**
-     * The loan/deposit account ID for which the interest accrued amount is retrieved
+     * The loan or deposit account ID for which interest is accrued.
      */
     accountId?: string
     /**
-     * The type of GL Account: ASSET / LIABILITY / EQUITY / INCOME / EXPENSE
+     * The general ledger account type, which can be: `ASSET`, `LIABILITY`, `EQUITY`, `INCOME`, or `EXPENSE`.
      */
     glAccountType?: string
     /**
-     * The encoded key of the GL Account used for logging the interest accrual
+     * The encoded key of the general ledger account used for logging the interest accrual.
      */
     glAccountKey?: string
     /**
-     * The booking date, in Organization Time Zone
+     * The booking date in the organization's timezone.
      */
     bookingDate?: string
     /**
-     * The Id of the GL Journal Entry that represents the interest accrual sum logged for all of the very same product
+     * The ID of the general ledger journal entry that logged the interest accrual sum for all accounts of the same product.
      */
     parentEntryId?: number
     /**
-     * The type of Product (Loan or Deposit)
+     * The product type.
      */
     productType?: string
 }
 
 /**
- * Representation of details of GL Journal Entries posted in foreign currency.
+ * Represents the details of general ledger journal entries posted in foreign currency.
  */
 export interface ForeignAmount {
     accountingRate?: AccountingRate
     /**
-     * Amount in foreign currency
+     * The foreign currency amount of the accounting entry.
      */
     amount?: number
     currency?: Currency

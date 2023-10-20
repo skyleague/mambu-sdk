@@ -44,7 +44,7 @@ export class MambuTransactionChannels {
     }
 
     /**
-     * Allows retrieval of transaction channels
+     * Get transaction channels
      */
     public async getAll({
         query,
@@ -66,7 +66,7 @@ export class MambuTransactionChannels {
     }
 
     /**
-     * Creates a new transaction channel
+     * Create transaction channel
      */
     public async create({
         body,
@@ -96,7 +96,7 @@ export class MambuTransactionChannels {
     }
 
     /**
-     * Allows retrieval of a single transaction channel by id
+     * Get transaction channel
      */
     public async getById({
         path,
@@ -121,7 +121,7 @@ export class MambuTransactionChannels {
     }
 
     /**
-     * Updates an existing transaction channel
+     * Update transaction channel
      */
     public async update({
         body,
@@ -151,7 +151,7 @@ export class MambuTransactionChannels {
     }
 
     /**
-     * Deletes a transaction channel by id
+     * Delete transaction channel
      */
     public async delete({
         path,
@@ -182,7 +182,7 @@ export class MambuTransactionChannels {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

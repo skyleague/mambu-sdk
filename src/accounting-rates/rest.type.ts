@@ -3,13 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 export type GetAllResponse = AccountingRate[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate10 as unknown as ValidateFunction<GetAllResponse>,
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -24,7 +24,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -34,7 +34,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -54,8 +54,7 @@ export interface PostAccountingRateDTO {
 }
 
 export const PostAccountingRateDTO = {
-    validate: (await import('./schemas/post-accounting-rate-dto.schema.js'))
-        .validate10 as unknown as ValidateFunction<PostAccountingRateDTO>,
+    validate: (await import('./schemas/post-accounting-rate-dto.schema.js')).validate as ValidateFunction<PostAccountingRateDTO>,
     get schema() {
         return PostAccountingRateDTO.validate.schema
     },
@@ -65,7 +64,7 @@ export const PostAccountingRateDTO = {
     is: (o: unknown): o is PostAccountingRateDTO => PostAccountingRateDTO.validate(o) === true,
     assert: (o: unknown) => {
         if (!PostAccountingRateDTO.validate(o)) {
-            throw new AjvValidator.ValidationError(PostAccountingRateDTO.errors ?? [])
+            throw new ValidationError(PostAccountingRateDTO.errors ?? [])
         }
     },
 } as const
@@ -101,7 +100,7 @@ export interface AccountingRate {
 }
 
 export const AccountingRate = {
-    validate: (await import('./schemas/accounting-rate.schema.js')).validate10 as unknown as ValidateFunction<AccountingRate>,
+    validate: (await import('./schemas/accounting-rate.schema.js')).validate as ValidateFunction<AccountingRate>,
     get schema() {
         return AccountingRate.validate.schema
     },

@@ -44,7 +44,7 @@ export class MambuCustomFieldSets {
     }
 
     /**
-     * Allows retrieval of custom fields by custom field set key or id
+     * Get custom field definitions by custom field set
      */
     public async getAllBySetId({
         path,
@@ -72,7 +72,7 @@ export class MambuCustomFieldSets {
     }
 
     /**
-     * Allows retrieval of custom field sets using various query parameters
+     * Get custom field sets
      */
     public async getAll({
         query,
@@ -105,7 +105,7 @@ export class MambuCustomFieldSets {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

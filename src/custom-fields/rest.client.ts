@@ -44,7 +44,7 @@ export class MambuCustomFields {
     }
 
     /**
-     * Allows retrieval of a single custom field via id or encoded key
+     * Get custom field definition
      */
     public async getById({
         path,
@@ -73,7 +73,7 @@ export class MambuCustomFields {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

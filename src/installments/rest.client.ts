@@ -44,13 +44,21 @@ export class MambuInstallments {
     }
 
     /**
-     * Allows retrieval of installments by due dates
+     * Get installments for `ACTIVE` or `ACTIVE_IN_ARREARS` loan accounts
      */
     public async getAll({
         query,
         auth = [['apiKey'], ['basic']],
     }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; dueFrom: string; dueTo: string }
+        query?: {
+            offset?: string
+            limit?: string
+            paginationDetails?: string
+            dueFrom: string
+            dueTo: string
+            productTypeKey?: string
+            accountState?: string
+        }
         auth?: string[][] | string[]
     }) {
         return this.awaitResponse(
@@ -64,13 +72,14 @@ export class MambuInstallments {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

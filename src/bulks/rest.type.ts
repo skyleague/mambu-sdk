@@ -3,8 +3,8 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
  * Holds information about the status of a bulk process
@@ -36,8 +36,7 @@ export interface BulkProcessStatus {
 }
 
 export const BulkProcessStatus = {
-    validate: (await import('./schemas/bulk-process-status.schema.js'))
-        .validate10 as unknown as ValidateFunction<BulkProcessStatus>,
+    validate: (await import('./schemas/bulk-process-status.schema.js')).validate as ValidateFunction<BulkProcessStatus>,
     get schema() {
         return BulkProcessStatus.validate.schema
     },
@@ -52,7 +51,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -62,7 +61,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const

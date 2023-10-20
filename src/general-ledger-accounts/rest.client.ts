@@ -44,7 +44,7 @@ export class MambuGeneralLedgerAccounts {
     }
 
     /**
-     * Allows retrieval of GL account by code or encoded key.
+     * Get general ledger account
      */
     public async getById({
         path,
@@ -72,7 +72,7 @@ export class MambuGeneralLedgerAccounts {
     }
 
     /**
-     * Partially update an existing GL account
+     * Partially update an existing general ledger account
      */
     public async patch({
         body,
@@ -102,7 +102,7 @@ export class MambuGeneralLedgerAccounts {
     }
 
     /**
-     * Allows retrieval of GL accounts by type.
+     * Get general ledger accounts
      */
     public async getAll({
         query,
@@ -136,7 +136,7 @@ export class MambuGeneralLedgerAccounts {
     }
 
     /**
-     * Create GL Accounts
+     * Create general ledger account
      */
     public async create({
         body,
@@ -173,7 +173,7 @@ export class MambuGeneralLedgerAccounts {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

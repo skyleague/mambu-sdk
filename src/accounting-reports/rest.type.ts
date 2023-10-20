@@ -3,23 +3,23 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * Holds the information about the accounting report, wraps calculation result items.
+ * Represents information about the accounting report.
  */
 export interface AccountingReport {
     /**
-     * The encoded key of the generated accounting report
+     * The encoded key of the generated accounting report.
      */
     reportKey?: string
     /**
-     * The list of the accounting report items
+     * The list of the accounting report items.
      */
     items?: AccountingReportItem[]
     /**
-     * The accounting report generation status
+     * The accounting report generation status.
      */
     status?:
         | 'QUEUED'
@@ -36,7 +36,7 @@ export interface AccountingReport {
 }
 
 export const AccountingReport = {
-    validate: (await import('./schemas/accounting-report.schema.js')).validate10 as unknown as ValidateFunction<AccountingReport>,
+    validate: (await import('./schemas/accounting-report.schema.js')).validate as ValidateFunction<AccountingReport>,
     get schema() {
         return AccountingReport.validate.schema
     },
@@ -51,7 +51,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -61,7 +61,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -73,34 +73,34 @@ type AccountingReportGenerationInputGlTypesArray = 'ASSET' | 'LIABILITY' | 'EQUI
  */
 export interface AccountingReportGenerationInput {
     /**
-     * The branch id/encoded key to filter GL Journal Entries by
+     * The branch ID  or encoded key to filter general ledger journal entries by.
      */
     branchId?: string
     /**
-     * The account types to filter GL Accounts by. For Header GL Accounts the report will reflect the sum of Details GL Accounts that match the given filters used
+     * The account types to filter general ledger accounts by. For header general ledger accounts the report will reflect the sum of the detail general ledger accounts that match the given filters used.
      */
     glTypes?: AccountingReportGenerationInputGlTypesArray[]
     /**
-     * The balance types to include in generated report
+     * The balance types to include in the generated report.
      */
     balanceTypes?: ('OPENING_BALANCE' | 'NET_CHANGE' | 'CLOSING_BALANCE')[]
     /**
-     * The inclusive end date of GL Journal entry date filtering (as Organization time)
+     * The inclusive end date in the organization time format and timezone that the general ledger journal entries' entry date is filtered to.
      */
     endDate: string
     /**
-     * The ISO currency code to filter GL Accounts by
+     * The ISO currency code to filter general ledger accounts by.
      */
     currencyCode?: string
     /**
-     * The inclusive start date of GL Journal entry date filtering (as Organization time)
+     * The inclusive start date in the organization time format and timezone that the general ledger journal entries' entry date is filtered from.
      */
     startDate: string
 }
 
 export const AccountingReportGenerationInput = {
     validate: (await import('./schemas/accounting-report-generation-input.schema.js'))
-        .validate10 as unknown as ValidateFunction<AccountingReportGenerationInput>,
+        .validate as ValidateFunction<AccountingReportGenerationInput>,
     get schema() {
         return AccountingReportGenerationInput.validate.schema
     },
@@ -110,21 +110,21 @@ export const AccountingReportGenerationInput = {
     is: (o: unknown): o is AccountingReportGenerationInput => AccountingReportGenerationInput.validate(o) === true,
     assert: (o: unknown) => {
         if (!AccountingReportGenerationInput.validate(o)) {
-            throw new AjvValidator.ValidationError(AccountingReportGenerationInput.errors ?? [])
+            throw new ValidationError(AccountingReportGenerationInput.errors ?? [])
         }
     },
 } as const
 
 /**
- * Holds the information about accounting report generation status.
+ * Represents the information about the accounting report generation status.
  */
 export interface AccountingReportGenerationResponse {
     /**
-     * The encoded key of the generated report
+     * The encoded key of the generated report.
      */
     reportKey?: string
     /**
-     * The accounting report generation status
+     * The accounting report generation status.
      */
     status?:
         | 'QUEUED'
@@ -142,7 +142,7 @@ export interface AccountingReportGenerationResponse {
 
 export const AccountingReportGenerationResponse = {
     validate: (await import('./schemas/accounting-report-generation-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<AccountingReportGenerationResponse>,
+        .validate as ValidateFunction<AccountingReportGenerationResponse>,
     get schema() {
         return AccountingReportGenerationResponse.validate.schema
     },
@@ -153,7 +153,7 @@ export const AccountingReportGenerationResponse = {
 } as const
 
 /**
- * Holds accounting report information about GL accounts and GL account amounts in both organizational and foreign currencies.
+ * Represents the accounting report information about general ledger accounts and their amounts in both the organization's currency and foreign currencies.
  */
 export interface AccountingReportItem {
     foreignAmounts?: AccountingReportAmounts
@@ -162,73 +162,73 @@ export interface AccountingReportItem {
 }
 
 /**
- * Holds the information about accounting report amounts.
+ * Represents information about the accounting report amounts.
  */
 export interface AccountingReportAmounts {
     /**
-     * The net change amount of the GL account
+     * The net change amount of the general ledger account.
      */
     netChange?: number
     /**
-     * The closing balance amount of the GL account
+     * The closing balance amount of the general ledger account.
      */
     closingBalance?: number
     /**
-     * The opening balance amount of the GL account
+     * The opening balance amount of the general ledger account.
      */
     openingBalance?: number
     /**
-     * The debit amount of the GL account
+     * The debit amount of the general ledger account.
      */
     debits?: number
     /**
-     * The credit amount of the GL account
+     * The credit amount of the general ledger account.
      */
     credits?: number
 }
 
 /**
- * The response representation of a GLAccount.
+ * Represents a general ledger account.
  */
 export interface GLAccount {
     /**
-     * The data migration event key if this GL Account was created as a part of a data migration event.
+     * The data migration event key if the general ledger account was created as a part of a data migration event.
      */
     migrationEventKey?: string
     /**
-     * Indicates when the last modification occurred. Stored as UTC.
+     * The last modification date and time, which is stored as UTC.
      */
     lastModifiedDate?: string
     /**
-     * General ledger code used to identify different account types. Also used for grouping and categorizing accounts. For instance an account code of '3201' is considered a subtype of account of '3200'.
+     * The general ledger code used to identify different account types. Also used for grouping and categorizing accounts. For example: an account code of '3201' is considered a subtype of '3200'.
      */
     glCode?: string
     /**
-     * Categorization of GL Account by their usage (detail - where transactions are logged, or headers, for reporting and organization purposes).
+     * The usage type of the general ledger account. `DETAIL` accounts are used to stores transaction balances. `HEADER` accounts are used to organise and group detail accounts for reporting purposes.
      */
     usage?: 'DETAIL' | 'HEADER'
     /**
-     * Description of the GL Account.
+     * A description of the general ledger account.
      */
     description?: string
     /**
-     * Indicates the creation date for this account. Stored as UTC.
+     * The creation date for this account, which is stored as UTC.
      */
     creationDate?: string
     /**
-     * Type of the GL Account
+     * The general ledger account type.
      */
     type?: 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE'
     /**
-     * Indicates whether manual Journal Entries are allowed or not
+     * `TRUE` if manual journal entries are allowed, `FALSE` otherwise.
      */
     allowManualJournalEntries?: boolean
     /**
-     * Indicates the balance of the GL Account. This field is populated only for GET /glaccounts endpoint.
+     * The balance of the general ledger account, which is only populated for the GET /glaccounts endpoint.
      */
     balance?: number
     /**
-     * Name of the GL Account
+     * The name of the general ledger account.
      */
     name?: string
     /**
@@ -237,11 +237,11 @@ export interface GLAccount {
     encodedKey?: string
     currency?: Currency
     /**
-     * Indicates whether to strip trailing zeros.
+     * `TRUE` if trailing zeros are stripped, `FALSE` otherwise.
      */
     stripTrailingZeros?: boolean
     /**
-     * Whether the Account is activated and may be used.
+     * `TRUE` if the account is activated and may be used, `FALSE` otherwise.
      */
     activated?: boolean
 }

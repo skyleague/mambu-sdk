@@ -3,14 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 export type GetCommentsResponse = Comment[]
 
 export const GetCommentsResponse = {
-    validate: (await import('./schemas/get-comments-response.schema.js'))
-        .validate10 as unknown as ValidateFunction<GetCommentsResponse>,
+    validate: (await import('./schemas/get-comments-response.schema.js')).validate as ValidateFunction<GetCommentsResponse>,
     get schema() {
         return GetCommentsResponse.validate.schema
     },
@@ -25,7 +24,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -35,17 +34,17 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
 
 /**
- * Comment Data Transfer Object
+ * Represents information about the comment data transfer object.
  */
 export interface Comment {
     /**
-     * The type of the entity that owns this comment
+     * The type of the entity that owns this comment.
      */
     ownerType?:
         | 'CLIENT'
@@ -61,33 +60,33 @@ export interface Comment {
         | 'LINE_OF_CREDIT'
         | 'GL_JOURNAL_ENTRY'
     /**
-     * The last date this comment was modified
+     * The last date when this comment was modified.
      */
     lastModifiedDate?: string
     /**
-     * The encoded key of the comment, auto generated, unique
+     * The comments's encoded key, which is auto-generated and unique.
      */
     encodedKey?: string
     /**
-     * The message in the comment
+     * The message in the comment.
      */
     text?: string
     /**
-     * The creation date of the comment
+     * The creation date of the comment.
      */
     creationDate?: string
     /**
-     * The owner key of the comment, representing the encoded key of the entity owning this comment
+     * The encoded key of the entity that owns this comment.
      */
     ownerKey?: string
     /**
-     * The key of the user
+     * The user's key.
      */
     userKey?: string
 }
 
 export const Comment = {
-    validate: (await import('./schemas/comment.schema.js')).validate10 as unknown as ValidateFunction<Comment>,
+    validate: (await import('./schemas/comment.schema.js')).validate as ValidateFunction<Comment>,
     get schema() {
         return Comment.validate.schema
     },
@@ -97,7 +96,7 @@ export const Comment = {
     is: (o: unknown): o is Comment => Comment.validate(o) === true,
     assert: (o: unknown) => {
         if (!Comment.validate(o)) {
-            throw new AjvValidator.ValidationError(Comment.errors ?? [])
+            throw new ValidationError(Comment.errors ?? [])
         }
     },
 } as const

@@ -43,7 +43,7 @@ export class MambuCurrenciesConfiguration {
     }
 
     /**
-     * Allows retrieval of the currencies configuration.
+     * Get currencies configuration
      */
     public async get({
         query,
@@ -65,7 +65,7 @@ export class MambuCurrenciesConfiguration {
     }
 
     /**
-     * Allows updating the currencies configuration.
+     * Update currencies configuration
      */
     public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
@@ -85,7 +85,7 @@ export class MambuCurrenciesConfiguration {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

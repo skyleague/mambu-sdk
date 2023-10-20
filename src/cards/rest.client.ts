@@ -54,7 +54,7 @@ export class MambuCards {
     }
 
     /**
-     * Increases the amount of an authorization hold.
+     * Increase authorization hold amount
      */
     public async increaseAuthorizationHold({
         body,
@@ -91,7 +91,7 @@ export class MambuCards {
     }
 
     /**
-     * Allows retrieval of a single card authorization hold via external reference id
+     * Get card authorization hold
      */
     public async getAuthorizationHoldById({
         path,
@@ -119,7 +119,7 @@ export class MambuCards {
     }
 
     /**
-     * Reverses a card authorization hold.
+     * Reverse a card authorization hold.
      */
     public async reverseAuthorizationHold({
         path,
@@ -181,31 +181,7 @@ export class MambuCards {
     }
 
     /**
-     * Allows retrieval of account balances by its card token
-     */
-    public async getAccountBalances({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { cardReferenceToken: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`cards/${path.cardReferenceToken}/balanceInquiry`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: AccountBalances,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Reverses a card transaction.
+     * Reverse card transaction
      */
     public async reverseCardTransaction({
         body,
@@ -242,7 +218,31 @@ export class MambuCards {
     }
 
     /**
-     * Creates a financial transaction corresponding to a given card.
+     * Get account balances using card tokens
+     */
+    public async getAccountBalances({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { cardReferenceToken: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`cards/${path.cardReferenceToken}/balanceInquiry`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: AccountBalances,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Create a financial transaction corresponding to a given card
      */
     public async createCardTransaction({
         body,
@@ -313,7 +313,7 @@ export class MambuCards {
     }
 
     /**
-     * Creates an authorization hold corresponding to a given card.
+     * Create an authorization hold corresponding to a given card.
      */
     public async createAuthorizationHold({
         body,
@@ -353,7 +353,7 @@ export class MambuCards {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`

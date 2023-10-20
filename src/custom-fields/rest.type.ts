@@ -3,39 +3,39 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
- * Custom Field Date Transfer Object
+ * Represents a custom field definition.
  */
 export interface CustomFieldMeta {
     displaySettings?: CustomFieldDisplaySettings
     /**
-     * Date at which the latest update was performed for this field
+     * The date the latest update was performed for this custom field definition.
      */
     lastModifiedDate?: string
     /**
-     * Information on what record types the custom field is available for.
+     * Represents the usage settings of a custom field definition.
      */
     usage?: CustomFieldUsage[]
     /**
-     * Indicates that the field has predefined selections and only those can be used to populate it
+     * Can be defined only for selection custom field definitions. Indicates that the field has predefined selections and only those can be used to populate it.
      */
     selectionOptions?: CustomFieldSelectionOption[]
     editRights?: CustomFieldEditRights
     /**
-     * Date at which the custom field was created
+     * The date the custom field definition was created.
      */
     creationDate?: string
     /**
-     * Supported input type
+     * The type of custom field definition.
      */
     type?: 'FREE_TEXT' | 'SELECTION' | 'NUMBER' | 'CHECKBOX' | 'DATE' | 'DATE_TIME' | 'CLIENT_LINK' | 'GROUP_LINK' | 'USER_LINK'
     viewRights?: CustomFieldViewRights
     valueValidationSettings?: CustomFieldValueValidationSettings
     /**
-     * Indicates with what object the custom field is associated
+     * The entity type the custom field definition is associated with.
      */
     availableFor?:
         | 'CLIENT'
@@ -52,7 +52,7 @@ export interface CustomFieldMeta {
         | 'CENTRE'
         | 'USER'
     /**
-     * Indicates the master field on which the dependency is based upon.
+     * Can be defined only for selection custom field definitions. Indicates the parent custom field definition on which the dependency is based upon.
      */
     dependentFieldKey?: string
     /**
@@ -60,17 +60,17 @@ export interface CustomFieldMeta {
      */
     encodedKey?: string
     /**
-     * User-defined ID, globally unique.
+     * The user-defined ID, which is globally unique.
      */
     id?: string
     /**
-     * Indicates whether the field is active or inactive
+     * Indicates whether the custom field definition is active or inactive.
      */
     state?: 'ACTIVE' | 'INACTIVE'
 }
 
 export const CustomFieldMeta = {
-    validate: (await import('./schemas/custom-field-meta.schema.js')).validate10 as unknown as ValidateFunction<CustomFieldMeta>,
+    validate: (await import('./schemas/custom-field-meta.schema.js')).validate as ValidateFunction<CustomFieldMeta>,
     get schema() {
         return CustomFieldMeta.validate.schema
     },
@@ -85,7 +85,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -95,29 +95,29 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
 
 /**
- * Groups all fields related to a custom field's display settings
+ * Represents the display settings of a custom field definition.
  */
 export interface CustomFieldDisplaySettings {
     /**
-     * Free-text description of the field.
+     * The user-provided description of the custom field definition.
      */
     description?: string
     /**
-     * Field display size in the UI.
+     * The custom field value display size in the UI.
      */
     fieldSize?: 'SHORT' | 'LONG'
     /**
-     * Custom field position in the custom field set.
+     * The custom field definition position in the custom field set.
      */
     position?: number
     /**
-     * Shows the original id of the built in custom field
+     * The original ID of the built-in custom field definition.
      */
     builtInId?:
         | 'FIRST_NAME'
@@ -130,103 +130,103 @@ export interface CustomFieldDisplaySettings {
         | 'HOME_PHONE'
         | 'EMAIL_ADDRESS'
     /**
-     * User-defined name, displayed in the UI.
+     * The user-provided name of the custom field definition.
      */
     displayName?: string
 }
 
 /**
- * Information on what record types the custom field is available for.
+ * Represents the usage settings of the custom field definition.
  */
 export interface CustomFieldUsage {
     /**
-     * Indicates whether the field is displayed by default on create/edit page for this record type.
+     * `TRUE` if the field is displayed by default on create or edit pages for this record type, `FALSE` otherwise.
      */
     default?: boolean
     /**
-     * Indicates the key of the record type (eg client type)
+     * The key of the record type.
      */
     objectKey?: string
     /**
-     * Indicates whether the field is mandatory or not for this record type.
+     * `TRUE` if the field is required for this record type, `FALSE` otherwise.
      */
     required?: boolean
 }
 
 /**
- * Groups all fields related to a custom field's selection option
+ * Represents the information related to the options of a selection custom field definition.
  */
 export interface CustomFieldSelectionOption {
     /**
-     * Indicates the key for the value on the master field.
+     * The key for the parent selection custom field value.
      */
     forSelectionKey?: string
     /**
-     * Indicates the value of the master field.
+     * The parent selection custom field value.
      */
     forValue?: string
     /**
-     * List of values that can be used in the slave field based on current master selection.
+     * The list of options that that are available for the dependent selection custom field value based on the selected parent custom field value.
      */
     availableOptions?: CustomFieldAvailableOption[]
 }
 
 /**
- * Groups the fields related to one option available within a selection
+ * Represents one option of a selection custom field definition.
  */
 export interface CustomFieldAvailableOption {
     /**
-     * Selection score
+     * The score of the option.
      */
     score?: number
     /**
-     * System-generated ID of the predefined value
+     * The system-generated ID of the option.
      */
     selectionKey?: string
     /**
-     * Predefined value name
+     * The name of the option.
      */
     value?: string
 }
 
 /**
- * Settings that indicate the defined editing rights by role for the custom field
+ * Represents the edit rights for custom field values for a particular custom field definition.
  */
 export interface CustomFieldEditRights {
     /**
-     * Indicates whether the field can be edited by all users or by roles
+     * `TRUE` if custom field values of a custom field definition can be edited by all users, `FALSE` if custom field values of a custom field definition can only be edited by users with the specified roles.
      */
     allUsers?: boolean
     /**
-     * Lists the IDs of the roles that have edit rights for this field when it's not accessible by all users
+     * The list of IDs of the roles that have edit rights for the custom field values of a custom field definition if it is not accessible by all users.
      */
     roles?: string[]
 }
 
 /**
- * Settings that indicate the defined view rights by role for the custom field
+ * Represents the view rights for custom field values for a particular custom field definition.
  */
 export interface CustomFieldViewRights {
     /**
-     * Indicates whether the field can be viewed by all users or by roles
+     * `TRUE` if custom field values of a custom field definition can be viewed by all users, `FALSE` if custom field values of a custom field definition can only be viewed by users with the specified roles.
      */
     allUsers?: boolean
     /**
-     * Lists the IDs of the roles that have view rights for this field when it's not accessible by all users
+     * Lists the IDs of the roles that have view rights for the custom field values of a custom field definition if it is not accessible by all users.
      */
     roles?: string[]
 }
 
 /**
- * Settings for field input validation.
+ * Represents the settings for field input validation.
  */
 export interface CustomFieldValueValidationSettings {
     /**
-     * Indicates if a validation is set in terms of expected character type/format
+     * The expected format for the input.
      */
     validationPattern?: string
     /**
-     * Indicates whether this field allows duplicate values or not
+     * `TRUE` if this field does not allow duplicate values, `FALSE` otherwise.
      */
     unique?: boolean
 }

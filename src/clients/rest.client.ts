@@ -53,7 +53,7 @@ export class MambuClients {
     }
 
     /**
-     * Allows retrieval of a single client via id or encoded key
+     * Get client
      */
     public async getById({
         path,
@@ -81,7 +81,7 @@ export class MambuClients {
     }
 
     /**
-     * Update an existing client
+     * Update client
      */
     public async update({
         body,
@@ -111,7 +111,7 @@ export class MambuClients {
     }
 
     /**
-     * Delete a client
+     * Delete client
      */
     public async delete({ path, auth = [['apiKey'], ['basic']] }: { path: { clientId: string }; auth?: string[][] | string[] }) {
         return this.awaitResponse(
@@ -130,7 +130,7 @@ export class MambuClients {
     }
 
     /**
-     * Partially update an existing client
+     * Partially update client
      */
     public async patch({
         body,
@@ -160,7 +160,7 @@ export class MambuClients {
     }
 
     /**
-     * Allows retrieval of clients using various query parameters
+     * Get clients
      */
     public async getAll({
         query,
@@ -199,7 +199,7 @@ export class MambuClients {
     }
 
     /**
-     * Create a new client
+     * Create client
      */
     public async create({
         body,
@@ -229,7 +229,7 @@ export class MambuClients {
     }
 
     /**
-     * Allows you to search clients by various criteria
+     * Search clients
      */
     public async search({
         body,
@@ -259,7 +259,7 @@ export class MambuClients {
     }
 
     /**
-     * Allows to retrieve the client role for a client
+     * Get client role for client
      */
     public async getRoleByClientId({
         path,
@@ -283,7 +283,7 @@ export class MambuClients {
     }
 
     /**
-     * Credit arrangements list retrieved
+     * Credit arrangements list returned.
      */
     public async getCreditArrangementsByClientIdOrKey({
         path,
@@ -317,7 +317,7 @@ export class MambuClients {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`
