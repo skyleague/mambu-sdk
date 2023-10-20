@@ -1,12 +1,16 @@
 import camelcase from 'camelcase'
 
-import fs from 'fs'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 ;(() => {
+    const __dirname = path.dirname(fileURLToPath(import.meta.url))
     const directories = fs.readdirSync(`${__dirname}/../src`)
     const globalExports: string[] = [
-        `export * from './pagination'`,
-        `export * from './streaming'`,
-        `export * as streaming from './base-streaming.type'`,
+        `export * from './pagination.js'`,
+        `export * from './streaming.js'`,
+        `export * as streaming from './base-streaming.type.js'`,
     ]
     for (const dir of directories) {
         if (fs.lstatSync(`${__dirname}/../src/${dir}`).isDirectory()) {
@@ -15,15 +19,15 @@ import fs from 'fs'
             const exports: string[] = []
             for (const file of files) {
                 if (file.endsWith('.type.ts')) {
-                    exports.push(`export * as ${camelcase(dir)} from './${file.replace('.ts', '')}'`)
+                    exports.push(`export * as ${camelcase(dir)} from './${file.replace('.ts', '.js')}'`)
                 } else if (file.endsWith('.client.ts')) {
-                    exports.push(`export * from './${file.replace('.ts', '')}'`)
+                    exports.push(`export * from './${file.replace('.ts', '.js')}'`)
                 }
             }
 
             if (exports.length > 0) {
                 fs.writeFileSync(`${__dirname}/../src/${dir}/index.ts`, [...exports, ''].join('\n'))
-                globalExports.push(`export * from './${dir}'`)
+                globalExports.push(`export * from './${dir}/index.js'`)
             }
         }
         if (globalExports.length > 0) {

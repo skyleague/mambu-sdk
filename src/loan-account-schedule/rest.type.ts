@@ -3,23 +3,22 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 /**
  * Represents a single loan account schedule structure.
  */
 export interface LoanAccountSchedule {
     /**
-     * The loan account schedule installments' list.
+     * The loan account schedule installments list.
      */
     installments?: Installment[]
     currency?: Currency
 }
 
 export const LoanAccountSchedule = {
-    validate: (await import('./schemas/loan-account-schedule.schema.js'))
-        .validate10 as unknown as ValidateFunction<LoanAccountSchedule>,
+    validate: (await import('./schemas/loan-account-schedule.schema.js')).validate as ValidateFunction<LoanAccountSchedule>,
     get schema() {
         return LoanAccountSchedule.validate.schema
     },
@@ -29,7 +28,7 @@ export const LoanAccountSchedule = {
     is: (o: unknown): o is LoanAccountSchedule => LoanAccountSchedule.validate(o) === true,
     assert: (o: unknown) => {
         if (!LoanAccountSchedule.validate(o)) {
-            throw new AjvValidator.ValidationError(LoanAccountSchedule.errors ?? [])
+            throw new ValidationError(LoanAccountSchedule.errors ?? [])
         }
     },
 } as const
@@ -39,7 +38,7 @@ export interface ErrorResponse {
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate10 as unknown as ValidateFunction<ErrorResponse>,
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -49,7 +48,7 @@ export const ErrorResponse = {
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
     assert: (o: unknown) => {
         if (!ErrorResponse.validate(o)) {
-            throw new AjvValidator.ValidationError(ErrorResponse.errors ?? [])
+            throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
 } as const
@@ -57,8 +56,7 @@ export const ErrorResponse = {
 export type EditScheduleRequest = Installment[]
 
 export const EditScheduleRequest = {
-    validate: (await import('./schemas/edit-schedule-request.schema.js'))
-        .validate10 as unknown as ValidateFunction<EditScheduleRequest>,
+    validate: (await import('./schemas/edit-schedule-request.schema.js')).validate as ValidateFunction<EditScheduleRequest>,
     get schema() {
         return EditScheduleRequest.validate.schema
     },
@@ -68,7 +66,7 @@ export const EditScheduleRequest = {
     is: (o: unknown): o is EditScheduleRequest => EditScheduleRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!EditScheduleRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(EditScheduleRequest.errors ?? [])
+            throw new ValidationError(EditScheduleRequest.errors ?? [])
         }
     },
 } as const
@@ -77,7 +75,7 @@ export type PreviewTranchesOnScheduleRequest = LoanTranche[]
 
 export const PreviewTranchesOnScheduleRequest = {
     validate: (await import('./schemas/preview-tranches-on-schedule-request.schema.js'))
-        .validate10 as unknown as ValidateFunction<PreviewTranchesOnScheduleRequest>,
+        .validate as ValidateFunction<PreviewTranchesOnScheduleRequest>,
     get schema() {
         return PreviewTranchesOnScheduleRequest.validate.schema
     },
@@ -87,7 +85,7 @@ export const PreviewTranchesOnScheduleRequest = {
     is: (o: unknown): o is PreviewTranchesOnScheduleRequest => PreviewTranchesOnScheduleRequest.validate(o) === true,
     assert: (o: unknown) => {
         if (!PreviewTranchesOnScheduleRequest.validate(o)) {
-            throw new AjvValidator.ValidationError(PreviewTranchesOnScheduleRequest.errors ?? [])
+            throw new ValidationError(PreviewTranchesOnScheduleRequest.errors ?? [])
         }
     },
 } as const
@@ -127,7 +125,7 @@ export interface PreviewLoanAccountSchedule {
 
 export const PreviewLoanAccountSchedule = {
     validate: (await import('./schemas/preview-loan-account-schedule.schema.js'))
-        .validate10 as unknown as ValidateFunction<PreviewLoanAccountSchedule>,
+        .validate as ValidateFunction<PreviewLoanAccountSchedule>,
     get schema() {
         return PreviewLoanAccountSchedule.validate.schema
     },
@@ -137,7 +135,7 @@ export const PreviewLoanAccountSchedule = {
     is: (o: unknown): o is PreviewLoanAccountSchedule => PreviewLoanAccountSchedule.validate(o) === true,
     assert: (o: unknown) => {
         if (!PreviewLoanAccountSchedule.validate(o)) {
-            throw new AjvValidator.ValidationError(PreviewLoanAccountSchedule.errors ?? [])
+            throw new ValidationError(PreviewLoanAccountSchedule.errors ?? [])
         }
     },
 } as const
@@ -158,7 +156,7 @@ export interface Installment {
     repaidDate?: string
     principal?: InstallmentAllocationElementAmount
     /**
-     * The order number of an installment among all the installments generated for a loan. Loan installments are put in ascending order by due date.
+     * The order number of an installment among all the installments generated for a loan. Loan installments are put in ascending order by due date. The order number only applies to the content of a particular JSON response therefore it is not unique.
      */
     number?: string
     /**
@@ -166,16 +164,16 @@ export interface Installment {
      */
     lastPaidDate?: string
     /**
-     * The parent account key of the installment
+     * The parent account key of the installment.
      */
     parentAccountKey?: string
     interest?: InstallmentAllocationElementTaxableAmount
     /**
-     * The breakdown of the fees amounts that have been applied for the loan account.
+     * The breakdown of the fee amounts that have been applied to the loan account.
      */
     feeDetails?: InstallmentFeeDetails[]
     /**
-     * The encoded key of the installment, auto generated, unique.
+     * The encoded key of the installment, which is auto generated, and unique.
      */
     encodedKey?: string
     /**
@@ -183,7 +181,7 @@ export interface Installment {
      */
     state?: 'PENDING' | 'LATE' | 'PAID' | 'PARTIALLY_PAID' | 'GRACE'
     /**
-     * Whether the payment holiday is offered for the installment.
+     * `TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.
      */
     isPaymentHoliday?: boolean
 }

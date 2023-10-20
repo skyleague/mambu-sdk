@@ -6,35 +6,17 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
-/**
- * Mambu Function Tenant Secret create data.
- */
-export interface MambuFunctionSecretCreate {
-    /**
-     * Customer secret name
-     */
-    name?: string
-    /**
-     * The value of the customer secret
-     */
-    value?: string
-}
+export type GetLogsResponse = MFunctionLogs[]
 
-export const MambuFunctionSecretCreate = {
-    validate: (await import('./schemas/mambu-function-secret-create.schema.js'))
-        .validate as ValidateFunction<MambuFunctionSecretCreate>,
+export const GetLogsResponse = {
+    validate: (await import('./schemas/get-logs-response.schema.js')).validate as ValidateFunction<GetLogsResponse>,
     get schema() {
-        return MambuFunctionSecretCreate.validate.schema
+        return GetLogsResponse.validate.schema
     },
     get errors() {
-        return MambuFunctionSecretCreate.validate.errors ?? undefined
+        return GetLogsResponse.validate.errors ?? undefined
     },
-    is: (o: unknown): o is MambuFunctionSecretCreate => MambuFunctionSecretCreate.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!MambuFunctionSecretCreate.validate(o)) {
-            throw new ValidationError(MambuFunctionSecretCreate.errors ?? [])
-        }
-    },
+    is: (o: unknown): o is GetLogsResponse => GetLogsResponse.validate(o) === true,
 } as const
 
 export interface ErrorResponse {
@@ -57,8 +39,164 @@ export const ErrorResponse = {
     },
 } as const
 
+export type GetAllResponse = MambuFunction[]
+
+export const GetAllResponse = {
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    get schema() {
+        return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+} as const
+
+/**
+ * Mambu Function create data.
+ */
+export interface MambuFunctionCreate {
+    /**
+     * Mambu function name
+     */
+    name?: string
+    /**
+     * The id of the extension point
+     */
+    extensionPointId?: string
+    functionCode?: MambuFunctionCode
+    /**
+     * Mambu function version
+     */
+    version?: string
+}
+
+export const MambuFunctionCreate = {
+    validate: (await import('./schemas/mambu-function-create.schema.js')).validate as ValidateFunction<MambuFunctionCreate>,
+    get schema() {
+        return MambuFunctionCreate.validate.schema
+    },
+    get errors() {
+        return MambuFunctionCreate.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is MambuFunctionCreate => MambuFunctionCreate.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!MambuFunctionCreate.validate(o)) {
+            throw new ValidationError(MambuFunctionCreate.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Mambu Function information.
+ */
+export interface MambuFunction {
+    /**
+     * Mambu function name
+     */
+    name?: string
+    /**
+     * The id of the extension point
+     */
+    extensionPointId?: string
+    /**
+     * Mambu function state
+     */
+    state?: string
+    /**
+     * Mambu function version
+     */
+    version?: string
+    /**
+     * The last date the Mambu function was updated (as UTC)
+     */
+    lastModifiedDate?: string
+}
+
+export const MambuFunction = {
+    validate: (await import('./schemas/mambu-function.schema.js')).validate as ValidateFunction<MambuFunction>,
+    get schema() {
+        return MambuFunction.validate.schema
+    },
+    get errors() {
+        return MambuFunction.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is MambuFunction => MambuFunction.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!MambuFunction.validate(o)) {
+            throw new ValidationError(MambuFunction.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Mambu Function update data.
+ */
+export interface MambuFunctionUpdate {
+    functionCode?: MambuFunctionCode
+    /**
+     * Mambu function version
+     */
+    version?: string
+}
+
+export const MambuFunctionUpdate = {
+    validate: (await import('./schemas/mambu-function-update.schema.js')).validate as ValidateFunction<MambuFunctionUpdate>,
+    get schema() {
+        return MambuFunctionUpdate.validate.schema
+    },
+    get errors() {
+        return MambuFunctionUpdate.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is MambuFunctionUpdate => MambuFunctionUpdate.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!MambuFunctionUpdate.validate(o)) {
+            throw new ValidationError(MambuFunctionUpdate.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Represents a Mambu function logs list
+ */
+export interface MFunctionLogs {
+    logs?: MFunctionLog[]
+}
+
+/**
+ * Represents a Mambu function log
+ */
+export interface MFunctionLog {
+    /**
+     * Mambu function log time
+     */
+    time?: number
+    /**
+     * Mambu function message
+     */
+    message?: string
+    /**
+     * Mambu function log level
+     */
+    logLevel?: number
+}
+
 export interface RestError {
     errorCode?: number
     errorSource?: string
     errorReason?: string
+}
+
+/**
+ * Represents a Mambu function code
+ */
+export interface MambuFunctionCode {
+    /**
+     * Mambu function programming language
+     */
+    languageId?: 'es2020'
+    /**
+     * Mambu function code (as Base64)
+     */
+    code?: string
 }

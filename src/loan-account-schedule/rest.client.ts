@@ -50,9 +50,9 @@ export class MambuLoanAccountSchedule {
     }
 
     /**
-     * Allows retrieval of a loan account schedule by provided loan account id or encodedKey.
+     * Get loan account schedule
      */
-    public async getSchedule({
+    public async getScheduleForLoanAccount({
         path,
         query,
         auth = [['apiKey'], ['basic']],
@@ -78,7 +78,7 @@ export class MambuLoanAccountSchedule {
     }
 
     /**
-     * Allows to update the entire loan account schedule by provided loan account id or encodedKey with the provided list of installments
+     * Update loan account schedule
      */
     public async editSchedule({
         body,
@@ -108,7 +108,7 @@ export class MambuLoanAccountSchedule {
     }
 
     /**
-     * Allows retrieval of a loan account schedule for non existing loan account
+     * Preview loan account schedule for non-existent loan account
      */
     public async previewTranchesOnSchedule({
         body,
@@ -139,7 +139,7 @@ export class MambuLoanAccountSchedule {
     }
 
     /**
-     * Allows retrieval of a loan account schedule for non existing loan account
+     * Preview loan account schedule for non-existent loan account
      */
     public async previewSchedule({
         body,
@@ -174,7 +174,7 @@ export class MambuLoanAccountSchedule {
 
     public async awaitResponse<
         T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>
+        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
     >(response: CancelableRequest<Response<unknown>>, schemas: S) {
         type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
             ? `${S}` extends `${T}${infer _X}`
