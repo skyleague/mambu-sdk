@@ -259,21 +259,6 @@ export const SearchResponse = {
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
 } as const
 
-export type GetCreditArrangementsByClientIdOrKeyResponse = CreditArrangement[]
-
-export const GetCreditArrangementsByClientIdOrKeyResponse = {
-    validate: (await import('./schemas/get-credit-arrangements-by-client-id-or-key-response.schema.js'))
-        .validate as ValidateFunction<GetCreditArrangementsByClientIdOrKeyResponse>,
-    get schema() {
-        return GetCreditArrangementsByClientIdOrKeyResponse.validate.schema
-    },
-    get errors() {
-        return GetCreditArrangementsByClientIdOrKeyResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetCreditArrangementsByClientIdOrKeyResponse =>
-        GetCreditArrangementsByClientIdOrKeyResponse.validate(o) === true,
-} as const
-
 /**
  * Represents a client or group role.
  */
@@ -333,6 +318,21 @@ export const ClientRole = {
         return ClientRole.validate.errors ?? undefined
     },
     is: (o: unknown): o is ClientRole => ClientRole.validate(o) === true,
+} as const
+
+export type GetCreditArrangementsByClientIdOrKeyResponse = CreditArrangement[]
+
+export const GetCreditArrangementsByClientIdOrKeyResponse = {
+    validate: (await import('./schemas/get-credit-arrangements-by-client-id-or-key-response.schema.js'))
+        .validate as ValidateFunction<GetCreditArrangementsByClientIdOrKeyResponse>,
+    get schema() {
+        return GetCreditArrangementsByClientIdOrKeyResponse.validate.schema
+    },
+    get errors() {
+        return GetCreditArrangementsByClientIdOrKeyResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetCreditArrangementsByClientIdOrKeyResponse =>
+        GetCreditArrangementsByClientIdOrKeyResponse.validate(o) === true,
 } as const
 
 /**

@@ -259,6 +259,30 @@ export class MambuClients {
     }
 
     /**
+     * Get client role for client
+     */
+    public async getRoleByClientId({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { clientId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`clients/${path.clientId}/role`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: ClientRole,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Credit arrangements list returned.
      */
     public async getCreditArrangementsByClientIdOrKey({
@@ -279,30 +303,6 @@ export class MambuClients {
             {
                 200: GetCreditArrangementsByClientIdOrKeyResponse,
                 400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get client role for client
-     */
-    public async getRoleByClientId({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { clientId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`clients/${path.clientId}/role`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: ClientRole,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
