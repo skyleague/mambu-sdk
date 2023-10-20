@@ -44,6 +44,31 @@ export class MambuClientDocuments {
     }
 
     /**
+     * Get client document
+     */
+    public async getClientDocumentById({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { documentId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`clients/documents/${path.documentId}/metadata`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: Document,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Get all client documents
      */
     public async getDocumentsByClientId({
@@ -63,31 +88,6 @@ export class MambuClientDocuments {
             }),
             {
                 200: GetDocumentsByClientIdResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get client document
-     */
-    public async getClientDocumentById({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { documentId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`clients/documents/${path.documentId}/metadata`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: Document,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
