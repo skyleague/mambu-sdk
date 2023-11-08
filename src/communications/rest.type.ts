@@ -329,9 +329,6 @@ export interface RestError {
  * The unit that composes the list used for communication messages client directed searching
  */
 export interface CommunicationMessageFilterCriteria {
-    /**
-     * The field(s) to use to perform the search.
-     */
     field:
         | 'encodedKey'
         | 'creationDate'
@@ -346,6 +343,7 @@ export interface CommunicationMessageFilterCriteria {
         | 'destination'
         | 'type'
         | 'event'
+        | string
     /**
      * The value to match the searching criteria.
      */

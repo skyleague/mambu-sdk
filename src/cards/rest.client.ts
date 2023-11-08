@@ -16,6 +16,7 @@ import {
     CardTransactionReversal,
     ErrorResponse,
     GetAuthorizationHold,
+    GetCardTransaction,
     PatchAuthorizationHoldRequest,
 } from './rest.type.js'
 
@@ -86,6 +87,37 @@ export class MambuCards {
                 403: ErrorResponse,
                 404: ErrorResponse,
                 409: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get card transaction
+     */
+    public async getCardTransaction({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { cardReferenceToken: string; cardTransactionExternalReferenceId: string }
+        query?: { detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(
+                `cards/${path.cardReferenceToken}/financialtransactions/${path.cardTransactionExternalReferenceId}`,
+                {
+                    searchParams: query ?? {},
+                    headers: { Accept: 'application/vnd.mambu.v2+json' },
+                    responseType: 'json',
+                }
+            ),
+            {
+                200: GetCardTransaction,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }
@@ -181,6 +213,30 @@ export class MambuCards {
     }
 
     /**
+     * Get account balances using card tokens
+     */
+    public async getAccountBalances({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { cardReferenceToken: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`cards/${path.cardReferenceToken}/balanceInquiry`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: AccountBalances,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Reverse card transaction
      */
     public async reverseCardTransaction({
@@ -213,30 +269,6 @@ export class MambuCards {
                 403: ErrorResponse,
                 404: ErrorResponse,
                 409: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get account balances using card tokens
-     */
-    public async getAccountBalances({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { cardReferenceToken: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`cards/${path.cardReferenceToken}/balanceInquiry`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: AccountBalances,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
             }
         )
     }

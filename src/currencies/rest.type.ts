@@ -79,6 +79,10 @@ export interface CurrencyDetails {
      * `TRUE` if the currency is the base currency, `FALSE` otherwise. It cannot be changed and it's a read-only field not required for update operations.
      */
     baseCurrency: boolean
+    /**
+     * The currency numeric code.
+     */
+    numericCode?: string
 }
 
 export const CurrencyDetails = {

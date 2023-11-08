@@ -97,9 +97,6 @@ export interface InterestAccrualSortingCriteria {
  * Represents the filter criteria used for searching interest accrual entries.
  */
 export interface InterestAccrualFilterCriteria {
-    /**
-     * Contains the fields to use for searching.
-     */
     field:
         | 'entryId'
         | 'glAccountKey'
@@ -119,6 +116,7 @@ export interface InterestAccrualFilterCriteria {
         | 'foreignCredit'
         | 'foreignDebit'
         | 'foreignCurrencyCode'
+        | string
     /**
      * The value to match the searching criteria.
      */

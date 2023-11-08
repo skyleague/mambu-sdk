@@ -769,14 +769,6 @@ export interface LoanTransactionSortingCriteria {
  * The unit that composes the list used for Loan transaction client directed queries searching
  */
 export interface LoanTransactionFilterCriteria {
-    /**
-     * Contains the actual searching fields that can be native (one from the provided list) or otherwise can specify a custom field definition using the format [customFieldSetId].[customFieldId].
-     * |Field with limited capabilities          |Data Type |Operators   |
-     * |-----------------------------------------|----------|------------|
-     * |originalTransactionKey                   |KEY       |EQUALS, IN  |
-     * |transactionDetails.transactionChannelId  |STRING    |EQUALS      |
-     * |originalTransactionID                    |STRING    |EQUALS      |
-     */
     field:
         | 'encodedKey'
         | 'id'
@@ -824,6 +816,7 @@ export interface LoanTransactionFilterCriteria {
         | 'parentAccountID'
         | 'adjustmentTransactionID'
         | 'originalTransactionID'
+        | string
     /**
      * The value to match the searching criteria.
      */

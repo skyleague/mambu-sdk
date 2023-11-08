@@ -2952,9 +2952,6 @@ export interface LoanAccountSortingCriteria {
  * Wrapper that holds a list of filtering criteria and a sorting criteria for Loan account directed query
  */
 export interface LoanAccountFilterCriteria {
-    /**
-     * Contains the actual searching fields that can be native (one from the provided list) or otherwise can specify a custom field definition using the format [customFieldSetId].[customFieldId].
-     */
     field:
         | 'accountHolderKey'
         | 'productTypeKey'
@@ -3029,6 +3026,7 @@ export interface LoanAccountFilterCriteria {
         | 'disbursementDetails.expectedDisbursementDate'
         | 'disbursementDetails.disbursementDate'
         | 'lastAccountAppraisalDate'
+        | string
     /**
      * The value to match the searching criteria.
      */

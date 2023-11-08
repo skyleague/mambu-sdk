@@ -562,9 +562,6 @@ export interface GLJournalEntrySortingCriteria {
  * Represents the filtering criteria used for searching general ledger journal entries.
  */
 export interface GLJournalEntryFilterCriteria {
-    /**
-     * The fields used to search. These fields can be from the enumerated values or you can specify a custom field using the format [customFieldSetId].[customFieldId].
-     */
     field:
         | 'productType'
         | 'glAccountKey'
@@ -584,6 +581,7 @@ export interface GLJournalEntryFilterCriteria {
         | 'loanAccountId'
         | 'foreignCurrencyCode'
         | 'assignedBranchKey'
+        | string
     /**
      * The value to match the searching criteria.
      */

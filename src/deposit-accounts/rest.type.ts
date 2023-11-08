@@ -2421,9 +2421,6 @@ export interface DepositAccountSortingCriteria {
  * Represents the filter list used for searching deposit accounts.
  */
 export interface DepositAccountFilterCriteria {
-    /**
-     * The fields to search, which can be enumerated values or custom fields using the format [customFieldSetId].[customFieldId].
-     */
     field:
         | 'encodedKey'
         | 'id'
@@ -2485,6 +2482,7 @@ export interface DepositAccountFilterCriteria {
         | 'taxApplied'
         | 'withholdingTaxSourceKey'
         | 'taxRate'
+        | string
     /**
      * The value to match the searching criteria.
      */

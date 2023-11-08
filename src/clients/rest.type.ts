@@ -581,9 +581,6 @@ export interface ClientSortingCriteria {
  * The unit that composes the list used for Clients searching
  */
 export interface ClientFilterCriteria {
-    /**
-     * The fields to perform the search. They can be native (one from the provided list) or otherwise can specify a custom field definition using the format [customFieldSetId].[customFieldId].
-     */
     field:
         | 'encodedKey'
         | 'creditOfficerKey'
@@ -617,6 +614,7 @@ export interface ClientFilterCriteria {
         | 'portalState'
         | 'preferredLanguage'
         | 'groupId'
+        | string
     /**
      * The value to match the searching criteria.
      */
