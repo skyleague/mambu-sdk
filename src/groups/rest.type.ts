@@ -641,9 +641,6 @@ export interface GroupSortingCriteria {
  * The unit that composes the list used for Groups searching
  */
 export interface GroupFilterCriteria {
-    /**
-     * The fields to perform the search. They can be native (one from the provided list) or otherwise can specify a custom field definition using the format [customFieldSetId].[customFieldId].
-     */
     field:
         | 'encodedKey'
         | 'id'
@@ -660,6 +657,7 @@ export interface GroupFilterCriteria {
         | 'totalBalance'
         | 'numberOfMembers'
         | 'loanCycle'
+        | string
     /**
      * The value to match the searching criteria.
      */

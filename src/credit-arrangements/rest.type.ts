@@ -1899,10 +1899,7 @@ export interface CreditArrangementSortingCriteria {
  * Represents credit arrangment filter and search criteria.
  */
 export interface CreditArrangementFilterCriteria {
-    /**
-     * Contains the actual searching fields
-     */
-    field: 'id' | 'startDate' | 'expireDate' | 'approvedDate' | 'state' | 'subState' | 'exposureLimitType'
+    field: 'id' | 'startDate' | 'expireDate' | 'approvedDate' | 'state' | 'subState' | 'exposureLimitType' | string
     /**
      * The value to match the searching criteria.
      */

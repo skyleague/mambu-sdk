@@ -76,6 +76,18 @@ for (const item of clientList) {
                 delete (api.components?.schemas?.RestError as any)?.properties?.errorReason?.enum
             }
 
+            for (const [name, definition] of Object.entries(api.components?.schemas ?? {})) {
+                if (name.endsWith('FilterCriteria')) {
+                    if ('properties' in definition && definition.properties.field !== undefined) {
+                        if ('type' in definition.properties.field && definition.properties.field.type === 'string') {
+                            definition.properties.field = {
+                                anyOf: [definition.properties.field, { type: 'string' }],
+                            }
+                        }
+                    }
+                }
+            }
+
             return api
         },
         explicitContentNegotiation: true,

@@ -1105,14 +1105,6 @@ export interface DepositTransactionSortingCriteria {
  * The unit that composes the list used for Deposit transactions client directed searching
  */
 export interface DepositTransactionFilterCriteria {
-    /**
-     * The fields to search can be the enumerated values or a custom field using the format [customFieldSetId].[customFieldId].
-     * |Field with limited capabilities          |Data Type |Operators   |
-     * |-----------------------------------------|----------|------------|
-     * |originalTransactionKey                   |KEY       |EQUALS, IN  |
-     * |transactionDetails.transactionChannelId  |STRING    |EQUALS      |
-     * |originalTransactionID                    |STRING    |EQUALS      |
-     */
     field:
         | 'encodedKey'
         | 'id'
@@ -1159,6 +1151,7 @@ export interface DepositTransactionFilterCriteria {
         | 'affectedAmounts.technicalOverdraftInterestAmount'
         | 'terms.overdraftInterestSettings.interestRate'
         | 'terms.overdraftInterestSettings.indexInterestRate'
+        | string
     /**
      * The value to match the searching criteria.
      */
