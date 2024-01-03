@@ -44,28 +44,6 @@ export class MambuTransactionChannels {
     }
 
     /**
-     * Get transaction channels
-     */
-    public async getAll({
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: { query?: { detailsLevel?: string; transactionChannelState?: string }; auth?: string[][] | string[] } = {}) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`organization/transactionChannels`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetAllResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Create transaction channel
      */
     public async create({
@@ -88,6 +66,53 @@ export class MambuTransactionChannels {
             {
                 102: { is: (_x: unknown): _x is unknown => true },
                 201: TransactionChannel,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Delete transaction channel
+     */
+    public async delete({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { transactionChannelId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).delete(`organization/transactionChannels/${path.transactionChannelId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get transaction channels
+     */
+    public async getAll({
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: { query?: { detailsLevel?: string; transactionChannelState?: string }; auth?: string[][] | string[] } = {}) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`organization/transactionChannels`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetAllResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -142,31 +167,6 @@ export class MambuTransactionChannels {
             }),
             {
                 200: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Delete transaction channel
-     */
-    public async delete({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { transactionChannelId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).delete(`organization/transactionChannels/${path.transactionChannelId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

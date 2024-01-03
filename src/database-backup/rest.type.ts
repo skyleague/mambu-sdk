@@ -6,6 +6,32 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
+export interface ErrorResponse {
+    errors?: RestError[]
+}
+
+export const ErrorResponse = {
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    get schema() {
+        return ErrorResponse.validate.schema
+    },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
+} as const
+
+export interface RestError {
+    errorCode?: number
+    errorReason?: string
+    errorSource?: string
+}
+
 /**
  * Represents a request for triggering a database backup.
  */
@@ -15,13 +41,13 @@ export interface TriggerDatabaseBackupRequest {
      */
     callback?: string
     /**
-     * If provided, it needs to be a list of tables that exist in the database schema. The backup will only include the specified tables. If not provided, the backup will include all tables.
-     */
-    tables?: string[]
-    /**
      * If provided, it needs to be a date time from which the backup should include data. If not provided, the backup will include all the data.
      */
     createBackupFromDate?: string
+    /**
+     * If provided, it needs to be a list of tables that exist in the database schema. The backup will only include the specified tables. If not provided, the backup will include all tables.
+     */
+    tables?: string[]
 }
 
 export const TriggerDatabaseBackupRequest = {
@@ -73,29 +99,3 @@ export const TriggerDatabaseBackupResponse = {
     },
     is: (o: unknown): o is TriggerDatabaseBackupResponse => TriggerDatabaseBackupResponse.validate(o) === true,
 } as const
-
-export interface ErrorResponse {
-    errors?: RestError[]
-}
-
-export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
-    get schema() {
-        return ErrorResponse.validate.schema
-    },
-    get errors() {
-        return ErrorResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
-        }
-    },
-} as const
-
-export interface RestError {
-    errorCode?: number
-    errorSource?: string
-    errorReason?: string
-}

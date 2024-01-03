@@ -7,304 +7,39 @@ import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
 /**
- * Represents the filtering criteria list and sorting criteria for searching interest accrual entries.
- */
-export interface InterestAccrualSearchCriteria {
-    sortingCriteria?: InterestAccrualSortingCriteria
-    /**
-     * The list of filtering criteria.
-     */
-    filterCriteria?: InterestAccrualFilterCriteria[]
-}
-
-export const InterestAccrualSearchCriteria = {
-    validate: (await import('./schemas/interest-accrual-search-criteria.schema.js'))
-        .validate as ValidateFunction<InterestAccrualSearchCriteria>,
-    get schema() {
-        return InterestAccrualSearchCriteria.validate.schema
-    },
-    get errors() {
-        return InterestAccrualSearchCriteria.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is InterestAccrualSearchCriteria => InterestAccrualSearchCriteria.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!InterestAccrualSearchCriteria.validate(o)) {
-            throw new ValidationError(InterestAccrualSearchCriteria.errors ?? [])
-        }
-    },
-} as const
-
-export type SearchResponse = InterestAccrualBreakdown[]
-
-export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
-    get schema() {
-        return SearchResponse.validate.schema
-    },
-    get errors() {
-        return SearchResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[]
-}
-
-export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
-    get schema() {
-        return ErrorResponse.validate.schema
-    },
-    get errors() {
-        return ErrorResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * The sorting criteria used for sorting interest accrual entries.
- */
-export interface InterestAccrualSortingCriteria {
-    /**
-     * The field to use as the sorting criteria.
-     */
-    field:
-        | 'entryId'
-        | 'parentEntryId'
-        | 'bookingDate'
-        | 'creationDate'
-        | 'transactionId'
-        | 'glAccountType'
-        | 'debit'
-        | 'credit'
-        | 'accountId'
-        | 'foreignCredit'
-        | 'foreignDebit'
-        | 'foreignCurrencyCode'
-    /**
-     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
-     */
-    order?: 'ASC' | 'DESC'
-}
-
-/**
- * Represents the filter criteria used for searching interest accrual entries.
- */
-export interface InterestAccrualFilterCriteria {
-    field:
-        | 'entryId'
-        | 'glAccountKey'
-        | 'parentEntryId'
-        | 'productType'
-        | 'bookingDate'
-        | 'creationDate'
-        | 'transactionId'
-        | 'glAccountId'
-        | 'glAccountType'
-        | 'debit'
-        | 'credit'
-        | 'branchKey'
-        | 'accountKey'
-        | 'productKey'
-        | 'accountId'
-        | 'foreignCredit'
-        | 'foreignDebit'
-        | 'foreignCurrencyCode'
-        | string
-    /**
-     * The value to match the searching criteria.
-     */
-    value?: string
-    /**
-     * | **Operator**                | **Affected values**  | **Available for**                                                    |
-     * |---------------               |----------------------|----------------------------------------------------------------------|
-     * | EQUALS                       | ONE_VALUE            | BIG_DECIMAL,BOOLEAN,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY        |
-     * | EQUALS_CASE_SENSITIVE        | ONE_VALUE            | BIG_DECIMAL,BOOLEAN,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY 		  |
-     * | MORE_THAN                    | ONE_VALUE            | BIG_DECIMAL,NUMBER,MONEY                                             |
-     * | LESS_THAN                    | ONE_VALUE            | BIG_DECIMAL,NUMBER,MONEY                                             |
-     * | BETWEEN                      | TWO_VALUES           | BIG_DECIMAL,NUMBER,MONEY,DATE,DATE_TIME                              |
-     * | ON                           | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | AFTER                        | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | BEFORE                       | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | BEFORE_INCLUSIVE             | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | STARTS_WITH                  | ONE_VALUE            | STRING                                                               |
-     * | STARTS_WITH_CASE_SENSITIVE   | ONE_VALUE            | STRING                                                               |
-     * | IN                           | LIST                 | ENUM,KEY                                                             |
-     * | TODAY                        | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | THIS_WEEK                    | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | THIS_MONTH                   | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | THIS_YEAR                    | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | LAST_DAYS                    | ONE_VALUE            | NUMBER                                                               |
-     * | EMPTY                        | NO_VALUE             | BIG_DECIMAL,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY,DATE,DATE_TIME |
-     * | NOT_EMPTY                    | NO_VALUE             | BIG_DECIMAL,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY,DATE,DATE_TIME |
-     */
-    operator:
-        | 'EQUALS'
-        | 'EQUALS_CASE_SENSITIVE'
-        | 'DIFFERENT_THAN'
-        | 'MORE_THAN'
-        | 'LESS_THAN'
-        | 'BETWEEN'
-        | 'ON'
-        | 'AFTER'
-        | 'AFTER_INCLUSIVE'
-        | 'BEFORE'
-        | 'BEFORE_INCLUSIVE'
-        | 'STARTS_WITH'
-        | 'STARTS_WITH_CASE_SENSITIVE'
-        | 'IN'
-        | 'TODAY'
-        | 'THIS_WEEK'
-        | 'THIS_MONTH'
-        | 'THIS_YEAR'
-        | 'LAST_DAYS'
-        | 'EMPTY'
-        | 'NOT_EMPTY'
-    /**
-     * The second value to match the searching criteria, when the `BETWEEN` operator is used.
-     */
-    secondValue?: string
-    /**
-     * List of values when the `IN` operator is used.
-     */
-    values?: string[]
-}
-
-/**
- * Represents an interest accrual breakdown entry.
- */
-export interface InterestAccrualBreakdown {
-    /**
-     * Debit or Credit.
-     */
-    entryType?: string
-    /**
-     * The interest accrued amount for the account in this entry.
-     */
-    amount?: number
-    /**
-     * The name of the general ledger account.
-     */
-    glAccountName?: string
-    /**
-     * The ID of the account's product.
-     */
-    productId?: string
-    /**
-     * The ID of the general ledger account.
-     */
-    glAccountId?: string
-    /**
-     * The name of the account's branch
-     */
-    branchName?: string
-    /**
-     * The encoded key of the account's product.
-     */
-    productKey?: string
-    /**
-     * The creation date and time of the entry in UTC.
-     */
-    creationDate?: string
-    /**
-     * The journal entry transaction ID.
-     */
-    transactionId?: string
-    /**
-     * The encoded key of the loan or deposit account for which interest is accrued.
-     */
-    accountKey?: string
-    /**
-     * The generated ID of the interest accrual per account entry.
-     */
-    entryId?: number
-    foreignAmount?: ForeignAmount
-    /**
-     * The encoded key of the account's branch.
-     */
-    branchKey?: string
-    /**
-     * The loan or deposit account ID for which interest is accrued.
-     */
-    accountId?: string
-    /**
-     * The general ledger account type, which can be: `ASSET`, `LIABILITY`, `EQUITY`, `INCOME`, or `EXPENSE`.
-     */
-    glAccountType?: string
-    /**
-     * The encoded key of the general ledger account used for logging the interest accrual.
-     */
-    glAccountKey?: string
-    /**
-     * The booking date in the organization's timezone.
-     */
-    bookingDate?: string
-    /**
-     * The ID of the general ledger journal entry that logged the interest accrual sum for all accounts of the same product.
-     */
-    parentEntryId?: number
-    /**
-     * The product type.
-     */
-    productType?: string
-}
-
-/**
- * Represents the details of general ledger journal entries posted in foreign currency.
- */
-export interface ForeignAmount {
-    accountingRate?: AccountingRate
-    /**
-     * The foreign currency amount of the accounting entry.
-     */
-    amount?: number
-    currency?: Currency
-}
-
-/**
  * Represents the conversion rate used in accounting to convert amounts from one currency to organisation currency
  */
 export interface AccountingRate {
-    /**
-     * Value of rate to be used for accounting conversions
-     */
-    rate?: number
-    /**
-     * Rate validity end date (as Organization Time)
-     */
-    endDate?: string
-    /**
-     * Foreign currency code
-     */
-    toCurrencyCode?: string
     /**
      * The encoded key of the accounting rate, auto generated, unique
      */
     encodedKey?: string
     /**
+     * Rate validity end date (as Organization Time)
+     */
+    endDate?: string
+    /**
      * Organisation currency code
      */
     fromCurrencyCode?: string
     /**
+     * Value of rate to be used for accounting conversions
+     */
+    rate?: number
+    /**
      * Rate validity start date (as Organization Time)
      */
     startDate?: string
+    /**
+     * Foreign currency code
+     */
+    toCurrencyCode?: string
 }
 
 /**
  * Represents a currency eg. USD, EUR.
  */
 export interface Currency {
-    /**
-     * Currency code for NON_FIAT currency.
-     */
-    currencyCode?: string
     /**
      * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
@@ -497,10 +232,275 @@ export interface Currency {
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+    /**
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
+}
+
+export interface ErrorResponse {
+    errors?: RestError[]
+}
+
+export const ErrorResponse = {
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    get schema() {
+        return ErrorResponse.validate.schema
+    },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Represents the details of general ledger journal entries posted in foreign currency.
+ */
+export interface ForeignAmount {
+    accountingRate?: AccountingRate
+    /**
+     * The foreign currency amount of the accounting entry.
+     */
+    amount?: number
+    currency?: Currency
+}
+
+/**
+ * Represents an interest accrual breakdown entry.
+ */
+export interface InterestAccrualBreakdown {
+    /**
+     * The loan or deposit account ID for which interest is accrued.
+     */
+    accountId?: string
+    /**
+     * The encoded key of the loan or deposit account for which interest is accrued.
+     */
+    accountKey?: string
+    /**
+     * The interest accrued amount for the account in this entry.
+     */
+    amount?: number
+    /**
+     * The booking date in the organization's timezone.
+     */
+    bookingDate?: string
+    /**
+     * The encoded key of the account's branch.
+     */
+    branchKey?: string
+    /**
+     * The name of the account's branch
+     */
+    branchName?: string
+    /**
+     * The creation date and time of the entry in UTC.
+     */
+    creationDate?: string
+    /**
+     * The generated ID of the interest accrual per account entry.
+     */
+    entryId?: number
+    /**
+     * Debit or Credit.
+     */
+    entryType?: string
+    foreignAmount?: ForeignAmount
+    /**
+     * The ID of the general ledger account.
+     */
+    glAccountId?: string
+    /**
+     * The encoded key of the general ledger account used for logging the interest accrual.
+     */
+    glAccountKey?: string
+    /**
+     * The name of the general ledger account.
+     */
+    glAccountName?: string
+    /**
+     * The general ledger account type, which can be: `ASSET`, `LIABILITY`, `EQUITY`, `INCOME`, or `EXPENSE`.
+     */
+    glAccountType?: string
+    /**
+     * The ID of the general ledger journal entry that logged the interest accrual sum for all accounts of the same product.
+     */
+    parentEntryId?: number
+    /**
+     * The ID of the account's product.
+     */
+    productId?: string
+    /**
+     * The encoded key of the account's product.
+     */
+    productKey?: string
+    /**
+     * The product type.
+     */
+    productType?: string
+    /**
+     * The journal entry transaction ID.
+     */
+    transactionId?: string
+}
+
+/**
+ * Represents the filter criteria used for searching interest accrual entries.
+ */
+export interface InterestAccrualFilterCriteria {
+    field:
+        | 'entryId'
+        | 'glAccountKey'
+        | 'parentEntryId'
+        | 'productType'
+        | 'bookingDate'
+        | 'creationDate'
+        | 'transactionId'
+        | 'glAccountId'
+        | 'glAccountType'
+        | 'debit'
+        | 'credit'
+        | 'branchKey'
+        | 'accountKey'
+        | 'productKey'
+        | 'accountId'
+        | 'foreignCredit'
+        | 'foreignDebit'
+        | 'foreignCurrencyCode'
+        | string
+    /**
+     * | **Operator**                | **Affected values**  | **Available for**                                                    |
+     * |---------------               |----------------------|----------------------------------------------------------------------|
+     * | EQUALS                       | ONE_VALUE            | BIG_DECIMAL,BOOLEAN,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY        |
+     * | EQUALS_CASE_SENSITIVE        | ONE_VALUE            | BIG_DECIMAL,BOOLEAN,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY 		  |
+     * | MORE_THAN                    | ONE_VALUE            | BIG_DECIMAL,NUMBER,MONEY                                             |
+     * | LESS_THAN                    | ONE_VALUE            | BIG_DECIMAL,NUMBER,MONEY                                             |
+     * | BETWEEN                      | TWO_VALUES           | BIG_DECIMAL,NUMBER,MONEY,DATE,DATE_TIME                              |
+     * | ON                           | ONE_VALUE            | DATE,DATE_TIME                                                       |
+     * | AFTER                        | ONE_VALUE            | DATE,DATE_TIME                                                       |
+     * | BEFORE                       | ONE_VALUE            | DATE,DATE_TIME                                                       |
+     * | BEFORE_INCLUSIVE             | ONE_VALUE            | DATE,DATE_TIME                                                       |
+     * | STARTS_WITH                  | ONE_VALUE            | STRING                                                               |
+     * | STARTS_WITH_CASE_SENSITIVE   | ONE_VALUE            | STRING                                                               |
+     * | IN                           | LIST                 | ENUM,KEY                                                             |
+     * | TODAY                        | NO_VALUE             | DATE,DATE_TIME                                                       |
+     * | THIS_WEEK                    | NO_VALUE             | DATE,DATE_TIME                                                       |
+     * | THIS_MONTH                   | NO_VALUE             | DATE,DATE_TIME                                                       |
+     * | THIS_YEAR                    | NO_VALUE             | DATE,DATE_TIME                                                       |
+     * | LAST_DAYS                    | ONE_VALUE            | NUMBER                                                               |
+     * | EMPTY                        | NO_VALUE             | BIG_DECIMAL,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY,DATE,DATE_TIME |
+     * | NOT_EMPTY                    | NO_VALUE             | BIG_DECIMAL,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY,DATE,DATE_TIME |
+     */
+    operator:
+        | 'EQUALS'
+        | 'EQUALS_CASE_SENSITIVE'
+        | 'DIFFERENT_THAN'
+        | 'MORE_THAN'
+        | 'LESS_THAN'
+        | 'BETWEEN'
+        | 'ON'
+        | 'AFTER'
+        | 'AFTER_INCLUSIVE'
+        | 'BEFORE'
+        | 'BEFORE_INCLUSIVE'
+        | 'STARTS_WITH'
+        | 'STARTS_WITH_CASE_SENSITIVE'
+        | 'IN'
+        | 'TODAY'
+        | 'THIS_WEEK'
+        | 'THIS_MONTH'
+        | 'THIS_YEAR'
+        | 'LAST_DAYS'
+        | 'EMPTY'
+        | 'NOT_EMPTY'
+    /**
+     * The second value to match the searching criteria, when the `BETWEEN` operator is used.
+     */
+    secondValue?: string
+    /**
+     * The value to match the searching criteria.
+     */
+    value?: string
+    /**
+     * List of values when the `IN` operator is used.
+     */
+    values?: string[]
+}
+
+/**
+ * Represents the filtering criteria list and sorting criteria for searching interest accrual entries.
+ */
+export interface InterestAccrualSearchCriteria {
+    /**
+     * The list of filtering criteria.
+     */
+    filterCriteria?: InterestAccrualFilterCriteria[]
+    sortingCriteria?: InterestAccrualSortingCriteria
+}
+
+export const InterestAccrualSearchCriteria = {
+    validate: (await import('./schemas/interest-accrual-search-criteria.schema.js'))
+        .validate as ValidateFunction<InterestAccrualSearchCriteria>,
+    get schema() {
+        return InterestAccrualSearchCriteria.validate.schema
+    },
+    get errors() {
+        return InterestAccrualSearchCriteria.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is InterestAccrualSearchCriteria => InterestAccrualSearchCriteria.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!InterestAccrualSearchCriteria.validate(o)) {
+            throw new ValidationError(InterestAccrualSearchCriteria.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * The sorting criteria used for sorting interest accrual entries.
+ */
+export interface InterestAccrualSortingCriteria {
+    /**
+     * The field to use as the sorting criteria.
+     */
+    field:
+        | 'entryId'
+        | 'parentEntryId'
+        | 'bookingDate'
+        | 'creationDate'
+        | 'transactionId'
+        | 'glAccountType'
+        | 'debit'
+        | 'credit'
+        | 'accountId'
+        | 'foreignCredit'
+        | 'foreignDebit'
+        | 'foreignCurrencyCode'
+    /**
+     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
+     */
+    order?: 'ASC' | 'DESC'
 }
 
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }
+
+export type SearchResponse = InterestAccrualBreakdown[]
+
+export const SearchResponse = {
+    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
+    get schema() {
+        return SearchResponse.validate.schema
+    },
+    get errors() {
+        return SearchResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
+} as const

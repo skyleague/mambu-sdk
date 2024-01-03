@@ -49,24 +49,6 @@ export class MambuAccountingReports {
     }
 
     /**
-     * Get accounting reports
-     */
-    public async get({ path, auth = [['apiKey'], ['basic']] }: { path: { reportKey: string }; auth?: string[][] | string[] }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`accounting/reports/${path.reportKey}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: AccountingReport,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Create  accounting report
      */
     public async create({
@@ -90,6 +72,24 @@ export class MambuAccountingReports {
                 102: { is: (_x: unknown): _x is unknown => true },
                 202: AccountingReportGenerationResponse,
                 400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get accounting reports
+     */
+    public async get({ path, auth = [['apiKey'], ['basic']] }: { path: { reportKey: string }; auth?: string[][] | string[] }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`accounting/reports/${path.reportKey}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: AccountingReport,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,

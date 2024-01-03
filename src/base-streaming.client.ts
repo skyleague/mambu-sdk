@@ -50,6 +50,44 @@ export class BaseMambuStreaming {
     }
 
     /**
+     * Commit Cursors
+     *
+     * This endpoint commits offsets of the subscription.
+     *
+     * - If there is uncommited data, and no commits happen for 60 seconds, Mambu will consider the client to be gone, and will close the connection. As long as no events are sent, the client does not need to commit.
+     *
+     * - If the connection is closed, the client has 60 seconds to commit the events it received, from the moment they were sent. After that, the connection will be considered closed, and it will not be possible to do commit with that `X-Mambu-StreamId` anymore.
+     *
+     * - When a batch is committed, that also automatically commits all previous batches that were sent in a stream for this partition.
+     */
+    public async commitSubscriptionCursors({
+        body,
+        path,
+        headers,
+    }: {
+        body: CommitSubscriptionCursorsRequest
+        path: { subscriptionId: string }
+        headers: { ['X-Mambu-StreamId']: string; apikey?: string }
+    }) {
+        this.validateRequestBody(CommitSubscriptionCursorsRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient().post(`subscriptions/${path.subscriptionId}/cursors`, {
+                json: body,
+                headers: headers,
+                responseType: 'json',
+            }),
+            {
+                200: CommitSubscriptionCursorsResponse200,
+                204: { is: (_x: unknown): _x is unknown => true },
+                403: Problem,
+                404: Problem,
+                422: Problem,
+            }
+        )
+    }
+
+    /**
      * Create a Subscription
      *
      * This endpoint creates a subscription for `event_types`. Event types must first be specified using the Mambu UI following the instructions in our [Event Streaming API](https://support.mambu.com/docs/streaming-api) article.
@@ -74,6 +112,38 @@ export class BaseMambuStreaming {
                 201: Subscription,
                 400: Problem,
                 422: Problem,
+            }
+        )
+    }
+
+    /**
+     * Delete a Subscription
+     *
+     * This endpoint deletes an existing subscription for event types.
+     * > <strong>Example Request</strong>
+     * ```http
+     * DELETE https://TENNT_NAME.MAMBU.COM/api/v1/subscriptions/0691160a-b519-4595-b85c-a400fc73e96 HTTP/1.1
+     *
+     * apikey: string
+     * ```
+     *
+     * - In case the subscription is not needed anymore, it can be manually deleted by providing its unique subscription id.
+     */
+    public async deleteSubscriptionBySubscriptionId({
+        path,
+        headers,
+    }: {
+        path: { subscriptionId: string }
+        headers?: { apikey?: string }
+    }) {
+        return this.awaitResponse(
+            this.buildClient().delete(`subscriptions/${path.subscriptionId}`, {
+                headers: headers ?? {},
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                404: DeleteSubscriptionBySubscriptionIdResponse404,
             }
         )
     }
@@ -132,76 +202,6 @@ export class BaseMambuStreaming {
                 403: Problem,
                 404: Problem,
                 409: Problem,
-            }
-        )
-    }
-
-    /**
-     * Commit Cursors
-     *
-     * This endpoint commits offsets of the subscription.
-     *
-     * - If there is uncommited data, and no commits happen for 60 seconds, Mambu will consider the client to be gone, and will close the connection. As long as no events are sent, the client does not need to commit.
-     *
-     * - If the connection is closed, the client has 60 seconds to commit the events it received, from the moment they were sent. After that, the connection will be considered closed, and it will not be possible to do commit with that `X-Mambu-StreamId` anymore.
-     *
-     * - When a batch is committed, that also automatically commits all previous batches that were sent in a stream for this partition.
-     */
-    public async commitSubscriptionCursors({
-        body,
-        path,
-        headers,
-    }: {
-        body: CommitSubscriptionCursorsRequest
-        path: { subscriptionId: string }
-        headers: { ['X-Mambu-StreamId']: string; apikey?: string }
-    }) {
-        this.validateRequestBody(CommitSubscriptionCursorsRequest, body)
-
-        return this.awaitResponse(
-            this.buildClient().post(`subscriptions/${path.subscriptionId}/cursors`, {
-                json: body,
-                headers: headers,
-                responseType: 'json',
-            }),
-            {
-                200: CommitSubscriptionCursorsResponse200,
-                204: { is: (_x: unknown): _x is unknown => true },
-                403: Problem,
-                404: Problem,
-                422: Problem,
-            }
-        )
-    }
-
-    /**
-     * Delete a Subscription
-     *
-     * This endpoint deletes an existing subscription for event types.
-     * > <strong>Example Request</strong>
-     * ```http
-     * DELETE https://TENNT_NAME.MAMBU.COM/api/v1/subscriptions/0691160a-b519-4595-b85c-a400fc73e96 HTTP/1.1
-     *
-     * apikey: string
-     * ```
-     *
-     * - In case the subscription is not needed anymore, it can be manually deleted by providing its unique subscription id.
-     */
-    public async deleteSubscriptionBySubscriptionId({
-        path,
-        headers,
-    }: {
-        path: { subscriptionId: string }
-        headers?: { apikey?: string }
-    }) {
-        return this.awaitResponse(
-            this.buildClient().delete(`subscriptions/${path.subscriptionId}`, {
-                headers: headers ?? {},
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                404: DeleteSubscriptionBySubscriptionIdResponse404,
             }
         )
     }

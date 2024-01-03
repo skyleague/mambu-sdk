@@ -56,23 +56,23 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Remove account from credit arrangement
+     * Add account to credit arrangement
      */
-    public async removeAccount({
+    public async addAccount({
         body,
         path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: RemoveCreditArrangementAccountInput
+        body: AddCreditArrangementAccountInput
         path: { creditArrangementId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(RemoveCreditArrangementAccountInput, body)
+        this.validateRequestBody(AddCreditArrangementAccountInput, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`creditarrangements/${path.creditArrangementId}:removeAccount`, {
+            this.buildClient(auth).post(`creditarrangements/${path.creditArrangementId}:addAccount`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
@@ -84,61 +84,6 @@ export class MambuCreditArrangements {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get credit arrangements
-     */
-    public async getAll({
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string; sortBy?: string }
-        auth?: string[][] | string[]
-    } = {}) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`creditarrangements`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetAllResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create credit arrangement
-     */
-    public async create({
-        body,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: CreditArrangement
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(CreditArrangement, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`creditarrangements`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: CreditArrangement,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
             }
         )
     }
@@ -177,28 +122,28 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Search credit arrangements
+     * Create credit arrangement
      */
-    public async search({
+    public async create({
         body,
-        query,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: CreditArrangementSearchCriteria
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
+        body: CreditArrangement
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(CreditArrangementSearchCriteria, body)
+        this.validateRequestBody(CreditArrangement, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`creditarrangements:search`, {
+            this.buildClient(auth).post(`creditarrangements`, {
                 json: body,
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: SearchResponse,
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: CreditArrangement,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -207,30 +152,22 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Add account to credit arrangement
+     * Delete credit arrangement
      */
-    public async addAccount({
-        body,
+    public async delete({
         path,
-        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: AddCreditArrangementAccountInput
         path: { creditArrangementId: string }
-        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(AddCreditArrangementAccountInput, body)
-
         return this.awaitResponse(
-            this.buildClient(auth).post(`creditarrangements/${path.creditArrangementId}:addAccount`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+            this.buildClient(auth).delete(`creditarrangements/${path.creditArrangementId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                200: CreditArrangementAccounts,
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -240,26 +177,47 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Get credit arrangement schedule
+     * Get credit arrangements
      */
-    public async getSchedule({
-        path,
+    public async getAll({
         query,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { creditArrangementId: string }
-        query?: { detailsLevel?: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string; sortBy?: string }
         auth?: string[][] | string[]
-    }) {
+    } = {}) {
         return this.awaitResponse(
-            this.buildClient(auth).get(`creditarrangements/${path.creditArrangementId}/schedule`, {
+            this.buildClient(auth).get(`creditarrangements`, {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                200: CreditArrangementSchedule,
+                200: GetAllResponse,
                 400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get all loan and deposit accounts linked to credit arrangement
+     */
+    public async getAllAccounts({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { creditArrangementId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`creditarrangements/${path.creditArrangementId}/accounts`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: CreditArrangementAccounts,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
@@ -296,52 +254,25 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Update credit arrangement
+     * Get credit arrangement schedule
      */
-    public async update({
-        body,
+    public async getSchedule({
         path,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: CreditArrangement
         path: { creditArrangementId: string }
+        query?: { detailsLevel?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(CreditArrangement, body)
-
         return this.awaitResponse(
-            this.buildClient(auth).put(`creditarrangements/${path.creditArrangementId}`, {
-                json: body,
+            this.buildClient(auth).get(`creditarrangements/${path.creditArrangementId}/schedule`, {
+                searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                200: CreditArrangement,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Delete credit arrangement
-     */
-    public async delete({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { creditArrangementId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).delete(`creditarrangements/${path.creditArrangementId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
+                200: CreditArrangementSchedule,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -381,22 +312,91 @@ export class MambuCreditArrangements {
     }
 
     /**
-     * Get all loan and deposit accounts linked to credit arrangement
+     * Remove account from credit arrangement
      */
-    public async getAllAccounts({
+    public async removeAccount({
+        body,
         path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
+        body: RemoveCreditArrangementAccountInput
         path: { creditArrangementId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
+        this.validateRequestBody(RemoveCreditArrangementAccountInput, body)
+
         return this.awaitResponse(
-            this.buildClient(auth).get(`creditarrangements/${path.creditArrangementId}/accounts`, {
+            this.buildClient(auth).post(`creditarrangements/${path.creditArrangementId}:removeAccount`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                200: CreditArrangementAccounts,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Search credit arrangements
+     */
+    public async search({
+        body,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CreditArrangementSearchCriteria
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(CreditArrangementSearchCriteria, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`creditarrangements:search`, {
+                json: body,
+                searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                200: CreditArrangementAccounts,
+                200: SearchResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Update credit arrangement
+     */
+    public async update({
+        body,
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CreditArrangement
+        path: { creditArrangementId: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(CreditArrangement, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).put(`creditarrangements/${path.creditArrangementId}`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: CreditArrangement,
+                400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,

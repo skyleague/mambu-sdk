@@ -6,18 +6,45 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
-export type GetAllResponse = Installment[]
+/**
+ * Represents a simple installment amount structure.
+ */
+export interface Amount {
+    /**
+     * The due amount.
+     */
+    due?: number
+    /**
+     * The expected amount, which is sum of paid and due amounts.
+     */
+    expected?: number
+    /**
+     * The paid amount.
+     */
+    paid?: number
+}
 
-export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
-    get schema() {
-        return GetAllResponse.validate.schema
-    },
-    get errors() {
-        return GetAllResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
-} as const
+/**
+ * Represents a simple installment amount structure.
+ */
+export interface AmountWithReduced {
+    /**
+     * The due amount.
+     */
+    due?: number
+    /**
+     * The expected amount, which is sum of paid and due amounts.
+     */
+    expected?: number
+    /**
+     * The paid amount.
+     */
+    paid?: number
+    /**
+     * The reduced amount.
+     */
+    reduced?: number
+}
 
 export interface ErrorResponse {
     errors?: RestError[]
@@ -40,93 +67,9 @@ export const ErrorResponse = {
 } as const
 
 /**
- * Represents a single installment details structure.
- */
-export interface Installment {
-    penalty?: InstallmentAllocationElementTaxableAmount
-    /**
-     * The installment due date.
-     */
-    dueDate?: string
-    fee?: InstallmentFee
-    /**
-     * The installment repaid date.
-     */
-    repaidDate?: string
-    principal?: InstallmentAllocationElementAmount
-    /**
-     * The order number of an installment among all the installments generated for a loan. Loan installments are put in ascending order by due date. The order number only applies to the content of a particular JSON response therefore it is not unique.
-     */
-    number?: string
-    /**
-     * The installment last paid date.
-     */
-    lastPaidDate?: string
-    /**
-     * The parent account key of the installment.
-     */
-    parentAccountKey?: string
-    interest?: InstallmentAllocationElementTaxableAmount
-    /**
-     * The breakdown of the fee amounts that have been applied to the loan account.
-     */
-    feeDetails?: InstallmentFeeDetails[]
-    /**
-     * The encoded key of the installment, which is auto generated, and unique.
-     */
-    encodedKey?: string
-    /**
-     * The installment state.
-     */
-    state?: 'PENDING' | 'LATE' | 'PAID' | 'PARTIALLY_PAID' | 'GRACE'
-    /**
-     * `TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.
-     */
-    isPaymentHoliday?: boolean
-}
-
-/**
- * Represents an installment allocation element taxable amount structure.
- */
-export interface InstallmentAllocationElementTaxableAmount {
-    amount?: Amount
-    tax?: Amount
-}
-
-/**
- * Represents a simple installment amount structure.
- */
-export interface Amount {
-    /**
-     * The paid amount.
-     */
-    paid?: number
-    /**
-     * The due amount.
-     */
-    due?: number
-    /**
-     * The expected amount, which is sum of paid and due amounts.
-     */
-    expected?: number
-}
-
-/**
- * Represents an installment fee structure.
- */
-export interface InstallmentFee {
-    amount?: FeeAmount
-    tax?: Amount
-}
-
-/**
  * Represents a fee amount.
  */
 export interface FeeAmount {
-    /**
-     * The paid amount.
-     */
-    paid?: number
     /**
      * The due amount.
      */
@@ -139,6 +82,69 @@ export interface FeeAmount {
      * The expected amount, which is the sum of unapplied fee and planned fee due amounts.
      */
     expectedUnapplied?: number
+    /**
+     * The paid amount.
+     */
+    paid?: number
+}
+
+export type GetAllResponse = Installment[]
+
+export const GetAllResponse = {
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    get schema() {
+        return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+} as const
+
+/**
+ * Represents a single installment details structure.
+ */
+export interface Installment {
+    /**
+     * The installment due date.
+     */
+    dueDate?: string
+    /**
+     * The encoded key of the installment, which is auto generated, and unique.
+     */
+    encodedKey?: string
+    fee?: InstallmentFee
+    /**
+     * The breakdown of the fee amounts that have been applied to the loan account.
+     */
+    feeDetails?: InstallmentFeeDetails[]
+    interest?: InstallmentAllocationElementTaxableAmount
+    /**
+     * `TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.
+     */
+    isPaymentHoliday?: boolean
+    /**
+     * The installment last paid date.
+     */
+    lastPaidDate?: string
+    /**
+     * The order number of an installment among all the installments generated for a loan. Loan installments are put in ascending order by due date. The order number only applies to the content of a particular JSON response therefore it is not unique.
+     */
+    number?: string
+    /**
+     * The parent account key of the installment.
+     */
+    parentAccountKey?: string
+    penalty?: InstallmentAllocationElementTaxableAmount
+    principal?: InstallmentAllocationElementAmount
+    /**
+     * The installment repaid date.
+     */
+    repaidDate?: string
+    /**
+     * The installment state.
+     */
+    state?: 'PENDING' | 'LATE' | 'PAID' | 'PARTIALLY_PAID' | 'GRACE'
 }
 
 /**
@@ -149,15 +155,26 @@ export interface InstallmentAllocationElementAmount {
 }
 
 /**
+ * Represents an installment allocation element taxable amount structure.
+ */
+export interface InstallmentAllocationElementTaxableAmount {
+    amount?: Amount
+    tax?: Amount
+}
+
+/**
+ * Represents an installment fee structure.
+ */
+export interface InstallmentFee {
+    amount?: FeeAmount
+    tax?: Amount
+}
+
+/**
  * Represents fee details for an installment.
  */
 export interface InstallmentFeeDetails {
-    /**
-     * The name of the fee
-     */
-    name?: string
     amount?: AmountWithReduced
-    tax?: AmountWithReduced
     /**
      * The encoded key of the predefined fee, auto generated, unique
      */
@@ -166,32 +183,15 @@ export interface InstallmentFeeDetails {
      * The id of the fee, provided by the client
      */
     id?: string
-}
-
-/**
- * Represents a simple installment amount structure.
- */
-export interface AmountWithReduced {
     /**
-     * The paid amount.
+     * The name of the fee
      */
-    paid?: number
-    /**
-     * The reduced amount.
-     */
-    reduced?: number
-    /**
-     * The due amount.
-     */
-    due?: number
-    /**
-     * The expected amount, which is sum of paid and due amounts.
-     */
-    expected?: number
+    name?: string
+    tax?: AmountWithReduced
 }
 
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

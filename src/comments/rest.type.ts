@@ -6,43 +6,26 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
-export type GetCommentsResponse = Comment[]
-
-export const GetCommentsResponse = {
-    validate: (await import('./schemas/get-comments-response.schema.js')).validate as ValidateFunction<GetCommentsResponse>,
-    get schema() {
-        return GetCommentsResponse.validate.schema
-    },
-    get errors() {
-        return GetCommentsResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetCommentsResponse => GetCommentsResponse.validate(o) === true,
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[]
-}
-
-export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
-    get schema() {
-        return ErrorResponse.validate.schema
-    },
-    get errors() {
-        return ErrorResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
-        }
-    },
-} as const
-
 /**
  * Represents information about the comment data transfer object.
  */
 export interface Comment {
+    /**
+     * The creation date of the comment.
+     */
+    creationDate?: string
+    /**
+     * The comments's encoded key, which is auto-generated and unique.
+     */
+    encodedKey?: string
+    /**
+     * The last date when this comment was modified.
+     */
+    lastModifiedDate?: string
+    /**
+     * The encoded key of the entity that owns this comment.
+     */
+    ownerKey?: string
     /**
      * The type of the entity that owns this comment.
      */
@@ -60,25 +43,9 @@ export interface Comment {
         | 'LINE_OF_CREDIT'
         | 'GL_JOURNAL_ENTRY'
     /**
-     * The last date when this comment was modified.
-     */
-    lastModifiedDate?: string
-    /**
-     * The comments's encoded key, which is auto-generated and unique.
-     */
-    encodedKey?: string
-    /**
      * The message in the comment.
      */
     text?: string
-    /**
-     * The creation date of the comment.
-     */
-    creationDate?: string
-    /**
-     * The encoded key of the entity that owns this comment.
-     */
-    ownerKey?: string
     /**
      * The user's key.
      */
@@ -101,8 +68,41 @@ export const Comment = {
     },
 } as const
 
+export interface ErrorResponse {
+    errors?: RestError[]
+}
+
+export const ErrorResponse = {
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    get schema() {
+        return ErrorResponse.validate.schema
+    },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
+} as const
+
+export type GetCommentsResponse = Comment[]
+
+export const GetCommentsResponse = {
+    validate: (await import('./schemas/get-comments-response.schema.js')).validate as ValidateFunction<GetCommentsResponse>,
+    get schema() {
+        return GetCommentsResponse.validate.schema
+    },
+    get errors() {
+        return GetCommentsResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetCommentsResponse => GetCommentsResponse.validate(o) === true,
+} as const
+
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

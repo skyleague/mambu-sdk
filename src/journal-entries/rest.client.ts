@@ -51,6 +51,36 @@ export class MambuJournalEntries {
     }
 
     /**
+     * Create general ledger journal entries.
+     */
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: PostGLJournalEntriesDTO
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(PostGLJournalEntriesDTO, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`gljournalentries`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: CreateResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Get general ledger journal entries
      */
     public async getAll({
@@ -76,36 +106,6 @@ export class MambuJournalEntries {
             }),
             {
                 200: GetAllResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create general ledger journal entries.
-     */
-    public async create({
-        body,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: PostGLJournalEntriesDTO
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PostGLJournalEntriesDTO, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`gljournalentries`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: CreateResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

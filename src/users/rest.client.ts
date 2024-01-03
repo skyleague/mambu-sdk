@@ -44,62 +44,31 @@ export class MambuUsers {
     }
 
     /**
-     * Get user
+     * Create user
      */
-    public async getById({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { userId: string }
-        query?: { detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`users/${path.userId}`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: User,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Update user
-     */
-    public async update({
+    public async create({
         body,
-        path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: User
-        path: { userId: string }
+        body: UserRequest
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(User, body)
+        this.validateRequestBody(UserRequest, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).put(`users/${path.userId}`, {
+            this.buildClient(auth).post(`users`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
                 102: { is: (_x: unknown): _x is unknown => true },
-                200: User,
+                201: User,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-                404: ErrorResponse,
             }
         )
     }
@@ -111,38 +80,6 @@ export class MambuUsers {
         return this.awaitResponse(
             this.buildClient(auth).delete(`users/${path.userId}`, {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Partially update user
-     */
-    public async patch({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: PatchRequest
-        path: { userId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PatchRequest, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).patch(`users/${path.userId}`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
@@ -188,31 +125,94 @@ export class MambuUsers {
     }
 
     /**
-     * Create user
+     * Get user
      */
-    public async create({
+    public async getById({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { userId: string }
+        query?: { detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`users/${path.userId}`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: User,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Partially update user
+     */
+    public async patch({
         body,
+        path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: UserRequest
+        body: PatchRequest
+        path: { userId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(UserRequest, body)
+        this.validateRequestBody(PatchRequest, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`users`, {
+            this.buildClient(auth).patch(`users/${path.userId}`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Update user
+     */
+    public async update({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: User
+        path: { userId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(User, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).put(`users/${path.userId}`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
                 102: { is: (_x: unknown): _x is unknown => true },
-                201: User,
+                200: User,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }

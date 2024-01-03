@@ -11,6 +11,46 @@ import { ValidationError } from 'ajv'
  */
 export interface Document {
     /**
+     * The creation date of the document, stored as UTC
+     */
+    creationDate?: string
+    /**
+     * The document encodedKey
+     */
+    encodedKey?: string
+    /**
+     * The original file name of the document
+     */
+    fileName?: string
+    /**
+     * The file size of the document
+     */
+    fileSize?: number
+    /**
+     * The document id
+     */
+    id: number
+    /**
+     * The last modified date of the document, stored as UTC
+     */
+    lastModifiedDate?: string
+    /**
+     * Location where the document can be found, eg /myfiles/mypicture.jpeg
+     */
+    location?: string
+    /**
+     * The name of the document
+     */
+    name: string
+    /**
+     * Detailed notes about the document
+     */
+    notes?: string
+    /**
+     * Represents the holder of this document. If null, means nobody is the owner of this document
+     */
+    ownerKey?: string
+    /**
      * Determines the owner type of the document
      */
     ownerType?:
@@ -27,49 +67,9 @@ export interface Document {
         | 'LINE_OF_CREDIT'
         | 'GL_JOURNAL_ENTRY'
     /**
-     * The original file name of the document
-     */
-    fileName?: string
-    /**
-     * Detailed notes about the document
-     */
-    notes?: string
-    /**
-     * The last modified date of the document, stored as UTC
-     */
-    lastModifiedDate?: string
-    /**
-     * The creation date of the document, stored as UTC
-     */
-    creationDate?: string
-    /**
      * The extension of the document
      */
     type: string
-    /**
-     * Represents the holder of this document. If null, means nobody is the owner of this document
-     */
-    ownerKey?: string
-    /**
-     * The file size of the document
-     */
-    fileSize?: number
-    /**
-     * The name of the document
-     */
-    name: string
-    /**
-     * The document encodedKey
-     */
-    encodedKey?: string
-    /**
-     * Location where the document can be found, eg /myfiles/mypicture.jpeg
-     */
-    location?: string
-    /**
-     * The document id
-     */
-    id: number
 }
 
 export const Document = {
@@ -119,6 +119,6 @@ export const GetDocumentsByEntityIdResponse = {
 
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

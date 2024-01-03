@@ -53,59 +53,31 @@ export class MambuClients {
     }
 
     /**
-     * Get client
+     * Create client
      */
-    public async getById({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { clientId: string }
-        query?: { detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`clients/${path.clientId}`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: Client,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Update client
-     */
-    public async update({
+    public async create({
         body,
-        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
         body: Client
-        path: { clientId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(Client, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).put(`clients/${path.clientId}`, {
+            this.buildClient(auth).post(`clients`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: Client,
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: Client,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-                404: ErrorResponse,
             }
         )
     }
@@ -116,36 +88,6 @@ export class MambuClients {
     public async delete({ path, auth = [['apiKey'], ['basic']] }: { path: { clientId: string }; auth?: string[][] | string[] }) {
         return this.awaitResponse(
             this.buildClient(auth).delete(`clients/${path.clientId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Partially update client
-     */
-    public async patch({
-        body,
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: PatchRequest
-        path: { clientId: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PatchRequest, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).patch(`clients/${path.clientId}`, {
-                json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
@@ -199,31 +141,111 @@ export class MambuClients {
     }
 
     /**
-     * Create client
+     * Get client
      */
-    public async create({
-        body,
-        headers,
+    public async getById({
+        path,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: Client
-        headers?: { ['Idempotency-Key']?: string }
+        path: { clientId: string }
+        query?: { detailsLevel?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(Client, body)
-
         return this.awaitResponse(
-            this.buildClient(auth).post(`clients`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+            this.buildClient(auth).get(`clients/${path.clientId}`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: Client,
+                200: Client,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Credit arrangements list returned.
+     */
+    public async getCreditArrangementsByClientIdOrKey({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { clientId: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`clients/${path.clientId}/creditarrangements`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetCreditArrangementsByClientIdOrKeyResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get client role for client
+     */
+    public async getRoleByClientId({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { clientId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`clients/${path.clientId}/role`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: ClientRole,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Partially update client
+     */
+    public async patch({
+        body,
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: PatchRequest
+        path: { clientId: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(PatchRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).patch(`clients/${path.clientId}`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }
@@ -259,49 +281,27 @@ export class MambuClients {
     }
 
     /**
-     * Get client role for client
+     * Update client
      */
-    public async getRoleByClientId({
+    public async update({
+        body,
         path,
         auth = [['apiKey'], ['basic']],
     }: {
+        body: Client
         path: { clientId: string }
         auth?: string[][] | string[]
     }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`clients/${path.clientId}/role`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: ClientRole,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
+        this.validateRequestBody(Client, body)
 
-    /**
-     * Credit arrangements list returned.
-     */
-    public async getCreditArrangementsByClientIdOrKey({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { clientId: string }
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
         return this.awaitResponse(
-            this.buildClient(auth).get(`clients/${path.clientId}/creditarrangements`, {
-                searchParams: query ?? {},
+            this.buildClient(auth).put(`clients/${path.clientId}`, {
+                json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                200: GetCreditArrangementsByClientIdOrKeyResponse,
+                200: Client,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

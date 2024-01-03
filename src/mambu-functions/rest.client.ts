@@ -11,8 +11,12 @@ import {
     ErrorResponse,
     GetAllResponse,
     GetLogsResponse,
+    ListFunctionSubscriptionsResponse,
     MambuFunction,
     MambuFunctionCreate,
+    MambuFunctionSubscription,
+    MambuFunctionSubscriptionCreate,
+    MambuFunctionSubscriptionUpdate,
     MambuFunctionUpdate,
 } from './rest.type.js'
 
@@ -51,52 +55,29 @@ export class MambuMambuFunctions {
     }
 
     /**
-     * Allows retrieval of functions logs various query parameters
+     * Create a new Mambu Function Subscription
      */
-    public async getLogs({
+    public async create({
+        body,
         path,
-        query,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
+        body: MambuFunctionSubscriptionCreate
         path: { functionName: string }
-        query?: { from?: string; to?: string; limit?: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`mambu-functions/${path.functionName}/logs`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetLogsResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-                500: ErrorResponse,
-            }
-        )
-    }
+        this.validateRequestBody(MambuFunctionSubscriptionCreate, body)
 
-    /**
-     * Allows retrieval of functions using various query parameters
-     */
-    public async getAll({
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; ['Extension Point ID']?: string }
-        auth?: string[][] | string[]
-    } = {}) {
         return this.awaitResponse(
-            this.buildClient(auth).get(`mambu-functions`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            this.buildClient(auth).post(`mambu-functions/${path.functionName}/subscriptions`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: GetAllResponse,
+                201: MambuFunctionSubscription,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -107,7 +88,7 @@ export class MambuMambuFunctions {
     /**
      * Create a new Mambu Function
      */
-    public async create({
+    public async create1({
         body,
         headers,
         auth = [['apiKey'], ['basic']],
@@ -126,6 +107,166 @@ export class MambuMambuFunctions {
             }),
             {
                 201: MambuFunction,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Delete an existing Mambu Function Subscription
+     */
+    public async delete({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { functionName: string; subscriptionName: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).delete(`mambu-functions/${path.functionName}/subscriptions/${path.subscriptionName}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Delete an existing Mambu Function
+     */
+    public async delete1({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { functionName: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).delete(`mambu-functions/${path.functionName}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Disable an existing Mambu Function Subscription
+     */
+    public async disable({
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { functionName: string; subscriptionName: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).put(`mambu-functions/${path.functionName}/subscriptions/${path.subscriptionName}/disable`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                200: MambuFunctionSubscription,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Enable an existing Mambu Function Subscription
+     */
+    public async enable({
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { functionName: string; subscriptionName: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).put(`mambu-functions/${path.functionName}/subscriptions/${path.subscriptionName}/enable`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                200: MambuFunctionSubscription,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Allows retrieval of a single subscription via name
+     */
+    public async get({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { functionName: string; subscriptionName: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`mambu-functions/${path.functionName}/subscriptions/${path.subscriptionName}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: MambuFunctionSubscription,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Allows retrieval of functions using various query parameters
+     */
+    public async getAll({
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        query?: {
+            offset?: string
+            limit?: string
+            paginationDetails?: string
+            ['Extension Point ID']?: string
+            ['Function Name']?: string
+        }
+        auth?: string[][] | string[]
+    } = {}) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`mambu-functions`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetAllResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -159,9 +300,95 @@ export class MambuMambuFunctions {
     }
 
     /**
-     * Update an existing Mambu Function
+     * Allows retrieval of functions logs various query parameters
+     */
+    public async getLogs({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { functionName: string }
+        query?: { from?: string; to?: string; limit?: string; level?: string; msgPattern?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`mambu-functions/${path.functionName}/logs`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetLogsResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+                500: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * List all Mambu Function Subscriptions for a function
+     */
+    public async listFunctionSubscriptions({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { functionName: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`mambu-functions/${path.functionName}/subscriptions`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: ListFunctionSubscriptionsResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Update an existing Mambu Function Subscription
      */
     public async update({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: MambuFunctionSubscriptionUpdate
+        path: { functionName: string; subscriptionName: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(MambuFunctionSubscriptionUpdate, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).put(`mambu-functions/${path.functionName}/subscriptions/${path.subscriptionName}`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                200: MambuFunctionSubscription,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Update an existing Mambu Function
+     */
+    public async update1({
         body,
         path,
         headers,
@@ -183,31 +410,6 @@ export class MambuMambuFunctions {
             {
                 102: { is: (_x: unknown): _x is unknown => true },
                 200: MambuFunction,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Delete an existing Mambu Function
-     */
-    public async delete({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { functionName: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).delete(`mambu-functions/${path.functionName}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

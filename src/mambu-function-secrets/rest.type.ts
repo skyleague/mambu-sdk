@@ -6,6 +6,26 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
+export interface ErrorResponse {
+    errors?: RestError[]
+}
+
+export const ErrorResponse = {
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    get schema() {
+        return ErrorResponse.validate.schema
+    },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
+} as const
+
 /**
  * Mambu Function Tenant Secret create data.
  */
@@ -37,28 +57,35 @@ export const MambuFunctionSecretCreate = {
     },
 } as const
 
-export interface ErrorResponse {
-    errors?: RestError[]
+/**
+ * Mambu Function Tenant Secret update data.
+ */
+export interface MambuFunctionSecretUpdate {
+    /**
+     * The value of the customer secret
+     */
+    value?: string
 }
 
-export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+export const MambuFunctionSecretUpdate = {
+    validate: (await import('./schemas/mambu-function-secret-update.schema.js'))
+        .validate as ValidateFunction<MambuFunctionSecretUpdate>,
     get schema() {
-        return ErrorResponse.validate.schema
+        return MambuFunctionSecretUpdate.validate.schema
     },
     get errors() {
-        return ErrorResponse.validate.errors ?? undefined
+        return MambuFunctionSecretUpdate.validate.errors ?? undefined
     },
-    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    is: (o: unknown): o is MambuFunctionSecretUpdate => MambuFunctionSecretUpdate.validate(o) === true,
     assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+        if (!MambuFunctionSecretUpdate.validate(o)) {
+            throw new ValidationError(MambuFunctionSecretUpdate.errors ?? [])
         }
     },
 } as const
 
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

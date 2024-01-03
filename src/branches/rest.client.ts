@@ -44,29 +44,31 @@ export class MambuBranches {
     }
 
     /**
-     * Get branch
+     * Create branch
      */
-    public async getById({
-        path,
-        query,
+    public async create({
+        body,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { branchId: string }
-        query?: { detailsLevel?: string }
+        body: Branch
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
+        this.validateRequestBody(Branch, body)
+
         return this.awaitResponse(
-            this.buildClient(auth).get(`branches/${path.branchId}`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            this.buildClient(auth).post(`branches`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: Branch,
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: Branch,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-                404: ErrorResponse,
             }
         )
     }
@@ -97,31 +99,29 @@ export class MambuBranches {
     }
 
     /**
-     * Create branch
+     * Get branch
      */
-    public async create({
-        body,
-        headers,
+    public async getById({
+        path,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: Branch
-        headers?: { ['Idempotency-Key']?: string }
+        path: { branchId: string }
+        query?: { detailsLevel?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(Branch, body)
-
         return this.awaitResponse(
-            this.buildClient(auth).post(`branches`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+            this.buildClient(auth).get(`branches/${path.branchId}`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: Branch,
+                200: Branch,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }

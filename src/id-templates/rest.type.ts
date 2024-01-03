@@ -6,19 +6,6 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
-export type GetAllResponse = IdentificationDocumentTemplate[]
-
-export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
-    get schema() {
-        return GetAllResponse.validate.schema
-    },
-    get errors() {
-        return GetAllResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
-} as const
-
 export interface ErrorResponse {
     errors?: RestError[]
 }
@@ -39,14 +26,31 @@ export const ErrorResponse = {
     },
 } as const
 
+export type GetAllResponse = IdentificationDocumentTemplate[]
+
+export const GetAllResponse = {
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    get schema() {
+        return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+} as const
+
 /**
  * Represents a template for identification documents.
  */
 export interface IdentificationDocumentTemplate {
     /**
-     * The authority that issued the document.
+     * `TRUE` if a template allows files to be attached, `FALSE` otherwise.
      */
-    issuingAuthority?: string
+    allowAttachments?: boolean
+    /**
+     * The ID template constraint to define the ID number length and format. Templates consist of the characters `#`, `@`, and `$`, where `#` specifies a number, `@` a letter, and `$` a number or a letter.
+     */
+    documentIdTemplate?: string
     /**
      * The type of the document. For example, passport.
      */
@@ -60,21 +64,17 @@ export interface IdentificationDocumentTemplate {
      */
     id?: string
     /**
-     * The ID template constraint to define the ID number length and format. Templates consist of the characters `#`, `@`, and `$`, where `#` specifies a number, `@` a letter, and `$` a number or a letter.
+     * The authority that issued the document.
      */
-    documentIdTemplate?: string
+    issuingAuthority?: string
     /**
      * `TRUE` if a template is mandatory for all the individual clients, `FALSE` otherwise.
      */
     mandatory?: boolean
-    /**
-     * `TRUE` if a template allows files to be attached, `FALSE` otherwise.
-     */
-    allowAttachments?: boolean
 }
 
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

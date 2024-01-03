@@ -11,13 +11,21 @@ import { ValidationError } from 'ajv'
  */
 export interface BackgroundProcess {
     /**
-     * When this process was ended. Stored as Organization Time
+     * When this process was created. Stored as Organization Time
      */
-    endDate?: string
+    creationDate?: string
     /**
      * The encoded key of the entity, generated, globally unique
      */
     encodedKey?: string
+    /**
+     * When this process was ended. Stored as Organization Time
+     */
+    endDate?: string
+    /**
+     * When this process was started. Stored as Organization Time
+     */
+    startDate?: string
     /**
      * The current status of this process
      */
@@ -37,14 +45,6 @@ export interface BackgroundProcess {
      * The type of the background process
      */
     type?: 'CRON_JOBS' | 'MANUAL_CRON_JOBS_TRIGGER'
-    /**
-     * When this process was created. Stored as Organization Time
-     */
-    creationDate?: string
-    /**
-     * When this process was started. Stored as Organization Time
-     */
-    startDate?: string
 }
 
 export const BackgroundProcess = {
@@ -85,6 +85,6 @@ export const ErrorResponse = {
 
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

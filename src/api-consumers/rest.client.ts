@@ -53,22 +53,60 @@ export class MambuApiConsumers {
     }
 
     /**
-     * Get API consumer
+     * Create API consumer
      */
-    public async getById({
-        path,
+    public async create({
+        body,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { apiConsumerId: string }
+        body: ApiConsumer
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
+        this.validateRequestBody(ApiConsumer, body)
+
         return this.awaitResponse(
-            this.buildClient(auth).get(`consumers/${path.apiConsumerId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            this.buildClient(auth).post(`consumers`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: ApiConsumer,
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: ApiConsumer,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Create API key
+     */
+    public async createApiKeyForConsumer({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: ApiKeyInput
+        path: { apiConsumerId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(ApiKeyInput, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`consumers/${path.apiConsumerId}/apikeys`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: ApiKey,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -78,30 +116,25 @@ export class MambuApiConsumers {
     }
 
     /**
-     * Update API consumer
+     * Create secret key
      */
-    public async update({
-        body,
+    public async createSecretKeyForConsumer({
         path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: ApiConsumer
         path: { apiConsumerId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(ApiConsumer, body)
-
         return this.awaitResponse(
-            this.buildClient(auth).put(`consumers/${path.apiConsumerId}`, {
-                json: body,
+            this.buildClient(auth).post(`consumers/${path.apiConsumerId}/secretkeys`, {
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
                 102: { is: (_x: unknown): _x is unknown => true },
-                200: ApiConsumer,
+                201: SecretKey,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -127,6 +160,105 @@ export class MambuApiConsumers {
             }),
             {
                 204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Delete API key
+     */
+    public async deleteApiKeyForConsumer({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { apiConsumerId: string; apiKeyId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).delete(`consumers/${path.apiConsumerId}/apikeys/${path.apiKeyId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get all API consumers
+     */
+    public async getAll({
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: { query?: { offset?: string; limit?: string; paginationDetails?: string }; auth?: string[][] | string[] } = {}) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`consumers`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetAllResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get API consumer
+     */
+    public async getById({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { apiConsumerId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`consumers/${path.apiConsumerId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: ApiConsumer,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get API keys
+     *
+     * This endpoint allows you to get the API key ID and a six character clear text prefix of the API key.
+     */
+    public async getKeysByConsumerId({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { apiConsumerId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`consumers/${path.apiConsumerId}/keys`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetKeysByConsumerIdResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -168,162 +300,30 @@ export class MambuApiConsumers {
     }
 
     /**
-     * Delete API key
+     * Update API consumer
      */
-    public async deleteApiKeyForConsumer({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { apiConsumerId: string; apiKeyId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).delete(`consumers/${path.apiConsumerId}/apikeys/${path.apiKeyId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create API key
-     */
-    public async createApiKeyForConsumer({
+    public async update({
         body,
         path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: ApiKeyInput
-        path: { apiConsumerId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ApiKeyInput, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`consumers/${path.apiConsumerId}/apikeys`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: ApiKey,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get all API consumers
-     */
-    public async getAll({
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: { query?: { offset?: string; limit?: string; paginationDetails?: string }; auth?: string[][] | string[] } = {}) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`consumers`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetAllResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create API consumer
-     */
-    public async create({
-        body,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
         body: ApiConsumer
+        path: { apiConsumerId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(ApiConsumer, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`consumers`, {
+            this.buildClient(auth).put(`consumers/${path.apiConsumerId}`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
                 102: { is: (_x: unknown): _x is unknown => true },
-                201: ApiConsumer,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get API keys
-     *
-     * This endpoint allows you to get the API key ID and a six character clear text prefix of the API key.
-     */
-    public async getKeysByConsumerId({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { apiConsumerId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`consumers/${path.apiConsumerId}/keys`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetKeysByConsumerIdResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create secret key
-     */
-    public async createSecretKeyForConsumer({
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { apiConsumerId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).post(`consumers/${path.apiConsumerId}/secretkeys`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: SecretKey,
+                200: ApiConsumer,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

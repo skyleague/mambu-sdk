@@ -10,6 +10,7 @@ import type { IncomingHttpHeaders } from 'http'
 import {
     EditScheduleRequest,
     ErrorResponse,
+    LoanAccountPreviewProcessPMTTransactionally,
     LoanAccountSchedule,
     PreviewLoanAccountSchedule,
     PreviewTranchesOnScheduleRequest,
@@ -50,34 +51,6 @@ export class MambuLoanAccountSchedule {
     }
 
     /**
-     * Get loan account schedule
-     */
-    public async getScheduleForLoanAccount({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string }
-        query?: { detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`loans/${path.loanAccountId}/schedule`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: LoanAccountSchedule,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Update loan account schedule
      */
     public async editSchedule({
@@ -108,25 +81,21 @@ export class MambuLoanAccountSchedule {
     }
 
     /**
-     * Preview loan account schedule for non-existent loan account
+     * Get loan account schedule
      */
-    public async previewTranchesOnSchedule({
-        body,
+    public async getScheduleForLoanAccount({
         path,
-        headers,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: PreviewTranchesOnScheduleRequest
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        query?: { detailsLevel?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(PreviewTranchesOnScheduleRequest, body)
-
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}/schedule:previewTranches`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+            this.buildClient(auth).get(`loans/${path.loanAccountId}/schedule`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
@@ -134,6 +103,34 @@ export class MambuLoanAccountSchedule {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Preview loan account schedule using transactional processing for PMT.
+     */
+    public async previewProcessPmtTransactionally({
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/${path.loanAccountId}/schedule/previewProcessPMTTransactionally`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                200: LoanAccountPreviewProcessPMTTransactionally,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }
@@ -154,6 +151,37 @@ export class MambuLoanAccountSchedule {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/schedule:preview`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                200: LoanAccountSchedule,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Preview loan account schedule for non-existent loan account
+     */
+    public async previewTranchesOnSchedule({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: PreviewTranchesOnScheduleRequest
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(PreviewTranchesOnScheduleRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/${path.loanAccountId}/schedule:previewTranches`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',

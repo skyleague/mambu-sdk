@@ -10,16 +10,15 @@ import { ValidationError } from 'ajv'
  * Represents an API consumer.
  */
 export interface ApiConsumer {
-    role?: RoleIdentifier
     access?: ApiConsumerAccess
     /**
-     * The last time the API consumer was modified in UTC.
+     * The encoded key of the branch this API consumer is assigned to.
      */
-    lastModifiedDate?: string
+    assignedBranchKey?: string
     /**
-     * The API consumer name.
+     * The date when the API consumer was created in UTC.
      */
-    name: string
+    creationDate?: string
     /**
      * The encoded key of the entity, generated, globally unique
      */
@@ -29,19 +28,20 @@ export interface ApiConsumer {
      */
     id?: string
     /**
+     * The last time the API consumer was modified in UTC.
+     */
+    lastModifiedDate?: string
+    /**
+     * The API consumer name.
+     */
+    name: string
+    role?: RoleIdentifier
+    /**
      * The API consumer transaction limits.
      */
     transactionLimits?: {
         [k: string]: number
     }
-    /**
-     * The date when the API consumer was created in UTC.
-     */
-    creationDate?: string
-    /**
-     * The encoded key of the branch this API consumer is assigned to.
-     */
-    assignedBranchKey?: string
 }
 
 export const ApiConsumer = {
@@ -60,42 +60,67 @@ export const ApiConsumer = {
     },
 } as const
 
-export interface ErrorResponse {
-    errors?: RestError[]
+/**
+ * Represents the API consumer permissions and access rights.
+ */
+export interface ApiConsumerAccess {
+    /**
+     * `TRUE` if the API consumer has the administrator user type, `FALSE` otherwise. Administrators (admins) have all permissions and can perform any action in Mambu.
+     */
+    administratorAccess?: boolean
+    /**
+     * `TRUE` if the API consumer can authenticate and interact with Mambu APIs, `FALSE` otherwise. The API consumer may still require additional permissions for specific API requests.
+     */
+    apiAccess?: boolean
+    /**
+     * `TRUE` if the API consumer permissions apply to all branches, `FALSE` if they only apply to specific branches.
+     */
+    canManageAllBranches?: boolean
+    /**
+     * `TRUE` if the API consumer (that has the credit officer access) can access entities (for example, clients or accounts) assigned to other credit officers, `FALSE` otherwise.
+     */
+    canManageEntitiesAssignedToOtherOfficers?: boolean
+    /**
+     * `TRUE` if the API consumer has the credit officer user type, `FALSE` otherwise. Credit officers have the option of having clients and groups assigned to them.
+     */
+    creditOfficerAccess?: boolean
+    /**
+     * The list of branches that can be managed by the API consumer. If the API consumer has the `canManageAllBranches` property set to `TRUE`, this list does not apply.
+     */
+    managedBranches?: UserManagedBranch[]
+    /**
+     * Permissions for the API consumer. The non-admin API consumers and users are authorized to do actions based a set of permissions in order to access Mambu features. Permissions may be relevant for the API and/or the Mambu UI.
+     */
+    permissions?: Local0[]
 }
 
-export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+/**
+ * Represents an API key of an API consumer.
+ */
+export interface ApiKey {
+    /**
+     * A six character cleartext prefix of the API key. The prefix is not guaranteed to be unique. You must base any identification process on the API key ID, not the prefix.
+     */
+    apiKey?: string
+    /**
+     * The time to live (TTL) for the API key in seconds.
+     */
+    expirationTime?: number
+    /**
+     * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
+     */
+    id?: string
+}
+
+export const ApiKey = {
+    validate: (await import('./schemas/api-key.schema.js')).validate as ValidateFunction<ApiKey>,
     get schema() {
-        return ErrorResponse.validate.schema
+        return ApiKey.validate.schema
     },
     get errors() {
-        return ErrorResponse.validate.errors ?? undefined
+        return ApiKey.validate.errors ?? undefined
     },
-    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
-        }
-    },
-} as const
-
-export type PatchRequest = PatchOperation[]
-
-export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
-    get schema() {
-        return PatchRequest.validate.schema
-    },
-    get errors() {
-        return PatchRequest.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
-        }
-    },
+    is: (o: unknown): o is ApiKey => ApiKey.validate(o) === true,
 } as const
 
 /**
@@ -124,33 +149,24 @@ export const ApiKeyInput = {
     },
 } as const
 
-/**
- * Represents an API key of an API consumer.
- */
-export interface ApiKey {
-    /**
-     * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
-     */
-    id?: string
-    /**
-     * A six character cleartext prefix of the API key. The prefix is not guaranteed to be unique. You must base any identification process on the API key ID, not the prefix.
-     */
-    apiKey?: string
-    /**
-     * The time to live (TTL) for the API key in seconds.
-     */
-    expirationTime?: number
+export interface ErrorResponse {
+    errors?: RestError[]
 }
 
-export const ApiKey = {
-    validate: (await import('./schemas/api-key.schema.js')).validate as ValidateFunction<ApiKey>,
+export const ErrorResponse = {
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
     get schema() {
-        return ApiKey.validate.schema
+        return ErrorResponse.validate.schema
     },
     get errors() {
-        return ApiKey.validate.errors ?? undefined
+        return ErrorResponse.validate.errors ?? undefined
     },
-    is: (o: unknown): o is ApiKey => ApiKey.validate(o) === true,
+    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
 } as const
 
 export type GetAllResponse = ApiConsumer[]
@@ -179,75 +195,6 @@ export const GetKeysByConsumerIdResponse = {
     },
     is: (o: unknown): o is GetKeysByConsumerIdResponse => GetKeysByConsumerIdResponse.validate(o) === true,
 } as const
-
-/**
- * Representation of an API Consumer's Secret Key
- */
-export interface SecretKey {
-    /**
-     * The secret key
-     */
-    secretKey?: string
-}
-
-export const SecretKey = {
-    validate: (await import('./schemas/secret-key.schema.js')).validate as ValidateFunction<SecretKey>,
-    get schema() {
-        return SecretKey.validate.schema
-    },
-    get errors() {
-        return SecretKey.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is SecretKey => SecretKey.validate(o) === true,
-} as const
-
-/**
- * Represents the role identifier.
- */
-export interface RoleIdentifier {
-    /**
-     * The encoded key of the entity, generated automatically, globally unique.
-     */
-    encodedKey?: string
-    /**
-     * The ID of the role, which can be generated and customized, but must be unique.
-     */
-    id?: string
-}
-
-/**
- * Represents the API consumer permissions and access rights.
- */
-export interface ApiConsumerAccess {
-    /**
-     * `TRUE` if the API consumer (that has the credit officer access) can access entities (for example, clients or accounts) assigned to other credit officers, `FALSE` otherwise.
-     */
-    canManageEntitiesAssignedToOtherOfficers?: boolean
-    /**
-     * `TRUE` if the API consumer has the administrator user type, `FALSE` otherwise. Administrators (admins) have all permissions and can perform any action in Mambu.
-     */
-    administratorAccess?: boolean
-    /**
-     * `TRUE` if the API consumer can authenticate and interact with Mambu APIs, `FALSE` otherwise. The API consumer may still require additional permissions for specific API requests.
-     */
-    apiAccess?: boolean
-    /**
-     * Permissions for the API consumer. The non-admin API consumers and users are authorized to do actions based a set of permissions in order to access Mambu features. Permissions may be relevant for the API and/or the Mambu UI.
-     */
-    permissions?: Local0[]
-    /**
-     * `TRUE` if the API consumer has the credit officer user type, `FALSE` otherwise. Credit officers have the option of having clients and groups assigned to them.
-     */
-    creditOfficerAccess?: boolean
-    /**
-     * `TRUE` if the API consumer permissions apply to all branches, `FALSE` if they only apply to specific branches.
-     */
-    canManageAllBranches?: boolean
-    /**
-     * The list of branches that can be managed by the API consumer. If the API consumer has the `canManageAllBranches` property set to `TRUE`, this list does not apply.
-     */
-    managedBranches?: UserManagedBranch[]
-}
 
 type Local0 =
     | 'AUDIT_TRANSACTIONS'
@@ -324,6 +271,7 @@ type Local0 =
     | 'MAKE_EARLY_WITHDRAWALS'
     | 'BLOCK_AND_SEIZE_FUNDS'
     | 'WITHDRAW_BLOCKED_FUNDS'
+    | 'MAKE_BULK_CHANGE_INTEREST_AVAILABILITY'
     | 'CREATE_CARDS'
     | 'VIEW_CARDS'
     | 'DELETE_CARDS'
@@ -476,6 +424,14 @@ type Local0 =
     | 'CREATE_PROFIT_SHARING_SYSTEM_OPTIONS'
     | 'EDIT_PROFIT_SHARING_SYSTEM_OPTIONS'
     | 'DELETE_PROFIT_SHARING_SYSTEM_OPTIONS'
+    | 'VIEW_PROFIT_SHARING_EXPENSES'
+    | 'CREATE_PROFIT_SHARING_EXPENSES'
+    | 'EDIT_PROFIT_SHARING_EXPENSES'
+    | 'DELETE_PROFIT_SHARING_EXPENSES'
+    | 'VIEW_PROFIT_SHARING_DEDUCTIONS'
+    | 'CREATE_PROFIT_SHARING_DEDUCTIONS'
+    | 'EDIT_PROFIT_SHARING_DEDUCTIONS'
+    | 'DELETE_PROFIT_SHARING_DEDUCTIONS'
     | 'VIEW_PROFIT_SHARING_DEPOSIT_PRODUCTS'
     | 'EDIT_PROFIT_SHARING_DEPOSIT_PRODUCT_LINK'
     | 'VIEW_PROFIT_SHARING_ACCOUNTS_SETTINGS'
@@ -483,25 +439,13 @@ type Local0 =
     | 'EDIT_PROFIT_SHARING_ACCOUNT_SETTINGS'
 
 /**
- * Represents a branch that can be managed by the user or API consumer.
- */
-export interface UserManagedBranch {
-    /**
-     * The encoded key of the branch, it is automatically generated.
-     */
-    branchKey?: string
-}
-
-export interface RestError {
-    errorCode?: number
-    errorSource?: string
-    errorReason?: string
-}
-
-/**
  * A single change that needs to be made to a resource
  */
 export interface PatchOperation {
+    /**
+     * The field from where a value should be moved, when using move
+     */
+    from?: string
     /**
      * The change to perform
      */
@@ -511,13 +455,78 @@ export interface PatchOperation {
      */
     path: string
     /**
-     * The field from where a value should be moved, when using move
-     */
-    from?: string
-    /**
      * The value of the field, can be null
      */
     value?: {
         [k: string]: unknown | undefined
     }
+}
+
+export type PatchRequest = PatchOperation[]
+
+export const PatchRequest = {
+    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
+    get schema() {
+        return PatchRequest.validate.schema
+    },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!PatchRequest.validate(o)) {
+            throw new ValidationError(PatchRequest.errors ?? [])
+        }
+    },
+} as const
+
+export interface RestError {
+    errorCode?: number
+    errorReason?: string
+    errorSource?: string
+}
+
+/**
+ * Represents the role identifier.
+ */
+export interface RoleIdentifier {
+    /**
+     * The encoded key of the entity, generated automatically, globally unique.
+     */
+    encodedKey?: string
+    /**
+     * The ID of the role, which can be generated and customized, but must be unique.
+     */
+    id?: string
+}
+
+/**
+ * Representation of an API Consumer's Secret Key
+ */
+export interface SecretKey {
+    /**
+     * The secret key
+     */
+    secretKey?: string
+}
+
+export const SecretKey = {
+    validate: (await import('./schemas/secret-key.schema.js')).validate as ValidateFunction<SecretKey>,
+    get schema() {
+        return SecretKey.validate.schema
+    },
+    get errors() {
+        return SecretKey.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is SecretKey => SecretKey.validate(o) === true,
+} as const
+
+/**
+ * Represents a branch that can be managed by the user or API consumer.
+ */
+export interface UserManagedBranch {
+    /**
+     * The encoded key of the branch, it is automatically generated.
+     */
+    branchKey?: string
 }

@@ -44,32 +44,6 @@ export class MambuComments {
     }
 
     /**
-     * Get comments for an entity
-     */
-    public async getComments({
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; ownerType: string; ownerKey: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`comments`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetCommentsResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Create a new comment for an entity.
      */
     public async createComment({
@@ -95,6 +69,32 @@ export class MambuComments {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get comments for an entity
+     */
+    public async getComments({
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        query?: { offset?: string; limit?: string; paginationDetails?: string; ownerType: string; ownerKey: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`comments`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetCommentsResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }

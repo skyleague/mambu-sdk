@@ -44,62 +44,31 @@ export class MambuUserRoles {
     }
 
     /**
-     * Get user role
+     * Create user role
      */
-    public async getById({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { roleId: string }
-        query?: { detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`userroles/${path.roleId}`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: Role,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Update user role
-     */
-    public async update({
+    public async create({
         body,
-        path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
         body: Role
-        path: { roleId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(Role, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).put(`userroles/${path.roleId}`, {
+            this.buildClient(auth).post(`userroles`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
                 102: { is: (_x: unknown): _x is unknown => true },
-                200: Role,
+                201: Role,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-                404: ErrorResponse,
             }
         )
     }
@@ -110,36 +79,6 @@ export class MambuUserRoles {
     public async delete({ path, auth = [['apiKey'], ['basic']] }: { path: { roleId: string }; auth?: string[][] | string[] }) {
         return this.awaitResponse(
             this.buildClient(auth).delete(`userroles/${path.roleId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Partially update user role
-     */
-    public async patch({
-        body,
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: PatchRequest
-        path: { roleId: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PatchRequest, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).patch(`userroles/${path.roleId}`, {
-                json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
@@ -179,31 +118,92 @@ export class MambuUserRoles {
     }
 
     /**
-     * Create user role
+     * Get user role
      */
-    public async create({
+    public async getById({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { roleId: string }
+        query?: { detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`userroles/${path.roleId}`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: Role,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Partially update user role
+     */
+    public async patch({
         body,
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: PatchRequest
+        path: { roleId: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(PatchRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).patch(`userroles/${path.roleId}`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Update user role
+     */
+    public async update({
+        body,
+        path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
         body: Role
+        path: { roleId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(Role, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`userroles`, {
+            this.buildClient(auth).put(`userroles/${path.roleId}`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
                 102: { is: (_x: unknown): _x is unknown => true },
-                201: Role,
+                200: Role,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }

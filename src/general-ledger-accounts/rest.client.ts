@@ -44,6 +44,71 @@ export class MambuGeneralLedgerAccounts {
     }
 
     /**
+     * Create general ledger account
+     */
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CreateRequest
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(CreateRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`glaccounts`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: CreateResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get general ledger accounts
+     */
+    public async getAll({
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        query?: {
+            offset?: string
+            limit?: string
+            paginationDetails?: string
+            type: string
+            from?: string
+            to?: string
+            branchId?: string
+            balanceExcluded?: string
+        }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`glaccounts`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetAllResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Get general ledger account
      */
     public async getById({
@@ -93,71 +158,6 @@ export class MambuGeneralLedgerAccounts {
             }),
             {
                 204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get general ledger accounts
-     */
-    public async getAll({
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        query?: {
-            offset?: string
-            limit?: string
-            paginationDetails?: string
-            type: string
-            from?: string
-            to?: string
-            branchId?: string
-            balanceExcluded?: string
-        }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`glaccounts`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetAllResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create general ledger account
-     */
-    public async create({
-        body,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: CreateRequest
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(CreateRequest, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`glaccounts`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: CreateResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

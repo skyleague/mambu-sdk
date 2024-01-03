@@ -6,7 +6,55 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
-type HolidaysNonWorkingDaysArray = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
+export interface ErrorResponse {
+    errors?: RestError[]
+}
+
+export const ErrorResponse = {
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    get schema() {
+        return ErrorResponse.validate.schema
+    },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Represents the holiday.
+ */
+export interface Holiday {
+    /**
+     * The date when the holiday was created.
+     */
+    creationDate?: string
+    /**
+     * The date the holiday takes place.
+     */
+    date?: string
+    /**
+     * The encoded key of the entity, generated, globally unique
+     */
+    encodedKey?: string
+    /**
+     * The ID of the holiday.
+     */
+    id?: number
+    /**
+     * `TRUE` if a holiday is annually recurring, `FALSE` otherwise.
+     */
+    isAnnuallyRecurring?: boolean
+    /**
+     * The name of the holiday.
+     */
+    name?: string
+}
 
 /**
  * Represents the holidays of the organization.
@@ -38,58 +86,10 @@ export const Holidays = {
     },
 } as const
 
-export interface ErrorResponse {
-    errors?: RestError[]
-}
-
-export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
-    get schema() {
-        return ErrorResponse.validate.schema
-    },
-    get errors() {
-        return ErrorResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents the holiday.
- */
-export interface Holiday {
-    /**
-     * The date the holiday takes place.
-     */
-    date?: string
-    /**
-     * `TRUE` if a holiday is annually recurring, `FALSE` otherwise.
-     */
-    isAnnuallyRecurring?: boolean
-    /**
-     * The name of the holiday.
-     */
-    name?: string
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * The ID of the holiday.
-     */
-    id?: number
-    /**
-     * The date when the holiday was created.
-     */
-    creationDate?: string
-}
+type HolidaysNonWorkingDaysArray = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
 
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

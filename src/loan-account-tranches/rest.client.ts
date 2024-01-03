@@ -44,30 +44,6 @@ export class MambuLoanAccountTranches {
     }
 
     /**
-     * Get loan account tranches list
-     */
-    public async getTranches({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`loans/${path.loanAccountId}/tranches`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetTranchesResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Update loan account tranches list
      */
     public async editTranches({
@@ -93,6 +69,30 @@ export class MambuLoanAccountTranches {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get loan account tranches list
+     */
+    public async getTranches({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { loanAccountId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`loans/${path.loanAccountId}/tranches`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetTranchesResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
             }
         )
     }

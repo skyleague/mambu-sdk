@@ -67,25 +67,6 @@ export class MambuDocuments {
     }
 
     /**
-     * Download document
-     */
-    public async downloadDocumentById({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { documentId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(this.buildClient(auth).get(`documents/${path.documentId}`, {}), {
-            200: { is: (_x: unknown): _x is string => true },
-            400: { is: (_x: unknown): _x is string => true },
-            401: { is: (_x: unknown): _x is string => true },
-            403: { is: (_x: unknown): _x is string => true },
-            404: { is: (_x: unknown): _x is string => true },
-        })
-    }
-
-    /**
      * Delete document
      */
     public async deleteDocumentById({
@@ -108,6 +89,25 @@ export class MambuDocuments {
                 404: ErrorResponse,
             }
         )
+    }
+
+    /**
+     * Download document
+     */
+    public async downloadDocumentById({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { documentId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(this.buildClient(auth).get(`documents/${path.documentId}`, {}), {
+            200: { is: (_x: unknown): _x is string => true },
+            400: { is: (_x: unknown): _x is string => true },
+            401: { is: (_x: unknown): _x is string => true },
+            403: { is: (_x: unknown): _x is string => true },
+            404: { is: (_x: unknown): _x is string => true },
+        })
     }
 
     /**

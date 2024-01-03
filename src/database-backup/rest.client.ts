@@ -44,6 +44,24 @@ export class MambuDatabaseBackup {
     }
 
     /**
+     * Download database backup
+     */
+    public async downloadBackup({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { databaseBackupVersion: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(this.buildClient(auth).get(`database/backup/${path.databaseBackupVersion}`, {}), {
+            200: { is: (_x: unknown): _x is string => true },
+            400: { is: (_x: unknown): _x is string => true },
+            401: { is: (_x: unknown): _x is string => true },
+            403: { is: (_x: unknown): _x is string => true },
+        })
+    }
+
+    /**
      * Trigger database backup
      */
     public async triggerBackup({
@@ -71,24 +89,6 @@ export class MambuDatabaseBackup {
                 403: ErrorResponse,
             }
         )
-    }
-
-    /**
-     * Download database backup
-     */
-    public async downloadBackup({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { databaseBackupVersion: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(this.buildClient(auth).get(`database/backup/${path.databaseBackupVersion}`, {}), {
-            200: { is: (_x: unknown): _x is string => true },
-            400: { is: (_x: unknown): _x is string => true },
-            401: { is: (_x: unknown): _x is string => true },
-            403: { is: (_x: unknown): _x is string => true },
-        })
     }
 
     public validateRequestBody<T>(schema: { is: (o: unknown) => o is T; assert: (o: unknown) => void }, body: T) {

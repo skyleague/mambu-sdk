@@ -7,6 +7,56 @@ import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
 /**
+ * Represents an address.
+ */
+export interface Address {
+    /**
+     * The city for the address.
+     */
+    city?: string
+    /**
+     * The country.
+     */
+    country?: string
+    /**
+     * The address encoded key, which is unique and generated.
+     */
+    encodedKey?: string
+    /**
+     * The index of this address in the list of addresses.
+     */
+    indexInList?: number
+    /**
+     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
+     */
+    latitude?: number
+    /**
+     * The first line of the address.
+     */
+    line1?: string
+    /**
+     * The second line of the address.
+     */
+    line2?: string
+    /**
+     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
+     */
+    longitude?: number
+    /**
+     * The address parent key indicating the object owning this address. For example: client, centre, or branch.
+     */
+    parentKey?: string
+    /**
+     * The post code.
+     */
+    postcode?: string
+    /**
+     * The region for the address.
+     */
+    region?: string
+}
+
+/**
  * Represents a centre. A centre is a common meeting area that credit officers and the individual and group clients go to. Each centre is assigned to a branch (a branch can have multiple centres) and might have a specific meeting day and location.
  */
 export interface Centre {
@@ -15,21 +65,13 @@ export interface Centre {
      */
     addresses?: Address[]
     /**
-     * The notes or description attached to this object.
+     * The encoded key of the branch this centre is assigned to.
      */
-    notes?: string
+    assignedBranchKey?: string
     /**
-     * The last time the centre was modified.
+     * The date the centre was created.
      */
-    lastModifiedDate?: string
-    /**
-     * The name of the centre.
-     */
-    name?: string
-    /**
-     * The day of the week when repayments are collected. This influences the repayments schedule, upon update all repayments are updated to this day of the week.
-     */
-    meetingDay?: string
+    creationDate?: string
     /**
      * The encoded key of the entity, generated, globally unique
      */
@@ -39,17 +81,25 @@ export interface Centre {
      */
     id?: string
     /**
+     * The last time the centre was modified.
+     */
+    lastModifiedDate?: string
+    /**
+     * The day of the week when repayments are collected. This influences the repayments schedule, upon update all repayments are updated to this day of the week.
+     */
+    meetingDay?: string
+    /**
+     * The name of the centre.
+     */
+    name?: string
+    /**
+     * The notes or description attached to this object.
+     */
+    notes?: string
+    /**
      * The state of the centre.
      */
     state?: 'ACTIVE' | 'INACTIVE'
-    /**
-     * The date the centre was created.
-     */
-    creationDate?: string
-    /**
-     * The encoded key of the branch this centre is assigned to.
-     */
-    assignedBranchKey?: string
 }
 
 export const Centre = {
@@ -96,58 +146,8 @@ export const GetAllResponse = {
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
-/**
- * Represents an address.
- */
-export interface Address {
-    /**
-     * The country.
-     */
-    country?: string
-    /**
-     * The address parent key indicating the object owning this address. For example: client, centre, or branch.
-     */
-    parentKey?: string
-    /**
-     * The city for the address.
-     */
-    city?: string
-    /**
-     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
-     */
-    latitude?: number
-    /**
-     * The post code.
-     */
-    postcode?: string
-    /**
-     * The index of this address in the list of addresses.
-     */
-    indexInList?: number
-    /**
-     * The address encoded key, which is unique and generated.
-     */
-    encodedKey?: string
-    /**
-     * The region for the address.
-     */
-    region?: string
-    /**
-     * The second line of the address.
-     */
-    line2?: string
-    /**
-     * The first line of the address.
-     */
-    line1?: string
-    /**
-     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
-     */
-    longitude?: number
-}
-
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

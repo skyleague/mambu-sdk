@@ -52,6 +52,55 @@ export class MambuGroups {
     }
 
     /**
+     * Create group
+     */
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: Group
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(Group, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`groups`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: Group,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Delete group
+     */
+    public async delete({ path, auth = [['apiKey'], ['basic']] }: { path: { groupId: string }; auth?: string[][] | string[] }) {
+        return this.awaitResponse(
+            this.buildClient(auth).delete(`groups/${path.groupId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Get groups
      */
     public async getAll({
@@ -86,64 +135,6 @@ export class MambuGroups {
     }
 
     /**
-     * Create group
-     */
-    public async create({
-        body,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: Group
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(Group, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`groups`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: Group,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Credit arrangements list returned.
-     */
-    public async getCreditArrangementsByGroupIdOrKey({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { groupId: string }
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`groups/${path.groupId}/creditarrangements`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetCreditArrangementsByGroupIdOrKeyResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Get group
      */
     public async getById({
@@ -172,46 +163,25 @@ export class MambuGroups {
     }
 
     /**
-     * Update group
+     * Credit arrangements list returned.
      */
-    public async update({
-        body,
+    public async getCreditArrangementsByGroupIdOrKey({
         path,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: Group
         path: { groupId: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(Group, body)
-
         return this.awaitResponse(
-            this.buildClient(auth).put(`groups/${path.groupId}`, {
-                json: body,
+            this.buildClient(auth).get(`groups/${path.groupId}/creditarrangements`, {
+                searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                200: Group,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Delete group
-     */
-    public async delete({ path, auth = [['apiKey'], ['basic']] }: { path: { groupId: string }; auth?: string[][] | string[] }) {
-        return this.awaitResponse(
-            this.buildClient(auth).delete(`groups/${path.groupId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
+                200: GetCreditArrangementsByGroupIdOrKeyResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -276,6 +246,36 @@ export class MambuGroups {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Update group
+     */
+    public async update({
+        body,
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: Group
+        path: { groupId: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(Group, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).put(`groups/${path.groupId}`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: Group,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }

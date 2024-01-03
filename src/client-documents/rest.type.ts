@@ -6,18 +6,86 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
-export type GetDocumentsByClientIdResponse = Document[]
+/**
+ * Holds information regarding the documents uploaded as attachments
+ */
+export interface Document {
+    /**
+     * The creation date of the document, stored as UTC
+     */
+    creationDate?: string
+    /**
+     * The document encodedKey
+     */
+    encodedKey?: string
+    /**
+     * The original file name of the document
+     */
+    fileName?: string
+    /**
+     * The file size of the document
+     */
+    fileSize?: number
+    /**
+     * The document id
+     */
+    id: number
+    /**
+     * The last modified date of the document, stored as UTC
+     */
+    lastModifiedDate?: string
+    /**
+     * Location where the document can be found, eg /myfiles/mypicture.jpeg
+     */
+    location?: string
+    /**
+     * The name of the document
+     */
+    name: string
+    /**
+     * Detailed notes about the document
+     */
+    notes?: string
+    /**
+     * Represents the holder of this document. If null, means nobody is the owner of this document
+     */
+    ownerKey?: string
+    /**
+     * Determines the owner type of the document
+     */
+    ownerType?:
+        | 'CLIENT'
+        | 'GROUP'
+        | 'LOAN_PRODUCT'
+        | 'SAVINGS_PRODUCT'
+        | 'CENTRE'
+        | 'BRANCH'
+        | 'USER'
+        | 'LOAN_ACCOUNT'
+        | 'DEPOSIT_ACCOUNT'
+        | 'ID_DOCUMENT'
+        | 'LINE_OF_CREDIT'
+        | 'GL_JOURNAL_ENTRY'
+    /**
+     * The extension of the document
+     */
+    type: string
+}
 
-export const GetDocumentsByClientIdResponse = {
-    validate: (await import('./schemas/get-documents-by-client-id-response.schema.js'))
-        .validate as ValidateFunction<GetDocumentsByClientIdResponse>,
+export const Document = {
+    validate: (await import('./schemas/document.schema.js')).validate as ValidateFunction<Document>,
     get schema() {
-        return GetDocumentsByClientIdResponse.validate.schema
+        return Document.validate.schema
     },
     get errors() {
-        return GetDocumentsByClientIdResponse.validate.errors ?? undefined
+        return Document.validate.errors ?? undefined
     },
-    is: (o: unknown): o is GetDocumentsByClientIdResponse => GetDocumentsByClientIdResponse.validate(o) === true,
+    is: (o: unknown): o is Document => Document.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!Document.validate(o)) {
+            throw new ValidationError(Document.errors ?? [])
+        }
+    },
 } as const
 
 export interface ErrorResponse {
@@ -40,90 +108,22 @@ export const ErrorResponse = {
     },
 } as const
 
-/**
- * Holds information regarding the documents uploaded as attachments
- */
-export interface Document {
-    /**
-     * Determines the owner type of the document
-     */
-    ownerType?:
-        | 'CLIENT'
-        | 'GROUP'
-        | 'LOAN_PRODUCT'
-        | 'SAVINGS_PRODUCT'
-        | 'CENTRE'
-        | 'BRANCH'
-        | 'USER'
-        | 'LOAN_ACCOUNT'
-        | 'DEPOSIT_ACCOUNT'
-        | 'ID_DOCUMENT'
-        | 'LINE_OF_CREDIT'
-        | 'GL_JOURNAL_ENTRY'
-    /**
-     * The original file name of the document
-     */
-    fileName?: string
-    /**
-     * Detailed notes about the document
-     */
-    notes?: string
-    /**
-     * The last modified date of the document, stored as UTC
-     */
-    lastModifiedDate?: string
-    /**
-     * The creation date of the document, stored as UTC
-     */
-    creationDate?: string
-    /**
-     * The extension of the document
-     */
-    type: string
-    /**
-     * Represents the holder of this document. If null, means nobody is the owner of this document
-     */
-    ownerKey?: string
-    /**
-     * The file size of the document
-     */
-    fileSize?: number
-    /**
-     * The name of the document
-     */
-    name: string
-    /**
-     * The document encodedKey
-     */
-    encodedKey?: string
-    /**
-     * Location where the document can be found, eg /myfiles/mypicture.jpeg
-     */
-    location?: string
-    /**
-     * The document id
-     */
-    id: number
-}
+export type GetDocumentsByClientIdResponse = Document[]
 
-export const Document = {
-    validate: (await import('./schemas/document.schema.js')).validate as ValidateFunction<Document>,
+export const GetDocumentsByClientIdResponse = {
+    validate: (await import('./schemas/get-documents-by-client-id-response.schema.js'))
+        .validate as ValidateFunction<GetDocumentsByClientIdResponse>,
     get schema() {
-        return Document.validate.schema
+        return GetDocumentsByClientIdResponse.validate.schema
     },
     get errors() {
-        return Document.validate.errors ?? undefined
+        return GetDocumentsByClientIdResponse.validate.errors ?? undefined
     },
-    is: (o: unknown): o is Document => Document.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Document.validate(o)) {
-            throw new ValidationError(Document.errors ?? [])
-        }
-    },
+    is: (o: unknown): o is GetDocumentsByClientIdResponse => GetDocumentsByClientIdResponse.validate(o) === true,
 } as const
 
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

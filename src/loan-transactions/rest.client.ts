@@ -61,28 +61,63 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Search loan transactions
+     * Adjust loan transaction
      */
-    public async search({
+    public async adjust({
         body,
-        query,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: LoanTransactionSearchCriteria
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
+        body: LoanTransactionAdjustmentDetails
+        path: { loanTransactionId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(LoanTransactionSearchCriteria, body)
+        this.validateRequestBody(LoanTransactionAdjustmentDetails, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans/transactions:search`, {
+            this.buildClient(auth).post(`loans/transactions/${path.loanTransactionId}:adjust`, {
                 json: body,
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: SearchResponse,
+                102: { is: (_x: unknown): _x is unknown => true },
+                200: LoanTransaction,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Apply a fee on a loan account
+     */
+    public async applyFee({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: FeeLoanTransactionInput
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(FeeLoanTransactionInput, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/${path.loanAccountId}/fee-transactions`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: LoanTransaction,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -125,6 +160,39 @@ export class MambuLoanTransactions {
     }
 
     /**
+     * Make payment in redraw balance for loan account
+     */
+    public async applyPaymentMade({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: PaymentMadeTransactionInput
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(PaymentMadeTransactionInput, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/${path.loanAccountId}/payment-made-transactions`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: LoanTransaction,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Unlock loan account income sources (interest, fees, penalties)
      */
     public async applyUnlock({
@@ -158,96 +226,25 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Make repayment transaction on loan account
+     * Get loan transactions
      */
-    public async makeRepayment({
-        body,
+    public async getAll({
         path,
-        headers,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: RepaymentLoanTransactionInput
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(RepaymentLoanTransactionInput, body)
-
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}/repayment-transactions`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+            this.buildClient(auth).get(`loans/${path.loanAccountId}/transactions`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: LoanTransaction,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Adjust loan transaction
-     */
-    public async adjust({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: LoanTransactionAdjustmentDetails
-        path: { loanTransactionId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanTransactionAdjustmentDetails, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/transactions/${path.loanTransactionId}:adjust`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                200: LoanTransaction,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Make a disbursement on a loan
-     */
-    public async makeDisbursement({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: DisbursementLoanTransactionInput
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(DisbursementLoanTransactionInput, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}/disbursement-transactions`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: LoanTransaction,
+                200: GetAllResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -313,56 +310,23 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Make withdrawal from redraw balance
+     * Make a disbursement on a loan
      */
-    public async makeWithdrawal({
+    public async makeDisbursement({
         body,
         path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: WithdrawalRedrawTransactionInput
+        body: DisbursementLoanTransactionInput
         path: { loanAccountId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(WithdrawalRedrawTransactionInput, body)
+        this.validateRequestBody(DisbursementLoanTransactionInput, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}/withdrawal-transactions`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: LoanTransaction,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Make payment in redraw balance for loan account
-     */
-    public async applyPaymentMade({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: PaymentMadeTransactionInput
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PaymentMadeTransactionInput, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}/payment-made-transactions`, {
+            this.buildClient(auth).post(`loans/${path.loanAccountId}/disbursement-transactions`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
@@ -412,25 +376,30 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Get loan transactions
+     * Make repayment transaction on loan account
      */
-    public async getAll({
+    public async makeRepayment({
+        body,
         path,
-        query,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
+        body: RepaymentLoanTransactionInput
         path: { loanAccountId: string }
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
+        this.validateRequestBody(RepaymentLoanTransactionInput, body)
+
         return this.awaitResponse(
-            this.buildClient(auth).get(`loans/${path.loanAccountId}/transactions`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            this.buildClient(auth).post(`loans/${path.loanAccountId}/repayment-transactions`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: GetAllResponse,
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: LoanTransaction,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -440,23 +409,23 @@ export class MambuLoanTransactions {
     }
 
     /**
-     * Apply a fee on a loan account
+     * Make withdrawal from redraw balance
      */
-    public async applyFee({
+    public async makeWithdrawal({
         body,
         path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: FeeLoanTransactionInput
+        body: WithdrawalRedrawTransactionInput
         path: { loanAccountId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(FeeLoanTransactionInput, body)
+        this.validateRequestBody(WithdrawalRedrawTransactionInput, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}/fee-transactions`, {
+            this.buildClient(auth).post(`loans/${path.loanAccountId}/withdrawal-transactions`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
@@ -464,6 +433,37 @@ export class MambuLoanTransactions {
             {
                 102: { is: (_x: unknown): _x is unknown => true },
                 201: LoanTransaction,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Search loan transactions
+     */
+    public async search({
+        body,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: LoanTransactionSearchCriteria
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(LoanTransactionSearchCriteria, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/transactions:search`, {
+                json: body,
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: SearchResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

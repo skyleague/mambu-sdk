@@ -44,59 +44,31 @@ export class MambuLoanProducts {
     }
 
     /**
-     * Get loan product
+     * Create loan product
      */
-    public async getById({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanProductId: string }
-        query?: { detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`loanproducts/${path.loanProductId}`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: LoanProduct,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Update loan product
-     */
-    public async update({
+    public async create({
         body,
-        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
         body: LoanProduct
-        path: { loanProductId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(LoanProduct, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).put(`loanproducts/${path.loanProductId}`, {
+            this.buildClient(auth).post(`loanproducts`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: LoanProduct,
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: LoanProduct,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-                404: ErrorResponse,
             }
         )
     }
@@ -113,36 +85,6 @@ export class MambuLoanProducts {
     }) {
         return this.awaitResponse(
             this.buildClient(auth).delete(`loanproducts/${path.loanProductId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Partially update loan product
-     */
-    public async patch({
-        body,
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: PatchRequest
-        path: { loanProductId: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PatchRequest, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).patch(`loanproducts/${path.loanProductId}`, {
-                json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
@@ -182,31 +124,89 @@ export class MambuLoanProducts {
     }
 
     /**
-     * Create loan product
+     * Get loan product
      */
-    public async create({
+    public async getById({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { loanProductId: string }
+        query?: { detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`loanproducts/${path.loanProductId}`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: LoanProduct,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Partially update loan product
+     */
+    public async patch({
         body,
-        headers,
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: PatchRequest
+        path: { loanProductId: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(PatchRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).patch(`loanproducts/${path.loanProductId}`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Update loan product
+     */
+    public async update({
+        body,
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
         body: LoanProduct
-        headers?: { ['Idempotency-Key']?: string }
+        path: { loanProductId: string }
         auth?: string[][] | string[]
     }) {
         this.validateRequestBody(LoanProduct, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`loanproducts`, {
+            this.buildClient(auth).put(`loanproducts/${path.loanProductId}`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: LoanProduct,
+                200: LoanProduct,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }

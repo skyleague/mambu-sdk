@@ -6,19 +6,6 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
-export type GetLogsResponse = MFunctionLogs[]
-
-export const GetLogsResponse = {
-    validate: (await import('./schemas/get-logs-response.schema.js')).validate as ValidateFunction<GetLogsResponse>,
-    get schema() {
-        return GetLogsResponse.validate.schema
-    },
-    get errors() {
-        return GetLogsResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetLogsResponse => GetLogsResponse.validate(o) === true,
-} as const
-
 export interface ErrorResponse {
     errors?: RestError[]
 }
@@ -52,19 +39,102 @@ export const GetAllResponse = {
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
+export type GetLogsResponse = MFunctionLogs[]
+
+export const GetLogsResponse = {
+    validate: (await import('./schemas/get-logs-response.schema.js')).validate as ValidateFunction<GetLogsResponse>,
+    get schema() {
+        return GetLogsResponse.validate.schema
+    },
+    get errors() {
+        return GetLogsResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetLogsResponse => GetLogsResponse.validate(o) === true,
+} as const
+
+export type ListFunctionSubscriptionsResponse = MambuFunctionSubscriptionListItem[]
+
+export const ListFunctionSubscriptionsResponse = {
+    validate: (await import('./schemas/list-function-subscriptions-response.schema.js'))
+        .validate as ValidateFunction<ListFunctionSubscriptionsResponse>,
+    get schema() {
+        return ListFunctionSubscriptionsResponse.validate.schema
+    },
+    get errors() {
+        return ListFunctionSubscriptionsResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ListFunctionSubscriptionsResponse => ListFunctionSubscriptionsResponse.validate(o) === true,
+} as const
+
 /**
- * Mambu Function create data.
+ * Mambu Function information.
  */
-export interface MambuFunctionCreate {
+export interface MambuFunction {
+    /**
+     * The id of the extension point
+     */
+    extensionPointId?: string
+    /**
+     * The last date the Mambu function was updated (as UTC)
+     */
+    lastModifiedDate?: string
     /**
      * Mambu function name
      */
     name?: string
     /**
+     * Mambu function state
+     */
+    state?: string
+    /**
+     * Mambu function version
+     */
+    version?: string
+}
+
+export const MambuFunction = {
+    validate: (await import('./schemas/mambu-function.schema.js')).validate as ValidateFunction<MambuFunction>,
+    get schema() {
+        return MambuFunction.validate.schema
+    },
+    get errors() {
+        return MambuFunction.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is MambuFunction => MambuFunction.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!MambuFunction.validate(o)) {
+            throw new ValidationError(MambuFunction.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Represents a Mambu function code
+ */
+export interface MambuFunctionCode {
+    /**
+     * Mambu function code (as Base64)
+     */
+    code?: string
+    /**
+     * Mambu function programming language
+     */
+    languageId?: 'es2020'
+}
+
+/**
+ * Mambu Function create data.
+ */
+export interface MambuFunctionCreate {
+    /**
      * The id of the extension point
      */
     extensionPointId?: string
     functionCode?: MambuFunctionCode
+    /**
+     * Mambu function name
+     */
+    name?: string
     /**
      * Mambu function version
      */
@@ -88,43 +158,124 @@ export const MambuFunctionCreate = {
 } as const
 
 /**
- * Mambu Function information.
+ * Mambu Function Subscription information.
  */
-export interface MambuFunction {
+export interface MambuFunctionSubscription {
     /**
-     * Mambu function name
+     * subscription batch size, define the maximum number of records in each batch that subscription pulls from your stream
+     */
+    batchSize?: number
+    /**
+     * subscription batch window in seconds, define the maximum time range subscription pulls from your stream
+     */
+    batchWindow?: number
+    /**
+     * Mambu function subscription name
      */
     name?: string
     /**
-     * The id of the extension point
-     */
-    extensionPointId?: string
-    /**
-     * Mambu function state
+     * Mambu function subscription state
      */
     state?: string
     /**
-     * Mambu function version
+     * subscription topic name, source of stream for the subscription
      */
-    version?: string
-    /**
-     * The last date the Mambu function was updated (as UTC)
-     */
-    lastModifiedDate?: string
+    topicName?: string
 }
 
-export const MambuFunction = {
-    validate: (await import('./schemas/mambu-function.schema.js')).validate as ValidateFunction<MambuFunction>,
+export const MambuFunctionSubscription = {
+    validate: (await import('./schemas/mambu-function-subscription.schema.js'))
+        .validate as ValidateFunction<MambuFunctionSubscription>,
     get schema() {
-        return MambuFunction.validate.schema
+        return MambuFunctionSubscription.validate.schema
     },
     get errors() {
-        return MambuFunction.validate.errors ?? undefined
+        return MambuFunctionSubscription.validate.errors ?? undefined
     },
-    is: (o: unknown): o is MambuFunction => MambuFunction.validate(o) === true,
+    is: (o: unknown): o is MambuFunctionSubscription => MambuFunctionSubscription.validate(o) === true,
     assert: (o: unknown) => {
-        if (!MambuFunction.validate(o)) {
-            throw new ValidationError(MambuFunction.errors ?? [])
+        if (!MambuFunctionSubscription.validate(o)) {
+            throw new ValidationError(MambuFunctionSubscription.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Mambu Function Subscription create data.
+ */
+export interface MambuFunctionSubscriptionCreate {
+    /**
+     * subscription batch size, define the maximum number of records in each batch that subscription pulls from your stream
+     */
+    batchSize?: number
+    /**
+     * subscription batch window in seconds, define the maximum time range subscription pulls from your stream
+     */
+    batchWindow?: number
+    /**
+     * Mambu function subscription name
+     */
+    name?: string
+    /**
+     * subscription topic name, source of stream for the subscription
+     */
+    topicName?: string
+}
+
+export const MambuFunctionSubscriptionCreate = {
+    validate: (await import('./schemas/mambu-function-subscription-create.schema.js'))
+        .validate as ValidateFunction<MambuFunctionSubscriptionCreate>,
+    get schema() {
+        return MambuFunctionSubscriptionCreate.validate.schema
+    },
+    get errors() {
+        return MambuFunctionSubscriptionCreate.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is MambuFunctionSubscriptionCreate => MambuFunctionSubscriptionCreate.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!MambuFunctionSubscriptionCreate.validate(o)) {
+            throw new ValidationError(MambuFunctionSubscriptionCreate.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Mambu Function Subscription list item for list of subscriptions.
+ */
+export interface MambuFunctionSubscriptionListItem {
+    /**
+     * Mambu function subscription name
+     */
+    name?: string
+}
+
+/**
+ * Mambu Function Subscription update data.
+ */
+export interface MambuFunctionSubscriptionUpdate {
+    /**
+     * subscription batch size, define the maximum number of records in each batch that subscription pulls from your stream
+     */
+    batchSize?: number
+    /**
+     * subscription batch window in seconds, define the maximum time range subscription pulls from your stream
+     */
+    batchWindow?: number
+}
+
+export const MambuFunctionSubscriptionUpdate = {
+    validate: (await import('./schemas/mambu-function-subscription-update.schema.js'))
+        .validate as ValidateFunction<MambuFunctionSubscriptionUpdate>,
+    get schema() {
+        return MambuFunctionSubscriptionUpdate.validate.schema
+    },
+    get errors() {
+        return MambuFunctionSubscriptionUpdate.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is MambuFunctionSubscriptionUpdate => MambuFunctionSubscriptionUpdate.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!MambuFunctionSubscriptionUpdate.validate(o)) {
+            throw new ValidationError(MambuFunctionSubscriptionUpdate.errors ?? [])
         }
     },
 } as const
@@ -157,46 +308,36 @@ export const MambuFunctionUpdate = {
 } as const
 
 /**
+ * Represents a Mambu function log
+ */
+export interface MFunctionLog {
+    /**
+     * Mambu function log level
+     */
+    logLevel?: number
+    /**
+     * Mambu function message
+     */
+    message?: string
+    /**
+     * The ID of the specific request to the function
+     */
+    requestId?: string
+    /**
+     * Mambu function log time
+     */
+    time?: number
+}
+
+/**
  * Represents a Mambu function logs list
  */
 export interface MFunctionLogs {
     logs?: MFunctionLog[]
 }
 
-/**
- * Represents a Mambu function log
- */
-export interface MFunctionLog {
-    /**
-     * Mambu function log time
-     */
-    time?: number
-    /**
-     * Mambu function message
-     */
-    message?: string
-    /**
-     * Mambu function log level
-     */
-    logLevel?: number
-}
-
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
-}
-
-/**
- * Represents a Mambu function code
- */
-export interface MambuFunctionCode {
-    /**
-     * Mambu function programming language
-     */
-    languageId?: 'es2020'
-    /**
-     * Mambu function code (as Base64)
-     */
-    code?: string
+    errorSource?: string
 }

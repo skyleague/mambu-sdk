@@ -44,31 +44,6 @@ export class MambuCurrencies {
     }
 
     /**
-     * Get all currencies
-     */
-    public async getAll({
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; type?: string }
-        auth?: string[][] | string[]
-    } = {}) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`currencies`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetAllResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Create currency
      */
     public async create({
@@ -99,6 +74,31 @@ export class MambuCurrencies {
     }
 
     /**
+     * Delete currency by code
+     */
+    public async delete({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { currencyCode: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).delete(`currencies/${path.currencyCode}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Get currency by code
      */
     public async get({ path, auth = [['apiKey'], ['basic']] }: { path: { currencyCode: string }; auth?: string[][] | string[] }) {
@@ -112,6 +112,31 @@ export class MambuCurrencies {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get all currencies
+     */
+    public async getAll({
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        query?: { offset?: string; limit?: string; paginationDetails?: string; type?: string }
+        auth?: string[][] | string[]
+    } = {}) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`currencies`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetAllResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
             }
         )
     }
@@ -138,31 +163,6 @@ export class MambuCurrencies {
             }),
             {
                 200: CurrencyDetails,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Delete currency by code
-     */
-    public async delete({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { currencyCode: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).delete(`currencies/${path.currencyCode}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

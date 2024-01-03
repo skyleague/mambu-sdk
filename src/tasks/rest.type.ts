@@ -6,96 +6,6 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
-/**
- * Represents a human task that can be assigned by one user to another. When a task is created, it's status is set to `OPEN`.
- */
-export interface Task {
-    /**
-     * The last date when the task was modified.
-     */
-    lastModifiedDate?: string
-    /**
-     * The key of the user that created this task. The value is not editable and it is populated at task creation with the current user key.
-     */
-    createdByUserKey?: string
-    /**
-     * The due date when the task has to be completed.
-     */
-    dueDate: string
-    /**
-     * The description of the task.
-     */
-    description?: string
-    /**
-     * The date when the task was created.
-     */
-    creationDate?: string
-    /**
-     * The title of the task.
-     */
-    title?: string
-    /**
-     * The individual linked to this task. If null, it means nobody is linked to this task.
-     */
-    taskLinkKey?: string
-    /**
-     * The name of the user who created the task.
-     */
-    createdByFullName?: string
-    /**
-     * The encoded key of the task, which is auto generated, and must be unique.
-     */
-    encodedKey?: string
-    /**
-     * The ID of the task, which is uniquely generated for the task.
-     */
-    id?: number
-    /**
-     * The key of the user this task is assigned to.
-     */
-    assignedUserKey?: string
-    /**
-     * The type of the owner represented by the task link key.
-     */
-    taskLinkType?:
-        | 'CLIENT'
-        | 'GROUP'
-        | 'LOAN_PRODUCT'
-        | 'SAVINGS_PRODUCT'
-        | 'CENTRE'
-        | 'BRANCH'
-        | 'USER'
-        | 'LOAN_ACCOUNT'
-        | 'DEPOSIT_ACCOUNT'
-        | 'ID_DOCUMENT'
-        | 'LINE_OF_CREDIT'
-        | 'GL_JOURNAL_ENTRY'
-    /**
-     * The status of this task, a new task always has an `OPEN` status.
-     */
-    status?: 'OPEN' | 'COMPLETED'
-    /**
-     * The template key used to create the task.
-     */
-    templateKey?: string
-}
-
-export const Task = {
-    validate: (await import('./schemas/task.schema.js')).validate as ValidateFunction<Task>,
-    get schema() {
-        return Task.validate.schema
-    },
-    get errors() {
-        return Task.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Task => Task.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Task.validate(o)) {
-            throw new ValidationError(Task.errors ?? [])
-        }
-    },
-} as const
-
 export interface ErrorResponse {
     errors?: RestError[]
 }
@@ -116,6 +26,43 @@ export const ErrorResponse = {
     },
 } as const
 
+export type GetAllResponse = Task[]
+
+export const GetAllResponse = {
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    get schema() {
+        return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+} as const
+
+/**
+ * A single change that needs to be made to a resource
+ */
+export interface PatchOperation {
+    /**
+     * The field from where a value should be moved, when using move
+     */
+    from?: string
+    /**
+     * The change to perform
+     */
+    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
+    /**
+     * The field to perform the operation on
+     */
+    path: string
+    /**
+     * The value of the field, can be null
+     */
+    value?: {
+        [k: string]: unknown | undefined
+    }
+}
+
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
@@ -134,45 +81,98 @@ export const PatchRequest = {
     },
 } as const
 
-export type GetAllResponse = Task[]
-
-export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
-    get schema() {
-        return GetAllResponse.validate.schema
-    },
-    get errors() {
-        return GetAllResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
-} as const
-
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }
 
 /**
- * A single change that needs to be made to a resource
+ * Represents a human task that can be assigned by one user to another. When a task is created, it's status is set to `OPEN`.
  */
-export interface PatchOperation {
+export interface Task {
     /**
-     * The change to perform
+     * The key of the user this task is assigned to.
      */
-    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
+    assignedUserKey?: string
     /**
-     * The field to perform the operation on
+     * The name of the user who created the task.
      */
-    path: string
+    createdByFullName?: string
     /**
-     * The field from where a value should be moved, when using move
+     * The key of the user that created this task. The value is not editable and it is populated at task creation with the current user key.
      */
-    from?: string
+    createdByUserKey?: string
     /**
-     * The value of the field, can be null
+     * The date when the task was created.
      */
-    value?: {
-        [k: string]: unknown | undefined
-    }
+    creationDate?: string
+    /**
+     * The description of the task.
+     */
+    description?: string
+    /**
+     * The due date when the task has to be completed.
+     */
+    dueDate: string
+    /**
+     * The encoded key of the task, which is auto generated, and must be unique.
+     */
+    encodedKey?: string
+    /**
+     * The ID of the task, which is uniquely generated for the task.
+     */
+    id?: number
+    /**
+     * The last date when the task was modified.
+     */
+    lastModifiedDate?: string
+    /**
+     * The status of this task, a new task always has an `OPEN` status.
+     */
+    status?: 'OPEN' | 'COMPLETED'
+    /**
+     * The individual linked to this task. If null, it means nobody is linked to this task.
+     */
+    taskLinkKey?: string
+    /**
+     * The type of the owner represented by the task link key.
+     */
+    taskLinkType?:
+        | 'CLIENT'
+        | 'GROUP'
+        | 'LOAN_PRODUCT'
+        | 'SAVINGS_PRODUCT'
+        | 'CENTRE'
+        | 'BRANCH'
+        | 'USER'
+        | 'LOAN_ACCOUNT'
+        | 'DEPOSIT_ACCOUNT'
+        | 'ID_DOCUMENT'
+        | 'LINE_OF_CREDIT'
+        | 'GL_JOURNAL_ENTRY'
+    /**
+     * The template key used to create the task.
+     */
+    templateKey?: string
+    /**
+     * The title of the task.
+     */
+    title?: string
 }
+
+export const Task = {
+    validate: (await import('./schemas/task.schema.js')).validate as ValidateFunction<Task>,
+    get schema() {
+        return Task.validate.schema
+    },
+    get errors() {
+        return Task.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Task => Task.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!Task.validate(o)) {
+            throw new ValidationError(Task.errors ?? [])
+        }
+    },
+} as const
