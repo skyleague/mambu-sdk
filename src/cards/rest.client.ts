@@ -55,215 +55,30 @@ export class MambuCards {
     }
 
     /**
-     * Increase authorization hold amount
+     * Create an authorization hold corresponding to a given card.
      */
-    public async increaseAuthorizationHold({
+    public async createAuthorizationHold({
         body,
         path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: AuthorizationHoldAmountAdjustmentRequest
-        path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
+        body: AuthorizationHold
+        path: { cardReferenceToken: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(AuthorizationHoldAmountAdjustmentRequest, body)
+        this.validateRequestBody(AuthorizationHold, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(
-                `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}:increase`,
-                {
-                    json: body,
-                    headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                    responseType: 'json',
-                }
-            ),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-                409: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get card transaction
-     */
-    public async getCardTransaction({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { cardReferenceToken: string; cardTransactionExternalReferenceId: string }
-        query?: { detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(
-                `cards/${path.cardReferenceToken}/financialtransactions/${path.cardTransactionExternalReferenceId}`,
-                {
-                    searchParams: query ?? {},
-                    headers: { Accept: 'application/vnd.mambu.v2+json' },
-                    responseType: 'json',
-                }
-            ),
-            {
-                200: GetCardTransaction,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get card authorization hold
-     */
-    public async getAuthorizationHoldById({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(
-                `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}`,
-                {
-                    headers: { Accept: 'application/vnd.mambu.v2+json' },
-                    responseType: 'json',
-                }
-            ),
-            {
-                200: GetAuthorizationHold,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Reverse a card authorization hold.
-     */
-    public async reverseAuthorizationHold({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).delete(
-                `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}`,
-                {
-                    headers: { Accept: 'application/vnd.mambu.v2+json' },
-                    responseType: 'json',
-                }
-            ),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-                409: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Partially update an authorization hold
-     */
-    public async patchAuthorizationHold({
-        body,
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: PatchAuthorizationHoldRequest
-        path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PatchAuthorizationHoldRequest, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).patch(
-                `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}`,
-                {
-                    json: body,
-                    headers: { Accept: 'application/vnd.mambu.v2+json' },
-                    responseType: 'json',
-                }
-            ),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get account balances using card tokens
-     */
-    public async getAccountBalances({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { cardReferenceToken: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`cards/${path.cardReferenceToken}/balanceInquiry`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            this.buildClient(auth).post(`cards/${path.cardReferenceToken}/authorizationholds`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: AccountBalances,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Reverse card transaction
-     */
-    public async reverseCardTransaction({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: CardTransactionReversal
-        path: { cardReferenceToken: string; cardTransactionExternalReferenceId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(CardTransactionReversal, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(
-                `cards/${path.cardReferenceToken}/financialtransactions/${path.cardTransactionExternalReferenceId}:decrease`,
-                {
-                    json: body,
-                    headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                    responseType: 'json',
-                }
-            ),
-            {
                 102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                201: AuthorizationHold,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -345,30 +160,218 @@ export class MambuCards {
     }
 
     /**
-     * Create an authorization hold corresponding to a given card.
+     * Get account balances using card tokens
      */
-    public async createAuthorizationHold({
+    public async getAccountBalances({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { cardReferenceToken: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`cards/${path.cardReferenceToken}/balanceInquiry`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: AccountBalances,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get card authorization hold
+     */
+    public async getAuthorizationHoldById({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(
+                `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}`,
+                {
+                    headers: { Accept: 'application/vnd.mambu.v2+json' },
+                    responseType: 'json',
+                }
+            ),
+            {
+                200: GetAuthorizationHold,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get card transaction
+     */
+    public async getCardTransaction({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { cardReferenceToken: string; cardTransactionExternalReferenceId: string }
+        query?: { detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(
+                `cards/${path.cardReferenceToken}/financialtransactions/${path.cardTransactionExternalReferenceId}`,
+                {
+                    searchParams: query ?? {},
+                    headers: { Accept: 'application/vnd.mambu.v2+json' },
+                    responseType: 'json',
+                }
+            ),
+            {
+                200: GetCardTransaction,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Increase authorization hold amount
+     */
+    public async increaseAuthorizationHold({
         body,
         path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: AuthorizationHold
-        path: { cardReferenceToken: string }
+        body: AuthorizationHoldAmountAdjustmentRequest
+        path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(AuthorizationHold, body)
+        this.validateRequestBody(AuthorizationHoldAmountAdjustmentRequest, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`cards/${path.cardReferenceToken}/authorizationholds`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
+            this.buildClient(auth).post(
+                `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}:increase`,
+                {
+                    json: body,
+                    headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                    responseType: 'json',
+                }
+            ),
             {
                 102: { is: (_x: unknown): _x is unknown => true },
-                201: AuthorizationHold,
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+                409: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Partially update an authorization hold
+     */
+    public async patchAuthorizationHold({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: PatchAuthorizationHoldRequest
+        path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(PatchAuthorizationHoldRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).patch(
+                `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}`,
+                {
+                    json: body,
+                    headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                    responseType: 'json',
+                }
+            ),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Reverse a card authorization hold.
+     */
+    public async reverseAuthorizationHold({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).delete(
+                `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}`,
+                {
+                    headers: { Accept: 'application/vnd.mambu.v2+json' },
+                    responseType: 'json',
+                }
+            ),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+                409: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Reverse card transaction
+     */
+    public async reverseCardTransaction({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CardTransactionReversal
+        path: { cardReferenceToken: string; cardTransactionExternalReferenceId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(CardTransactionReversal, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(
+                `cards/${path.cardReferenceToken}/financialtransactions/${path.cardTransactionExternalReferenceId}:decrease`,
+                {
+                    json: body,
+                    headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                    responseType: 'json',
+                }
+            ),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

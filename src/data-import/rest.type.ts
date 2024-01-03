@@ -7,102 +7,6 @@ import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
 /**
- * Holds information about the response of the data import action
- */
-export interface DataImportResponse {
-    /**
-     * Background process state
-     */
-    state?:
-        | 'QUEUED'
-        | 'IN_PROGRESS'
-        | 'COMPLETE'
-        | 'NOT_FOUND'
-        | 'CANCEL'
-        | 'TO_BE_CANCELED'
-        | 'TIMED_OUT'
-        | 'ERROR'
-        | 'TRANSIENT_ERROR'
-        | 'OVERRIDDEN'
-        | 'RECOVERABLE_ERROR'
-    /**
-     * Import key
-     */
-    importKey?: string
-}
-
-export const DataImportResponse = {
-    validate: (await import('./schemas/data-import-response.schema.js')).validate as ValidateFunction<DataImportResponse>,
-    get schema() {
-        return DataImportResponse.validate.schema
-    },
-    get errors() {
-        return DataImportResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is DataImportResponse => DataImportResponse.validate(o) === true,
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[]
-}
-
-export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
-    get schema() {
-        return ErrorResponse.validate.schema
-    },
-    get errors() {
-        return ErrorResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Holds information about the data import status
- */
-export interface DataImportStatus {
-    /**
-     * Background process state
-     */
-    state?:
-        | 'QUEUED'
-        | 'IN_PROGRESS'
-        | 'COMPLETE'
-        | 'NOT_FOUND'
-        | 'CANCEL'
-        | 'TO_BE_CANCELED'
-        | 'TIMED_OUT'
-        | 'ERROR'
-        | 'TRANSIENT_ERROR'
-        | 'OVERRIDDEN'
-        | 'RECOVERABLE_ERROR'
-    /**
-     * List of errors
-     */
-    errors?: DataImportError[]
-    /**
-     * Event key
-     */
-    eventKey?: string
-}
-
-export const DataImportStatus = {
-    validate: (await import('./schemas/data-import-status.schema.js')).validate as ValidateFunction<DataImportStatus>,
-    get schema() {
-        return DataImportStatus.validate.schema
-    },
-    get errors() {
-        return DataImportStatus.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is DataImportStatus => DataImportStatus.validate(o) === true,
-} as const
-
-/**
  * Holds information about the data import action
  */
 export interface DataImportAction {
@@ -128,12 +32,6 @@ export const DataImportAction = {
     },
 } as const
 
-export interface RestError {
-    errorCode?: number
-    errorSource?: string
-    errorReason?: string
-}
-
 /**
  * Holds information about the data import error
  */
@@ -144,13 +42,13 @@ export interface DataImportError {
      */
     errorMessage?: string
     /**
-     * Sheet name
-     */
-    sheet?: string
-    /**
      * Row index
      */
     row?: number
+    /**
+     * Sheet name
+     */
+    sheet?: string
 }
 
 /**
@@ -158,11 +56,113 @@ export interface DataImportError {
  */
 export interface DataImportErrorColumn {
     /**
-     * Column name
-     */
-    name?: string
-    /**
      * Column index
      */
     index?: number
+    /**
+     * Column name
+     */
+    name?: string
+}
+
+/**
+ * Holds information about the response of the data import action
+ */
+export interface DataImportResponse {
+    /**
+     * Import key
+     */
+    importKey?: string
+    /**
+     * Background process state
+     */
+    state?:
+        | 'QUEUED'
+        | 'IN_PROGRESS'
+        | 'COMPLETE'
+        | 'NOT_FOUND'
+        | 'CANCEL'
+        | 'TO_BE_CANCELED'
+        | 'TIMED_OUT'
+        | 'ERROR'
+        | 'TRANSIENT_ERROR'
+        | 'OVERRIDDEN'
+        | 'RECOVERABLE_ERROR'
+}
+
+export const DataImportResponse = {
+    validate: (await import('./schemas/data-import-response.schema.js')).validate as ValidateFunction<DataImportResponse>,
+    get schema() {
+        return DataImportResponse.validate.schema
+    },
+    get errors() {
+        return DataImportResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is DataImportResponse => DataImportResponse.validate(o) === true,
+} as const
+
+/**
+ * Holds information about the data import status
+ */
+export interface DataImportStatus {
+    /**
+     * List of errors
+     */
+    errors?: DataImportError[]
+    /**
+     * Event key
+     */
+    eventKey?: string
+    /**
+     * Background process state
+     */
+    state?:
+        | 'QUEUED'
+        | 'IN_PROGRESS'
+        | 'COMPLETE'
+        | 'NOT_FOUND'
+        | 'CANCEL'
+        | 'TO_BE_CANCELED'
+        | 'TIMED_OUT'
+        | 'ERROR'
+        | 'TRANSIENT_ERROR'
+        | 'OVERRIDDEN'
+        | 'RECOVERABLE_ERROR'
+}
+
+export const DataImportStatus = {
+    validate: (await import('./schemas/data-import-status.schema.js')).validate as ValidateFunction<DataImportStatus>,
+    get schema() {
+        return DataImportStatus.validate.schema
+    },
+    get errors() {
+        return DataImportStatus.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is DataImportStatus => DataImportStatus.validate(o) === true,
+} as const
+
+export interface ErrorResponse {
+    errors?: RestError[]
+}
+
+export const ErrorResponse = {
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    get schema() {
+        return ErrorResponse.validate.schema
+    },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
+} as const
+
+export interface RestError {
+    errorCode?: number
+    errorReason?: string
+    errorSource?: string
 }

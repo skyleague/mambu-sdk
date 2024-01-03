@@ -44,34 +44,6 @@ export class MambuCustomFieldSets {
     }
 
     /**
-     * Get custom field definitions by custom field set
-     */
-    public async getAllBySetId({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { customFieldSetId: string }
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`customfieldsets/${path.customFieldSetId}/customfields`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetAllBySetIdResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Get custom field sets
      */
     public async getAll({
@@ -99,6 +71,34 @@ export class MambuCustomFieldSets {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get custom field definitions by custom field set
+     */
+    public async getAllBySetId({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { customFieldSetId: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`customfieldsets/${path.customFieldSetId}/customfields`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetAllBySetIdResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }

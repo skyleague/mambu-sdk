@@ -44,25 +44,24 @@ export class MambuClientDocuments {
     }
 
     /**
-     * Get all client documents
+     * Create client document
      */
-    public async getDocumentsByClientId({
+    public async createDocument({
         path,
-        query,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
         path: { clientId: string }
-        query?: { offset?: string; limit?: string; paginationDetails?: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
         return this.awaitResponse(
-            this.buildClient(auth).get(`clients/${path.clientId}/documentsMetadata`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            this.buildClient(auth).post(`clients/${path.clientId}/documents`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: GetDocumentsByClientIdResponse,
+                201: Document,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -97,33 +96,6 @@ export class MambuClientDocuments {
     }
 
     /**
-     * Create client document
-     */
-    public async createDocument({
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { clientId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).post(`clients/${path.clientId}/documents`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                201: Document,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Download client document
      */
     public async getClientDocumentFileById({
@@ -140,6 +112,34 @@ export class MambuClientDocuments {
             403: { is: (_x: unknown): _x is string => true },
             404: { is: (_x: unknown): _x is string => true },
         })
+    }
+
+    /**
+     * Get all client documents
+     */
+    public async getDocumentsByClientId({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { clientId: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`clients/${path.clientId}/documentsMetadata`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetDocumentsByClientIdResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
     }
 
     public async awaitResponse<

@@ -7,7 +7,7 @@ import got from 'got'
 import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
 import type { ValidateFunction, ErrorObject } from 'ajv'
 import type { IncomingHttpHeaders } from 'http'
-import { ErrorResponse, MambuFunctionSecretCreate } from './rest.type.js'
+import { ErrorResponse, MambuFunctionSecretCreate, MambuFunctionSecretUpdate } from './rest.type.js'
 
 /**
  * mambu-functions-secrets
@@ -68,6 +68,75 @@ export class MambuMambuFunctionSecrets {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Delete an existing Mambu Function Secret
+     */
+    public async delete({ path, auth = [['apiKey'], ['basic']] }: { path: { name: string }; auth?: string[][] | string[] }) {
+        return this.awaitResponse(
+            this.buildClient(auth).delete(`mambu-functions-secrets/${path.name}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * List Mambu Function Secret
+     */
+    public async listSecrets({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`mambu-functions-secrets`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Update an existing Mambu Function Secret
+     */
+    public async update({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: MambuFunctionSecretUpdate
+        path: { name: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(MambuFunctionSecretUpdate, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).put(`mambu-functions-secrets/${path.name}`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                200: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }

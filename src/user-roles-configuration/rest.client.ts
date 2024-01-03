@@ -60,6 +60,23 @@ export class MambuUserRolesConfiguration {
     }
 
     /**
+     * Get user roles configuration template
+     */
+    public async getTemplate({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`configuration/userroles/template.yaml`, {
+                headers: { Accept: 'application/vnd.mambu.v2+yaml' },
+                responseType: 'text',
+            }),
+            {
+                200: { is: (_x: unknown): _x is string => true },
+                401: { is: (_x: unknown): _x is string => true },
+                403: { is: (_x: unknown): _x is string => true },
+            }
+        )
+    }
+
+    /**
      * Update user roles configuration
      */
     public async update({
@@ -77,23 +94,6 @@ export class MambuUserRolesConfiguration {
                 401: { is: (_x: unknown): _x is string => true },
                 403: { is: (_x: unknown): _x is string => true },
                 404: { is: (_x: unknown): _x is string => true },
-            }
-        )
-    }
-
-    /**
-     * Get user roles configuration template
-     */
-    public async getTemplate({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`configuration/userroles/template.yaml`, {
-                headers: { Accept: 'application/vnd.mambu.v2+yaml' },
-                responseType: 'text',
-            }),
-            {
-                200: { is: (_x: unknown): _x is string => true },
-                401: { is: (_x: unknown): _x is string => true },
-                403: { is: (_x: unknown): _x is string => true },
             }
         )
     }

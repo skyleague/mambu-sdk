@@ -44,27 +44,31 @@ export class MambuOrganizationGeneralHolidays {
     }
 
     /**
-     * Get holiday
+     * Create holidays
      */
-    public async getByIdentifier({
-        path,
+    public async create({
+        body,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { holidayIdentifier: string }
+        body: CreateRequest
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
+        this.validateRequestBody(CreateRequest, body)
+
         return this.awaitResponse(
-            this.buildClient(auth).get(`organization/holidays/general/${path.holidayIdentifier}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            this.buildClient(auth).post(`organization/holidays/general`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: Holiday,
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: CreateResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-                404: ErrorResponse,
-                409: ErrorResponse,
             }
         )
     }
@@ -96,31 +100,27 @@ export class MambuOrganizationGeneralHolidays {
     }
 
     /**
-     * Create holidays
+     * Get holiday
      */
-    public async create({
-        body,
-        headers,
+    public async getByIdentifier({
+        path,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: CreateRequest
-        headers?: { ['Idempotency-Key']?: string }
+        path: { holidayIdentifier: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(CreateRequest, body)
-
         return this.awaitResponse(
-            this.buildClient(auth).post(`organization/holidays/general`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+            this.buildClient(auth).get(`organization/holidays/general/${path.holidayIdentifier}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: CreateResponse,
+                200: Holiday,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+                404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }

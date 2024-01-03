@@ -44,6 +44,27 @@ export class MambuBackgroundProcess {
     }
 
     /**
+     * Get the latest manual or automatic end of day (EOD) process by specifying the type
+     */
+    public async getLatestByType({
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: { query?: { type?: string }; auth?: string[][] | string[] } = {}) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`backgroundprocess/latest`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: BackgroundProcess,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Cancel manual or automatic end of day (EOD) processes using the encoded key
      */
     public async update({
@@ -68,27 +89,6 @@ export class MambuBackgroundProcess {
                 403: ErrorResponse,
                 404: ErrorResponse,
                 500: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get the latest manual or automatic end of day (EOD) process by specifying the type
-     */
-    public async getLatestByType({
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: { query?: { type?: string }; auth?: string[][] | string[] } = {}) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`backgroundprocess/latest`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: BackgroundProcess,
-                401: ErrorResponse,
-                403: ErrorResponse,
             }
         )
     }

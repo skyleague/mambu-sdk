@@ -6,127 +6,6 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
-/**
- * Represents a general ledger account.
- */
-export interface GLAccount {
-    /**
-     * The data migration event key if the general ledger account was created as a part of a data migration event.
-     */
-    migrationEventKey?: string
-    /**
-     * The last modification date and time, which is stored as UTC.
-     */
-    lastModifiedDate?: string
-    /**
-     * The general ledger code used to identify different account types. Also used for grouping and categorizing accounts. For example: an account code of '3201' is considered a subtype of '3200'.
-     */
-    glCode?: string
-    /**
-     * The usage type of the general ledger account. `DETAIL` accounts are used to stores transaction balances. `HEADER` accounts are used to organise and group detail accounts for reporting purposes.
-     */
-    usage?: 'DETAIL' | 'HEADER'
-    /**
-     * A description of the general ledger account.
-     */
-    description?: string
-    /**
-     * The creation date for this account, which is stored as UTC.
-     */
-    creationDate?: string
-    /**
-     * The general ledger account type.
-     */
-    type?: 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE'
-    /**
-     * `TRUE` if manual journal entries are allowed, `FALSE` otherwise.
-     */
-    allowManualJournalEntries?: boolean
-    /**
-     * The balance of the general ledger account, which is only populated for the GET /glaccounts endpoint.
-     */
-    balance?: number
-    /**
-     * The name of the general ledger account.
-     */
-    name?: string
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    currency?: Currency
-    /**
-     * `TRUE` if trailing zeros are stripped, `FALSE` otherwise.
-     */
-    stripTrailingZeros?: boolean
-    /**
-     * `TRUE` if the account is activated and may be used, `FALSE` otherwise.
-     */
-    activated?: boolean
-}
-
-export const GLAccount = {
-    validate: (await import('./schemas/gl-account.schema.js')).validate as ValidateFunction<GLAccount>,
-    get schema() {
-        return GLAccount.validate.schema
-    },
-    get errors() {
-        return GLAccount.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GLAccount => GLAccount.validate(o) === true,
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[]
-}
-
-export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
-    get schema() {
-        return ErrorResponse.validate.schema
-    },
-    get errors() {
-        return ErrorResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
-        }
-    },
-} as const
-
-export type PatchRequest = PatchOperation[]
-
-export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
-    get schema() {
-        return PatchRequest.validate.schema
-    },
-    get errors() {
-        return PatchRequest.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
-        }
-    },
-} as const
-
-export type GetAllResponse = GLAccount[]
-
-export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
-    get schema() {
-        return GetAllResponse.validate.schema
-    },
-    get errors() {
-        return GetAllResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
-} as const
-
 export type CreateRequest = GLAccountInput[]
 
 export const CreateRequest = {
@@ -162,10 +41,6 @@ export const CreateResponse = {
  * Represents a currency eg. USD, EUR.
  */
 export interface Currency {
-    /**
-     * Currency code for NON_FIAT currency.
-     */
-    currencyCode?: string
     /**
      * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
@@ -358,59 +233,136 @@ export interface Currency {
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+    /**
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
 }
 
-export interface RestError {
-    errorCode?: number
-    errorSource?: string
-    errorReason?: string
+export interface ErrorResponse {
+    errors?: RestError[]
 }
+
+export const ErrorResponse = {
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    get schema() {
+        return ErrorResponse.validate.schema
+    },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
+} as const
+
+export type GetAllResponse = GLAccount[]
+
+export const GetAllResponse = {
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    get schema() {
+        return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+} as const
 
 /**
- * A single change that needs to be made to a resource
+ * Represents a general ledger account.
  */
-export interface PatchOperation {
+export interface GLAccount {
     /**
-     * The change to perform
+     * `TRUE` if the account is activated and may be used, `FALSE` otherwise.
      */
-    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
+    activated?: boolean
     /**
-     * The field to perform the operation on
+     * `TRUE` if manual journal entries are allowed, `FALSE` otherwise.
      */
-    path: string
+    allowManualJournalEntries?: boolean
     /**
-     * The field from where a value should be moved, when using move
+     * The balance of the general ledger account, which is only populated for the GET /glaccounts endpoint.
      */
-    from?: string
+    balance?: number
     /**
-     * The value of the field, can be null
+     * The creation date for this account, which is stored as UTC.
      */
-    value?: {
-        [k: string]: unknown | undefined
-    }
+    creationDate?: string
+    currency?: Currency
+    /**
+     * A description of the general ledger account.
+     */
+    description?: string
+    /**
+     * The encoded key of the entity, generated, globally unique
+     */
+    encodedKey?: string
+    /**
+     * The general ledger code used to identify different account types. Also used for grouping and categorizing accounts. For example: an account code of '3201' is considered a subtype of '3200'.
+     */
+    glCode?: string
+    /**
+     * The last modification date and time, which is stored as UTC.
+     */
+    lastModifiedDate?: string
+    /**
+     * The data migration event key if the general ledger account was created as a part of a data migration event.
+     */
+    migrationEventKey?: string
+    /**
+     * The name of the general ledger account.
+     */
+    name?: string
+    /**
+     * `TRUE` if trailing zeros are stripped, `FALSE` otherwise.
+     */
+    stripTrailingZeros?: boolean
+    /**
+     * The general ledger account type.
+     */
+    type?: 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE'
+    /**
+     * The usage type of the general ledger account. `DETAIL` accounts are used to stores transaction balances. `HEADER` accounts are used to organise and group detail accounts for reporting purposes.
+     */
+    usage?: 'DETAIL' | 'HEADER'
 }
+
+export const GLAccount = {
+    validate: (await import('./schemas/gl-account.schema.js')).validate as ValidateFunction<GLAccount>,
+    get schema() {
+        return GLAccount.validate.schema
+    },
+    get errors() {
+        return GLAccount.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GLAccount => GLAccount.validate(o) === true,
+} as const
 
 /**
  * Represents the request payload for creating a GL Account
  */
 export interface GLAccountInput {
     /**
-     * The general ledger code used to identify different account types. Also used for grouping and categorizing accounts. For example: an account code of '3201' is considered a subtype of '3200'.
+     * `TRUE` if manual journal entries are allowed, `FALSE` otherwise. This is only available for Detail Accounts.
      */
-    glCode: string
-    /**
-     * `DETAIL` for general ledger accounts that log transactions, and `HEADER` for general ledger accounts used for reporting and organizational purposes.
-     */
-    usage: 'DETAIL' | 'HEADER'
-    /**
-     * The name of the general ledger account.
-     */
-    name: string
+    allowManualJournalEntries?: boolean
+    currency?: Currency
     /**
      * The description of the general ledger account.
      */
     description?: string
-    currency?: Currency
+    /**
+     * The general ledger code used to identify different account types. Also used for grouping and categorizing accounts. For example: an account code of '3201' is considered a subtype of '3200'.
+     */
+    glCode: string
+    /**
+     * The name of the general ledger account.
+     */
+    name: string
     /**
      * `TRUE` to strip trailing zeros, `FALSE` otherwise. Only available for Header Accounts.
      */
@@ -420,7 +372,55 @@ export interface GLAccountInput {
      */
     type: 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE'
     /**
-     * `TRUE` if manual journal entries are allowed, `FALSE` otherwise. This is only available for Detail Accounts.
+     * `DETAIL` for general ledger accounts that log transactions, and `HEADER` for general ledger accounts used for reporting and organizational purposes.
      */
-    allowManualJournalEntries?: boolean
+    usage: 'DETAIL' | 'HEADER'
+}
+
+/**
+ * A single change that needs to be made to a resource
+ */
+export interface PatchOperation {
+    /**
+     * The field from where a value should be moved, when using move
+     */
+    from?: string
+    /**
+     * The change to perform
+     */
+    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
+    /**
+     * The field to perform the operation on
+     */
+    path: string
+    /**
+     * The value of the field, can be null
+     */
+    value?: {
+        [k: string]: unknown | undefined
+    }
+}
+
+export type PatchRequest = PatchOperation[]
+
+export const PatchRequest = {
+    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
+    get schema() {
+        return PatchRequest.validate.schema
+    },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!PatchRequest.validate(o)) {
+            throw new ValidationError(PatchRequest.errors ?? [])
+        }
+    },
+} as const
+
+export interface RestError {
+    errorCode?: number
+    errorReason?: string
+    errorSource?: string
 }

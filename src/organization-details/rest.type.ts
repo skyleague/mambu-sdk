@@ -7,67 +7,54 @@ import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
 /**
- * Response representation of the organization setup details
+ * Represents an address.
  */
-export interface OrganizationSetup {
+export interface Address {
     /**
-     * The email address of the organization
+     * The city for the address.
      */
-    emailAddress?: string
+    city?: string
     /**
-     * The phone number of the organization
+     * The country.
      */
-    phoneNumber?: string
-    address?: Address
+    country?: string
     /**
-     * The format used to represent the time and date
+     * The address encoded key, which is unique and generated.
      */
-    dateTimeFormat: string
+    encodedKey?: string
     /**
-     * Symbol used to mark the border between the integral and the fractional parts of a decimal numeral
+     * The index of this address in the list of addresses.
      */
-    decimalSeparator: 'COMMA' | 'POINT'
+    indexInList?: number
     /**
-     * The last modified date of the organization
+     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
      */
-    lastModifiedDate?: string
+    latitude?: number
     /**
-     * The format used to represent the date
+     * The first line of the address.
      */
-    dateFormat: string
+    line1?: string
     /**
-     * The timezone id, must be the same as the existing one
+     * The second line of the address.
      */
-    timeZoneID?: string
+    line2?: string
     /**
-     * The name of the organization
+     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
      */
-    institutionName: string
+    longitude?: number
     /**
-     * The currency of the organization, must be the same as the existing one
+     * The address parent key indicating the object owning this address. For example: client, centre, or branch.
      */
-    currency?: string
+    parentKey?: string
     /**
-     * The creation date of the organization
+     * The post code.
      */
-    creationDate?: string
+    postcode?: string
+    /**
+     * The region for the address.
+     */
+    region?: string
 }
-
-export const OrganizationSetup = {
-    validate: (await import('./schemas/organization-setup.schema.js')).validate as ValidateFunction<OrganizationSetup>,
-    get schema() {
-        return OrganizationSetup.validate.schema
-    },
-    get errors() {
-        return OrganizationSetup.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is OrganizationSetup => OrganizationSetup.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!OrganizationSetup.validate(o)) {
-            throw new ValidationError(OrganizationSetup.errors ?? [])
-        }
-    },
-} as const
 
 export interface ErrorResponse {
     errors?: RestError[]
@@ -90,57 +77,70 @@ export const ErrorResponse = {
 } as const
 
 /**
- * Represents an address.
+ * Response representation of the organization setup details
  */
-export interface Address {
+export interface OrganizationSetup {
+    address?: Address
     /**
-     * The country.
+     * The creation date of the organization
      */
-    country?: string
+    creationDate?: string
     /**
-     * The address parent key indicating the object owning this address. For example: client, centre, or branch.
+     * The currency of the organization, must be the same as the existing one
      */
-    parentKey?: string
+    currency?: string
     /**
-     * The city for the address.
+     * The format used to represent the date
      */
-    city?: string
+    dateFormat: string
     /**
-     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
+     * The format used to represent the time and date
      */
-    latitude?: number
+    dateTimeFormat: string
     /**
-     * The post code.
+     * Symbol used to mark the border between the integral and the fractional parts of a decimal numeral
      */
-    postcode?: string
+    decimalSeparator: 'COMMA' | 'POINT'
     /**
-     * The index of this address in the list of addresses.
+     * The email address of the organization
      */
-    indexInList?: number
+    emailAddress?: string
     /**
-     * The address encoded key, which is unique and generated.
+     * The name of the organization
      */
-    encodedKey?: string
+    institutionName: string
     /**
-     * The region for the address.
+     * The last modified date of the organization
      */
-    region?: string
+    lastModifiedDate?: string
     /**
-     * The second line of the address.
+     * The phone number of the organization
      */
-    line2?: string
+    phoneNumber?: string
     /**
-     * The first line of the address.
+     * The timezone id, must be the same as the existing one
      */
-    line1?: string
-    /**
-     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
-     */
-    longitude?: number
+    timeZoneID?: string
 }
+
+export const OrganizationSetup = {
+    validate: (await import('./schemas/organization-setup.schema.js')).validate as ValidateFunction<OrganizationSetup>,
+    get schema() {
+        return OrganizationSetup.validate.schema
+    },
+    get errors() {
+        return OrganizationSetup.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is OrganizationSetup => OrganizationSetup.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!OrganizationSetup.validate(o)) {
+            throw new ValidationError(OrganizationSetup.errors ?? [])
+        }
+    },
+} as const
 
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

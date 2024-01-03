@@ -7,9 +7,96 @@ import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
 /**
- * Represents the account to remove from the credit arrangement.
+ * The account arrears settings, holds the required information for the arrears settings of an account.
  */
-export interface RemoveCreditArrangementAccountInput {
+export interface AccountArrearsSettings {
+    /**
+     * The arrears date calculation method.
+     */
+    dateCalculationMethod?:
+        | 'ACCOUNT_FIRST_WENT_TO_ARREARS'
+        | 'LAST_LATE_REPAYMENT'
+        | 'ACCOUNT_FIRST_BREACHED_MATERIALITY_THRESHOLD'
+    /**
+     * The encoded key of the arrears base settings, auto generated, unique.
+     */
+    encodedKey?: string
+    /**
+     * Defines monthly arrears tolerance day value.
+     */
+    monthlyToleranceDay?: number
+    /**
+     * Shows whether the non working days are taken in consideration or not when applying penaltees/late fees or when setting an account into arrears
+     */
+    nonWorkingDaysMethod?: 'INCLUDED' | 'EXCLUDED'
+    /**
+     * Defines the tolerance calculation method
+     */
+    toleranceCalculationMethod?: 'ARREARS_TOLERANCE_PERIOD' | 'MONTHLY_ARREARS_TOLERANCE_DAY'
+    /**
+     * The tolerance floor amount.
+     */
+    toleranceFloorAmount?: number
+    /**
+     * Defines the arrears tolerance amount.
+     */
+    tolerancePercentageOfOutstandingPrincipal?: number
+    /**
+     * Defines the arrears tolerance period value.
+     */
+    tolerancePeriod?: number
+}
+
+/**
+ * Adjustable interest rates settings for loan account
+ */
+export interface AccountInterestRateSettings {
+    /**
+     * The encoded key of the interest rate settings, auto generated, unique
+     */
+    encodedKey?: string
+    /**
+     * Index rate source key.
+     */
+    indexSourceKey?: string
+    /**
+     * Interest rate value.
+     */
+    interestRate?: number
+    /**
+     * Maximum value allowed for index based interest rate. Valid only for index interest rate.
+     */
+    interestRateCeilingValue?: number
+    /**
+     * Minimum value allowed for index based interest rate. Valid only for index interest rate.
+     */
+    interestRateFloorValue?: number
+    /**
+     * Interest rate review frequency unit count. Valid only for index interest rate.
+     */
+    interestRateReviewCount?: number
+    /**
+     * Interest rate review frequency measurement unit. Valid only for index interest rate.
+     */
+    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
+    /**
+     * Interest calculation method: fixed or indexed(interest spread + active organization index interest rate)
+     */
+    interestRateSource: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE'
+    /**
+     * Interest spread value.
+     */
+    interestSpread?: number
+    /**
+     * Date since an interest rate is valid
+     */
+    validFrom: string
+}
+
+/**
+ * Represents the account to add to the credit arrangement.
+ */
+export interface AddCreditArrangementAccountInput {
     /**
      * The encoded key of the account.
      */
@@ -20,19 +107,269 @@ export interface RemoveCreditArrangementAccountInput {
     accountType: 'LOAN' | 'DEPOSIT'
 }
 
-export const RemoveCreditArrangementAccountInput = {
-    validate: (await import('./schemas/remove-credit-arrangement-account-input.schema.js'))
-        .validate as ValidateFunction<RemoveCreditArrangementAccountInput>,
+export const AddCreditArrangementAccountInput = {
+    validate: (await import('./schemas/add-credit-arrangement-account-input.schema.js'))
+        .validate as ValidateFunction<AddCreditArrangementAccountInput>,
     get schema() {
-        return RemoveCreditArrangementAccountInput.validate.schema
+        return AddCreditArrangementAccountInput.validate.schema
     },
     get errors() {
-        return RemoveCreditArrangementAccountInput.validate.errors ?? undefined
+        return AddCreditArrangementAccountInput.validate.errors ?? undefined
     },
-    is: (o: unknown): o is RemoveCreditArrangementAccountInput => RemoveCreditArrangementAccountInput.validate(o) === true,
+    is: (o: unknown): o is AddCreditArrangementAccountInput => AddCreditArrangementAccountInput.validate(o) === true,
     assert: (o: unknown) => {
-        if (!RemoveCreditArrangementAccountInput.validate(o)) {
-            throw new ValidationError(RemoveCreditArrangementAccountInput.errors ?? [])
+        if (!AddCreditArrangementAccountInput.validate(o)) {
+            throw new ValidationError(AddCreditArrangementAccountInput.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Represents a simple installment amount structure.
+ */
+export interface Amount {
+    /**
+     * The due amount.
+     */
+    due?: number
+    /**
+     * The expected amount, which is sum of paid and due amounts.
+     */
+    expected?: number
+    /**
+     * The paid amount.
+     */
+    paid?: number
+}
+
+/**
+ * Represents a simple installment amount structure.
+ */
+export interface AmountWithReduced {
+    /**
+     * The due amount.
+     */
+    due?: number
+    /**
+     * The expected amount, which is sum of paid and due amounts.
+     */
+    expected?: number
+    /**
+     * The paid amount.
+     */
+    paid?: number
+    /**
+     * The reduced amount.
+     */
+    reduced?: number
+}
+
+/**
+ * Asset, holds information about a client asset entry.
+ */
+export interface Asset {
+    /**
+     * The amount used by the client for the guaranty
+     */
+    amount: number
+    /**
+     * The name of a value the client guarantees with (populated when the guaranty type is ASSET)
+     */
+    assetName: string
+    /**
+     * The key of the deposit account used by the guarantor (populated when the guaranty type is GUARANTOR). It can be null.
+     */
+    depositAccountKey?: string
+    /**
+     * The encoded key of the security, auto generated, unique.
+     */
+    encodedKey?: string
+    /**
+     * The key of the client/group used as the guarantor.
+     */
+    guarantorKey?: string
+    /**
+     * The type of the guarantor (client/group)
+     */
+    guarantorType?: 'CLIENT' | 'GROUP'
+    /**
+     * The original amount used by the client for a collateral asset
+     */
+    originalAmount?: number
+    originalCurrency?: Currency
+}
+
+/**
+ * The loan account balance details.
+ */
+export interface Balances {
+    /**
+     * The fees balance. Represents the total fees expected to be paid on this account at a given moment.
+     */
+    feesBalance?: number
+    /**
+     * The fees due. Representing the total fees due for the account.
+     */
+    feesDue?: number
+    /**
+     * The fees paid. Represents the total fees paid for the account.
+     */
+    feesPaid?: number
+    /**
+     * The sum of all the authorization hold amounts on this account.
+     */
+    holdBalance?: number
+    /**
+     * Represents the total interest owed by the client (total interest applied for account minus interest paid).
+     */
+    interestBalance?: number
+    /**
+     * The interest due. Indicates how much interest it's due for the account at this moment.
+     */
+    interestDue?: number
+    /**
+     * The interest from arrears balance. Indicates interest from arrears owned by the client, from now on. (total interest from arrears accrued for account - interest from arrears paid).
+     */
+    interestFromArrearsBalance?: number
+    /**
+     * The interest from arrears due. Indicates how much interest from arrears it's due for the account at this moment.
+     */
+    interestFromArrearsDue?: number
+    /**
+     * The interest from arrears paid, indicates total interest from arrears paid into the account.
+     */
+    interestFromArrearsPaid?: number
+    /**
+     * The interest paid, indicates total interest paid into the account.
+     */
+    interestPaid?: number
+    /**
+     * The penalty balance. Represents the total penalty expected to be paid on this account at a given moment.
+     */
+    penaltyBalance?: number
+    /**
+     * The penalty due. Represents the total penalty amount due for the account.
+     */
+    penaltyDue?: number
+    /**
+     * The Penalty paid. Represents the total penalty amount paid for the account.
+     */
+    penaltyPaid?: number
+    /**
+     * The total principal owned by the client, from now on (principal disbursed - principal paid).
+     */
+    principalBalance?: number
+    /**
+     * The principal due, indicates how much principal it's due at this moment.
+     */
+    principalDue?: number
+    /**
+     * The principal paid, holds the value of the total paid into the account.
+     */
+    principalPaid?: number
+    /**
+     * The total redraw amount owned by the client, from now on.
+     */
+    redrawBalance?: number
+}
+
+/**
+ * Defines the billing cycles settings for a loan account
+ */
+export interface BillingCycleDays {
+    /**
+     * The billing cycle start days in case it is enabled
+     */
+    days?: number[]
+}
+
+/**
+ * Represents a credit arrangement.
+ */
+export interface CreditArrangement {
+    /**
+     * The maximum credit amount the client can be exposed to.
+     */
+    amount: number
+    /**
+     * The date when the credit arrangement was approved.
+     */
+    approvedDate?: string
+    /**
+     * The available amount of the credit arrangement.
+     */
+    availableCreditAmount?: number
+    /**
+     * The date when the credit arrangement was closed.
+     */
+    closedDate?: string
+    /**
+     * The consumed amount of the credit arrangement, which is calculated as the difference between the amount and available amount.
+     */
+    consumedCreditAmount?: number
+    /**
+     * The date when the credit arrangement was created.
+     */
+    creationDate?: string
+    currency?: Currency
+    /**
+     * The encoded key of the credit arrangement, it is auto generated, and unique.
+     */
+    encodedKey?: string
+    /**
+     * The date when the credit arrangement expires.
+     */
+    expireDate: string
+    /**
+     * The type of exposure limit calculation method used for the credit arrangement.
+     */
+    exposureLimitType?: 'APPROVED_AMOUNT' | 'OUTSTANDING_AMOUNT'
+    /**
+     * The encoded key of the credit arrangement holder (individual client or group).
+     */
+    holderKey?: string
+    /**
+     * The type of the credit arrangement holder (individual client or group).
+     */
+    holderType: 'CLIENT' | 'GROUP'
+    /**
+     * The ID of credit arrangement, can be generated and customized, and must be unique.
+     */
+    id?: string
+    /**
+     * The last date when the credit arrangement was modified.
+     */
+    lastModifiedDate?: string
+    /**
+     * The notes or description of the credit arrangement.
+     */
+    notes?: string
+    /**
+     * The start date from which the credit arrangement became active.
+     */
+    startDate: string
+    /**
+     * The state of the credit arrangement.
+     */
+    state?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
+    /**
+     * The substate of credit arrangement.
+     */
+    subState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
+}
+
+export const CreditArrangement = {
+    validate: (await import('./schemas/credit-arrangement.schema.js')).validate as ValidateFunction<CreditArrangement>,
+    get schema() {
+        return CreditArrangement.validate.schema
+    },
+    get errors() {
+        return CreditArrangement.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CreditArrangement => CreditArrangement.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!CreditArrangement.validate(o)) {
+            throw new ValidationError(CreditArrangement.errors ?? [])
         }
     },
 } as const
@@ -42,13 +379,13 @@ export const RemoveCreditArrangementAccountInput = {
  */
 export interface CreditArrangementAccounts {
     /**
-     * List of loan accounts linked to the credit arrangement.
-     */
-    loanAccounts?: LoanAccount[]
-    /**
      * List of the deposit accounts linked to the credit arrangement.
      */
     depositAccounts?: DepositAccount[]
+    /**
+     * List of loan accounts linked to the credit arrangement.
+     */
+    loanAccounts?: LoanAccount[]
 }
 
 export const CreditArrangementAccounts = {
@@ -64,130 +401,6 @@ export const CreditArrangementAccounts = {
     assert: (o: unknown) => {
         if (!CreditArrangementAccounts.validate(o)) {
             throw new ValidationError(CreditArrangementAccounts.errors ?? [])
-        }
-    },
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[]
-}
-
-export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
-    get schema() {
-        return ErrorResponse.validate.schema
-    },
-    get errors() {
-        return ErrorResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
-        }
-    },
-} as const
-
-export type GetAllResponse = CreditArrangement[]
-
-export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
-    get schema() {
-        return GetAllResponse.validate.schema
-    },
-    get errors() {
-        return GetAllResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
-} as const
-
-/**
- * Represents a credit arrangement.
- */
-export interface CreditArrangement {
-    /**
-     * The available amount of the credit arrangement.
-     */
-    availableCreditAmount?: number
-    /**
-     * The maximum credit amount the client can be exposed to.
-     */
-    amount: number
-    /**
-     * The notes or description of the credit arrangement.
-     */
-    notes?: string
-    /**
-     * The last date when the credit arrangement was modified.
-     */
-    lastModifiedDate?: string
-    /**
-     * The encoded key of the credit arrangement holder (individual client or group).
-     */
-    holderKey?: string
-    /**
-     * The consumed amount of the credit arrangement, which is calculated as the difference between the amount and available amount.
-     */
-    consumedCreditAmount?: number
-    /**
-     * The date when the credit arrangement was created.
-     */
-    creationDate?: string
-    /**
-     * The date when the credit arrangement was approved.
-     */
-    approvedDate?: string
-    /**
-     * The substate of credit arrangement.
-     */
-    subState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
-    /**
-     * The date when the credit arrangement was closed.
-     */
-    closedDate?: string
-    /**
-     * The type of exposure limit calculation method used for the credit arrangement.
-     */
-    exposureLimitType?: 'APPROVED_AMOUNT' | 'OUTSTANDING_AMOUNT'
-    /**
-     * The encoded key of the credit arrangement, it is auto generated, and unique.
-     */
-    encodedKey?: string
-    /**
-     * The date when the credit arrangement expires.
-     */
-    expireDate: string
-    currency?: Currency
-    /**
-     * The ID of credit arrangement, can be generated and customized, and must be unique.
-     */
-    id?: string
-    /**
-     * The state of the credit arrangement.
-     */
-    state?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
-    /**
-     * The type of the credit arrangement holder (individual client or group).
-     */
-    holderType: 'CLIENT' | 'GROUP'
-    /**
-     * The start date from which the credit arrangement became active.
-     */
-    startDate: string
-}
-
-export const CreditArrangement = {
-    validate: (await import('./schemas/credit-arrangement.schema.js')).validate as ValidateFunction<CreditArrangement>,
-    get schema() {
-        return CreditArrangement.validate.schema
-    },
-    get errors() {
-        return CreditArrangement.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CreditArrangement => CreditArrangement.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!CreditArrangement.validate(o)) {
-            throw new ValidationError(CreditArrangement.errors ?? [])
         }
     },
 } as const
@@ -224,76 +437,68 @@ export const CreditArrangementAction = {
 } as const
 
 /**
- * Represents the filtering and sorting criteria when searching credit arrangements.
+ * Represents credit arrangment filter and search criteria.
  */
-export interface CreditArrangementSearchCriteria {
-    sortingCriteria?: CreditArrangementSortingCriteria
+export interface CreditArrangementFilterCriteria {
+    field: 'id' | 'startDate' | 'expireDate' | 'approvedDate' | 'state' | 'subState' | 'exposureLimitType' | string
     /**
-     * The list of filtering criteria.
+     * | **Operator**                | **Affected values**  | **Available for**                                                    |
+     * |---------------               |----------------------|----------------------------------------------------------------------|
+     * | EQUALS                       | ONE_VALUE            | BIG_DECIMAL,BOOLEAN,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY        |
+     * | EQUALS_CASE_SENSITIVE        | ONE_VALUE            | BIG_DECIMAL,BOOLEAN,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY 		  |
+     * | MORE_THAN                    | ONE_VALUE            | BIG_DECIMAL,NUMBER,MONEY                                             |
+     * | LESS_THAN                    | ONE_VALUE            | BIG_DECIMAL,NUMBER,MONEY                                             |
+     * | BETWEEN                      | TWO_VALUES           | BIG_DECIMAL,NUMBER,MONEY,DATE,DATE_TIME                              |
+     * | ON                           | ONE_VALUE            | DATE,DATE_TIME                                                       |
+     * | AFTER                        | ONE_VALUE            | DATE,DATE_TIME                                                       |
+     * | BEFORE                       | ONE_VALUE            | DATE,DATE_TIME                                                       |
+     * | BEFORE_INCLUSIVE             | ONE_VALUE            | DATE,DATE_TIME                                                       |
+     * | STARTS_WITH                  | ONE_VALUE            | STRING                                                               |
+     * | STARTS_WITH_CASE_SENSITIVE   | ONE_VALUE            | STRING                                                               |
+     * | IN                           | LIST                 | ENUM,KEY                                                             |
+     * | TODAY                        | NO_VALUE             | DATE,DATE_TIME                                                       |
+     * | THIS_WEEK                    | NO_VALUE             | DATE,DATE_TIME                                                       |
+     * | THIS_MONTH                   | NO_VALUE             | DATE,DATE_TIME                                                       |
+     * | THIS_YEAR                    | NO_VALUE             | DATE,DATE_TIME                                                       |
+     * | LAST_DAYS                    | ONE_VALUE            | NUMBER                                                               |
+     * | EMPTY                        | NO_VALUE             | BIG_DECIMAL,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY,DATE,DATE_TIME |
+     * | NOT_EMPTY                    | NO_VALUE             | BIG_DECIMAL,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY,DATE,DATE_TIME |
      */
-    filterCriteria?: CreditArrangementFilterCriteria[]
+    operator:
+        | 'EQUALS'
+        | 'EQUALS_CASE_SENSITIVE'
+        | 'DIFFERENT_THAN'
+        | 'MORE_THAN'
+        | 'LESS_THAN'
+        | 'BETWEEN'
+        | 'ON'
+        | 'AFTER'
+        | 'AFTER_INCLUSIVE'
+        | 'BEFORE'
+        | 'BEFORE_INCLUSIVE'
+        | 'STARTS_WITH'
+        | 'STARTS_WITH_CASE_SENSITIVE'
+        | 'IN'
+        | 'TODAY'
+        | 'THIS_WEEK'
+        | 'THIS_MONTH'
+        | 'THIS_YEAR'
+        | 'LAST_DAYS'
+        | 'EMPTY'
+        | 'NOT_EMPTY'
+    /**
+     * The second value to match the searching criteria, when the `BETWEEN` operator is used.
+     */
+    secondValue?: string
+    /**
+     * The value to match the searching criteria.
+     */
+    value?: string
+    /**
+     * List of values when the `IN` operator is used.
+     */
+    values?: string[]
 }
-
-export const CreditArrangementSearchCriteria = {
-    validate: (await import('./schemas/credit-arrangement-search-criteria.schema.js'))
-        .validate as ValidateFunction<CreditArrangementSearchCriteria>,
-    get schema() {
-        return CreditArrangementSearchCriteria.validate.schema
-    },
-    get errors() {
-        return CreditArrangementSearchCriteria.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CreditArrangementSearchCriteria => CreditArrangementSearchCriteria.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!CreditArrangementSearchCriteria.validate(o)) {
-            throw new ValidationError(CreditArrangementSearchCriteria.errors ?? [])
-        }
-    },
-} as const
-
-export type SearchResponse = CreditArrangement[]
-
-export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
-    get schema() {
-        return SearchResponse.validate.schema
-    },
-    get errors() {
-        return SearchResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
-} as const
-
-/**
- * Represents the account to add to the credit arrangement.
- */
-export interface AddCreditArrangementAccountInput {
-    /**
-     * The encoded key of the account.
-     */
-    accountId: string
-    /**
-     * The type of the account.
-     */
-    accountType: 'LOAN' | 'DEPOSIT'
-}
-
-export const AddCreditArrangementAccountInput = {
-    validate: (await import('./schemas/add-credit-arrangement-account-input.schema.js'))
-        .validate as ValidateFunction<AddCreditArrangementAccountInput>,
-    get schema() {
-        return AddCreditArrangementAccountInput.validate.schema
-    },
-    get errors() {
-        return AddCreditArrangementAccountInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is AddCreditArrangementAccountInput => AddCreditArrangementAccountInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!AddCreditArrangementAccountInput.validate(o)) {
-            throw new ValidationError(AddCreditArrangementAccountInput.errors ?? [])
-        }
-    },
-} as const
 
 /**
  * Represents the credit arrangement schedule.
@@ -317,550 +522,52 @@ export const CreditArrangementSchedule = {
     is: (o: unknown): o is CreditArrangementSchedule => CreditArrangementSchedule.validate(o) === true,
 } as const
 
-export type PatchRequest = PatchOperation[]
+/**
+ * Represents the filtering and sorting criteria when searching credit arrangements.
+ */
+export interface CreditArrangementSearchCriteria {
+    /**
+     * The list of filtering criteria.
+     */
+    filterCriteria?: CreditArrangementFilterCriteria[]
+    sortingCriteria?: CreditArrangementSortingCriteria
+}
 
-export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
+export const CreditArrangementSearchCriteria = {
+    validate: (await import('./schemas/credit-arrangement-search-criteria.schema.js'))
+        .validate as ValidateFunction<CreditArrangementSearchCriteria>,
     get schema() {
-        return PatchRequest.validate.schema
+        return CreditArrangementSearchCriteria.validate.schema
     },
     get errors() {
-        return PatchRequest.validate.errors ?? undefined
+        return CreditArrangementSearchCriteria.validate.errors ?? undefined
     },
-    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
+    is: (o: unknown): o is CreditArrangementSearchCriteria => CreditArrangementSearchCriteria.validate(o) === true,
     assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
+        if (!CreditArrangementSearchCriteria.validate(o)) {
+            throw new ValidationError(CreditArrangementSearchCriteria.errors ?? [])
         }
     },
 } as const
 
 /**
- * Represents a loan account. A loan account defines the amount that your organization lends to a client. The terms and conditions of a loan account are defined by a loan product. In a loan account, Mambu stores all the information related to disbursements, repayments, interest rates, and withdrawals.
+ * The sorting criteria used for credit arrangement client directed query
  */
-export interface LoanAccount {
+export interface CreditArrangementSortingCriteria {
     /**
-     * The state of the loan account.
+     * Contains the actual sorting fields
      */
-    accountState?: 'PARTIAL_APPLICATION' | 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'ACTIVE_IN_ARREARS' | 'CLOSED'
-    prepaymentSettings?: PrepaymentSettings
+    field: 'creationDate' | 'startDate' | 'expireDate' | 'amount'
     /**
-     * The migration event encoded key associated with this loan account. If this account was imported, track which 'migration event' they came from.
+     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
      */
-    migrationEventKey?: string
-    /**
-     * The date when the loan account was set to last standing or null; if never set, it is expressed in your organization time format and time zone.
-     */
-    lastSetToArrearsDate?: string
-    /**
-     * The notes about this loan account.
-     */
-    notes?: string
-    disbursementDetails?: DisbursementDetails
-    redrawSettings?: LoanAccountRedrawSettings
-    /**
-     * The list with manual fees planned on the installments of the loan account.
-     */
-    plannedInstallmentFees?: PlannedInstallmentFee[]
-    /**
-     * The number of days the loan account is in arrears.
-     */
-    daysInArrears?: number
-    /**
-     * A second state for the loan account. Beside the account state, a second substate is sometimes necessary to provide more information about the exact lifecycle state of a loan account.For example, even if the account state of a loan account is `ACTIVE`, it can also have a substate of `LOCKED`.
-     */
-    accountSubState?:
-        | 'PARTIALLY_DISBURSED'
-        | 'LOCKED'
-        | 'LOCKED_CAPPING'
-        | 'REFINANCED'
-        | 'RESCHEDULED'
-        | 'WITHDRAWN'
-        | 'REPAID'
-        | 'REJECTED'
-        | 'WRITTEN_OFF'
-        | 'TERMINATED'
-    /**
-     * The name of the loan account.
-     */
-    loanName?: string
-    /**
-     * The date this loan account was terminated.
-     */
-    terminationDate?: string
-    interestSettings?: InterestSettings
-    /**
-     * The list of assets associated with the current loan account.
-     */
-    assets?: Asset[]
-    /**
-     * The date the interest was reviewed last time, stored in the organization time format and time zone.
-     */
-    lastInterestReviewDate?: string
-    /**
-     * The ID of the loan account, it can be generated and customized, and must be unique.
-     */
-    id?: string
-    /**
-     * The key of the user this loan account is assigned to.
-     */
-    assignedUserKey?: string
-    /**
-     * The locked account total due type.
-     */
-    lockedAccountTotalDueType?: 'BALANCE_AMOUNT' | 'DUE_AMOUNT_ON_LATE_INSTALLMENTS'
-    /**
-     * Shows whether the repayment transactions with entry date set in the future are allowed or not for this loan account.
-     */
-    futurePaymentsAcceptance?: 'NO_FUTURE_PAYMENTS' | 'ACCEPT_FUTURE_PAYMENTS' | 'ACCEPT_OVERPAYMENTS'
-    /**
-     * The key of the original rescheduled or refinanced loan account.
-     */
-    originalAccountKey?: string
-    /**
-     * A list with operations which are locked when the account is in the AccountState.LOCKED substate.
-     */
-    lockedOperations?: ('APPLY_INTEREST' | 'APPLY_FEES' | 'APPLY_PENALTIES')[]
-    /**
-     * The amount of interest that has been accrued in the loan account.
-     */
-    accruedInterest?: number
-    /**
-     * The accrued penalty, represents the amount of penalty that has been accrued in the loan account.
-     */
-    accruedPenalty?: number
-    /**
-     * The date the loan account was created.
-     */
-    creationDate?: string
-    /**
-     * Adjust the interest for the first repayment when the first repayment period is different than the repayment frequency
-     */
-    modifyInterestForFirstInstallment?: boolean
-    /**
-     * The key of the centre this account is assigned to.
-     */
-    assignedCentreKey?: string
-    /**
-     * The list of disbursement tranches available for the loan account.
-     */
-    tranches?: LoanTranche[]
-    /**
-     * The date the loan account was approved.
-     */
-    approvedDate?: string
-    /**
-     * The tax rate.
-     */
-    taxRate?: number
-    /**
-     * The date the tax rate on the loan account was last checked, expressed in the organization time format and time zone.
-     */
-    lastTaxRateReviewDate?: string
-    /**
-     * The amount of interest from arrears that has been accrued in the loan account.
-     */
-    interestFromArrearsAccrued?: number
-    scheduleSettings: ScheduleSettings
-    /**
-     * The number of days a repayment for the loan account is late.
-     */
-    daysLate?: number
-    /**
-     * The interest payment method that determines whether the payments are made horizontally (on the repayments) or vertically (on the loan account).
-     */
-    paymentMethod?: 'HORIZONTAL' | 'VERTICAL'
-    /**
-     * The encoded key of the account holder.
-     */
-    accountHolderKey: string
-    /**
-     * The overdue payments recalculation method inherited from the loan product on which this loan account is based.
-     */
-    latePaymentsRecalculationMethod?: 'OVERDUE_INSTALLMENTS_INCREASE' | 'LAST_INSTALLMENT_INCREASE'
-    /**
-     * The list of funds associated with the loan account.
-     */
-    fundingSources?: InvestorFund[]
-    /**
-     * The type of the account holder.
-     */
-    accountHolderType: 'CLIENT' | 'GROUP'
-    /**
-     * The arrears tolerance (period or day of month) depending on the product settings.
-     */
-    arrearsTolerancePeriod?: number
-    /**
-     * The date of the last time the loan account had interest applied (stored to interest balance), expressed in the organization time format and time zone.
-     */
-    lastInterestAppliedDate?: string
-    /**
-     * The key pointing to where this loan account was rescheduled or refinanced to. This value is only not null if rescheduled.
-     */
-    rescheduledAccountKey?: string
-    /**
-     * The amount of interest that has been accrued during payment holidays in the loan account.
-     */
-    paymentHolidaysAccruedInterest?: number
-    /**
-     * The encoded key of the transaction that activated the loan account.
-     */
-    activationTransactionKey?: string
-    /**
-     * The interest that is accrued in the current billing cycle.
-     */
-    interestAccruedInBillingCycle?: number
-    /**
-     * The key of the branch this loan account is assigned to. The branch is set to unassigned if no branch field is set.
-     */
-    assignedBranchKey?: string
-    balances?: Balances
-    /**
-     * The key to the line of credit where this account is registered to.
-     */
-    creditArrangementKey?: string
-    /**
-     * The value of the interest booked by the organization from the accounts funded by investors. Null if the funds are not enabled.
-     */
-    interestCommission?: number
-    /**
-     * The encoded key of the loan account, it is auto generated, and must be unique.
-     */
-    encodedKey?: string
-    currency?: Currency
-    /**
-     * The date the loan account has last been evaluated for interest, principal, fees, and penalties calculations expressed in the organization time format and time zone.
-     */
-    lastAccountAppraisalDate?: string
-    penaltySettings?: PenaltySettings
-    /**
-     * The encoded key of the settlement account.
-     */
-    settlementAccountKey?: string
-    /**
-     * The last date the loan was updated.
-     */
-    lastModifiedDate?: string
-    principalPaymentSettings?: PrincipalPaymentAccountSettings
-    /**
-     * The date when the loan account was set for the last time in the `LOCKED` state expressed in the organization time format and time zone. If null, the account is not locked anymore.
-     */
-    lastLockedDate?: string
-    /**
-     * The loan amount.
-     */
-    loanAmount: number
-    /**
-     * The date the loan was closed.
-     */
-    closedDate?: string
-    /**
-     * The key for the type of loan product that this loan account is based on.
-     */
-    productTypeKey: string
-    /**
-     * DEPRECATED - Will always be false.
-     */
-    allowOffset?: boolean
-    /**
-     * The list of guarantees associated with the loan account.
-     */
-    guarantors?: Guarantor[]
-    accountArrearsSettings?: AccountArrearsSettings
-}
-
-/**
- * The prepayment settings, holds all prepayment properties.
- */
-export interface PrepaymentSettings {
-    /**
-     * The elements recalculation method, indicates how the declining balance with equal installments repayments are recalculated.
-     */
-    elementsRecalculationMethod?: 'PRINCIPAL_EXPECTED_FIXED' | 'TOTAL_EXPECTED_FIXED'
-    /**
-     * Installment status for the case when principal is paid off (copied from loan product).
-     */
-    principalPaidInstallmentStatus?: 'PARTIALLY_PAID' | 'PAID' | 'ORIGINAL_TOTAL_EXPECTED_PAID'
-    /**
-     * Prepayment recalculation method copied from the loan product on which this account is based.
-     */
-    prepaymentRecalculationMethod?:
-        | 'NO_RECALCULATION'
-        | 'RESCHEDULE_REMAINING_REPAYMENTS'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_NUMBER_OF_TERMS'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_PRINCIPAL_AMOUNT'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_TOTAL_REPAYMENT_AMOUNT'
-        | 'REDUCE_AMOUNT_PER_INSTALLMENT'
-        | 'REDUCE_NUMBER_OF_INSTALLMENTS'
-        | 'REDUCE_NUMBER_OF_INSTALLMENTS_NEW'
-    /**
-     * Apply interest on prepayment method copied from loan product on which this account is based.
-     */
-    applyInterestOnPrepaymentMethod?: 'AUTOMATIC' | 'MANUAL'
-}
-
-/**
- * The the disbursement details it holds the information related to the disbursement details as disbursement date, first repayment date, disbursement fees.
- */
-export interface DisbursementDetails {
-    transactionDetails?: LoanTransactionDetails
-    /**
-     * The date of the expected disbursement.Stored as Organization Time.
-     */
-    expectedDisbursementDate?: string
-    /**
-     * List of fees that should be applied at the disbursement time.
-     */
-    fees?: CustomPredefinedFee[]
-    /**
-     * The date of the expected first repayment. Stored as Organization Time.
-     */
-    firstRepaymentDate?: string
-    /**
-     * The activation date, the date when the disbursement actually took place.
-     */
-    disbursementDate?: string
-    /**
-     * The encoded key of the disbursement details, auto generated, unique
-     */
-    encodedKey?: string
-}
-
-/**
- * Represents the loan transaction details.
- */
-export interface LoanTransactionDetails {
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * Whether the transaction was transferred between loans or deposit accounts
-     */
-    internalTransfer?: boolean
-    /**
-     * The encoded key of the transaction channel associated with the transaction details.
-     */
-    transactionChannelKey?: string
-    /**
-     * The ID of the transaction channel associated with the transaction details.
-     */
-    transactionChannelId?: string
-    /**
-     * In case of a transaction to a deposit account this represent the deposit account key to which the transaction was made.
-     */
-    targetDepositAccountKey?: string
-}
-
-/**
- * The custom predefined fees, they may be used as the expected predefined fees that will be applied on the disbursement.
- */
-export interface CustomPredefinedFee {
-    /**
-     * The encoded key of the predefined fee
-     */
-    predefinedFeeEncodedKey?: string
-    /**
-     * The encoded key of the custom predefined fee, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The amount of the custom fee.
-     */
-    amount?: number
-    /**
-     * The percentage of the custom fee.
-     */
-    percentage?: number
-}
-
-/**
- * Represents the redraw settings for a loan account.
- */
-export interface LoanAccountRedrawSettings {
-    /**
-     * `TRUE` if withdrawing amounts that reduce the next due instalment repayment is restricted, `FALSE` otherwise.
-     */
-    restrictNextDueWithdrawal: boolean
-}
-
-/**
- * The planned fee details holds the information related to the installment key, predefined fee key and amount
- */
-export interface PlannedInstallmentFee {
-    /**
-     * The number of the installment on which the predefined fee is planned. It is used only in the case when fees are created at the same time with the loan account creation or during preview schedule, before account creation, otherwise this should be empty and installmentKey will be used to identify an installment.
-     */
-    installmentNumber?: number
-    /**
-     * The amount of the planned fee.
-     */
-    amount?: number
-    /**
-     * The date when a planned fee should be applied, overriding installment's due date. It should match the interval of the installment. If it belong to first installment, it should be between disbursement date and installment due date.
-     */
-    applyOnDate?: string
-    /**
-     * The encoded key of the predefined fee which is planned.
-     */
-    predefinedFeeKey: string
-    /**
-     * The encoded key of the planned installment fee, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The encoded key of the installment on which the predefined fee is planned.
-     */
-    installmentKey?: string
-}
-
-/**
- * The interest settings, holds all the properties regarding interests for the loan account.
- */
-export interface InterestSettings {
-    /**
-     * The interest rate review unit. Defines the interest rate update frequency measurement unit.
-     */
-    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
-    /**
-     * The interest rate. Represents the interest rate for the loan account. The interest on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.
-     */
-    interestRate?: number
-    /**
-     * The interest rate source. Represents the interest calculation method: fixed or (interest spread + active organization index interest rate)
-     */
-    interestRateSource?: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE'
-    /**
-     * The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.
-     */
-    interestApplicationMethod?: 'AFTER_DISBURSEMENT' | 'REPAYMENT_DUE_DATE'
-    /**
-     * The interest change frequency. Holds the possible values for how often is interest charged on loan or deposit accounts
-     */
-    interestChargeFrequency?: 'ANNUALIZED' | 'EVERY_MONTH' | 'EVERY_FOUR_WEEKS' | 'EVERY_WEEK' | 'EVERY_DAY' | 'EVERY_X_DAYS'
-    /**
-     * The possible values for how we compute and apply the interest
-     */
-    interestType?: 'SIMPLE_INTEREST' | 'CAPITALIZED_INTEREST' | 'COMPOUNDING_INTEREST'
-    /**
-     * The accrue interest after maturity. If the product support this option, specify if the interest should be accrued after the account maturity date.
-     */
-    accrueInterestAfterMaturity?: boolean
-    /**
-     * The interest balance calculation method. Represents the option which determines the way the balance for the account's interest is computed.
-     */
-    interestBalanceCalculationMethod?: 'ONLY_PRINCIPAL' | 'PRINCIPAL_AND_INTEREST'
-    /**
-     * Interest to be added to active organization index interest rate in order to find out actual interest rate
-     */
-    interestSpread?: number
-    /**
-     * The interest calculation method. Holds the type of interest calculation method.
-     */
-    interestCalculationMethod?: 'FLAT' | 'DECLINING_BALANCE' | 'DECLINING_BALANCE_DISCOUNTED'
-    /**
-     * Interest rate update frequency unit count.
-     */
-    interestRateReviewCount?: number
-    /**
-     * Indicates whether late interest is accrued for this loan account
-     */
-    accrueLateInterest?: boolean
-    /**
-     * Adjustable interest rates settings for loan account
-     */
-    accountInterestRateSettings?: AccountInterestRateSettings[]
-}
-
-/**
- * Adjustable interest rates settings for loan account
- */
-export interface AccountInterestRateSettings {
-    /**
-     * Interest rate review frequency measurement unit. Valid only for index interest rate.
-     */
-    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
-    /**
-     * Interest rate value.
-     */
-    interestRate?: number
-    /**
-     * Interest spread value.
-     */
-    interestSpread?: number
-    /**
-     * Interest calculation method: fixed or indexed(interest spread + active organization index interest rate)
-     */
-    interestRateSource: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE'
-    /**
-     * Interest rate review frequency unit count. Valid only for index interest rate.
-     */
-    interestRateReviewCount?: number
-    /**
-     * Index rate source key.
-     */
-    indexSourceKey?: string
-    /**
-     * Maximum value allowed for index based interest rate. Valid only for index interest rate.
-     */
-    interestRateCeilingValue?: number
-    /**
-     * The encoded key of the interest rate settings, auto generated, unique
-     */
-    encodedKey?: string
-    /**
-     * Date since an interest rate is valid
-     */
-    validFrom: string
-    /**
-     * Minimum value allowed for index based interest rate. Valid only for index interest rate.
-     */
-    interestRateFloorValue?: number
-}
-
-/**
- * Asset, holds information about a client asset entry.
- */
-export interface Asset {
-    /**
-     * The amount used by the client for the guaranty
-     */
-    amount: number
-    /**
-     * The original amount used by the client for a collateral asset
-     */
-    originalAmount?: number
-    /**
-     * The key of the deposit account used by the guarantor (populated when the guaranty type is GUARANTOR). It can be null.
-     */
-    depositAccountKey?: string
-    /**
-     * The name of a value the client guarantees with (populated when the guaranty type is ASSET)
-     */
-    assetName: string
-    /**
-     * The encoded key of the security, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The key of the client/group used as the guarantor.
-     */
-    guarantorKey?: string
-    /**
-     * The type of the guarantor (client/group)
-     */
-    guarantorType?: 'CLIENT' | 'GROUP'
-    originalCurrency?: Currency
+    order?: 'ASC' | 'DESC'
 }
 
 /**
  * Represents a currency eg. USD, EUR.
  */
 export interface Currency {
-    /**
-     * Currency code for NON_FIAT currency.
-     */
-    currencyCode?: string
     /**
      * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
@@ -1053,410 +760,46 @@ export interface Currency {
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+    /**
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
 }
 
 /**
- * In some cases organizations may approve loans but not disburse the full amount initially. They would like to spread the disbursement (and risk) over time. Likewise for the client, they may not need the full loan amount up front. They may want to have a loan to buy some equipment for their business but will make one purchase today and another purchase in a few months.  In these cases, they don't need the full amount and wouldn't want to pay interest on cash they don't need yet. A solution for this matter is the usage of disbursement in tranches. This class holds the information required for one of this tranche.
+ * The custom predefined fees, they may be used as the expected predefined fees that will be applied on the disbursement.
  */
-export interface LoanTranche {
+export interface CustomPredefinedFee {
     /**
-     * The encoded key of the transaction details , auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The amount this tranche has available for disburse
-     */
-    amount: number
-    /**
-     * Fees that are associated with this tranche
-     */
-    fees?: CustomPredefinedFee[]
-    disbursementDetails?: TrancheDisbursementDetails
-    /**
-     * Index indicating the tranche number
-     */
-    trancheNumber?: number
-}
-
-/**
- * The disbursement details regarding a loan tranche.
- */
-export interface TrancheDisbursementDetails {
-    /**
-     * The date when this tranche is supposed to be disbursed (as Organization Time)
-     */
-    expectedDisbursementDate?: string
-    /**
-     * The key of the disbursement transaction logged when this tranche was disbursed. This field will be null until the tranche disbursement
-     */
-    disbursementTransactionKey?: string
-}
-
-/**
- * The schedule settings, holds all schedule properties.
- */
-export interface ScheduleSettings {
-    /**
-     * The grace period. Represents the grace period for loan repayment - in number of installments.
-     */
-    gracePeriod: number
-    /**
-     * The periodic payment amount for the accounts which have balloon payments or Reduce Number of Installments and Optimized Payments
-     */
-    periodicPayment?: number
-    /**
-     * The repayment schedule method. Represents the method that determines whether the schedule will be fixed all over the loan account's life cycle or will be dynamically recomputed when required.
-     */
-    repaymentScheduleMethod?: 'NONE' | 'FIXED' | 'DYNAMIC'
-    /**
-     * A list of periodic payments for the current loan account.
-     */
-    paymentPlan?: PeriodicPayment[]
-    /**
-     * The short handling method. Determines how to handle the short months, if they select a fixed day of month > 28. Will be null if no such date is selected and also for the Interval methodology. Only available if the Repayment Methodology is FIXED_DAYS_OF_MONTH.
-     */
-    shortMonthHandlingMethod?: 'LAST_DAY_IN_MONTH' | 'FIRST_DAY_OF_NEXT_MONTH'
-    /**
-     * The repayment installments. Represents how many installments are required to pay back the loan.
-     */
-    repaymentInstallments?: number
-    /**
-     * The grace period type. Representing the type of grace period which is possible for a loan account.
-     */
-    gracePeriodType?: 'NONE' | 'PAY_INTEREST_ONLY' | 'INTEREST_FORGIVENESS'
-    /**
-     * The principal repayment interval. Indicates the interval of repayments that the principal has to be paid.
-     */
-    principalRepaymentInterval?: number
-    /**
-     * Flag used when the repayments schedule for the current account was determined by the user, by editing the due dates or the principal due
-     */
-    hasCustomSchedule?: boolean
-    /**
-     * The repayment period unit. Represents the frequency of loan repayment.
-     */
-    repaymentPeriodUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS'
-    previewSchedule?: RevolvingAccountSettings
-    /**
-     * Specifies the days of the month when the repayment due dates should be. Only available if the Repayment Methodology is FIXED_DAYS_OF_MONTH.
-     */
-    fixedDaysOfMonth?: number[]
-    billingCycle?: BillingCycleDays
-    /**
-     * The schedule due dates method. Represents the methodology used by this account to compute the due dates of the repayments.
-     */
-    scheduleDueDatesMethod?: 'INTERVAL' | 'FIXED_DAYS_OF_MONTH'
-    /**
-     * The repayment period count. Represents how often the loan is to be repaid: stored based on the type repayment option.
-     */
-    repaymentPeriodCount?: number
-    /**
-     * The default first repayment due date offset, indicates how many days the first repayment due date should be extended(all other due dates from the schedule are relative to first repayment due date - they will also be affected by the offset)
-     */
-    defaultFirstRepaymentDueDateOffset?: number
-}
-
-/**
- * For fixed term loans there is the possibility to define a payment plan. A payment plan consists of multiple periodic payments. This class holds information about a periodic payment.
- */
-export interface PeriodicPayment {
-    /**
-     * The installment's position up to which the PMT will be used
-     */
-    toInstallment: number
-    /**
-     * The encoded key of the periodic payment, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The PMT value used in periodic payment
-     */
-    amount: number
-}
-
-/**
- * The number of previewed instalments for an account
- */
-export interface RevolvingAccountSettings {
-    /**
-     * The number of previewed instalments
-     */
-    numberOfPreviewedInstalments?: number
-}
-
-/**
- * Defines the billing cycles settings for a loan account
- */
-export interface BillingCycleDays {
-    /**
-     * The billing cycle start days in case it is enabled
-     */
-    days?: number[]
-}
-
-/**
- * Contains the details about an investor fund including fields like encoded key, guarantor type, amount and guarantor key
- */
-export interface InvestorFund {
-    /**
-     * The amount used by the client for the guaranty
-     */
-    amount: number
-    /**
-     * The constraint minimum value
-     */
-    interestCommission?: number
-    /**
-     * The key of the deposit account used by the guarantor (populated when the guaranty type is GUARANTOR). It can be null.
-     */
-    depositAccountKey?: string
-    /**
-     * The name of a value the client guarantees with (populated when the guaranty type is ASSET)
-     */
-    assetName?: string
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * Investor fund unique identifier. All versions of an investor fund will have same id.
-     */
-    id?: string
-    /**
-     * The key of the client/group used as the guarantor.
-     */
-    guarantorKey: string
-    /**
-     * The type of the guarantor (client/group)
-     */
-    guarantorType: 'CLIENT' | 'GROUP'
-    /**
-     * Percentage of loan shares this investor owns
-     */
-    sharePercentage?: number
-}
-
-/**
- * The loan account balance details.
- */
-export interface Balances {
-    /**
-     * The interest from arrears paid, indicates total interest from arrears paid into the account.
-     */
-    interestFromArrearsPaid?: number
-    /**
-     * The principal due, indicates how much principal it's due at this moment.
-     */
-    principalDue?: number
-    /**
-     * Represents the total interest owed by the client (total interest applied for account minus interest paid).
-     */
-    interestBalance?: number
-    /**
-     * The sum of all the authorization hold amounts on this account.
-     */
-    holdBalance?: number
-    /**
-     * The principal paid, holds the value of the total paid into the account.
-     */
-    principalPaid?: number
-    /**
-     * The penalty due. Represents the total penalty amount due for the account.
-     */
-    penaltyDue?: number
-    /**
-     * The fees balance. Represents the total fees expected to be paid on this account at a given moment.
-     */
-    feesBalance?: number
-    /**
-     * The penalty balance. Represents the total penalty expected to be paid on this account at a given moment.
-     */
-    penaltyBalance?: number
-    /**
-     * The total redraw amount owned by the client, from now on.
-     */
-    redrawBalance?: number
-    /**
-     * The interest from arrears balance. Indicates interest from arrears owned by the client, from now on. (total interest from arrears accrued for account - interest from arrears paid).
-     */
-    interestFromArrearsBalance?: number
-    /**
-     * The total principal owned by the client, from now on (principal disbursed - principal paid).
-     */
-    principalBalance?: number
-    /**
-     * The interest due. Indicates how much interest it's due for the account at this moment.
-     */
-    interestDue?: number
-    /**
-     * The Penalty paid. Represents the total penalty amount paid for the account.
-     */
-    penaltyPaid?: number
-    /**
-     * The fees paid. Represents the total fees paid for the account.
-     */
-    feesPaid?: number
-    /**
-     * The interest from arrears due. Indicates how much interest from arrears it's due for the account at this moment.
-     */
-    interestFromArrearsDue?: number
-    /**
-     * The fees due. Representing the total fees due for the account.
-     */
-    feesDue?: number
-    /**
-     * The interest paid, indicates total interest paid into the account.
-     */
-    interestPaid?: number
-}
-
-/**
- * The penalty settings, holds all the fields regarding penalties
- */
-export interface PenaltySettings {
-    /**
-     * The last penalty calculation method, represents on what amount are the penalties calculated.
-     */
-    loanPenaltyCalculationMethod?: 'NONE' | 'OVERDUE_BALANCE' | 'OVERDUE_BALANCE_AND_INTEREST' | 'OUTSTANDING_PRINCIPAL'
-    /**
-     * The penalty rate, represents the rate (in percent) which is charged as a penalty.
-     */
-    penaltyRate?: number
-}
-
-/**
- * The principal payment account settings, holds the required information for the principal payment process of an account.
- */
-export interface PrincipalPaymentAccountSettings {
-    /**
-     * Boolean flag, if true, the interest will be included along with the principal in the repayment floor amount, for a revolving credit account
-     */
-    includeInterestInFloorAmount?: boolean
-    /**
-     * The method of total due payment for revolving credit
-     */
-    totalDuePayment?:
-        | 'FLAT'
-        | 'OUTSTANDING_PRINCIPAL_PERCENTAGE'
-        | 'PRINCIPAL_PERCENTAGE_LAST_DISB'
-        | 'TOTAL_BALANCE_PERCENTAGE'
-        | 'TOTAL_BALANCE_FLAT'
-        | 'TOTAL_PRINCIPAL_PERCENTAGE'
-    /**
-     * Fixed amount for being used for the repayments principal due.
+     * The amount of the custom fee.
      */
     amount?: number
     /**
-     * The minimum principal due amount a repayment made with this settings can have
+     * The encoded key of the custom predefined fee, auto generated, unique.
      */
-    principalFloorValue?: number
+    encodedKey?: string
     /**
-     * The method of principal payment for revolving credit.
-     */
-    principalPaymentMethod?:
-        | 'FLAT'
-        | 'OUTSTANDING_PRINCIPAL_PERCENTAGE'
-        | 'PRINCIPAL_PERCENTAGE_LAST_DISB'
-        | 'TOTAL_BALANCE_PERCENTAGE'
-        | 'TOTAL_BALANCE_FLAT'
-        | 'TOTAL_PRINCIPAL_PERCENTAGE'
-    /**
-     * Percentage of principal amount used for the repayments principal due.
+     * The percentage of the custom fee.
      */
     percentage?: number
     /**
-     * Boolean flag, if true, the fees will be included along with the principal in the repayment floor amount, for a revolving credit account
+     * The encoded key of the predefined fee
      */
-    includeFeesInFloorAmount?: boolean
-    /**
-     * The encoded key of the principal payment base settings, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The minimum total due amount a repayment made with this settings can have
-     */
-    totalDueAmountFloor?: number
-    /**
-     * The maximum principal due amount a repayment made with this settings can have
-     */
-    principalCeilingValue?: number
-}
-
-/**
- * Guarantor, holds information about a client guaranty entry. It can be defined based on another client which guarantees (including or not a savings account whether it is a client of the organization using Mambu or not) or based on a value the client holds (an asset)
- */
-export interface Guarantor {
-    /**
-     * The amount used by the client for the guaranty
-     */
-    amount: number
-    /**
-     * The key of the deposit account used by the guarantor (populated when the guaranty type is GUARANTOR). It can be null.
-     */
-    depositAccountKey?: string
-    /**
-     * The name of a value the client guarantees with (populated when the guaranty type is ASSET)
-     */
-    assetName?: string
-    /**
-     * The encoded key of the security, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The key of the client/group used as the guarantor.
-     */
-    guarantorKey: string
-    /**
-     * The type of the guarantor (client/group)
-     */
-    guarantorType: 'CLIENT' | 'GROUP'
-}
-
-/**
- * The account arrears settings, holds the required information for the arrears settings of an account.
- */
-export interface AccountArrearsSettings {
-    /**
-     * Defines monthly arrears tolerance day value.
-     */
-    monthlyToleranceDay?: number
-    /**
-     * The tolerance floor amount.
-     */
-    toleranceFloorAmount?: number
-    /**
-     * Shows whether the non working days are taken in consideration or not when applying penaltees/late fees or when setting an account into arrears
-     */
-    nonWorkingDaysMethod?: 'INCLUDED' | 'EXCLUDED'
-    /**
-     * Defines the arrears tolerance amount.
-     */
-    tolerancePercentageOfOutstandingPrincipal?: number
-    /**
-     * Defines the arrears tolerance period value.
-     */
-    tolerancePeriod?: number
-    /**
-     * The encoded key of the arrears base settings, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * Defines the tolerance calculation method
-     */
-    toleranceCalculationMethod?: 'ARREARS_TOLERANCE_PERIOD' | 'MONTHLY_ARREARS_TOLERANCE_DAY'
-    /**
-     * The arrears date calculation method.
-     */
-    dateCalculationMethod?:
-        | 'ACCOUNT_FIRST_WENT_TO_ARREARS'
-        | 'LAST_LATE_REPAYMENT'
-        | 'ACCOUNT_FIRST_BREACHED_MATERIALITY_THRESHOLD'
+    predefinedFeeEncodedKey?: string
 }
 
 /**
  * Represents information about a deposit account.
  */
 export interface DepositAccount {
+    /**
+     * The encoded key of the account holder, which is an individual client or group.
+     */
+    accountHolderKey: string
+    /**
+     * The account holder type.
+     */
+    accountHolderType: 'CLIENT' | 'GROUP'
     /**
      * The state of the deposit account.
      */
@@ -1473,43 +816,47 @@ export interface DepositAccount {
         | 'WITHDRAWN'
         | 'CLOSED_REJECTED'
     /**
-     * The migration event encoded key associated with this deposit account. If this account was imported, you can track which migration event it came from.
+     * The deposit account type and the product that it belongs to.
      */
-    migrationEventKey?: string
+    accountType?: 'CURRENT_ACCOUNT' | 'REGULAR_SAVINGS' | 'FIXED_DEPOSIT' | 'SAVINGS_PLAN' | 'INVESTOR_ACCOUNT'
+    accruedAmounts?: DepositAccountAccruedAmounts
     /**
-     * The notes or description attached to this object.
+     * The date when the deposit account was activated, in the organization's timezone and time format.
      */
-    notes?: string
+    activationDate?: string
     /**
-     * The date when the deposit account was set to In Arrears, or null if the account is not In Arrears. The date is in the organization's timezone and time format.
+     * The date when the deposit account was approved, in the organization's timezone and time format.
      */
-    lastSetToArrearsDate?: string
+    approvedDate?: string
     /**
      * The key of the branch that this deposit account is assigned to.
      */
     assignedBranchKey?: string
     /**
-     * The date when the overdraft interest was last reviewed, in the organization's timezone and time format.
+     * The key of the centre that this account is assigned to.
      */
-    lastOverdraftInterestReviewDate?: string
+    assignedCentreKey?: string
     /**
-     * The date when interest was last applied on the account, in the organization's timezone and time format.
+     * The key of the user that this deposit is assigned to.
      */
-    lastInterestStoredDate?: string
-    interestSettings?: DepositAccountInterestSettings
+    assignedUserKey?: string
     balances?: DepositAccountBalances
+    /**
+     * The date when the deposit account was closed, in UTC.
+     */
+    closedDate?: string
+    /**
+     * The date this deposit account was created, in UTC.
+     */
+    creationDate?: string
     /**
      * The key to the credit arrangement where this account is registered.
      */
     creditArrangementKey?: string
     /**
-     * The date when the account matures, for fixed or compulsory savings plans, in the organization's timezone and time format.
+     * The currency code.
      */
-    maturityDate?: string
-    /**
-     * The date when regular interest was last reviewed, in the organization's timezone and time format.
-     */
-    lastInterestReviewDate?: string
+    currencyCode?: string
     /**
      * The encoded key of the deposit account, which is auto-generated and unique.
      */
@@ -1518,158 +865,142 @@ export interface DepositAccount {
      * The ID of the deposit account, which can be generated and customized - but must be unique.
      */
     id?: string
-    overdraftSettings?: DepositAccountOverdraftSettings
+    interestSettings?: DepositAccountInterestSettings
+    internalControls?: DepositAccountInternalControls
     /**
      * The date when the account was last evaluated for interest calculations and maturity, in the organization's timezone and time format.
      */
     lastAccountAppraisalDate?: string
     /**
-     * The tax source where the account withholding taxes will be updated.
+     * The date when interest was last calculated for the account, in the organization's timezone and time format.
      */
-    withholdingTaxSourceKey?: string
+    lastInterestCalculationDate?: string
     /**
-     * The key of the user that this deposit is assigned to.
+     * The date when regular interest was last reviewed, in the organization's timezone and time format.
      */
-    assignedUserKey?: string
-    overdraftInterestSettings?: DepositAccountOverdraftInterestSettings
+    lastInterestReviewDate?: string
+    /**
+     * The date when interest was last applied on the account, in the organization's timezone and time format.
+     */
+    lastInterestStoredDate?: string
     /**
      * The last update date for the deposit account, in UTC.
      */
     lastModifiedDate?: string
     /**
-     * The deposit account type and the product that it belongs to.
+     * The date when the overdraft interest was last reviewed, in the organization's timezone and time format.
      */
-    accountType?: 'CURRENT_ACCOUNT' | 'REGULAR_SAVINGS' | 'FIXED_DEPOSIT' | 'SAVINGS_PLAN' | 'INVESTOR_ACCOUNT'
+    lastOverdraftInterestReviewDate?: string
+    /**
+     * The date when the deposit account was set to In Arrears, or null if the account is not In Arrears. The date is in the organization's timezone and time format.
+     */
+    lastSetToArrearsDate?: string
+    /**
+     * Lists all loan account keys on which the deposit account is used as the settlement account.
+     */
+    linkedSettlementAccountKeys?: string[]
     /**
      * The date when the deposit account was locked, in the organization's timezone and time format.
      */
     lockedDate?: string
     /**
-     * The date this deposit account was created, in UTC.
+     * The date when the account matures, for fixed or compulsory savings plans, in the organization's timezone and time format.
      */
-    creationDate?: string
+    maturityDate?: string
     /**
-     * The date when interest was last calculated for the account, in the organization's timezone and time format.
+     * The migration event encoded key associated with this deposit account. If this account was imported, you can track which migration event it came from.
      */
-    lastInterestCalculationDate?: string
-    /**
-     * The key of the centre that this account is assigned to.
-     */
-    assignedCentreKey?: string
-    /**
-     * The date when the deposit account was approved, in the organization's timezone and time format.
-     */
-    approvedDate?: string
-    /**
-     * The date when the deposit account was closed, in UTC.
-     */
-    closedDate?: string
-    accruedAmounts?: DepositAccountAccruedAmounts
+    migrationEventKey?: string
     /**
      * The deposit account name.
      */
     name: string
     /**
-     * The encoded key of the account holder, which is an individual client or group.
+     * The notes or description attached to this object.
      */
-    accountHolderKey: string
+    notes?: string
+    overdraftInterestSettings?: DepositAccountOverdraftInterestSettings
+    overdraftSettings?: DepositAccountOverdraftSettings
     /**
      * The key to the product type that this account is based on.
      */
     productTypeKey: string
     /**
-     * The date when the deposit account was activated, in the organization's timezone and time format.
+     * The tax source where the account withholding taxes will be updated.
      */
-    activationDate?: string
-    internalControls?: DepositAccountInternalControls
-    /**
-     * The currency code.
-     */
-    currencyCode?: string
-    /**
-     * The account holder type.
-     */
-    accountHolderType: 'CLIENT' | 'GROUP'
-    /**
-     * Lists all loan account keys on which the deposit account is used as the settlement account.
-     */
-    linkedSettlementAccountKeys?: string[]
+    withholdingTaxSourceKey?: string
 }
 
 /**
- * Represents information about the deposit account's interest settings.
+ * Represents information about the accrued amounts of deposit accounts.
  */
-export interface DepositAccountInterestSettings {
-    interestRateSettings?: DepositAccountInterestRateSettings
-    interestPaymentSettings?: DepositAccountInterestPaymentSettings
+export interface DepositAccountAccruedAmounts {
+    /**
+     * The amount of positive interest that has been accrued in the account.
+     */
+    interestAccrued?: number
+    /**
+     * The amount of negative interest that has been accrued in the account.
+     */
+    negativeInterestAccrued?: number
+    /**
+     * The amount of overdraft interest that has been accrued in the account.
+     */
+    overdraftInterestAccrued?: number
+    /**
+     * The amount of technical overdraft interest that has been accrued in the account.
+     */
+    technicalOverdraftInterestAccrued?: number
 }
 
 /**
- * Represents information about the interest rate settings for deposit accounts.
+ * Represents information about the balances of a deposit account.
  */
-export interface DepositAccountInterestRateSettings {
+export interface DepositAccountBalances {
     /**
-     * The interest rate for the deposit account.
+     * The current available balance for deposit transactions.
      */
-    interestRate?: number
+    availableBalance?: number
     /**
-     * The index interest rate that is used to calculate the interest rate that is applied to accounts.
+     * The sum of all the blocked amounts on an account.
      */
-    interestSpread?: number
+    blockedBalance?: number
     /**
-     * The time unit to use to determine the frequency of interest rate reviews.
+     * The amount of fees due to be paid on this account.
      */
-    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
+    feesDue?: number
     /**
-     * The interest calculation method used.
+     * The sum of all the authorization hold amounts that have `CRDT` as the `creditDebitIndicator` for an account.
      */
-    interestRateSource?: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE'
+    forwardAvailableBalance?: number
     /**
-     * The number of times to review the interest rate in a time period.
+     * The sum of all the authorization hold amounts that have `DBIT` as the `creditDebitIndicator` for an account.
      */
-    interestRateReviewCount?: number
+    holdBalance?: number
     /**
-     * The list of interest rate tiers, which hold the values to define how interest is calculated.
+     * The locked amount that is not available for withdrawal in the account. For more information, see [Deposit Account Overview Details](https://support.mambu.com/docs/deposit-account-overview-details).
      */
-    interestRateTiers?: DepositAccountInterestRateTier[]
+    lockedBalance?: number
     /**
-     * The interest charge frequency, which shows how often interest is charged on loan or deposit accounts.
+     * The overdraft amount that has been taken out in the account. For more information, see [Overdraft Products](https://support.mambu.com/docs/en/overdraft-products).
      */
-    interestChargeFrequency?: 'ANNUALIZED' | 'EVERY_MONTH' | 'EVERY_FOUR_WEEKS' | 'EVERY_WEEK' | 'EVERY_DAY' | 'EVERY_X_DAYS'
+    overdraftAmount?: number
     /**
-     * The encoded key for the set of interest settings, which is auto-generated and unique.
+     * The amount of interest due to be paid on an account as a result of an authorized overdraft.
      */
-    encodedKey?: string
+    overdraftInterestDue?: number
     /**
-     * The number of times to apply interest in a time period.
+     * The technical overdraft amount that has been taken out in the account. For more information, see [Technical Overdraft](https://support.mambu.com/docs/en/overdraft-products#technical-overdraft).
      */
-    interestChargeFrequencyCount?: number
+    technicalOverdraftAmount?: number
     /**
-     * The terms for how interest rate is determined when accruing for an account.
+     * The amount of interest due to be paid on an account as a result of a technical overdraft.
      */
-    interestRateTerms?: 'FIXED' | 'TIERED' | 'TIERED_PERIOD' | 'TIERED_BAND'
-}
-
-/**
- * Represents information about how interest rate is calculated.
- */
-export interface DepositAccountInterestRateTier {
+    technicalOverdraftInterestDue?: number
     /**
-     * The top-limit value for the account balance in order to determine if this tier is used or not
+     * The current balance of the account.
      */
-    endingBalance?: number
-    /**
-     * The rate used for computing the interest for an account which has the balance less than the ending balance
-     */
-    interestRate: number
-    /**
-     * The encoded key of the interest rate tier, auto generated, unique
-     */
-    encodedKey?: string
-    /**
-     * The end date for the account period. Used to determine if this interest rate tier is used or not.
-     */
-    endingDay?: number
+    totalBalance?: number
 }
 
 /**
@@ -1697,106 +1028,29 @@ export interface DepositAccountInterestPaymentSettings {
 }
 
 /**
- * Wrapper for month and day for instances where the year isn't needed
+ * Represents information about the interest rate settings for deposit accounts.
  */
-export interface MonthAndDay {
+export interface DepositAccountInterestRateSettings {
     /**
-     * The month of the year
+     * The encoded key for the set of interest settings, which is auto-generated and unique.
      */
-    month?: number
+    encodedKey?: string
     /**
-     * The day in the month
+     * The interest charge frequency, which shows how often interest is charged on loan or deposit accounts.
      */
-    day?: number
-}
-
-/**
- * Represents information about the balances of a deposit account.
- */
-export interface DepositAccountBalances {
+    interestChargeFrequency?: 'ANNUALIZED' | 'EVERY_MONTH' | 'EVERY_FOUR_WEEKS' | 'EVERY_WEEK' | 'EVERY_DAY' | 'EVERY_X_DAYS'
     /**
-     * The amount of interest due to be paid on an account as a result of an authorized overdraft.
+     * The number of times to apply interest in a time period.
      */
-    overdraftInterestDue?: number
-    /**
-     * The sum of all the authorization hold amounts that have `CRDT` as the `creditDebitIndicator` for an account.
-     */
-    forwardAvailableBalance?: number
-    /**
-     * The current balance of the account.
-     */
-    totalBalance?: number
-    /**
-     * The locked amount that is not available for withdrawal in the account. For more information, see [Deposit Account Overview Details](https://support.mambu.com/docs/deposit-account-overview-details).
-     */
-    lockedBalance?: number
-    /**
-     * The technical overdraft amount that has been taken out in the account. For more information, see [Technical Overdraft](https://support.mambu.com/docs/en/overdraft-products#technical-overdraft).
-     */
-    technicalOverdraftAmount?: number
-    /**
-     * The overdraft amount that has been taken out in the account. For more information, see [Overdraft Products](https://support.mambu.com/docs/en/overdraft-products).
-     */
-    overdraftAmount?: number
-    /**
-     * The sum of all the authorization hold amounts that have `DBIT` as the `creditDebitIndicator` for an account.
-     */
-    holdBalance?: number
-    /**
-     * The amount of interest due to be paid on an account as a result of a technical overdraft.
-     */
-    technicalOverdraftInterestDue?: number
-    /**
-     * The amount of fees due to be paid on this account.
-     */
-    feesDue?: number
-    /**
-     * The sum of all the blocked amounts on an account.
-     */
-    blockedBalance?: number
-    /**
-     * The current available balance for deposit transactions.
-     */
-    availableBalance?: number
-}
-
-/**
- * Represents information about a deposit account's overdraft settings.
- */
-export interface DepositAccountOverdraftSettings {
-    /**
-     * `TRUE` if this account supports overdraft, `FALSE` otherwise.
-     */
-    allowOverdraft?: boolean
-    /**
-     * The limit amount that may be taken out as overdraft, where null means 0.
-     */
-    overdraftLimit?: number
-    /**
-     * The expiration date of an overdraft.
-     */
-    overdraftExpiryDate?: string
-}
-
-/**
- * Represents information about a deposit account's overdraft interest settings.
- */
-export interface DepositAccountOverdraftInterestSettings {
-    interestRateSettings?: DepositAccountOverdraftInterestRateSettings
-}
-
-/**
- * Represents information about overdraft interest rate settings for deposit accounts.
- */
-export interface DepositAccountOverdraftInterestRateSettings {
+    interestChargeFrequencyCount?: number
     /**
      * The interest rate for the deposit account.
      */
     interestRate?: number
     /**
-     * The index interest rate that is used to calculate the interest rate that is applied to accounts.
+     * The number of times to review the interest rate in a time period.
      */
-    interestSpread?: number
+    interestRateReviewCount?: number
     /**
      * The time unit to use to determine the frequency of interest rate reviews.
      */
@@ -1806,51 +1060,47 @@ export interface DepositAccountOverdraftInterestRateSettings {
      */
     interestRateSource?: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE'
     /**
-     * The number of times to review the interest rate in a time period.
+     * The terms for how interest rate is determined when accruing for an account.
      */
-    interestRateReviewCount?: number
+    interestRateTerms?: 'FIXED' | 'TIERED' | 'TIERED_PERIOD' | 'TIERED_BAND'
     /**
      * The list of interest rate tiers, which hold the values to define how interest is calculated.
      */
     interestRateTiers?: DepositAccountInterestRateTier[]
     /**
-     * The interest charge frequency, which shows how often interest is charged on loan or deposit accounts.
+     * The index interest rate that is used to calculate the interest rate that is applied to accounts.
      */
-    interestChargeFrequency?: 'ANNUALIZED' | 'EVERY_MONTH' | 'EVERY_FOUR_WEEKS' | 'EVERY_WEEK' | 'EVERY_DAY' | 'EVERY_X_DAYS'
-    /**
-     * The encoded key for the set of interest settings, which is auto-generated and unique.
-     */
-    encodedKey?: string
-    /**
-     * The number of times to apply interest in a time period.
-     */
-    interestChargeFrequencyCount?: number
-    /**
-     * The terms for how interest rate is determined when accruing for an account.
-     */
-    interestRateTerms?: 'FIXED' | 'TIERED' | 'TIERED_PERIOD' | 'TIERED_BAND'
+    interestSpread?: number
 }
 
 /**
- * Represents information about the accrued amounts of deposit accounts.
+ * Represents information about how interest rate is calculated.
  */
-export interface DepositAccountAccruedAmounts {
+export interface DepositAccountInterestRateTier {
     /**
-     * The amount of overdraft interest that has been accrued in the account.
+     * The encoded key of the interest rate tier, auto generated, unique
      */
-    overdraftInterestAccrued?: number
+    encodedKey?: string
     /**
-     * The amount of positive interest that has been accrued in the account.
+     * The top-limit value for the account balance in order to determine if this tier is used or not
      */
-    interestAccrued?: number
+    endingBalance?: number
     /**
-     * The amount of technical overdraft interest that has been accrued in the account.
+     * The end date for the account period. Used to determine if this interest rate tier is used or not.
      */
-    technicalOverdraftInterestAccrued?: number
+    endingDay?: number
     /**
-     * The amount of negative interest that has been accrued in the account.
+     * The rate used for computing the interest for an account which has the balance less than the ending balance
      */
-    negativeInterestAccrued?: number
+    interestRate: number
+}
+
+/**
+ * Represents information about the deposit account's interest settings.
+ */
+export interface DepositAccountInterestSettings {
+    interestPaymentSettings?: DepositAccountInterestPaymentSettings
+    interestRateSettings?: DepositAccountInterestRateSettings
 }
 
 /**
@@ -1862,6 +1112,10 @@ export interface DepositAccountInternalControls {
      */
     maxDepositBalance?: number
     /**
+     * The maximum amount allowed for a withdrawal.
+     */
+    maxWithdrawalAmount?: number
+    /**
      * The recommended amount for a deposit.
      */
     recommendedDepositAmount?: number
@@ -1869,184 +1123,130 @@ export interface DepositAccountInternalControls {
      * The target amount for a deposit made towards a savings goal.
      */
     targetAmount?: number
-    /**
-     * The maximum amount allowed for a withdrawal.
-     */
-    maxWithdrawalAmount?: number
-}
-
-export interface RestError {
-    errorCode?: number
-    errorSource?: string
-    errorReason?: string
 }
 
 /**
- * The sorting criteria used for credit arrangement client directed query
+ * Represents information about overdraft interest rate settings for deposit accounts.
  */
-export interface CreditArrangementSortingCriteria {
+export interface DepositAccountOverdraftInterestRateSettings {
     /**
-     * Contains the actual sorting fields
-     */
-    field: 'creationDate' | 'startDate' | 'expireDate' | 'amount'
-    /**
-     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
-     */
-    order?: 'ASC' | 'DESC'
-}
-
-/**
- * Represents credit arrangment filter and search criteria.
- */
-export interface CreditArrangementFilterCriteria {
-    field: 'id' | 'startDate' | 'expireDate' | 'approvedDate' | 'state' | 'subState' | 'exposureLimitType' | string
-    /**
-     * The value to match the searching criteria.
-     */
-    value?: string
-    /**
-     * | **Operator**                | **Affected values**  | **Available for**                                                    |
-     * |---------------               |----------------------|----------------------------------------------------------------------|
-     * | EQUALS                       | ONE_VALUE            | BIG_DECIMAL,BOOLEAN,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY        |
-     * | EQUALS_CASE_SENSITIVE        | ONE_VALUE            | BIG_DECIMAL,BOOLEAN,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY 		  |
-     * | MORE_THAN                    | ONE_VALUE            | BIG_DECIMAL,NUMBER,MONEY                                             |
-     * | LESS_THAN                    | ONE_VALUE            | BIG_DECIMAL,NUMBER,MONEY                                             |
-     * | BETWEEN                      | TWO_VALUES           | BIG_DECIMAL,NUMBER,MONEY,DATE,DATE_TIME                              |
-     * | ON                           | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | AFTER                        | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | BEFORE                       | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | BEFORE_INCLUSIVE             | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | STARTS_WITH                  | ONE_VALUE            | STRING                                                               |
-     * | STARTS_WITH_CASE_SENSITIVE   | ONE_VALUE            | STRING                                                               |
-     * | IN                           | LIST                 | ENUM,KEY                                                             |
-     * | TODAY                        | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | THIS_WEEK                    | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | THIS_MONTH                   | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | THIS_YEAR                    | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | LAST_DAYS                    | ONE_VALUE            | NUMBER                                                               |
-     * | EMPTY                        | NO_VALUE             | BIG_DECIMAL,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY,DATE,DATE_TIME |
-     * | NOT_EMPTY                    | NO_VALUE             | BIG_DECIMAL,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY,DATE,DATE_TIME |
-     */
-    operator:
-        | 'EQUALS'
-        | 'EQUALS_CASE_SENSITIVE'
-        | 'DIFFERENT_THAN'
-        | 'MORE_THAN'
-        | 'LESS_THAN'
-        | 'BETWEEN'
-        | 'ON'
-        | 'AFTER'
-        | 'AFTER_INCLUSIVE'
-        | 'BEFORE'
-        | 'BEFORE_INCLUSIVE'
-        | 'STARTS_WITH'
-        | 'STARTS_WITH_CASE_SENSITIVE'
-        | 'IN'
-        | 'TODAY'
-        | 'THIS_WEEK'
-        | 'THIS_MONTH'
-        | 'THIS_YEAR'
-        | 'LAST_DAYS'
-        | 'EMPTY'
-        | 'NOT_EMPTY'
-    /**
-     * The second value to match the searching criteria, when the `BETWEEN` operator is used.
-     */
-    secondValue?: string
-    /**
-     * List of values when the `IN` operator is used.
-     */
-    values?: string[]
-}
-
-/**
- * Represents a single installment details structure.
- */
-export interface Installment {
-    penalty?: InstallmentAllocationElementTaxableAmount
-    /**
-     * The installment due date.
-     */
-    dueDate?: string
-    fee?: InstallmentFee
-    /**
-     * The installment repaid date.
-     */
-    repaidDate?: string
-    principal?: InstallmentAllocationElementAmount
-    /**
-     * The order number of an installment among all the installments generated for a loan. Loan installments are put in ascending order by due date. The order number only applies to the content of a particular JSON response therefore it is not unique.
-     */
-    number?: string
-    /**
-     * The installment last paid date.
-     */
-    lastPaidDate?: string
-    /**
-     * The parent account key of the installment.
-     */
-    parentAccountKey?: string
-    interest?: InstallmentAllocationElementTaxableAmount
-    /**
-     * The breakdown of the fee amounts that have been applied to the loan account.
-     */
-    feeDetails?: InstallmentFeeDetails[]
-    /**
-     * The encoded key of the installment, which is auto generated, and unique.
+     * The encoded key for the set of interest settings, which is auto-generated and unique.
      */
     encodedKey?: string
     /**
-     * The installment state.
+     * The interest charge frequency, which shows how often interest is charged on loan or deposit accounts.
      */
-    state?: 'PENDING' | 'LATE' | 'PAID' | 'PARTIALLY_PAID' | 'GRACE'
+    interestChargeFrequency?: 'ANNUALIZED' | 'EVERY_MONTH' | 'EVERY_FOUR_WEEKS' | 'EVERY_WEEK' | 'EVERY_DAY' | 'EVERY_X_DAYS'
     /**
-     * `TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.
+     * The number of times to apply interest in a time period.
      */
-    isPaymentHoliday?: boolean
+    interestChargeFrequencyCount?: number
+    /**
+     * The interest rate for the deposit account.
+     */
+    interestRate?: number
+    /**
+     * The number of times to review the interest rate in a time period.
+     */
+    interestRateReviewCount?: number
+    /**
+     * The time unit to use to determine the frequency of interest rate reviews.
+     */
+    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
+    /**
+     * The interest calculation method used.
+     */
+    interestRateSource?: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE'
+    /**
+     * The terms for how interest rate is determined when accruing for an account.
+     */
+    interestRateTerms?: 'FIXED' | 'TIERED' | 'TIERED_PERIOD' | 'TIERED_BAND'
+    /**
+     * The list of interest rate tiers, which hold the values to define how interest is calculated.
+     */
+    interestRateTiers?: DepositAccountInterestRateTier[]
+    /**
+     * The index interest rate that is used to calculate the interest rate that is applied to accounts.
+     */
+    interestSpread?: number
 }
 
 /**
- * Represents an installment allocation element taxable amount structure.
+ * Represents information about a deposit account's overdraft interest settings.
  */
-export interface InstallmentAllocationElementTaxableAmount {
-    amount?: Amount
-    tax?: Amount
+export interface DepositAccountOverdraftInterestSettings {
+    interestRateSettings?: DepositAccountOverdraftInterestRateSettings
 }
 
 /**
- * Represents a simple installment amount structure.
+ * Represents information about a deposit account's overdraft settings.
  */
-export interface Amount {
+export interface DepositAccountOverdraftSettings {
     /**
-     * The paid amount.
+     * `TRUE` if this account supports overdraft, `FALSE` otherwise.
      */
-    paid?: number
+    allowOverdraft?: boolean
     /**
-     * The due amount.
+     * The expiration date of an overdraft.
      */
-    due?: number
+    overdraftExpiryDate?: string
     /**
-     * The expected amount, which is sum of paid and due amounts.
+     * The limit amount that may be taken out as overdraft, where null means 0.
      */
-    expected?: number
+    overdraftLimit?: number
 }
 
 /**
- * Represents an installment fee structure.
+ * The the disbursement details it holds the information related to the disbursement details as disbursement date, first repayment date, disbursement fees.
  */
-export interface InstallmentFee {
-    amount?: FeeAmount
-    tax?: Amount
+export interface DisbursementDetails {
+    /**
+     * The activation date, the date when the disbursement actually took place.
+     */
+    disbursementDate?: string
+    /**
+     * The encoded key of the disbursement details, auto generated, unique
+     */
+    encodedKey?: string
+    /**
+     * The date of the expected disbursement.Stored as Organization Time.
+     */
+    expectedDisbursementDate?: string
+    /**
+     * List of fees that should be applied at the disbursement time.
+     */
+    fees?: CustomPredefinedFee[]
+    /**
+     * The date of the expected first repayment. Stored as Organization Time.
+     */
+    firstRepaymentDate?: string
+    transactionDetails?: LoanTransactionDetails
 }
+
+export interface ErrorResponse {
+    errors?: RestError[]
+}
+
+export const ErrorResponse = {
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    get schema() {
+        return ErrorResponse.validate.schema
+    },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
+} as const
 
 /**
  * Represents a fee amount.
  */
 export interface FeeAmount {
-    /**
-     * The paid amount.
-     */
-    paid?: number
     /**
      * The due amount.
      */
@@ -2059,6 +1259,99 @@ export interface FeeAmount {
      * The expected amount, which is the sum of unapplied fee and planned fee due amounts.
      */
     expectedUnapplied?: number
+    /**
+     * The paid amount.
+     */
+    paid?: number
+}
+
+export type GetAllResponse = CreditArrangement[]
+
+export const GetAllResponse = {
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    get schema() {
+        return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+} as const
+
+/**
+ * Guarantor, holds information about a client guaranty entry. It can be defined based on another client which guarantees (including or not a savings account whether it is a client of the organization using Mambu or not) or based on a value the client holds (an asset)
+ */
+export interface Guarantor {
+    /**
+     * The amount used by the client for the guaranty
+     */
+    amount: number
+    /**
+     * The name of a value the client guarantees with (populated when the guaranty type is ASSET)
+     */
+    assetName?: string
+    /**
+     * The key of the deposit account used by the guarantor (populated when the guaranty type is GUARANTOR). It can be null.
+     */
+    depositAccountKey?: string
+    /**
+     * The encoded key of the security, auto generated, unique.
+     */
+    encodedKey?: string
+    /**
+     * The key of the client/group used as the guarantor.
+     */
+    guarantorKey: string
+    /**
+     * The type of the guarantor (client/group)
+     */
+    guarantorType: 'CLIENT' | 'GROUP'
+}
+
+/**
+ * Represents a single installment details structure.
+ */
+export interface Installment {
+    /**
+     * The installment due date.
+     */
+    dueDate?: string
+    /**
+     * The encoded key of the installment, which is auto generated, and unique.
+     */
+    encodedKey?: string
+    fee?: InstallmentFee
+    /**
+     * The breakdown of the fee amounts that have been applied to the loan account.
+     */
+    feeDetails?: InstallmentFeeDetails[]
+    interest?: InstallmentAllocationElementTaxableAmount
+    /**
+     * `TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.
+     */
+    isPaymentHoliday?: boolean
+    /**
+     * The installment last paid date.
+     */
+    lastPaidDate?: string
+    /**
+     * The order number of an installment among all the installments generated for a loan. Loan installments are put in ascending order by due date. The order number only applies to the content of a particular JSON response therefore it is not unique.
+     */
+    number?: string
+    /**
+     * The parent account key of the installment.
+     */
+    parentAccountKey?: string
+    penalty?: InstallmentAllocationElementTaxableAmount
+    principal?: InstallmentAllocationElementAmount
+    /**
+     * The installment repaid date.
+     */
+    repaidDate?: string
+    /**
+     * The installment state.
+     */
+    state?: 'PENDING' | 'LATE' | 'PAID' | 'PARTIALLY_PAID' | 'GRACE'
 }
 
 /**
@@ -2069,15 +1362,26 @@ export interface InstallmentAllocationElementAmount {
 }
 
 /**
+ * Represents an installment allocation element taxable amount structure.
+ */
+export interface InstallmentAllocationElementTaxableAmount {
+    amount?: Amount
+    tax?: Amount
+}
+
+/**
+ * Represents an installment fee structure.
+ */
+export interface InstallmentFee {
+    amount?: FeeAmount
+    tax?: Amount
+}
+
+/**
  * Represents fee details for an installment.
  */
 export interface InstallmentFeeDetails {
-    /**
-     * The name of the fee
-     */
-    name?: string
     amount?: AmountWithReduced
-    tax?: AmountWithReduced
     /**
      * The encoded key of the predefined fee, auto generated, unique
      */
@@ -2086,34 +1390,428 @@ export interface InstallmentFeeDetails {
      * The id of the fee, provided by the client
      */
     id?: string
+    /**
+     * The name of the fee
+     */
+    name?: string
+    tax?: AmountWithReduced
 }
 
 /**
- * Represents a simple installment amount structure.
+ * The interest settings, holds all the properties regarding interests for the loan account.
  */
-export interface AmountWithReduced {
+export interface InterestSettings {
     /**
-     * The paid amount.
+     * Adjustable interest rates settings for loan account
      */
-    paid?: number
+    accountInterestRateSettings?: AccountInterestRateSettings[]
     /**
-     * The reduced amount.
+     * The accrue interest after maturity. If the product support this option, specify if the interest should be accrued after the account maturity date.
      */
-    reduced?: number
+    accrueInterestAfterMaturity?: boolean
     /**
-     * The due amount.
+     * Indicates whether late interest is accrued for this loan account
      */
-    due?: number
+    accrueLateInterest?: boolean
     /**
-     * The expected amount, which is sum of paid and due amounts.
+     * The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.
      */
-    expected?: number
+    interestApplicationMethod?: 'AFTER_DISBURSEMENT' | 'REPAYMENT_DUE_DATE'
+    /**
+     * The interest balance calculation method. Represents the option which determines the way the balance for the account's interest is computed.
+     */
+    interestBalanceCalculationMethod?: 'ONLY_PRINCIPAL' | 'PRINCIPAL_AND_INTEREST'
+    /**
+     * The interest calculation method. Holds the type of interest calculation method.
+     */
+    interestCalculationMethod?: 'FLAT' | 'DECLINING_BALANCE' | 'DECLINING_BALANCE_DISCOUNTED'
+    /**
+     * The interest change frequency. Holds the possible values for how often is interest charged on loan or deposit accounts
+     */
+    interestChargeFrequency?: 'ANNUALIZED' | 'EVERY_MONTH' | 'EVERY_FOUR_WEEKS' | 'EVERY_WEEK' | 'EVERY_DAY' | 'EVERY_X_DAYS'
+    /**
+     * The interest rate. Represents the interest rate for the loan account. The interest on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.
+     */
+    interestRate?: number
+    /**
+     * Interest rate update frequency unit count.
+     */
+    interestRateReviewCount?: number
+    /**
+     * The interest rate review unit. Defines the interest rate update frequency measurement unit.
+     */
+    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
+    /**
+     * The interest rate source. Represents the interest calculation method: fixed or (interest spread + active organization index interest rate)
+     */
+    interestRateSource?: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE'
+    /**
+     * Interest to be added to active organization index interest rate in order to find out actual interest rate
+     */
+    interestSpread?: number
+    /**
+     * The possible values for how we compute and apply the interest
+     */
+    interestType?: 'SIMPLE_INTEREST' | 'CAPITALIZED_INTEREST' | 'COMPOUNDING_INTEREST'
+}
+
+/**
+ * Contains the details about an investor fund including fields like encoded key, guarantor type, amount and guarantor key
+ */
+export interface InvestorFund {
+    /**
+     * The amount used by the client for the guaranty
+     */
+    amount: number
+    /**
+     * The name of a value the client guarantees with (populated when the guaranty type is ASSET)
+     */
+    assetName?: string
+    /**
+     * The key of the deposit account used by the guarantor (populated when the guaranty type is GUARANTOR). It can be null.
+     */
+    depositAccountKey?: string
+    /**
+     * The encoded key of the entity, generated, globally unique
+     */
+    encodedKey?: string
+    /**
+     * The key of the client/group used as the guarantor.
+     */
+    guarantorKey: string
+    /**
+     * The type of the guarantor (client/group)
+     */
+    guarantorType: 'CLIENT' | 'GROUP'
+    /**
+     * Investor fund unique identifier. All versions of an investor fund will have same id.
+     */
+    id?: string
+    /**
+     * The constraint minimum value
+     */
+    interestCommission?: number
+    /**
+     * Percentage of loan shares this investor owns
+     */
+    sharePercentage?: number
+}
+
+/**
+ * Represents a loan account. A loan account defines the amount that your organization lends to a client. The terms and conditions of a loan account are defined by a loan product. In a loan account, Mambu stores all the information related to disbursements, repayments, interest rates, and withdrawals.
+ */
+export interface LoanAccount {
+    accountArrearsSettings?: AccountArrearsSettings
+    /**
+     * The encoded key of the account holder.
+     */
+    accountHolderKey: string
+    /**
+     * The type of the account holder.
+     */
+    accountHolderType: 'CLIENT' | 'GROUP'
+    /**
+     * The state of the loan account.
+     */
+    accountState?: 'PARTIAL_APPLICATION' | 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'ACTIVE_IN_ARREARS' | 'CLOSED'
+    /**
+     * A second state for the loan account. Beside the account state, a second substate is sometimes necessary to provide more information about the exact lifecycle state of a loan account.For example, even if the account state of a loan account is `ACTIVE`, it can also have a substate of `LOCKED`.
+     */
+    accountSubState?:
+        | 'PARTIALLY_DISBURSED'
+        | 'LOCKED'
+        | 'LOCKED_CAPPING'
+        | 'REFINANCED'
+        | 'RESCHEDULED'
+        | 'WITHDRAWN'
+        | 'REPAID'
+        | 'REJECTED'
+        | 'WRITTEN_OFF'
+        | 'TERMINATED'
+    /**
+     * The amount of interest that has been accrued in the loan account.
+     */
+    accruedInterest?: number
+    /**
+     * The accrued penalty, represents the amount of penalty that has been accrued in the loan account.
+     */
+    accruedPenalty?: number
+    /**
+     * The encoded key of the transaction that activated the loan account.
+     */
+    activationTransactionKey?: string
+    /**
+     * DEPRECATED - Will always be false.
+     */
+    allowOffset?: boolean
+    /**
+     * The date the loan account was approved.
+     */
+    approvedDate?: string
+    /**
+     * The arrears tolerance (period or day of month) depending on the product settings.
+     */
+    arrearsTolerancePeriod?: number
+    /**
+     * The list of assets associated with the current loan account.
+     */
+    assets?: Asset[]
+    /**
+     * The key of the branch this loan account is assigned to. The branch is set to unassigned if no branch field is set.
+     */
+    assignedBranchKey?: string
+    /**
+     * The key of the centre this account is assigned to.
+     */
+    assignedCentreKey?: string
+    /**
+     * The key of the user this loan account is assigned to.
+     */
+    assignedUserKey?: string
+    balances?: Balances
+    /**
+     * The date the loan was closed.
+     */
+    closedDate?: string
+    /**
+     * The date the loan account was created.
+     */
+    creationDate?: string
+    /**
+     * The key to the line of credit where this account is registered to.
+     */
+    creditArrangementKey?: string
+    currency?: Currency
+    /**
+     * The number of days the loan account is in arrears.
+     */
+    daysInArrears?: number
+    /**
+     * The number of days a repayment for the loan account is late.
+     */
+    daysLate?: number
+    disbursementDetails?: DisbursementDetails
+    /**
+     * The encoded key of the loan account, it is auto generated, and must be unique.
+     */
+    encodedKey?: string
+    /**
+     * The list of funds associated with the loan account.
+     */
+    fundingSources?: InvestorFund[]
+    /**
+     * Shows whether the repayment transactions with entry date set in the future are allowed or not for this loan account.
+     */
+    futurePaymentsAcceptance?: 'NO_FUTURE_PAYMENTS' | 'ACCEPT_FUTURE_PAYMENTS' | 'ACCEPT_OVERPAYMENTS'
+    /**
+     * The list of guarantees associated with the loan account.
+     */
+    guarantors?: Guarantor[]
+    /**
+     * The ID of the loan account, it can be generated and customized, and must be unique.
+     */
+    id?: string
+    /**
+     * The interest that is accrued in the current billing cycle.
+     */
+    interestAccruedInBillingCycle?: number
+    /**
+     * The value of the interest booked by the organization from the accounts funded by investors. Null if the funds are not enabled.
+     */
+    interestCommission?: number
+    /**
+     * The amount of interest from arrears that has been accrued in the loan account.
+     */
+    interestFromArrearsAccrued?: number
+    interestSettings?: InterestSettings
+    /**
+     * The date the loan account has last been evaluated for interest, principal, fees, and penalties calculations expressed in the organization time format and time zone.
+     */
+    lastAccountAppraisalDate?: string
+    /**
+     * The date of the last time the loan account had interest applied (stored to interest balance), expressed in the organization time format and time zone.
+     */
+    lastInterestAppliedDate?: string
+    /**
+     * The date the interest was reviewed last time, stored in the organization time format and time zone.
+     */
+    lastInterestReviewDate?: string
+    /**
+     * The date when the loan account was set for the last time in the `LOCKED` state expressed in the organization time format and time zone. If null, the account is not locked anymore.
+     */
+    lastLockedDate?: string
+    /**
+     * The last date the loan was updated.
+     */
+    lastModifiedDate?: string
+    /**
+     * The date when the loan account was set to last standing or null; if never set, it is expressed in your organization time format and time zone.
+     */
+    lastSetToArrearsDate?: string
+    /**
+     * The date the tax rate on the loan account was last checked, expressed in the organization time format and time zone.
+     */
+    lastTaxRateReviewDate?: string
+    /**
+     * The overdue payments recalculation method inherited from the loan product on which this loan account is based.
+     */
+    latePaymentsRecalculationMethod?: 'OVERDUE_INSTALLMENTS_INCREASE' | 'LAST_INSTALLMENT_INCREASE'
+    /**
+     * The loan amount.
+     */
+    loanAmount: number
+    /**
+     * The name of the loan account.
+     */
+    loanName?: string
+    /**
+     * The locked account total due type.
+     */
+    lockedAccountTotalDueType?: 'BALANCE_AMOUNT' | 'DUE_AMOUNT_ON_LATE_INSTALLMENTS'
+    /**
+     * A list with operations which are locked when the account is in the AccountState.LOCKED substate.
+     */
+    lockedOperations?: ('APPLY_INTEREST' | 'APPLY_FEES' | 'APPLY_PENALTIES')[]
+    /**
+     * The migration event encoded key associated with this loan account. If this account was imported, track which 'migration event' they came from.
+     */
+    migrationEventKey?: string
+    /**
+     * Adjust the interest for the first repayment when the first repayment period is different than the repayment frequency
+     */
+    modifyInterestForFirstInstallment?: boolean
+    /**
+     * The notes about this loan account.
+     */
+    notes?: string
+    /**
+     * The key of the original rescheduled or refinanced loan account.
+     */
+    originalAccountKey?: string
+    /**
+     * The amount of interest that has been accrued during payment holidays in the loan account.
+     */
+    paymentHolidaysAccruedInterest?: number
+    /**
+     * The interest payment method that determines whether the payments are made horizontally (on the repayments) or vertically (on the loan account).
+     */
+    paymentMethod?: 'HORIZONTAL' | 'VERTICAL'
+    penaltySettings?: PenaltySettings
+    /**
+     * The list with manual fees planned on the installments of the loan account.
+     */
+    plannedInstallmentFees?: PlannedInstallmentFee[]
+    prepaymentSettings?: PrepaymentSettings
+    principalPaymentSettings?: PrincipalPaymentAccountSettings
+    /**
+     * The key for the type of loan product that this loan account is based on.
+     */
+    productTypeKey: string
+    redrawSettings?: LoanAccountRedrawSettings
+    /**
+     * The key pointing to where this loan account was rescheduled or refinanced to. This value is only not null if rescheduled.
+     */
+    rescheduledAccountKey?: string
+    scheduleSettings: ScheduleSettings
+    /**
+     * The encoded key of the settlement account.
+     */
+    settlementAccountKey?: string
+    /**
+     * The tax rate.
+     */
+    taxRate?: number
+    /**
+     * The date this loan account was terminated.
+     */
+    terminationDate?: string
+    /**
+     * The list of disbursement tranches available for the loan account.
+     */
+    tranches?: LoanTranche[]
+}
+
+/**
+ * Represents the redraw settings for a loan account.
+ */
+export interface LoanAccountRedrawSettings {
+    /**
+     * `TRUE` if withdrawing amounts that reduce the next due instalment repayment is restricted, `FALSE` otherwise.
+     */
+    restrictNextDueWithdrawal: boolean
+}
+
+/**
+ * In some cases organizations may approve loans but not disburse the full amount initially. They would like to spread the disbursement (and risk) over time. Likewise for the client, they may not need the full loan amount up front. They may want to have a loan to buy some equipment for their business but will make one purchase today and another purchase in a few months.  In these cases, they don't need the full amount and wouldn't want to pay interest on cash they don't need yet. A solution for this matter is the usage of disbursement in tranches. This class holds the information required for one of this tranche.
+ */
+export interface LoanTranche {
+    /**
+     * The amount this tranche has available for disburse
+     */
+    amount: number
+    disbursementDetails?: TrancheDisbursementDetails
+    /**
+     * The encoded key of the transaction details , auto generated, unique.
+     */
+    encodedKey?: string
+    /**
+     * Fees that are associated with this tranche
+     */
+    fees?: CustomPredefinedFee[]
+    /**
+     * Index indicating the tranche number
+     */
+    trancheNumber?: number
+}
+
+/**
+ * Represents the loan transaction details.
+ */
+export interface LoanTransactionDetails {
+    /**
+     * The encoded key of the entity, generated, globally unique
+     */
+    encodedKey?: string
+    /**
+     * Whether the transaction was transferred between loans or deposit accounts
+     */
+    internalTransfer?: boolean
+    /**
+     * In case of a transaction to a deposit account this represent the deposit account key to which the transaction was made.
+     */
+    targetDepositAccountKey?: string
+    /**
+     * The ID of the transaction channel associated with the transaction details.
+     */
+    transactionChannelId?: string
+    /**
+     * The encoded key of the transaction channel associated with the transaction details.
+     */
+    transactionChannelKey?: string
+}
+
+/**
+ * Wrapper for month and day for instances where the year isn't needed
+ */
+export interface MonthAndDay {
+    /**
+     * The day in the month
+     */
+    day?: number
+    /**
+     * The month of the year
+     */
+    month?: number
 }
 
 /**
  * A single change that needs to be made to a resource
  */
 export interface PatchOperation {
+    /**
+     * The field from where a value should be moved, when using move
+     */
+    from?: string
     /**
      * The change to perform
      */
@@ -2123,13 +1821,315 @@ export interface PatchOperation {
      */
     path: string
     /**
-     * The field from where a value should be moved, when using move
-     */
-    from?: string
-    /**
      * The value of the field, can be null
      */
     value?: {
         [k: string]: unknown | undefined
     }
+}
+
+export type PatchRequest = PatchOperation[]
+
+export const PatchRequest = {
+    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
+    get schema() {
+        return PatchRequest.validate.schema
+    },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!PatchRequest.validate(o)) {
+            throw new ValidationError(PatchRequest.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * The penalty settings, holds all the fields regarding penalties
+ */
+export interface PenaltySettings {
+    /**
+     * The last penalty calculation method, represents on what amount are the penalties calculated.
+     */
+    loanPenaltyCalculationMethod?: 'NONE' | 'OVERDUE_BALANCE' | 'OVERDUE_BALANCE_AND_INTEREST' | 'OUTSTANDING_PRINCIPAL'
+    /**
+     * The penalty rate, represents the rate (in percent) which is charged as a penalty.
+     */
+    penaltyRate?: number
+}
+
+/**
+ * For fixed term loans there is the possibility to define a payment plan. A payment plan consists of multiple periodic payments. This class holds information about a periodic payment.
+ */
+export interface PeriodicPayment {
+    /**
+     * The PMT value used in periodic payment
+     */
+    amount: number
+    /**
+     * The encoded key of the periodic payment, auto generated, unique.
+     */
+    encodedKey?: string
+    /**
+     * The installment's position up to which the PMT will be used
+     */
+    toInstallment: number
+}
+
+/**
+ * The planned fee details holds the information related to the installment key, predefined fee key and amount
+ */
+export interface PlannedInstallmentFee {
+    /**
+     * The amount of the planned fee.
+     */
+    amount?: number
+    /**
+     * The date when a planned fee should be applied, overriding installment's due date. It should match the interval of the installment. If it belong to first installment, it should be between disbursement date and installment due date.
+     */
+    applyOnDate?: string
+    /**
+     * The encoded key of the planned installment fee, auto generated, unique.
+     */
+    encodedKey?: string
+    /**
+     * The encoded key of the installment on which the predefined fee is planned.
+     */
+    installmentKey?: string
+    /**
+     * The number of the installment on which the predefined fee is planned. It is used only in the case when fees are created at the same time with the loan account creation or during preview schedule, before account creation, otherwise this should be empty and installmentKey will be used to identify an installment.
+     */
+    installmentNumber?: number
+    /**
+     * The encoded key of the predefined fee which is planned.
+     */
+    predefinedFeeKey: string
+}
+
+/**
+ * The prepayment settings, holds all prepayment properties.
+ */
+export interface PrepaymentSettings {
+    /**
+     * Apply interest on prepayment method copied from loan product on which this account is based.
+     */
+    applyInterestOnPrepaymentMethod?: 'AUTOMATIC' | 'MANUAL'
+    /**
+     * The elements recalculation method, indicates how the declining balance with equal installments repayments are recalculated.
+     */
+    elementsRecalculationMethod?: 'PRINCIPAL_EXPECTED_FIXED' | 'TOTAL_EXPECTED_FIXED'
+    /**
+     * Prepayment recalculation method copied from the loan product on which this account is based.
+     */
+    prepaymentRecalculationMethod?:
+        | 'NO_RECALCULATION'
+        | 'RESCHEDULE_REMAINING_REPAYMENTS'
+        | 'RECALCULATE_SCHEDULE_KEEP_SAME_NUMBER_OF_TERMS'
+        | 'RECALCULATE_SCHEDULE_KEEP_SAME_PRINCIPAL_AMOUNT'
+        | 'RECALCULATE_SCHEDULE_KEEP_SAME_TOTAL_REPAYMENT_AMOUNT'
+        | 'REDUCE_AMOUNT_PER_INSTALLMENT'
+        | 'REDUCE_NUMBER_OF_INSTALLMENTS'
+        | 'REDUCE_NUMBER_OF_INSTALLMENTS_NEW'
+    /**
+     * Installment status for the case when principal is paid off (copied from loan product).
+     */
+    principalPaidInstallmentStatus?: 'PARTIALLY_PAID' | 'PAID' | 'ORIGINAL_TOTAL_EXPECTED_PAID'
+}
+
+/**
+ * The principal payment account settings, holds the required information for the principal payment process of an account.
+ */
+export interface PrincipalPaymentAccountSettings {
+    /**
+     * Fixed amount for being used for the repayments principal due.
+     */
+    amount?: number
+    /**
+     * The encoded key of the principal payment base settings, auto generated, unique.
+     */
+    encodedKey?: string
+    /**
+     * Boolean flag, if true, the fees will be included along with the principal in the repayment floor amount, for a revolving credit account
+     */
+    includeFeesInFloorAmount?: boolean
+    /**
+     * Boolean flag, if true, the interest will be included along with the principal in the repayment floor amount, for a revolving credit account
+     */
+    includeInterestInFloorAmount?: boolean
+    /**
+     * Percentage of principal amount used for the repayments principal due.
+     */
+    percentage?: number
+    /**
+     * The maximum principal due amount a repayment made with this settings can have
+     */
+    principalCeilingValue?: number
+    /**
+     * The minimum principal due amount a repayment made with this settings can have
+     */
+    principalFloorValue?: number
+    /**
+     * The method of principal payment for revolving credit.
+     */
+    principalPaymentMethod?:
+        | 'FLAT'
+        | 'OUTSTANDING_PRINCIPAL_PERCENTAGE'
+        | 'PRINCIPAL_PERCENTAGE_LAST_DISB'
+        | 'TOTAL_BALANCE_PERCENTAGE'
+        | 'TOTAL_BALANCE_FLAT'
+        | 'TOTAL_PRINCIPAL_PERCENTAGE'
+    /**
+     * The minimum total due amount a repayment made with this settings can have
+     */
+    totalDueAmountFloor?: number
+    /**
+     * The method of total due payment for revolving credit
+     */
+    totalDuePayment?:
+        | 'FLAT'
+        | 'OUTSTANDING_PRINCIPAL_PERCENTAGE'
+        | 'PRINCIPAL_PERCENTAGE_LAST_DISB'
+        | 'TOTAL_BALANCE_PERCENTAGE'
+        | 'TOTAL_BALANCE_FLAT'
+        | 'TOTAL_PRINCIPAL_PERCENTAGE'
+}
+
+/**
+ * Represents the account to remove from the credit arrangement.
+ */
+export interface RemoveCreditArrangementAccountInput {
+    /**
+     * The encoded key of the account.
+     */
+    accountId: string
+    /**
+     * The type of the account.
+     */
+    accountType: 'LOAN' | 'DEPOSIT'
+}
+
+export const RemoveCreditArrangementAccountInput = {
+    validate: (await import('./schemas/remove-credit-arrangement-account-input.schema.js'))
+        .validate as ValidateFunction<RemoveCreditArrangementAccountInput>,
+    get schema() {
+        return RemoveCreditArrangementAccountInput.validate.schema
+    },
+    get errors() {
+        return RemoveCreditArrangementAccountInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is RemoveCreditArrangementAccountInput => RemoveCreditArrangementAccountInput.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!RemoveCreditArrangementAccountInput.validate(o)) {
+            throw new ValidationError(RemoveCreditArrangementAccountInput.errors ?? [])
+        }
+    },
+} as const
+
+export interface RestError {
+    errorCode?: number
+    errorReason?: string
+    errorSource?: string
+}
+
+/**
+ * The number of previewed instalments for an account
+ */
+export interface RevolvingAccountSettings {
+    /**
+     * The number of previewed instalments
+     */
+    numberOfPreviewedInstalments?: number
+}
+
+/**
+ * The schedule settings, holds all schedule properties.
+ */
+export interface ScheduleSettings {
+    billingCycle?: BillingCycleDays
+    /**
+     * The default first repayment due date offset, indicates how many days the first repayment due date should be extended(all other due dates from the schedule are relative to first repayment due date - they will also be affected by the offset)
+     */
+    defaultFirstRepaymentDueDateOffset?: number
+    /**
+     * Specifies the days of the month when the repayment due dates should be. Only available if the Repayment Methodology is FIXED_DAYS_OF_MONTH.
+     */
+    fixedDaysOfMonth?: number[]
+    /**
+     * The grace period. Represents the grace period for loan repayment - in number of installments.
+     */
+    gracePeriod: number
+    /**
+     * The grace period type. Representing the type of grace period which is possible for a loan account.
+     */
+    gracePeriodType?: 'NONE' | 'PAY_INTEREST_ONLY' | 'INTEREST_FORGIVENESS'
+    /**
+     * Flag used when the repayments schedule for the current account was determined by the user, by editing the due dates or the principal due
+     */
+    hasCustomSchedule?: boolean
+    /**
+     * A list of periodic payments for the current loan account.
+     */
+    paymentPlan?: PeriodicPayment[]
+    /**
+     * The periodic payment amount for the accounts which have balloon payments or Reduce Number of Installments and Optimized Payments
+     */
+    periodicPayment?: number
+    previewSchedule?: RevolvingAccountSettings
+    /**
+     * The principal repayment interval. Indicates the interval of repayments that the principal has to be paid.
+     */
+    principalRepaymentInterval?: number
+    /**
+     * The repayment installments. Represents how many installments are required to pay back the loan.
+     */
+    repaymentInstallments?: number
+    /**
+     * The repayment period count. Represents how often the loan is to be repaid: stored based on the type repayment option.
+     */
+    repaymentPeriodCount?: number
+    /**
+     * The repayment period unit. Represents the frequency of loan repayment.
+     */
+    repaymentPeriodUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS'
+    /**
+     * The repayment schedule method. Represents the method that determines whether the schedule will be fixed all over the loan account's life cycle or will be dynamically recomputed when required.
+     */
+    repaymentScheduleMethod?: 'NONE' | 'FIXED' | 'DYNAMIC'
+    /**
+     * The schedule due dates method. Represents the methodology used by this account to compute the due dates of the repayments.
+     */
+    scheduleDueDatesMethod?: 'INTERVAL' | 'FIXED_DAYS_OF_MONTH'
+    /**
+     * The short handling method. Determines how to handle the short months, if they select a fixed day of month > 28. Will be null if no such date is selected and also for the Interval methodology. Only available if the Repayment Methodology is FIXED_DAYS_OF_MONTH.
+     */
+    shortMonthHandlingMethod?: 'LAST_DAY_IN_MONTH' | 'FIRST_DAY_OF_NEXT_MONTH'
+}
+
+export type SearchResponse = CreditArrangement[]
+
+export const SearchResponse = {
+    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
+    get schema() {
+        return SearchResponse.validate.schema
+    },
+    get errors() {
+        return SearchResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
+} as const
+
+/**
+ * The disbursement details regarding a loan tranche.
+ */
+export interface TrancheDisbursementDetails {
+    /**
+     * The key of the disbursement transaction logged when this tranche was disbursed. This field will be null until the tranche disbursement
+     */
+    disbursementTransactionKey?: string
+    /**
+     * The date when this tranche is supposed to be disbursed (as Organization Time)
+     */
+    expectedDisbursementDate?: string
 }

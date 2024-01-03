@@ -43,11 +43,15 @@ export class MambuCustomFieldsConfiguration {
     }
 
     /**
-     * Get custom field definitions configuration template
+     * Get custom field definitions configuration
      */
-    public async getTemplate({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
+    public async get({
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: { query?: { availableFor?: string }; auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
-            this.buildClient(auth).get(`configuration/customfields/template.yaml`, {
+            this.buildClient(auth).get(`configuration/customfields.yaml`, {
+                searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+yaml' },
                 responseType: 'text',
             }),
@@ -60,15 +64,11 @@ export class MambuCustomFieldsConfiguration {
     }
 
     /**
-     * Get custom field definitions configuration
+     * Get custom field definitions configuration template
      */
-    public async get({
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: { query?: { availableFor?: string }; auth?: string[][] | string[] } = {}) {
+    public async getTemplate({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
-            this.buildClient(auth).get(`configuration/customfields.yaml`, {
-                searchParams: query ?? {},
+            this.buildClient(auth).get(`configuration/customfields/template.yaml`, {
                 headers: { Accept: 'application/vnd.mambu.v2+yaml' },
                 responseType: 'text',
             }),

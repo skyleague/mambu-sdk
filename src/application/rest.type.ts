@@ -46,6 +46,6 @@ export const ErrorResponse = {
 
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

@@ -7,1053 +7,17 @@ import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
 /**
- * Represents the filtering and sorting criteria when searching loan transactions.
+ * Contains the details for the spread of the adjusted amount over the installments
  */
-export interface LoanTransactionSearchCriteria {
-    sortingCriteria?: LoanTransactionSortingCriteria
+export interface AdjustTransactionInstallmentDetailsDTO {
     /**
-     * The list of filtering criteria.
+     * The amount to be added on the fee/penalty due amounts (depending on transaction type), on the corresponding installment
      */
-    filterCriteria?: LoanTransactionFilterCriteria[]
-}
-
-export const LoanTransactionSearchCriteria = {
-    validate: (await import('./schemas/loan-transaction-search-criteria.schema.js'))
-        .validate as ValidateFunction<LoanTransactionSearchCriteria>,
-    get schema() {
-        return LoanTransactionSearchCriteria.validate.schema
-    },
-    get errors() {
-        return LoanTransactionSearchCriteria.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanTransactionSearchCriteria => LoanTransactionSearchCriteria.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!LoanTransactionSearchCriteria.validate(o)) {
-            throw new ValidationError(LoanTransactionSearchCriteria.errors ?? [])
-        }
-    },
-} as const
-
-export type SearchResponse = LoanTransaction[]
-
-export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
-    get schema() {
-        return SearchResponse.validate.schema
-    },
-    get errors() {
-        return SearchResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[]
-}
-
-export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
-    get schema() {
-        return ErrorResponse.validate.schema
-    },
-    get errors() {
-        return ErrorResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents the information for locking an account.
- */
-export interface LockLoanAccountInput {
+    amountToAdd?: number
     /**
-     * The locked account total due type.
+     * The encoded key of the installment
      */
-    lockedAccountTotalDueType?: 'BALANCE_AMOUNT' | 'DUE_AMOUNT_ON_LATE_INSTALLMENTS'
-    /**
-     * The notes about the account locking operation.
-     */
-    notes?: string
-    /**
-     * A list with operations which are locked when the account is in substate AccountState.LOCKED. Allowed options are `APPLY_INTEREST`, `APPLY_PENALTIES`, and `APPLY_FEES`.
-     */
-    lockedOperations?: ('APPLY_INTEREST' | 'APPLY_FEES' | 'APPLY_PENALTIES')[]
-}
-
-export const LockLoanAccountInput = {
-    validate: (await import('./schemas/lock-loan-account-input.schema.js')).validate as ValidateFunction<LockLoanAccountInput>,
-    get schema() {
-        return LockLoanAccountInput.validate.schema
-    },
-    get errors() {
-        return LockLoanAccountInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LockLoanAccountInput => LockLoanAccountInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!LockLoanAccountInput.validate(o)) {
-            throw new ValidationError(LockLoanAccountInput.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents a wrapper over a list of loan transactions, to be used when locking and unlocking an account.
- */
-export interface LockLoanTransactionsWrapper {
-    /**
-     * The list of loan transactions
-     */
-    loanTransactions?: LoanTransaction[]
-}
-
-export const LockLoanTransactionsWrapper = {
-    validate: (await import('./schemas/lock-loan-transactions-wrapper.schema.js'))
-        .validate as ValidateFunction<LockLoanTransactionsWrapper>,
-    get schema() {
-        return LockLoanTransactionsWrapper.validate.schema
-    },
-    get errors() {
-        return LockLoanTransactionsWrapper.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LockLoanTransactionsWrapper => LockLoanTransactionsWrapper.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!LockLoanTransactionsWrapper.validate(o)) {
-            throw new ValidationError(LockLoanTransactionsWrapper.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents the request payload for unlocking an account
- */
-export interface UnlockLoanAccountInput {
-    /**
-     * Extra notes about the current unlocking of account
-     */
-    notes?: string
-}
-
-export const UnlockLoanAccountInput = {
-    validate: (await import('./schemas/unlock-loan-account-input.schema.js'))
-        .validate as ValidateFunction<UnlockLoanAccountInput>,
-    get schema() {
-        return UnlockLoanAccountInput.validate.schema
-    },
-    get errors() {
-        return UnlockLoanAccountInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is UnlockLoanAccountInput => UnlockLoanAccountInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!UnlockLoanAccountInput.validate(o)) {
-            throw new ValidationError(UnlockLoanAccountInput.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents the request payload for creating a transaction of type REPAYMENT
- */
-export interface RepaymentLoanTransactionInput {
-    transactionDetails?: LoanTransactionDetailsInput
-    /**
-     * The amount of the repayment
-     */
-    amount: number
-    /**
-     * Extra notes about the repayment transaction. Notes can have at most 255 characters in length.
-     */
-    notes?: string
-    /**
-     * The list of custom amounts of the repayment
-     */
-    customPaymentAmounts?: CustomPaymentAmount[]
-    /**
-     * The external id of the repayment transaction, customizable, unique
-     */
-    externalId?: string
-    /**
-     * The booking date of the repayment (as Organization Time)
-     */
-    bookingDate?: string
-    /**
-     * The prepayment recalculation method of the repayment
-     */
-    prepaymentRecalculationMethod?:
-        | 'NO_RECALCULATION'
-        | 'RESCHEDULE_REMAINING_REPAYMENTS'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_NUMBER_OF_TERMS'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_PRINCIPAL_AMOUNT'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_TOTAL_REPAYMENT_AMOUNT'
-        | 'REDUCE_AMOUNT_PER_INSTALLMENT'
-        | 'REDUCE_NUMBER_OF_INSTALLMENTS'
-        | 'REDUCE_NUMBER_OF_INSTALLMENTS_NEW'
-    /**
-     * The entry date of the repayment (as Organization Time)
-     */
-    valueDate?: string
-    /**
-     * The currency code for the repayment transaction
-     */
-    originalCurrencyCode?: string
-    /**
-     * The encoded key of the schedule installment to which this repayment is associated
-     */
-    installmentEncodedKey?: string
-}
-
-export const RepaymentLoanTransactionInput = {
-    validate: (await import('./schemas/repayment-loan-transaction-input.schema.js'))
-        .validate as ValidateFunction<RepaymentLoanTransactionInput>,
-    get schema() {
-        return RepaymentLoanTransactionInput.validate.schema
-    },
-    get errors() {
-        return RepaymentLoanTransactionInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is RepaymentLoanTransactionInput => RepaymentLoanTransactionInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!RepaymentLoanTransactionInput.validate(o)) {
-            throw new ValidationError(RepaymentLoanTransactionInput.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents the action performed on a loan account after which the account's amount changes its value.
- */
-export interface LoanTransaction {
-    /**
-     * The migration event encoded key associated with the loan account. If the account was imported, track which 'migration event' it came from.
-     */
-    migrationEventKey?: string
-    transactionDetails?: TransactionDetails
-    /**
-     * The amounts that have been applied or paid as part of this transaction and involved predefined fees.
-     */
-    fees?: Fee[]
-    /**
-     * The notes or description for the loan transaction.
-     */
-    notes?: string
-    affectedAmounts?: LoanAffectedAmounts
-    cardTransaction?: CardTransaction
-    taxes?: Taxes
-    /**
-     * The till key associated with the transaction.
-     */
-    tillKey?: string
-    /**
-     * The key of the loan transaction where the adjustment for the transaction was made (if any adjustment was involved).
-     */
-    adjustmentTransactionKey?: string
-    /**
-     * The type of loan transaction.
-     */
-    type?:
-        | 'IMPORT'
-        | 'DISBURSEMENT'
-        | 'DISBURSEMENT_ADJUSTMENT'
-        | 'WRITE_OFF'
-        | 'WRITE_OFF_ADJUSTMENT'
-        | 'REPAYMENT'
-        | 'PAYMENT_MADE'
-        | 'WITHDRAWAL_REDRAW'
-        | 'WITHDRAWAL_REDRAW_ADJUSTMENT'
-        | 'FEE_APPLIED'
-        | 'FEE_CHARGED'
-        | 'FEES_DUE_REDUCED'
-        | 'FEE_ADJUSTMENT'
-        | 'PENALTY_APPLIED'
-        | 'PENALTY_ADJUSTMENT'
-        | 'PENALTIES_DUE_REDUCED'
-        | 'REPAYMENT_ADJUSTMENT'
-        | 'PAYMENT_MADE_ADJUSTMENT'
-        | 'INTEREST_RATE_CHANGED'
-        | 'TAX_RATE_CHANGED'
-        | 'PENALTY_RATE_CHANGED'
-        | 'INTEREST_APPLIED'
-        | 'INTEREST_APPLIED_ADJUSTMENT'
-        | 'INTEREST_DUE_REDUCED'
-        | 'PENALTY_REDUCTION_ADJUSTMENT'
-        | 'FEE_REDUCTION_ADJUSTMENT'
-        | 'INTEREST_REDUCTION_ADJUSTMENT'
-        | 'DEFERRED_INTEREST_APPLIED'
-        | 'DEFERRED_INTEREST_APPLIED_ADJUSTMENT'
-        | 'DEFERRED_INTEREST_PAID'
-        | 'DEFERRED_INTEREST_PAID_ADJUSTMENT'
-        | 'INTEREST_LOCKED'
-        | 'FEE_LOCKED'
-        | 'PENALTY_LOCKED'
-        | 'INTEREST_UNLOCKED'
-        | 'FEE_UNLOCKED'
-        | 'PENALTY_UNLOCKED'
-        | 'REDRAW_TRANSFER'
-        | 'REDRAW_REPAYMENT'
-        | 'REDRAW_TRANSFER_ADJUSTMENT'
-        | 'REDRAW_REPAYMENT_ADJUSTMENT'
-        | 'TRANSFER'
-        | 'TRANSFER_ADJUSTMENT'
-        | 'BRANCH_CHANGED'
-        | 'TERMS_CHANGED'
-        | 'CARD_TRANSACTION_REVERSAL'
-        | 'CARD_TRANSACTION_REVERSAL_ADJUSTMENT'
-        | 'DUE_DATE_CHANGED'
-        | 'DUE_DATE_CHANGED_ADJUSTMENT'
-        | 'ACCOUNT_TERMINATED'
-        | 'ACCOUNT_TERMINATED_ADJUSTMENT'
-    /**
-     * The branch where the transaction was performed.
-     */
-    branchKey?: string
-    terms?: LoanTerms
-    transferDetails?: TransferDetails
-    /**
-     * The key of the parent loan transaction.
-     */
-    parentLoanTransactionKey?: string
-    /**
-     * The list of custom amounts which the user has paid as part of this transaction.
-     */
-    customPaymentAmounts?: CustomPaymentAmount[]
-    /**
-     * The encoded key of the loan transaction, which is auto generated, and must be unique.
-     */
-    encodedKey?: string
-    currency?: Currency
-    /**
-     * The ID of the loan transaction, can be generated and customized, and must be unique.
-     */
-    id?: string
-    /**
-     * The currency in which this transaction was posted. The amounts are stored in the base currency, but the user may enter it in a foreign currency.
-     */
-    originalCurrencyCode?: string
-    /**
-     * The encoded key of the transaction that was adjusted as part of this one. Available only for adjustment transactions.
-     */
-    originalTransactionKey?: string
-    /**
-     * The amount that was added or removed on the loan account.
-     */
-    amount?: number
-    /**
-     * The center where the transaction was performed.
-     */
-    centreKey?: string
-    /**
-     * The external ID of the loan transaction, it is customizable, and must be unique.
-     */
-    externalId?: string
-    /**
-     * The date of the entry in the organization time format and timezone.
-     */
-    valueDate?: string
-    /**
-     * The date when this loan transaction was created.
-     */
-    creationDate?: string
-    /**
-     * The user that performed the transaction.
-     */
-    userKey?: string
-    /**
-     * The key of the parent loan account.
-     */
-    parentAccountKey?: string
-    /**
-     * The amount that was posted in a foreign currency. This amount was converted using the exchange rate available at entry date and set into the amount field.
-     */
-    originalAmount?: number
-    accountBalances?: TransactionBalances
-    /**
-     * The date when the corresponding journal entry is booked.
-     */
-    bookingDate?: string
-    /**
-     * The prepayment recalculation method of the loan transaction.
-     */
-    prepaymentRecalculationMethod?:
-        | 'NO_RECALCULATION'
-        | 'RESCHEDULE_REMAINING_REPAYMENTS'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_NUMBER_OF_TERMS'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_PRINCIPAL_AMOUNT'
-        | 'RECALCULATE_SCHEDULE_KEEP_SAME_TOTAL_REPAYMENT_AMOUNT'
-        | 'REDUCE_AMOUNT_PER_INSTALLMENT'
-        | 'REDUCE_NUMBER_OF_INSTALLMENTS'
-        | 'REDUCE_NUMBER_OF_INSTALLMENTS_NEW'
-    /**
-     * The specific installment encoded key associated to the loan transaction.
-     */
-    installmentEncodedKey?: string
-}
-
-export const LoanTransaction = {
-    validate: (await import('./schemas/loan-transaction.schema.js')).validate as ValidateFunction<LoanTransaction>,
-    get schema() {
-        return LoanTransaction.validate.schema
-    },
-    get errors() {
-        return LoanTransaction.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanTransaction => LoanTransaction.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!LoanTransaction.validate(o)) {
-            throw new ValidationError(LoanTransaction.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Contains the details of the transaction adjustment
- */
-export interface LoanTransactionAdjustmentDetails {
-    /**
-     * Date when the adjustment transaction is logged into accounting. Can be null. Available only for REPAYMENT, PAYMENT_MADE and FEE
-     */
-    bookingDate?: string
-    /**
-     * Notes detailing why the transaction is adjusted
-     */
-    notes: string
-    /**
-     * Details of installments with their corresponding amounts to be added to the reduced fee/penalty
-     */
-    installments?: AdjustTransactionInstallmentDetailsDTO[]
-}
-
-export const LoanTransactionAdjustmentDetails = {
-    validate: (await import('./schemas/loan-transaction-adjustment-details.schema.js'))
-        .validate as ValidateFunction<LoanTransactionAdjustmentDetails>,
-    get schema() {
-        return LoanTransactionAdjustmentDetails.validate.schema
-    },
-    get errors() {
-        return LoanTransactionAdjustmentDetails.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanTransactionAdjustmentDetails => LoanTransactionAdjustmentDetails.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!LoanTransactionAdjustmentDetails.validate(o)) {
-            throw new ValidationError(LoanTransactionAdjustmentDetails.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * The input representation of a loan transaction when making a disbursement
- */
-export interface DisbursementLoanTransactionInput {
-    transactionDetails?: TransactionDetailsInput
-    /**
-     * The amount to disburse
-     */
-    amount?: number
-    /**
-     * The list of the fees to apply
-     */
-    fees?: FeeInput[]
-    /**
-     * Extra notes related to disbursement action or transaction
-     */
-    notes?: string
-    /**
-     * The date of the first repayment for the loan account (as Organization Time)
-     */
-    firstRepaymentDate?: string
-    transferDetails?: DisbursementTransferDetailsInput
-    /**
-     * The external id of the disbursement transaction. Customizable and unique
-     */
-    externalId?: string
-    /**
-     * The date when disbursement is logged into accounting)
-     */
-    bookingDate?: string
-    /**
-     * Indicates whether the validFrom dates from Adjustable Interest Rates can be shifted automatically or not
-     */
-    shiftAdjustableInterestPeriods?: boolean
-    /**
-     * The date of the disbursal (as Organization Time)
-     */
-    valueDate?: string
-    /**
-     * The currency for the disbursement transaction
-     */
-    originalCurrencyCode?: string
-}
-
-export const DisbursementLoanTransactionInput = {
-    validate: (await import('./schemas/disbursement-loan-transaction-input.schema.js'))
-        .validate as ValidateFunction<DisbursementLoanTransactionInput>,
-    get schema() {
-        return DisbursementLoanTransactionInput.validate.schema
-    },
-    get errors() {
-        return DisbursementLoanTransactionInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is DisbursementLoanTransactionInput => DisbursementLoanTransactionInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!DisbursementLoanTransactionInput.validate(o)) {
-            throw new ValidationError(DisbursementLoanTransactionInput.errors ?? [])
-        }
-    },
-} as const
-
-export type GetTransactionsForAllVersionsResponse = LoanTransaction[]
-
-export const GetTransactionsForAllVersionsResponse = {
-    validate: (await import('./schemas/get-transactions-for-all-versions-response.schema.js'))
-        .validate as ValidateFunction<GetTransactionsForAllVersionsResponse>,
-    get schema() {
-        return GetTransactionsForAllVersionsResponse.validate.schema
-    },
-    get errors() {
-        return GetTransactionsForAllVersionsResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetTransactionsForAllVersionsResponse => GetTransactionsForAllVersionsResponse.validate(o) === true,
-} as const
-
-/**
- * Represents the request payload for creating a transaction of type WITHDRAWAL_REDRAW
- */
-export interface WithdrawalRedrawTransactionInput {
-    transactionDetails?: LoanTransactionDetailsInput
-    /**
-     * The amount to be withdrawn from redraw balance
-     */
-    amount: number
-    /**
-     * Extra notes about the withdrawal transaction. Notes can have at most 255 characters in length.
-     */
-    notes?: string
-    /**
-     * The external id of the withdrawal transaction, customizable, unique
-     */
-    externalId?: string
-    /**
-     * The booking date of the withdrawal transaction (as Organization Time)
-     */
-    bookingDate?: string
-    /**
-     * The value date of the withdrawal transaction (as Organization Time)
-     */
-    valueDate?: string
-    /**
-     * The currency code for the transaction
-     */
-    originalCurrencyCode?: string
-}
-
-export const WithdrawalRedrawTransactionInput = {
-    validate: (await import('./schemas/withdrawal-redraw-transaction-input.schema.js'))
-        .validate as ValidateFunction<WithdrawalRedrawTransactionInput>,
-    get schema() {
-        return WithdrawalRedrawTransactionInput.validate.schema
-    },
-    get errors() {
-        return WithdrawalRedrawTransactionInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is WithdrawalRedrawTransactionInput => WithdrawalRedrawTransactionInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!WithdrawalRedrawTransactionInput.validate(o)) {
-            throw new ValidationError(WithdrawalRedrawTransactionInput.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents the request payload for creating a transaction of type PAYMENT_MADE
- */
-export interface PaymentMadeTransactionInput {
-    transactionDetails?: LoanTransactionDetailsInput
-    /**
-     * The amount of the payment
-     */
-    amount: number
-    /**
-     * Notes about the payment made transaction. The notes can have at most 255 characters in length.
-     */
-    notes?: string
-    /**
-     * The external id of the payment made transaction, customizable, unique
-     */
-    externalId?: string
-    /**
-     * The booking date of the payment made transaction (as Organization Time)
-     */
-    bookingDate?: string
-    /**
-     * The entry date of the payment made transaction (as Organization Time)
-     */
-    valueDate?: string
-    /**
-     * The currency code for the payment made transaction
-     */
-    originalCurrencyCode?: string
-}
-
-export const PaymentMadeTransactionInput = {
-    validate: (await import('./schemas/payment-made-transaction-input.schema.js'))
-        .validate as ValidateFunction<PaymentMadeTransactionInput>,
-    get schema() {
-        return PaymentMadeTransactionInput.validate.schema
-    },
-    get errors() {
-        return PaymentMadeTransactionInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PaymentMadeTransactionInput => PaymentMadeTransactionInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PaymentMadeTransactionInput.validate(o)) {
-            throw new ValidationError(PaymentMadeTransactionInput.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents the request payload for creating a transaction of type REDRAW_REPAYMENT
- */
-export interface RedrawRepaymentTransactionInputDTO {
-    /**
-     * The amount of the redraw repayment
-     */
-    amount?: number
-    /**
-     * The booking date of the repayment (as Organization Time)
-     */
-    bookingDate?: string
-    /**
-     * The entry date of the repayment (as Organization Time)
-     */
-    valueDate?: string
-    /**
-     * Extra notes about the redraw repayment transaction. Notes can have at most 255 characters in length.
-     */
-    notes?: string
-}
-
-export const RedrawRepaymentTransactionInputDTO = {
-    validate: (await import('./schemas/redraw-repayment-transaction-input-dto.schema.js'))
-        .validate as ValidateFunction<RedrawRepaymentTransactionInputDTO>,
-    get schema() {
-        return RedrawRepaymentTransactionInputDTO.validate.schema
-    },
-    get errors() {
-        return RedrawRepaymentTransactionInputDTO.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is RedrawRepaymentTransactionInputDTO => RedrawRepaymentTransactionInputDTO.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!RedrawRepaymentTransactionInputDTO.validate(o)) {
-            throw new ValidationError(RedrawRepaymentTransactionInputDTO.errors ?? [])
-        }
-    },
-} as const
-
-export type GetAllResponse = LoanTransaction[]
-
-export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
-    get schema() {
-        return GetAllResponse.validate.schema
-    },
-    get errors() {
-        return GetAllResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
-} as const
-
-/**
- * Represents the request payload for creating a transaction of type FEE_APPLIED
- */
-export interface FeeLoanTransactionInput {
-    /**
-     * The installment number on which the fee will be applied
-     */
-    installmentNumber?: number
-    /**
-     * The fee amount to be applied on the account
-     */
-    amount?: number
-    /**
-     * Extra notes about the current transaction
-     */
-    notes?: string
-    /**
-     * The encodedKey of the predefined fee that defines the current fee
-     */
-    predefinedFeeKey?: string
-    /**
-     * The date of the first repayment for the loan account (as Organization Time)
-     */
-    firstRepaymentDate?: string
-    /**
-     * The external id of the repayment transaction, customizable, unique
-     */
-    externalId?: string
-    /**
-     * The date when the fee transaction is logged into accounting (as Organization Time)
-     */
-    bookingDate?: string
-    /**
-     * The date when to apply the fee (as Organization Time)
-     */
-    valueDate?: string
-}
-
-export const FeeLoanTransactionInput = {
-    validate: (await import('./schemas/fee-loan-transaction-input.schema.js'))
-        .validate as ValidateFunction<FeeLoanTransactionInput>,
-    get schema() {
-        return FeeLoanTransactionInput.validate.schema
-    },
-    get errors() {
-        return FeeLoanTransactionInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is FeeLoanTransactionInput => FeeLoanTransactionInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!FeeLoanTransactionInput.validate(o)) {
-            throw new ValidationError(FeeLoanTransactionInput.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * The sorting criteria used for when searching loan transactions.
- */
-export interface LoanTransactionSortingCriteria {
-    /**
-     * Contains the field that can be used as sorting selection. Can be native (one from the provided list) or otherwise can specify a custom field using the format [customFieldSetId].[customFieldId].
-     */
-    field:
-        | 'id'
-        | 'externalId'
-        | 'creationDate'
-        | 'valueDate'
-        | 'parentAccountId'
-        | 'productId'
-        | 'amount'
-        | 'originalAmount'
-        | 'originalCurrencyCode'
-        | 'branchId'
-        | 'centreId'
-        | 'tillId'
-        | 'terms.interestSettings.interestRate'
-        | 'transactionDetails.transactionChannelId'
-        | 'fees.name'
-        | 'accountBalances.totalBalance'
-        | 'accountBalances.principalBalance'
-        | 'accountBalances.redrawBalance'
-        | 'accountBalances.expectedPrincipalRedraw'
-        | 'accountBalances.advancePosition'
-        | 'accountBalances.arrearsPosition'
-        | 'affectedAmounts.principalAmount'
-        | 'affectedAmounts.interestAmount'
-        | 'affectedAmounts.interestFromArrearsAmount'
-        | 'affectedAmounts.deferredInterestAmount'
-        | 'affectedAmounts.feesAmount'
-        | 'affectedAmounts.penaltyAmount'
-        | 'affectedAmounts.organizationCommissionAmount'
-        | 'affectedAmounts.fundersInterestAmount'
-        | 'taxes.taxRate'
-    /**
-     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
-     */
-    order?: 'ASC' | 'DESC'
-}
-
-/**
- * The unit that composes the list used for Loan transaction client directed queries searching
- */
-export interface LoanTransactionFilterCriteria {
-    field:
-        | 'encodedKey'
-        | 'id'
-        | 'externalId'
-        | 'creationDate'
-        | 'valueDate'
-        | 'parentAccountKey'
-        | 'productTypeKey'
-        | 'productID'
-        | 'type'
-        | 'amount'
-        | 'originalAmount'
-        | 'originalCurrencyCode'
-        | 'affectedAmounts.principalAmount'
-        | 'affectedAmounts.interestAmount'
-        | 'affectedAmounts.fundersInterestAmount'
-        | 'affectedAmounts.organizationCommissionAmount'
-        | 'affectedAmounts.deferredInterestAmount'
-        | 'affectedAmounts.feesAmount'
-        | 'affectedAmounts.penaltyAmount'
-        | 'taxes.taxRate'
-        | 'accountBalances.totalBalance'
-        | 'accountBalances.advancePosition'
-        | 'accountBalances.arrearsPosition'
-        | 'accountBalances.expectedPrincipalRedraw'
-        | 'accountBalances.redrawBalance'
-        | 'accountBalances.principalBalance'
-        | 'userKey'
-        | 'branchKey'
-        | 'branchID'
-        | 'centreKey'
-        | 'centreID'
-        | 'tillKey'
-        | 'tillID'
-        | 'adjustmentTransactionKey'
-        | 'originalTransactionKey'
-        | 'terms.interestSettings.interestRate'
-        | 'transactionDetails.transactionChannelKey'
-        | 'transactionDetails.transactionChannelId'
-        | 'wasAdjusted'
-        | 'typeIsAdjustment'
-        | 'fees.predefinedFeeKey'
-        | 'fees.trigger'
-        | 'fees.name'
-        | 'parentAccountID'
-        | 'adjustmentTransactionID'
-        | 'originalTransactionID'
-        | string
-    /**
-     * The value to match the searching criteria.
-     */
-    value?: string
-    /**
-     * | **Operator**                | **Affected values**  | **Available for**                                                    |
-     * |---------------               |----------------------|----------------------------------------------------------------------|
-     * | EQUALS                       | ONE_VALUE            | BIG_DECIMAL,BOOLEAN,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY        |
-     * | EQUALS_CASE_SENSITIVE        | ONE_VALUE            | BIG_DECIMAL,BOOLEAN,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY 		  |
-     * | MORE_THAN                    | ONE_VALUE            | BIG_DECIMAL,NUMBER,MONEY                                             |
-     * | LESS_THAN                    | ONE_VALUE            | BIG_DECIMAL,NUMBER,MONEY                                             |
-     * | BETWEEN                      | TWO_VALUES           | BIG_DECIMAL,NUMBER,MONEY,DATE,DATE_TIME                              |
-     * | ON                           | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | AFTER                        | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | BEFORE                       | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | BEFORE_INCLUSIVE             | ONE_VALUE            | DATE,DATE_TIME                                                       |
-     * | STARTS_WITH                  | ONE_VALUE            | STRING                                                               |
-     * | STARTS_WITH_CASE_SENSITIVE   | ONE_VALUE            | STRING                                                               |
-     * | IN                           | LIST                 | ENUM,KEY                                                             |
-     * | TODAY                        | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | THIS_WEEK                    | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | THIS_MONTH                   | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | THIS_YEAR                    | NO_VALUE             | DATE,DATE_TIME                                                       |
-     * | LAST_DAYS                    | ONE_VALUE            | NUMBER                                                               |
-     * | EMPTY                        | NO_VALUE             | BIG_DECIMAL,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY,DATE,DATE_TIME |
-     * | NOT_EMPTY                    | NO_VALUE             | BIG_DECIMAL,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY,DATE,DATE_TIME |
-     */
-    operator:
-        | 'EQUALS'
-        | 'EQUALS_CASE_SENSITIVE'
-        | 'DIFFERENT_THAN'
-        | 'MORE_THAN'
-        | 'LESS_THAN'
-        | 'BETWEEN'
-        | 'ON'
-        | 'AFTER'
-        | 'AFTER_INCLUSIVE'
-        | 'BEFORE'
-        | 'BEFORE_INCLUSIVE'
-        | 'STARTS_WITH'
-        | 'STARTS_WITH_CASE_SENSITIVE'
-        | 'IN'
-        | 'TODAY'
-        | 'THIS_WEEK'
-        | 'THIS_MONTH'
-        | 'THIS_YEAR'
-        | 'LAST_DAYS'
-        | 'EMPTY'
-        | 'NOT_EMPTY'
-    /**
-     * The second value to match the searching criteria, when the `BETWEEN` operator is used.
-     */
-    secondValue?: string
-    /**
-     * List of values when the `IN` operator is used.
-     */
-    values?: string[]
-}
-
-export interface RestError {
-    errorCode?: number
-    errorSource?: string
-    errorReason?: string
-}
-
-/**
- * Contains the details about transaction including fields like transaction channel key and channel ID
- */
-export interface LoanTransactionDetailsInput {
-    /**
-     * The id of the transaction channel associated with the transaction details input.
-     */
-    transactionChannelId?: string
-    /**
-     * The encoded key of the transaction channel associated with the transaction details input.
-     */
-    transactionChannelKey?: string
-}
-
-/**
- * Custom payment amount for a specific element type
- */
-export interface CustomPaymentAmount {
-    /**
-     * The amount of the taxes paid in the transaction for the given type.
-     */
-    taxOnAmount?: number
-    /**
-     * The amount of the payment paid in the transaction for the given type.
-     */
-    amount: number
-    /**
-     * The encodedKey of the predefined fee to be paid.
-     */
-    predefinedFeeKey?: string
-    /**
-     * The type of the custom payment
-     */
-    customPaymentAmountType:
-        | 'PRINCIPAL'
-        | 'INTEREST'
-        | 'MANUAL_FEE'
-        | 'UPFRONT_DISBURSEMENT_FEE'
-        | 'LATE_REPAYMENT_FEE'
-        | 'PAYMENT_DUE_FEE'
-        | 'PENALTY'
-}
-
-/**
- * Contains the details about transaction including fields like transaction channel key and channel id
- */
-export interface TransactionDetails {
-    /**
-     * The id of the transaction channel associated with the transaction details.
-     */
-    transactionChannelId?: string
-    /**
-     * The encoded key of the transaction channel associated with the transaction details.
-     */
-    transactionChannelKey?: string
-}
-
-/**
- * An amount of predefined fee that was applied or paid on an account.
- */
-export interface Fee {
-    /**
-     * The name of the predefined fee
-     */
-    name?: string
-    /**
-     * The amount of the fee that was applied/paid in the transaction for the given predefined fee.
-     */
-    amount?: number
-    /**
-     * Shows the event that will trigger a fee
-     */
-    trigger?:
-        | 'MANUAL'
-        | 'MANUAL_PLANNED'
-        | 'DISBURSEMENT'
-        | 'CAPITALIZED_DISBURSEMENT'
-        | 'UPFRONT_DISBURSEMENT'
-        | 'LATE_REPAYMENT'
-        | 'PAYMENT_DUE'
-        | 'PAYMENT_DUE_APPLIED_ON_DUE_DATES'
-        | 'ARBITRARY'
-        | 'IOF'
-    /**
-     * The amount of the taxes on fee that was applied/paid in the transaction.
-     */
-    taxAmount?: number
-    /**
-     * The encoded key of the predefined fee, auto generated, unique
-     */
-    predefinedFeeKey: string
-}
-
-/**
- * The amounts affected after completing the loan transaction
- */
-export interface LoanAffectedAmounts {
-    /**
-     * How much fees was added/removed in account, within this transaction.
-     */
-    feesAmount?: number
-    /**
-     * How much interest is given to the investors, within this transaction (only for p2p products)
-     */
-    fundersInterestAmount?: number
-    /**
-     * How much interest is given to the organization, within this transaction (only for p2p products)
-     */
-    organizationCommissionAmount?: number
-    /**
-     * How much interest pre-paid was added/removed in account, within this transaction (including taxes).
-     */
-    deferredInterestAmount?: number
-    /**
-     * How much interest was added/removed in account, within this transaction (including taxes). If there is any deferred interest amount set in this transaction, that amount should be included in this field.
-     */
-    interestAmount?: number
-    /**
-     * How much Payment Holidays interest was added/removed in account, within this transaction (including taxes).
-     */
-    paymentHolidaysInterestAmount?: number
-    /**
-     * How much penalties was added/removed in account, within this transaction.
-     */
-    penaltyAmount?: number
-    /**
-     * How much principal was added/removed in account, within this transaction.
-     */
-    principalAmount?: number
-    /**
-     * How much interest from arrears was added/removed in account, within this transaction (including taxes).
-     */
-    interestFromArrearsAmount?: number
-}
-
-/**
- * A card transaction entry which will have a corresponding a financial transaction performed.
- */
-export interface CardTransaction {
-    /**
-     * The external reference ID to be used to reference the card transaction in subsequent requests.
-     */
-    externalReferenceId: string
-    /**
-     * The amount of money to be withdrawn in the financial transaction.
-     */
-    amount: number
-    /**
-     * Whether the given request should be accepted without balance validations.
-     */
-    advice: boolean
-    /**
-     * The external authorization hold reference ID, which relates this card transaction to a previous authorization hold.
-     */
-    externalAuthorizationReferenceId?: string
-    cardAcceptor?: CardAcceptor
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * The formatted time at which the user made this card transaction.
-     */
-    userTransactionTime?: string
-    /**
-     * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
-     */
-    currencyCode?: string
-    /**
-     * The reference token of the card.
-     */
-    cardToken?: string
+    installmentKey?: string
 }
 
 /**
@@ -1061,21 +25,17 @@ export interface CardTransaction {
  */
 export interface CardAcceptor {
     /**
-     * The ZIP code of the location in which the card acceptor has the business.
+     * The city in which the card acceptor has the business.
      */
-    zip?: string
+    city?: string
     /**
      * The country in which the card acceptor has the business.
      */
     country?: string
     /**
-     * The city in which the card acceptor has the business.
+     * The Merchant Category Code of the card acceptor.
      */
-    city?: string
-    /**
-     * The street in which the card acceptor has the business.
-     */
-    street?: string
+    mcc?: number
     /**
      * The name of the card acceptor.
      */
@@ -1085,100 +45,58 @@ export interface CardAcceptor {
      */
     state?: string
     /**
-     * The Merchant Category Code of the card acceptor.
+     * The street in which the card acceptor has the business.
      */
-    mcc?: number
+    street?: string
+    /**
+     * The ZIP code of the location in which the card acceptor has the business.
+     */
+    zip?: string
 }
 
 /**
- * The taxes applied within a transaction.
+ * A card transaction entry which will have a corresponding a financial transaction performed.
  */
-export interface Taxes {
+export interface CardTransaction {
     /**
-     * The amount of taxes on the interest from arrears that were applied/paid in account, within this transaction.
+     * Whether the given request should be accepted without balance validations.
      */
-    taxOnInterestFromArrearsAmount?: number
+    advice: boolean
     /**
-     * How much taxes on the fees that were paid in this transaction were added/removed in account, within this transaction.
+     * The amount of money to be withdrawn in the financial transaction.
      */
-    taxOnFeesAmount?: number
+    amount: number
+    cardAcceptor?: CardAcceptor
     /**
-     * The tax rate that was set or changed in this transaction.
+     * The reference token of the card.
      */
-    taxRate?: number
+    cardToken?: string
     /**
-     * The amount of taxes on the Payment Holidays interest that were added/removed in account, within this transaction.
+     * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
      */
-    taxOnPaymentHolidaysInterest?: number
+    currencyCode?: string
     /**
-     * How much taxes on the interest that was paid in this transaction were added/removed in account, within this transaction.
+     * The encoded key of the entity, generated, globally unique
      */
-    taxOnInterestAmount?: number
+    encodedKey?: string
     /**
-     * How much taxes on the penalties that were paid in this transaction were added/removed in account, within this transaction.
+     * The external authorization hold reference ID, which relates this card transaction to a previous authorization hold.
      */
-    taxOnPenaltyAmount?: number
+    externalAuthorizationReferenceId?: string
     /**
-     * How much taxes on the interest that was pre-paid were added/removed in account, within this transaction. If there is any deferred tax on interest amount set in this transaction, that amount should be included in this field.
+     * The external reference ID to be used to reference the card transaction in subsequent requests.
      */
-    deferredTaxOnInterestAmount?: number
-}
-
-/**
- * The loan transaction terms
- */
-export interface LoanTerms {
-    interestSettings?: TransactionInterestSettings
+    externalReferenceId: string
     /**
-     * The periodic payment value logged when changing it for a Balloon Payments account
+     * The formatted time at which the user made this card transaction.
      */
-    periodicPayment?: number
-    /**
-     * The principal payment flat amount logged when changing it for a Revolving Credit account
-     */
-    principalPaymentAmount?: number
-    /**
-     * The principal payment percentage value logged when changing it for a Revolving Credit account
-     */
-    principalPaymentPercentage?: number
-}
-
-/**
- * The interest settings, holds all the properties regarding interests for the loan account.
- */
-export interface TransactionInterestSettings {
-    /**
-     * The interest rate. Represents the interest rate for the loan account. The interest on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.
-     */
-    interestRate?: number
-    /**
-     * The value of the index interest rate
-     */
-    indexInterestRate?: number
-}
-
-/**
- * Represents the transfer details, such as the linked transaction key
- */
-export interface TransferDetails {
-    /**
-     * The key of the related loan transaction
-     */
-    linkedLoanTransactionKey?: string
-    /**
-     * The key of the related deposit transaction
-     */
-    linkedDepositTransactionKey?: string
+    userTransactionTime?: string
 }
 
 /**
  * Represents a currency eg. USD, EUR.
  */
 export interface Currency {
-    /**
-     * Currency code for NON_FIAT currency.
-     */
-    currencyCode?: string
     /**
      * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
@@ -1371,28 +289,1024 @@ export interface Currency {
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+    /**
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
+}
+
+/**
+ * Custom payment amount for a specific element type
+ */
+export interface CustomPaymentAmount {
+    /**
+     * The amount of the payment paid in the transaction for the given type.
+     */
+    amount: number
+    /**
+     * The type of the custom payment
+     */
+    customPaymentAmountType:
+        | 'PRINCIPAL'
+        | 'INTEREST'
+        | 'MANUAL_FEE'
+        | 'UPFRONT_DISBURSEMENT_FEE'
+        | 'LATE_REPAYMENT_FEE'
+        | 'PAYMENT_DUE_FEE'
+        | 'PENALTY'
+    /**
+     * The encodedKey of the predefined fee to be paid.
+     */
+    predefinedFeeKey?: string
+    /**
+     * The amount of the taxes paid in the transaction for the given type.
+     */
+    taxOnAmount?: number
+}
+
+/**
+ * The input representation of a loan transaction when making a disbursement
+ */
+export interface DisbursementLoanTransactionInput {
+    /**
+     * The amount to disburse
+     */
+    amount?: number
+    /**
+     * The date when disbursement is logged into accounting)
+     */
+    bookingDate?: string
+    /**
+     * The external id of the disbursement transaction. Customizable and unique
+     */
+    externalId?: string
+    /**
+     * The list of the fees to apply
+     */
+    fees?: FeeInput[]
+    /**
+     * The date of the first repayment for the loan account (as Organization Time)
+     */
+    firstRepaymentDate?: string
+    /**
+     * Extra notes related to disbursement action or transaction
+     */
+    notes?: string
+    /**
+     * The currency for the disbursement transaction
+     */
+    originalCurrencyCode?: string
+    /**
+     * Indicates whether the validFrom dates from Adjustable Interest Rates can be shifted automatically or not
+     */
+    shiftAdjustableInterestPeriods?: boolean
+    transactionDetails?: TransactionDetailsInput
+    transferDetails?: DisbursementTransferDetailsInput
+    /**
+     * The date of the disbursal (as Organization Time)
+     */
+    valueDate?: string
+}
+
+export const DisbursementLoanTransactionInput = {
+    validate: (await import('./schemas/disbursement-loan-transaction-input.schema.js'))
+        .validate as ValidateFunction<DisbursementLoanTransactionInput>,
+    get schema() {
+        return DisbursementLoanTransactionInput.validate.schema
+    },
+    get errors() {
+        return DisbursementLoanTransactionInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is DisbursementLoanTransactionInput => DisbursementLoanTransactionInput.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!DisbursementLoanTransactionInput.validate(o)) {
+            throw new ValidationError(DisbursementLoanTransactionInput.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Represents the input for the transfer details for a disbursement transaction
+ */
+export interface DisbursementTransferDetailsInput {
+    /**
+     * The id of the linked deposit account
+     */
+    linkedAccountId?: string
+    /**
+     * The encoded key of the linked deposit account
+     */
+    linkedAccountKey?: string
+}
+
+export interface ErrorResponse {
+    errors?: RestError[]
+}
+
+export const ErrorResponse = {
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    get schema() {
+        return ErrorResponse.validate.schema
+    },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * An amount of predefined fee that was applied or paid on an account.
+ */
+export interface Fee {
+    /**
+     * The amount of the fee that was applied/paid in the transaction for the given predefined fee.
+     */
+    amount?: number
+    /**
+     * The name of the predefined fee
+     */
+    name?: string
+    /**
+     * The encoded key of the predefined fee, auto generated, unique
+     */
+    predefinedFeeKey: string
+    /**
+     * The amount of the taxes on fee that was applied/paid in the transaction.
+     */
+    taxAmount?: number
+    /**
+     * Shows the event that will trigger a fee
+     */
+    trigger?:
+        | 'MANUAL'
+        | 'MANUAL_PLANNED'
+        | 'DISBURSEMENT'
+        | 'CAPITALIZED_DISBURSEMENT'
+        | 'UPFRONT_DISBURSEMENT'
+        | 'LATE_REPAYMENT'
+        | 'PAYMENT_DUE'
+        | 'PAYMENT_DUE_APPLIED_ON_DUE_DATES'
+        | 'ARBITRARY'
+        | 'IOF'
+        | 'EARLY_REPAYMENT_CHARGE'
+}
+
+/**
+ * An amount of predefined fee to apply on account.
+ */
+export interface FeeInput {
+    /**
+     * The amount of the fee to apply
+     */
+    amount?: number
+    /**
+     * The percentage of the fee to apply
+     */
+    percentage?: number
+    /**
+     * The encoded key of the predefined fee
+     */
+    predefinedFeeKey: string
+}
+
+/**
+ * Represents the request payload for creating a transaction of type FEE_APPLIED
+ */
+export interface FeeLoanTransactionInput {
+    /**
+     * The fee amount to be applied on the account
+     */
+    amount?: number
+    /**
+     * The date when the fee transaction is logged into accounting (as Organization Time)
+     */
+    bookingDate?: string
+    /**
+     * The external id of the repayment transaction, customizable, unique
+     */
+    externalId?: string
+    /**
+     * The date of the first repayment for the loan account (as Organization Time)
+     */
+    firstRepaymentDate?: string
+    /**
+     * The installment number on which the fee will be applied
+     */
+    installmentNumber?: number
+    /**
+     * Extra notes about the current transaction
+     */
+    notes?: string
+    /**
+     * The encodedKey of the predefined fee that defines the current fee
+     */
+    predefinedFeeKey?: string
+    /**
+     * The date when to apply the fee (as Organization Time)
+     */
+    valueDate?: string
+}
+
+export const FeeLoanTransactionInput = {
+    validate: (await import('./schemas/fee-loan-transaction-input.schema.js'))
+        .validate as ValidateFunction<FeeLoanTransactionInput>,
+    get schema() {
+        return FeeLoanTransactionInput.validate.schema
+    },
+    get errors() {
+        return FeeLoanTransactionInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is FeeLoanTransactionInput => FeeLoanTransactionInput.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!FeeLoanTransactionInput.validate(o)) {
+            throw new ValidationError(FeeLoanTransactionInput.errors ?? [])
+        }
+    },
+} as const
+
+export type GetAllResponse = LoanTransaction[]
+
+export const GetAllResponse = {
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    get schema() {
+        return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+} as const
+
+export type GetTransactionsForAllVersionsResponse = LoanTransaction[]
+
+export const GetTransactionsForAllVersionsResponse = {
+    validate: (await import('./schemas/get-transactions-for-all-versions-response.schema.js'))
+        .validate as ValidateFunction<GetTransactionsForAllVersionsResponse>,
+    get schema() {
+        return GetTransactionsForAllVersionsResponse.validate.schema
+    },
+    get errors() {
+        return GetTransactionsForAllVersionsResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetTransactionsForAllVersionsResponse => GetTransactionsForAllVersionsResponse.validate(o) === true,
+} as const
+
+/**
+ * The amounts affected after completing the loan transaction
+ */
+export interface LoanAffectedAmounts {
+    /**
+     * How much interest pre-paid was added/removed in account, within this transaction (including taxes).
+     */
+    deferredInterestAmount?: number
+    /**
+     * How much fees was added/removed in account, within this transaction.
+     */
+    feesAmount?: number
+    /**
+     * How much interest is given to the investors, within this transaction (only for p2p products)
+     */
+    fundersInterestAmount?: number
+    /**
+     * How much interest was added/removed in account, within this transaction (including taxes). If there is any deferred interest amount set in this transaction, that amount should be included in this field.
+     */
+    interestAmount?: number
+    /**
+     * How much interest from arrears was added/removed in account, within this transaction (including taxes).
+     */
+    interestFromArrearsAmount?: number
+    /**
+     * How much interest is given to the organization, within this transaction (only for p2p products)
+     */
+    organizationCommissionAmount?: number
+    /**
+     * How much Payment Holidays interest was added/removed in account, within this transaction (including taxes).
+     */
+    paymentHolidaysInterestAmount?: number
+    /**
+     * How much penalties was added/removed in account, within this transaction.
+     */
+    penaltyAmount?: number
+    /**
+     * How much principal was added/removed in account, within this transaction.
+     */
+    principalAmount?: number
+}
+
+/**
+ * The loan transaction terms
+ */
+export interface LoanTerms {
+    interestSettings?: TransactionInterestSettings
+    /**
+     * The periodic payment value logged when changing it for a Balloon Payments account
+     */
+    periodicPayment?: number
+    /**
+     * The principal payment flat amount logged when changing it for a Revolving Credit account
+     */
+    principalPaymentAmount?: number
+    /**
+     * The principal payment percentage value logged when changing it for a Revolving Credit account
+     */
+    principalPaymentPercentage?: number
+}
+
+/**
+ * Represents the action performed on a loan account after which the account's amount changes its value.
+ */
+export interface LoanTransaction {
+    accountBalances?: TransactionBalances
+    /**
+     * The key of the loan transaction where the adjustment for the transaction was made (if any adjustment was involved).
+     */
+    adjustmentTransactionKey?: string
+    affectedAmounts?: LoanAffectedAmounts
+    /**
+     * The amount that was added or removed on the loan account.
+     */
+    amount?: number
+    /**
+     * The date when the corresponding journal entry is booked.
+     */
+    bookingDate?: string
+    /**
+     * The branch where the transaction was performed.
+     */
+    branchKey?: string
+    cardTransaction?: CardTransaction
+    /**
+     * The center where the transaction was performed.
+     */
+    centreKey?: string
+    /**
+     * The date when this loan transaction was created.
+     */
+    creationDate?: string
+    currency?: Currency
+    /**
+     * The list of custom amounts which the user has paid as part of this transaction.
+     */
+    customPaymentAmounts?: CustomPaymentAmount[]
+    /**
+     * The encoded key of the loan transaction, which is auto generated, and must be unique.
+     */
+    encodedKey?: string
+    /**
+     * The external ID of the loan transaction, it is customizable, and must be unique.
+     */
+    externalId?: string
+    /**
+     * The amounts that have been applied or paid as part of this transaction and involved predefined fees.
+     */
+    fees?: Fee[]
+    /**
+     * The ID of the loan transaction, can be generated and customized, and must be unique.
+     */
+    id?: string
+    /**
+     * The specific installment encoded key associated to the loan transaction.
+     */
+    installmentEncodedKey?: string
+    /**
+     * The migration event encoded key associated with the loan account. If the account was imported, track which 'migration event' it came from.
+     */
+    migrationEventKey?: string
+    /**
+     * The notes or description for the loan transaction.
+     */
+    notes?: string
+    /**
+     * The amount that was posted in a foreign currency. This amount was converted using the exchange rate available at entry date and set into the amount field.
+     */
+    originalAmount?: number
+    /**
+     * The currency in which this transaction was posted. The amounts are stored in the base currency, but the user may enter it in a foreign currency.
+     */
+    originalCurrencyCode?: string
+    /**
+     * The encoded key of the transaction that was adjusted as part of this one. Available only for adjustment transactions.
+     */
+    originalTransactionKey?: string
+    /**
+     * The key of the parent loan account.
+     */
+    parentAccountKey?: string
+    /**
+     * The key of the parent loan transaction.
+     */
+    parentLoanTransactionKey?: string
+    /**
+     * The prepayment recalculation method of the loan transaction.
+     */
+    prepaymentRecalculationMethod?:
+        | 'NO_RECALCULATION'
+        | 'RESCHEDULE_REMAINING_REPAYMENTS'
+        | 'RECALCULATE_SCHEDULE_KEEP_SAME_NUMBER_OF_TERMS'
+        | 'RECALCULATE_SCHEDULE_KEEP_SAME_PRINCIPAL_AMOUNT'
+        | 'RECALCULATE_SCHEDULE_KEEP_SAME_TOTAL_REPAYMENT_AMOUNT'
+        | 'REDUCE_AMOUNT_PER_INSTALLMENT'
+        | 'REDUCE_NUMBER_OF_INSTALLMENTS'
+        | 'REDUCE_NUMBER_OF_INSTALLMENTS_NEW'
+    taxes?: Taxes
+    terms?: LoanTerms
+    /**
+     * The till key associated with the transaction.
+     */
+    tillKey?: string
+    transactionDetails?: TransactionDetails
+    transferDetails?: TransferDetails
+    /**
+     * The type of loan transaction.
+     */
+    type?:
+        | 'IMPORT'
+        | 'DISBURSEMENT'
+        | 'DISBURSEMENT_ADJUSTMENT'
+        | 'WRITE_OFF'
+        | 'WRITE_OFF_ADJUSTMENT'
+        | 'REPAYMENT'
+        | 'PAYMENT_MADE'
+        | 'WITHDRAWAL_REDRAW'
+        | 'WITHDRAWAL_REDRAW_ADJUSTMENT'
+        | 'FEE_APPLIED'
+        | 'FEE_CHARGED'
+        | 'FEES_DUE_REDUCED'
+        | 'FEE_ADJUSTMENT'
+        | 'PENALTY_APPLIED'
+        | 'PENALTY_ADJUSTMENT'
+        | 'PENALTIES_DUE_REDUCED'
+        | 'REPAYMENT_ADJUSTMENT'
+        | 'PAYMENT_MADE_ADJUSTMENT'
+        | 'INTEREST_RATE_CHANGED'
+        | 'TAX_RATE_CHANGED'
+        | 'PENALTY_RATE_CHANGED'
+        | 'INTEREST_APPLIED'
+        | 'INTEREST_APPLIED_ADJUSTMENT'
+        | 'INTEREST_DUE_REDUCED'
+        | 'PENALTY_REDUCTION_ADJUSTMENT'
+        | 'FEE_REDUCTION_ADJUSTMENT'
+        | 'INTEREST_REDUCTION_ADJUSTMENT'
+        | 'DEFERRED_INTEREST_APPLIED'
+        | 'DEFERRED_INTEREST_APPLIED_ADJUSTMENT'
+        | 'DEFERRED_INTEREST_PAID'
+        | 'DEFERRED_INTEREST_PAID_ADJUSTMENT'
+        | 'INTEREST_LOCKED'
+        | 'FEE_LOCKED'
+        | 'PENALTY_LOCKED'
+        | 'INTEREST_UNLOCKED'
+        | 'FEE_UNLOCKED'
+        | 'PENALTY_UNLOCKED'
+        | 'REDRAW_TRANSFER'
+        | 'REDRAW_REPAYMENT'
+        | 'REDRAW_TRANSFER_ADJUSTMENT'
+        | 'REDRAW_REPAYMENT_ADJUSTMENT'
+        | 'TRANSFER'
+        | 'TRANSFER_ADJUSTMENT'
+        | 'BRANCH_CHANGED'
+        | 'TERMS_CHANGED'
+        | 'CARD_TRANSACTION_REVERSAL'
+        | 'CARD_TRANSACTION_REVERSAL_ADJUSTMENT'
+        | 'DUE_DATE_CHANGED'
+        | 'DUE_DATE_CHANGED_ADJUSTMENT'
+        | 'ACCOUNT_TERMINATED'
+        | 'ACCOUNT_TERMINATED_ADJUSTMENT'
+    /**
+     * The user that performed the transaction.
+     */
+    userKey?: string
+    /**
+     * The date of the entry in the organization time format and timezone.
+     */
+    valueDate?: string
+}
+
+export const LoanTransaction = {
+    validate: (await import('./schemas/loan-transaction.schema.js')).validate as ValidateFunction<LoanTransaction>,
+    get schema() {
+        return LoanTransaction.validate.schema
+    },
+    get errors() {
+        return LoanTransaction.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is LoanTransaction => LoanTransaction.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!LoanTransaction.validate(o)) {
+            throw new ValidationError(LoanTransaction.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Contains the details of the transaction adjustment
+ */
+export interface LoanTransactionAdjustmentDetails {
+    /**
+     * Date when the adjustment transaction is logged into accounting. Can be null. Available only for REPAYMENT, PAYMENT_MADE and FEE
+     */
+    bookingDate?: string
+    /**
+     * Details of installments with their corresponding amounts to be added to the reduced fee/penalty
+     */
+    installments?: AdjustTransactionInstallmentDetailsDTO[]
+    /**
+     * Notes detailing why the transaction is adjusted
+     */
+    notes: string
+}
+
+export const LoanTransactionAdjustmentDetails = {
+    validate: (await import('./schemas/loan-transaction-adjustment-details.schema.js'))
+        .validate as ValidateFunction<LoanTransactionAdjustmentDetails>,
+    get schema() {
+        return LoanTransactionAdjustmentDetails.validate.schema
+    },
+    get errors() {
+        return LoanTransactionAdjustmentDetails.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is LoanTransactionAdjustmentDetails => LoanTransactionAdjustmentDetails.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!LoanTransactionAdjustmentDetails.validate(o)) {
+            throw new ValidationError(LoanTransactionAdjustmentDetails.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Contains the details about transaction including fields like transaction channel key and channel ID
+ */
+export interface LoanTransactionDetailsInput {
+    /**
+     * The id of the transaction channel associated with the transaction details input.
+     */
+    transactionChannelId?: string
+    /**
+     * The encoded key of the transaction channel associated with the transaction details input.
+     */
+    transactionChannelKey?: string
+}
+
+/**
+ * The unit that composes the list used for Loan transaction client directed queries searching
+ */
+export interface LoanTransactionFilterCriteria {
+    field:
+        | 'encodedKey'
+        | 'id'
+        | 'externalId'
+        | 'creationDate'
+        | 'valueDate'
+        | 'parentAccountKey'
+        | 'productTypeKey'
+        | 'productID'
+        | 'type'
+        | 'amount'
+        | 'originalAmount'
+        | 'originalCurrencyCode'
+        | 'affectedAmounts.principalAmount'
+        | 'affectedAmounts.interestAmount'
+        | 'affectedAmounts.fundersInterestAmount'
+        | 'affectedAmounts.organizationCommissionAmount'
+        | 'affectedAmounts.deferredInterestAmount'
+        | 'affectedAmounts.feesAmount'
+        | 'affectedAmounts.penaltyAmount'
+        | 'taxes.taxRate'
+        | 'accountBalances.totalBalance'
+        | 'accountBalances.advancePosition'
+        | 'accountBalances.arrearsPosition'
+        | 'accountBalances.expectedPrincipalRedraw'
+        | 'accountBalances.redrawBalance'
+        | 'accountBalances.principalBalance'
+        | 'userKey'
+        | 'branchKey'
+        | 'branchID'
+        | 'centreKey'
+        | 'centreID'
+        | 'tillKey'
+        | 'tillID'
+        | 'adjustmentTransactionKey'
+        | 'originalTransactionKey'
+        | 'terms.interestSettings.interestRate'
+        | 'transactionDetails.transactionChannelKey'
+        | 'transactionDetails.transactionChannelId'
+        | 'wasAdjusted'
+        | 'typeIsAdjustment'
+        | 'fees.predefinedFeeKey'
+        | 'fees.trigger'
+        | 'fees.name'
+        | 'parentAccountID'
+        | 'adjustmentTransactionID'
+        | 'originalTransactionID'
+        | string
+    /**
+     * | **Operator**                | **Affected values**  | **Available for**                                                    |
+     * |---------------               |----------------------|----------------------------------------------------------------------|
+     * | EQUALS                       | ONE_VALUE            | BIG_DECIMAL,BOOLEAN,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY        |
+     * | EQUALS_CASE_SENSITIVE        | ONE_VALUE            | BIG_DECIMAL,BOOLEAN,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY 		  |
+     * | MORE_THAN                    | ONE_VALUE            | BIG_DECIMAL,NUMBER,MONEY                                             |
+     * | LESS_THAN                    | ONE_VALUE            | BIG_DECIMAL,NUMBER,MONEY                                             |
+     * | BETWEEN                      | TWO_VALUES           | BIG_DECIMAL,NUMBER,MONEY,DATE,DATE_TIME                              |
+     * | ON                           | ONE_VALUE            | DATE,DATE_TIME                                                       |
+     * | AFTER                        | ONE_VALUE            | DATE,DATE_TIME                                                       |
+     * | BEFORE                       | ONE_VALUE            | DATE,DATE_TIME                                                       |
+     * | BEFORE_INCLUSIVE             | ONE_VALUE            | DATE,DATE_TIME                                                       |
+     * | STARTS_WITH                  | ONE_VALUE            | STRING                                                               |
+     * | STARTS_WITH_CASE_SENSITIVE   | ONE_VALUE            | STRING                                                               |
+     * | IN                           | LIST                 | ENUM,KEY                                                             |
+     * | TODAY                        | NO_VALUE             | DATE,DATE_TIME                                                       |
+     * | THIS_WEEK                    | NO_VALUE             | DATE,DATE_TIME                                                       |
+     * | THIS_MONTH                   | NO_VALUE             | DATE,DATE_TIME                                                       |
+     * | THIS_YEAR                    | NO_VALUE             | DATE,DATE_TIME                                                       |
+     * | LAST_DAYS                    | ONE_VALUE            | NUMBER                                                               |
+     * | EMPTY                        | NO_VALUE             | BIG_DECIMAL,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY,DATE,DATE_TIME |
+     * | NOT_EMPTY                    | NO_VALUE             | BIG_DECIMAL,LONG,MONEY,NUMBER,PERCENT,STRING,ENUM,KEY,DATE,DATE_TIME |
+     */
+    operator:
+        | 'EQUALS'
+        | 'EQUALS_CASE_SENSITIVE'
+        | 'DIFFERENT_THAN'
+        | 'MORE_THAN'
+        | 'LESS_THAN'
+        | 'BETWEEN'
+        | 'ON'
+        | 'AFTER'
+        | 'AFTER_INCLUSIVE'
+        | 'BEFORE'
+        | 'BEFORE_INCLUSIVE'
+        | 'STARTS_WITH'
+        | 'STARTS_WITH_CASE_SENSITIVE'
+        | 'IN'
+        | 'TODAY'
+        | 'THIS_WEEK'
+        | 'THIS_MONTH'
+        | 'THIS_YEAR'
+        | 'LAST_DAYS'
+        | 'EMPTY'
+        | 'NOT_EMPTY'
+    /**
+     * The second value to match the searching criteria, when the `BETWEEN` operator is used.
+     */
+    secondValue?: string
+    /**
+     * The value to match the searching criteria.
+     */
+    value?: string
+    /**
+     * List of values when the `IN` operator is used.
+     */
+    values?: string[]
+}
+
+/**
+ * Represents the filtering and sorting criteria when searching loan transactions.
+ */
+export interface LoanTransactionSearchCriteria {
+    /**
+     * The list of filtering criteria.
+     */
+    filterCriteria?: LoanTransactionFilterCriteria[]
+    sortingCriteria?: LoanTransactionSortingCriteria
+}
+
+export const LoanTransactionSearchCriteria = {
+    validate: (await import('./schemas/loan-transaction-search-criteria.schema.js'))
+        .validate as ValidateFunction<LoanTransactionSearchCriteria>,
+    get schema() {
+        return LoanTransactionSearchCriteria.validate.schema
+    },
+    get errors() {
+        return LoanTransactionSearchCriteria.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is LoanTransactionSearchCriteria => LoanTransactionSearchCriteria.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!LoanTransactionSearchCriteria.validate(o)) {
+            throw new ValidationError(LoanTransactionSearchCriteria.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * The sorting criteria used for when searching loan transactions.
+ */
+export interface LoanTransactionSortingCriteria {
+    /**
+     * Contains the field that can be used as sorting selection. Can be native (one from the provided list) or otherwise can specify a custom field using the format [customFieldSetId].[customFieldId].
+     */
+    field:
+        | 'id'
+        | 'externalId'
+        | 'creationDate'
+        | 'valueDate'
+        | 'parentAccountId'
+        | 'productId'
+        | 'amount'
+        | 'originalAmount'
+        | 'originalCurrencyCode'
+        | 'branchId'
+        | 'centreId'
+        | 'tillId'
+        | 'terms.interestSettings.interestRate'
+        | 'transactionDetails.transactionChannelId'
+        | 'fees.name'
+        | 'accountBalances.totalBalance'
+        | 'accountBalances.principalBalance'
+        | 'accountBalances.redrawBalance'
+        | 'accountBalances.expectedPrincipalRedraw'
+        | 'accountBalances.advancePosition'
+        | 'accountBalances.arrearsPosition'
+        | 'affectedAmounts.principalAmount'
+        | 'affectedAmounts.interestAmount'
+        | 'affectedAmounts.interestFromArrearsAmount'
+        | 'affectedAmounts.deferredInterestAmount'
+        | 'affectedAmounts.feesAmount'
+        | 'affectedAmounts.penaltyAmount'
+        | 'affectedAmounts.organizationCommissionAmount'
+        | 'affectedAmounts.fundersInterestAmount'
+        | 'taxes.taxRate'
+    /**
+     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
+     */
+    order?: 'ASC' | 'DESC'
+}
+
+/**
+ * Represents the information for locking an account.
+ */
+export interface LockLoanAccountInput {
+    /**
+     * The locked account total due type.
+     */
+    lockedAccountTotalDueType?: 'BALANCE_AMOUNT' | 'DUE_AMOUNT_ON_LATE_INSTALLMENTS'
+    /**
+     * A list with operations which are locked when the account is in substate AccountState.LOCKED. Allowed options are `APPLY_INTEREST`, `APPLY_PENALTIES`, and `APPLY_FEES`.
+     */
+    lockedOperations?: ('APPLY_INTEREST' | 'APPLY_FEES' | 'APPLY_PENALTIES')[]
+    /**
+     * The notes about the account locking operation.
+     */
+    notes?: string
+}
+
+export const LockLoanAccountInput = {
+    validate: (await import('./schemas/lock-loan-account-input.schema.js')).validate as ValidateFunction<LockLoanAccountInput>,
+    get schema() {
+        return LockLoanAccountInput.validate.schema
+    },
+    get errors() {
+        return LockLoanAccountInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is LockLoanAccountInput => LockLoanAccountInput.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!LockLoanAccountInput.validate(o)) {
+            throw new ValidationError(LockLoanAccountInput.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Represents a wrapper over a list of loan transactions, to be used when locking and unlocking an account.
+ */
+export interface LockLoanTransactionsWrapper {
+    /**
+     * The list of loan transactions
+     */
+    loanTransactions?: LoanTransaction[]
+}
+
+export const LockLoanTransactionsWrapper = {
+    validate: (await import('./schemas/lock-loan-transactions-wrapper.schema.js'))
+        .validate as ValidateFunction<LockLoanTransactionsWrapper>,
+    get schema() {
+        return LockLoanTransactionsWrapper.validate.schema
+    },
+    get errors() {
+        return LockLoanTransactionsWrapper.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is LockLoanTransactionsWrapper => LockLoanTransactionsWrapper.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!LockLoanTransactionsWrapper.validate(o)) {
+            throw new ValidationError(LockLoanTransactionsWrapper.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Represents the request payload for creating a transaction of type PAYMENT_MADE
+ */
+export interface PaymentMadeTransactionInput {
+    /**
+     * The amount of the payment
+     */
+    amount: number
+    /**
+     * The booking date of the payment made transaction (as Organization Time)
+     */
+    bookingDate?: string
+    /**
+     * The external id of the payment made transaction, customizable, unique
+     */
+    externalId?: string
+    /**
+     * Notes about the payment made transaction. The notes can have at most 255 characters in length.
+     */
+    notes?: string
+    /**
+     * The currency code for the payment made transaction
+     */
+    originalCurrencyCode?: string
+    transactionDetails?: LoanTransactionDetailsInput
+    /**
+     * The entry date of the payment made transaction (as Organization Time)
+     */
+    valueDate?: string
+}
+
+export const PaymentMadeTransactionInput = {
+    validate: (await import('./schemas/payment-made-transaction-input.schema.js'))
+        .validate as ValidateFunction<PaymentMadeTransactionInput>,
+    get schema() {
+        return PaymentMadeTransactionInput.validate.schema
+    },
+    get errors() {
+        return PaymentMadeTransactionInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PaymentMadeTransactionInput => PaymentMadeTransactionInput.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!PaymentMadeTransactionInput.validate(o)) {
+            throw new ValidationError(PaymentMadeTransactionInput.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Represents the request payload for creating a transaction of type REDRAW_REPAYMENT
+ */
+export interface RedrawRepaymentTransactionInputDTO {
+    /**
+     * The amount of the redraw repayment
+     */
+    amount?: number
+    /**
+     * The booking date of the repayment (as Organization Time)
+     */
+    bookingDate?: string
+    /**
+     * Extra notes about the redraw repayment transaction. Notes can have at most 255 characters in length.
+     */
+    notes?: string
+    /**
+     * The entry date of the repayment (as Organization Time)
+     */
+    valueDate?: string
+}
+
+export const RedrawRepaymentTransactionInputDTO = {
+    validate: (await import('./schemas/redraw-repayment-transaction-input-dto.schema.js'))
+        .validate as ValidateFunction<RedrawRepaymentTransactionInputDTO>,
+    get schema() {
+        return RedrawRepaymentTransactionInputDTO.validate.schema
+    },
+    get errors() {
+        return RedrawRepaymentTransactionInputDTO.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is RedrawRepaymentTransactionInputDTO => RedrawRepaymentTransactionInputDTO.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!RedrawRepaymentTransactionInputDTO.validate(o)) {
+            throw new ValidationError(RedrawRepaymentTransactionInputDTO.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Represents the request payload for creating a transaction of type REPAYMENT
+ */
+export interface RepaymentLoanTransactionInput {
+    /**
+     * The amount of the repayment
+     */
+    amount: number
+    /**
+     * The booking date of the repayment (as Organization Time)
+     */
+    bookingDate?: string
+    /**
+     * The list of custom amounts of the repayment
+     */
+    customPaymentAmounts?: CustomPaymentAmount[]
+    /**
+     * The external id of the repayment transaction, customizable, unique
+     */
+    externalId?: string
+    /**
+     * The encoded key of the schedule installment to which this repayment is associated
+     */
+    installmentEncodedKey?: string
+    /**
+     * Extra notes about the repayment transaction. Notes can have at most 255 characters in length.
+     */
+    notes?: string
+    /**
+     * The currency code for the repayment transaction
+     */
+    originalCurrencyCode?: string
+    /**
+     * The prepayment recalculation method of the repayment
+     */
+    prepaymentRecalculationMethod?:
+        | 'NO_RECALCULATION'
+        | 'RESCHEDULE_REMAINING_REPAYMENTS'
+        | 'RECALCULATE_SCHEDULE_KEEP_SAME_NUMBER_OF_TERMS'
+        | 'RECALCULATE_SCHEDULE_KEEP_SAME_PRINCIPAL_AMOUNT'
+        | 'RECALCULATE_SCHEDULE_KEEP_SAME_TOTAL_REPAYMENT_AMOUNT'
+        | 'REDUCE_AMOUNT_PER_INSTALLMENT'
+        | 'REDUCE_NUMBER_OF_INSTALLMENTS'
+        | 'REDUCE_NUMBER_OF_INSTALLMENTS_NEW'
+    transactionDetails?: LoanTransactionDetailsInput
+    /**
+     * The entry date of the repayment (as Organization Time)
+     */
+    valueDate?: string
+}
+
+export const RepaymentLoanTransactionInput = {
+    validate: (await import('./schemas/repayment-loan-transaction-input.schema.js'))
+        .validate as ValidateFunction<RepaymentLoanTransactionInput>,
+    get schema() {
+        return RepaymentLoanTransactionInput.validate.schema
+    },
+    get errors() {
+        return RepaymentLoanTransactionInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is RepaymentLoanTransactionInput => RepaymentLoanTransactionInput.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!RepaymentLoanTransactionInput.validate(o)) {
+            throw new ValidationError(RepaymentLoanTransactionInput.errors ?? [])
+        }
+    },
+} as const
+
+export interface RestError {
+    errorCode?: number
+    errorReason?: string
+    errorSource?: string
+}
+
+export type SearchResponse = LoanTransaction[]
+
+export const SearchResponse = {
+    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
+    get schema() {
+        return SearchResponse.validate.schema
+    },
+    get errors() {
+        return SearchResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
+} as const
+
+/**
+ * The taxes applied within a transaction.
+ */
+export interface Taxes {
+    /**
+     * How much taxes on the interest that was pre-paid were added/removed in account, within this transaction. If there is any deferred tax on interest amount set in this transaction, that amount should be included in this field.
+     */
+    deferredTaxOnInterestAmount?: number
+    /**
+     * How much taxes on the fees that were paid in this transaction were added/removed in account, within this transaction.
+     */
+    taxOnFeesAmount?: number
+    /**
+     * How much taxes on the interest that was paid in this transaction were added/removed in account, within this transaction.
+     */
+    taxOnInterestAmount?: number
+    /**
+     * The amount of taxes on the interest from arrears that were applied/paid in account, within this transaction.
+     */
+    taxOnInterestFromArrearsAmount?: number
+    /**
+     * The amount of taxes on the Payment Holidays interest that were added/removed in account, within this transaction.
+     */
+    taxOnPaymentHolidaysInterest?: number
+    /**
+     * How much taxes on the penalties that were paid in this transaction were added/removed in account, within this transaction.
+     */
+    taxOnPenaltyAmount?: number
+    /**
+     * The tax rate that was set or changed in this transaction.
+     */
+    taxRate?: number
 }
 
 /**
  * The balances changed within a transaction.
  */
 export interface TransactionBalances {
-    /**
-     * The account redraw balance captured after the transaction update.
-     */
-    redrawBalance?: number
-    /**
-     * The account redraw balance captured after the transaction update.
-     */
-    principalBalance?: number
-    /**
-     * The running balance still owed for the loan.
-     */
-    totalBalance?: number
-    /**
-     * The difference between principal balance and redraw balance after each transaction performed on the loan account.
-     */
-    expectedPrincipalRedraw?: number
     /**
      * Captures the advance (prepaid) amount.
      */
@@ -1401,20 +1315,36 @@ export interface TransactionBalances {
      * Captures the arrears position amount for the account in arrears.
      */
     arrearsPosition?: number
+    /**
+     * The difference between principal balance and redraw balance after each transaction performed on the loan account.
+     */
+    expectedPrincipalRedraw?: number
+    /**
+     * The account redraw balance captured after the transaction update.
+     */
+    principalBalance?: number
+    /**
+     * The account redraw balance captured after the transaction update.
+     */
+    redrawBalance?: number
+    /**
+     * The running balance still owed for the loan.
+     */
+    totalBalance?: number
 }
 
 /**
- * Contains the details for the spread of the adjusted amount over the installments
+ * Contains the details about transaction including fields like transaction channel key and channel id
  */
-export interface AdjustTransactionInstallmentDetailsDTO {
+export interface TransactionDetails {
     /**
-     * The encoded key of the installment
+     * The id of the transaction channel associated with the transaction details.
      */
-    installmentKey?: string
+    transactionChannelId?: string
     /**
-     * The amount to be added on the fee/penalty due amounts (depending on transaction type), on the corresponding installment
+     * The encoded key of the transaction channel associated with the transaction details.
      */
-    amountToAdd?: number
+    transactionChannelKey?: string
 }
 
 /**
@@ -1432,33 +1362,104 @@ export interface TransactionDetailsInput {
 }
 
 /**
- * An amount of predefined fee to apply on account.
+ * The interest settings, holds all the properties regarding interests for the loan account.
  */
-export interface FeeInput {
+export interface TransactionInterestSettings {
     /**
-     * The amount of the fee to apply
+     * The value of the index interest rate
      */
-    amount?: number
+    indexInterestRate?: number
     /**
-     * The encoded key of the predefined fee
+     * The interest rate. Represents the interest rate for the loan account. The interest on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.
      */
-    predefinedFeeKey: string
-    /**
-     * The percentage of the fee to apply
-     */
-    percentage?: number
+    interestRate?: number
 }
 
 /**
- * Represents the input for the transfer details for a disbursement transaction
+ * Represents the transfer details, such as the linked transaction key
  */
-export interface DisbursementTransferDetailsInput {
+export interface TransferDetails {
     /**
-     * The encoded key of the linked deposit account
+     * The key of the related deposit transaction
      */
-    linkedAccountKey?: string
+    linkedDepositTransactionKey?: string
     /**
-     * The id of the linked deposit account
+     * The key of the related loan transaction
      */
-    linkedAccountId?: string
+    linkedLoanTransactionKey?: string
 }
+
+/**
+ * Represents the request payload for unlocking an account
+ */
+export interface UnlockLoanAccountInput {
+    /**
+     * Extra notes about the current unlocking of account
+     */
+    notes?: string
+}
+
+export const UnlockLoanAccountInput = {
+    validate: (await import('./schemas/unlock-loan-account-input.schema.js'))
+        .validate as ValidateFunction<UnlockLoanAccountInput>,
+    get schema() {
+        return UnlockLoanAccountInput.validate.schema
+    },
+    get errors() {
+        return UnlockLoanAccountInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is UnlockLoanAccountInput => UnlockLoanAccountInput.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!UnlockLoanAccountInput.validate(o)) {
+            throw new ValidationError(UnlockLoanAccountInput.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Represents the request payload for creating a transaction of type WITHDRAWAL_REDRAW
+ */
+export interface WithdrawalRedrawTransactionInput {
+    /**
+     * The amount to be withdrawn from redraw balance
+     */
+    amount: number
+    /**
+     * The booking date of the withdrawal transaction (as Organization Time)
+     */
+    bookingDate?: string
+    /**
+     * The external id of the withdrawal transaction, customizable, unique
+     */
+    externalId?: string
+    /**
+     * Extra notes about the withdrawal transaction. Notes can have at most 255 characters in length.
+     */
+    notes?: string
+    /**
+     * The currency code for the transaction
+     */
+    originalCurrencyCode?: string
+    transactionDetails?: LoanTransactionDetailsInput
+    /**
+     * The value date of the withdrawal transaction (as Organization Time)
+     */
+    valueDate?: string
+}
+
+export const WithdrawalRedrawTransactionInput = {
+    validate: (await import('./schemas/withdrawal-redraw-transaction-input.schema.js'))
+        .validate as ValidateFunction<WithdrawalRedrawTransactionInput>,
+    get schema() {
+        return WithdrawalRedrawTransactionInput.validate.schema
+    },
+    get errors() {
+        return WithdrawalRedrawTransactionInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is WithdrawalRedrawTransactionInput => WithdrawalRedrawTransactionInput.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!WithdrawalRedrawTransactionInput.validate(o)) {
+            throw new ValidationError(WithdrawalRedrawTransactionInput.errors ?? [])
+        }
+    },
+} as const

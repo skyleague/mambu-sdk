@@ -86,395 +86,23 @@ export class MambuLoanAccounts {
     }
 
     /**
-     * Get loan account document
+     * Apply accrued interest
      */
-    public async getLoanAccountDocument({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string; templateId: string }
-        query?: { startDate?: string; endDate?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`loans/${path.loanAccountId}/templates/${path.templateId}`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetLoanAccountDocumentResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Update loan account funding sources
-     */
-    public async updateLoanAccountFundingSources({
-        body,
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: UpdateLoanAccountFundingSourcesRequest
-        path: { loanAccountId: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(UpdateLoanAccountFundingSourcesRequest, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).put(`loans/${path.loanAccountId}/funding`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: UpdateLoanAccountFundingSourcesResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create funding sources for a loan account
-     */
-    public async createLoanAccountFundingSources({
+    public async applyInterest({
         body,
         path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: CreateLoanAccountFundingSourcesRequest
+        body: ApplyInterestInput
         path: { loanAccountId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(CreateLoanAccountFundingSourcesRequest, body)
+        this.validateRequestBody(ApplyInterestInput, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}/funding`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: CreateLoanAccountFundingSourcesResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Delete loan account funding sources
-     */
-    public async deleteFundingSources({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).delete(`loans/${path.loanAccountId}/funding`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Undo write off for loan account
-     */
-    public async undoWriteOff({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: LoanActionDetails
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanActionDetails, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:undoWriteOff`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Pay off loan account
-     */
-    public async payOff({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: LoanAccountPayOffInput
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanAccountPayOffInput, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:payOff`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Change the periodic payment amount for an active loan, so that it is still possible to have principal and interest installments, but with a smaller or greater total due amount than the initial one.
-     */
-    public async changePeriodicPayment({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: ChangePeriodicPaymentLoanAccountInput
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ChangePeriodicPaymentLoanAccountInput, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:changePeriodicPayment`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Refinance loan account
-     */
-    public async refinance({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: RefinanceLoanAccountAction
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(RefinanceLoanAccountAction, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:refinance`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                200: LoanAccount,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Preview pay off due amounts in a future date
-     */
-    public async previewPayOffAmounts({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: PreviewPayOffDueAmountsInAFutureDateInput
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PreviewPayOffDueAmountsInAFutureDateInput, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:previewPayOffAmounts`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                200: PreviewPayOffDueAmountsInAFutureDateWrapper,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Reschedule loan account
-     */
-    public async reschedule({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: RescheduleLoanAccountAction
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(RescheduleLoanAccountAction, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:reschedule`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                200: LoanAccount,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Represents the information needed to delete a card associated to an account using its reference token.
-     */
-    public async deleteCard({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string; cardReferenceToken: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).delete(`loans/${path.loanAccountId}/cards/${path.cardReferenceToken}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Undo loan account reschedule action
-     */
-    public async undoReschedule({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: LoanActionDetails
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanActionDetails, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:undoReschedule`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Change arrears settings for loan account
-     */
-    public async changeArrearsSettings({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: ChangeArrearsSettingsInput
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ChangeArrearsSettingsInput, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:changeArrearsSettings`, {
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:applyInterest`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
@@ -524,23 +152,23 @@ export class MambuLoanAccounts {
     }
 
     /**
-     * Change loan account interest rate
+     * Change arrears settings for loan account
      */
-    public async changeInterestRate({
+    public async changeArrearsSettings({
         body,
         path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: ChangeInterestRateLoanAccountInput
+        body: ChangeArrearsSettingsInput
         path: { loanAccountId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(ChangeInterestRateLoanAccountInput, body)
+        this.validateRequestBody(ChangeArrearsSettingsInput, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:changeInterestRate`, {
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:changeArrearsSettings`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
@@ -552,36 +180,6 @@ export class MambuLoanAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Update collateral asset amounts
-     */
-    public async reevaluateCollateralAssets({
-        body,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: CollateralAssetFilter
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(CollateralAssetFilter, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans:reevaluateCollateral`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                202: CollateralAssetsReevaluationResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
             }
         )
     }
@@ -620,52 +218,29 @@ export class MambuLoanAccounts {
     }
 
     /**
-     * Search loan accounts
+     * Change loan account interest rate
      */
-    public async search({
+    public async changeInterestRate({
         body,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: LoanAccountSearchCriteria
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanAccountSearchCriteria, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans:search`, {
-                json: body,
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: SearchResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Delete loan account funding source
-     */
-    public async deleteSingleFundingSource({
         path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { loanAccountId: string; fundEncodedKey: string }
+        body: ChangeInterestRateLoanAccountInput
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
+        this.validateRequestBody(ChangeInterestRateLoanAccountInput, body)
+
         return this.awaitResponse(
-            this.buildClient(auth).delete(`loans/${path.loanAccountId}/funding/${path.fundEncodedKey}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:changeInterestRate`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (_x: unknown): _x is unknown => true },
                 204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -676,26 +251,29 @@ export class MambuLoanAccounts {
     }
 
     /**
-     * Update loan account funding source
+     * Change the periodic payment amount for an active loan, so that it is still possible to have principal and interest installments, but with a smaller or greater total due amount than the initial one.
      */
-    public async patchFundingSource({
+    public async changePeriodicPayment({
         body,
         path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: PatchFundingSourceRequest
-        path: { loanAccountId: string; fundEncodedKey: string }
+        body: ChangePeriodicPaymentLoanAccountInput
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(PatchFundingSourceRequest, body)
+        this.validateRequestBody(ChangePeriodicPaymentLoanAccountInput, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).patch(`loans/${path.loanAccountId}/funding/${path.fundEncodedKey}`, {
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:changePeriodicPayment`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
+                102: { is: (_x: unknown): _x is unknown => true },
                 204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -706,22 +284,94 @@ export class MambuLoanAccounts {
     }
 
     /**
-     * Get planned fees
+     * Change repayment value for loan account
      */
-    public async getAllPlannedFees({
+    public async changeRepaymentValue({
+        body,
         path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
+        body: ChangeRepaymentValueLoanAccountInput
         path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
+        this.validateRequestBody(ChangeRepaymentValueLoanAccountInput, body)
+
         return this.awaitResponse(
-            this.buildClient(auth).get(`loans/${path.loanAccountId}/plannedfees`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:changeRepaymentValue`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: GetAllPlannedFeesResponse,
+                102: { is: (_x: unknown): _x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Change loan account state
+     */
+    public async changeState({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: LoanAccountAction
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(LoanAccountAction, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:changeState`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                200: LoanAccount,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Create loan account
+     */
+    public async create({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: LoanAccount
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(LoanAccount, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: LoanAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -730,27 +380,63 @@ export class MambuLoanAccounts {
     }
 
     /**
-     * Update planned fees
+     * Represents the information needed to create and associate a new card to an account.
      */
-    public async updatePlannedFees({
+    public async createCard({
         body,
         path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: UpdatePlannedFeesRequest
+        body: Card
         path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(UpdatePlannedFeesRequest, body)
+        this.validateRequestBody(Card, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).put(`loans/${path.loanAccountId}/plannedfees`, {
+            this.buildClient(auth).post(`loans/${path.loanAccountId}/cards`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: UpdatePlannedFeesResponse,
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Create funding sources for a loan account
+     */
+    public async createLoanAccountFundingSources({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CreateLoanAccountFundingSourcesRequest
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(CreateLoanAccountFundingSourcesRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/${path.loanAccountId}/funding`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: CreateLoanAccountFundingSourcesResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -793,97 +479,6 @@ export class MambuLoanAccounts {
     }
 
     /**
-     * Write off loan account
-     */
-    public async writeOff({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: LoanActionDetails
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanActionDetails, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:writeOff`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get loan account
-     */
-    public async getById({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string }
-        query?: { detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`loans/${path.loanAccountId}`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: LoanAccount,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Update loan account
-     */
-    public async update({
-        body,
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: LoanAccount
-        path: { loanAccountId: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanAccount, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).put(`loans/${path.loanAccountId}`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: LoanAccount,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Delete loan account
      */
     public async delete({
@@ -909,22 +504,17 @@ export class MambuLoanAccounts {
     }
 
     /**
-     * Partially update loan account
+     * Represents the information needed to delete a card associated to an account using its reference token.
      */
-    public async patch({
-        body,
+    public async deleteCard({
         path,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: PatchRequest
-        path: { loanAccountId: string }
+        path: { loanAccountId: string; cardReferenceToken: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(PatchRequest, body)
-
         return this.awaitResponse(
-            this.buildClient(auth).patch(`loans/${path.loanAccountId}`, {
-                json: body,
+            this.buildClient(auth).delete(`loans/${path.loanAccountId}/cards/${path.cardReferenceToken}`, {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
@@ -934,6 +524,118 @@ export class MambuLoanAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Delete loan account funding sources
+     */
+    public async deleteFundingSources({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { loanAccountId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).delete(`loans/${path.loanAccountId}/funding`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Delete planned fee
+     */
+    public async deletePlannedFees({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { loanAccountId: string; plannedInstallmentFeeKey: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).delete(`loans/${path.loanAccountId}/plannedfees/${path.plannedInstallmentFeeKey}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Delete loan account funding source
+     */
+    public async deleteSingleFundingSource({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { loanAccountId: string; fundEncodedKey: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).delete(`loans/${path.loanAccountId}/funding/${path.fundEncodedKey}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get loan accounts
+     */
+    public async getAll({
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        query?: {
+            offset?: string
+            limit?: string
+            paginationDetails?: string
+            detailsLevel?: string
+            creditOfficerUsername?: string
+            branchId?: string
+            centreId?: string
+            accountState?: string
+            accountHolderType?: string
+            accountHolderId?: string
+            sortBy?: string
+        }
+        auth?: string[][] | string[]
+    } = {}) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`loans`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetAllResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
             }
         )
     }
@@ -992,164 +694,131 @@ export class MambuLoanAccounts {
     }
 
     /**
-     * Represents the information needed to create and associate a new card to an account.
+     * Get planned fees
      */
-    public async createCard({
-        body,
+    public async getAllPlannedFees({
         path,
-        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: Card
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(Card, body)
-
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}/cards`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+            this.buildClient(auth).get(`loans/${path.loanAccountId}/plannedfees`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: { is: (_x: unknown): _x is unknown => true },
+                200: GetAllPlannedFeesResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-                404: ErrorResponse,
             }
         )
     }
 
     /**
-     * Change repayment value for loan account
+     * Get loan account
      */
-    public async changeRepaymentValue({
-        body,
+    public async getById({
         path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: ChangeRepaymentValueLoanAccountInput
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ChangeRepaymentValueLoanAccountInput, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:changeRepaymentValue`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Apply accrued interest
-     */
-    public async applyInterest({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: ApplyInterestInput
-        path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ApplyInterestInput, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:applyInterest`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get loan accounts
-     */
-    public async getAll({
         query,
         auth = [['apiKey'], ['basic']],
     }: {
-        query?: {
-            offset?: string
-            limit?: string
-            paginationDetails?: string
-            detailsLevel?: string
-            creditOfficerUsername?: string
-            branchId?: string
-            centreId?: string
-            accountState?: string
-            accountHolderType?: string
-            accountHolderId?: string
-            sortBy?: string
-        }
+        path: { loanAccountId: string }
+        query?: { detailsLevel?: string }
         auth?: string[][] | string[]
-    } = {}) {
+    }) {
         return this.awaitResponse(
-            this.buildClient(auth).get(`loans`, {
+            this.buildClient(auth).get(`loans/${path.loanAccountId}`, {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                200: GetAllResponse,
+                200: LoanAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }
 
     /**
-     * Create loan account
+     * Get loan account document
      */
-    public async create({
-        body,
-        headers,
+    public async getLoanAccountDocument({
+        path,
+        query,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: LoanAccount
-        headers?: { ['Idempotency-Key']?: string }
+        path: { loanAccountId: string; templateId: string }
+        query?: { startDate?: string; endDate?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(LoanAccount, body)
-
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+            this.buildClient(auth).get(`loans/${path.loanAccountId}/templates/${path.templateId}`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: LoanAccount,
+                200: GetLoanAccountDocumentResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Download loan account document PDF
+     */
+    public async getPdfDocument({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { loanAccountId: string; templateId: string }
+        query?: { startDate?: string; endDate?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`loans/${path.loanAccountId}/templates/${path.templateId}/pdf`, {
+                searchParams: query ?? {},
+            }),
+            {
+                200: { is: (_x: unknown): _x is string => true },
+                400: { is: (_x: unknown): _x is string => true },
+                401: { is: (_x: unknown): _x is string => true },
+                403: { is: (_x: unknown): _x is string => true },
+                404: { is: (_x: unknown): _x is string => true },
+            }
+        )
+    }
+
+    /**
+     * Preview loan account schedule for non-existent loan account
+     */
+    public async getPreviewLoanAccountSchedule({
+        body,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: PreviewLoanAccountSchedule
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(PreviewLoanAccountSchedule, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans:previewSchedule`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: LoanAccountSchedule,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -1158,23 +827,111 @@ export class MambuLoanAccounts {
     }
 
     /**
-     * Undo loan account refinance action
+     * Get all versions of loan account
      */
-    public async undoRefinance({
+    public async getVersionsById({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { loanAccountId: string }
+        query?: { detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`loans/${path.loanAccountId}:versions`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetVersionsByIdResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Partially update loan account
+     */
+    public async patch({
+        body,
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: PatchRequest
+        path: { loanAccountId: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(PatchRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).patch(`loans/${path.loanAccountId}`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Update loan account funding source
+     */
+    public async patchFundingSource({
+        body,
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: PatchFundingSourceRequest
+        path: { loanAccountId: string; fundEncodedKey: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(PatchFundingSourceRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).patch(`loans/${path.loanAccountId}/funding/${path.fundEncodedKey}`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Pay off loan account
+     */
+    public async payOff({
         body,
         path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: LoanActionDetails
+        body: LoanAccountPayOffInput
         path: { loanAccountId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(LoanActionDetails, body)
+        this.validateRequestBody(LoanAccountPayOffInput, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:undoRefinance`, {
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:payOff`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
@@ -1182,6 +939,166 @@ export class MambuLoanAccounts {
             {
                 102: { is: (_x: unknown): _x is unknown => true },
                 204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Preview pay off due amounts in a future date
+     */
+    public async previewPayOffAmounts({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: PreviewPayOffDueAmountsInAFutureDateInput
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(PreviewPayOffDueAmountsInAFutureDateInput, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:previewPayOffAmounts`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                200: PreviewPayOffDueAmountsInAFutureDateWrapper,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Update collateral asset amounts
+     */
+    public async reevaluateCollateralAssets({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CollateralAssetFilter
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(CollateralAssetFilter, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans:reevaluateCollateral`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                202: CollateralAssetsReevaluationResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Refinance loan account
+     */
+    public async refinance({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: RefinanceLoanAccountAction
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(RefinanceLoanAccountAction, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:refinance`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                200: LoanAccount,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Reschedule loan account
+     */
+    public async reschedule({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: RescheduleLoanAccountAction
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(RescheduleLoanAccountAction, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:reschedule`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                200: LoanAccount,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Search loan accounts
+     */
+    public async search({
+        body,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: LoanAccountSearchCriteria
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(LoanAccountSearchCriteria, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans:search`, {
+                json: body,
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: SearchResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -1224,82 +1141,29 @@ export class MambuLoanAccounts {
     }
 
     /**
-     * Change loan account state
+     * Undo loan account refinance action
      */
-    public async changeState({
+    public async undoRefinance({
         body,
         path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: LoanAccountAction
+        body: LoanActionDetails
         path: { loanAccountId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(LoanAccountAction, body)
+        this.validateRequestBody(LoanActionDetails, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans/${path.loanAccountId}:changeState`, {
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:undoRefinance`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
                 102: { is: (_x: unknown): _x is unknown => true },
-                200: LoanAccount,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get all versions of loan account
-     */
-    public async getVersionsById({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string }
-        query?: { detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`loans/${path.loanAccountId}:versions`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetVersionsByIdResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Delete planned fee
-     */
-    public async deletePlannedFees({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string; plannedInstallmentFeeKey: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).delete(`loans/${path.loanAccountId}/plannedfees/${path.plannedInstallmentFeeKey}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
                 204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
@@ -1310,54 +1174,190 @@ export class MambuLoanAccounts {
     }
 
     /**
-     * Preview loan account schedule for non-existent loan account
+     * Undo loan account reschedule action
      */
-    public async getPreviewLoanAccountSchedule({
+    public async undoReschedule({
         body,
+        path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: PreviewLoanAccountSchedule
+        body: LoanActionDetails
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(PreviewLoanAccountSchedule, body)
+        this.validateRequestBody(LoanActionDetails, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans:previewSchedule`, {
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:undoReschedule`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: LoanAccountSchedule,
+                102: { is: (_x: unknown): _x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }
 
     /**
-     * Download loan account document PDF
+     * Undo write off for loan account
      */
-    public async getPdfDocument({
+    public async undoWriteOff({
+        body,
         path,
-        query,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { loanAccountId: string; templateId: string }
-        query?: { startDate?: string; endDate?: string }
+        body: LoanActionDetails
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
+        this.validateRequestBody(LoanActionDetails, body)
+
         return this.awaitResponse(
-            this.buildClient(auth).get(`loans/${path.loanAccountId}/templates/${path.templateId}/pdf`, {
-                searchParams: query ?? {},
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:undoWriteOff`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
             }),
             {
-                200: { is: (_x: unknown): _x is string => true },
-                400: { is: (_x: unknown): _x is string => true },
-                401: { is: (_x: unknown): _x is string => true },
-                403: { is: (_x: unknown): _x is string => true },
-                404: { is: (_x: unknown): _x is string => true },
+                102: { is: (_x: unknown): _x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Update loan account
+     */
+    public async update({
+        body,
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: LoanAccount
+        path: { loanAccountId: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(LoanAccount, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).put(`loans/${path.loanAccountId}`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: LoanAccount,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Update loan account funding sources
+     */
+    public async updateLoanAccountFundingSources({
+        body,
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: UpdateLoanAccountFundingSourcesRequest
+        path: { loanAccountId: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(UpdateLoanAccountFundingSourcesRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).put(`loans/${path.loanAccountId}/funding`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: UpdateLoanAccountFundingSourcesResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Update planned fees
+     */
+    public async updatePlannedFees({
+        body,
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: UpdatePlannedFeesRequest
+        path: { loanAccountId: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(UpdatePlannedFeesRequest, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).put(`loans/${path.loanAccountId}/plannedfees`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: UpdatePlannedFeesResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Write off loan account
+     */
+    public async writeOff({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: LoanActionDetails
+        path: { loanAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(LoanActionDetails, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/${path.loanAccountId}:writeOff`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }

@@ -51,6 +51,68 @@ export class MambuCommunications {
     }
 
     /**
+     * Resend failed communication message(s) asynchronously by date
+     */
+    public async enqueueByDate({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CommunicationMessageEnqueueAction
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(CommunicationMessageEnqueueAction, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`communications/messages:resendAsyncByDate`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                200: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Resend failed communication message(s) asynchronously using keys
+     */
+    public async enqueueByKeys({
+        body,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CommunicationMessageAction
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(CommunicationMessageAction, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`communications/messages:resendAsyncByKeys`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                200: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Get communication message
      */
     public async getByEncodedKey({
@@ -79,58 +141,28 @@ export class MambuCommunications {
     }
 
     /**
-     * Send communication message
+     * Resend failed communication message(s)
      */
-    public async send({
+    public async resend({
         body,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: CommunicationMessage
+        body: CommunicationMessageAction
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(CommunicationMessage, body)
+        this.validateRequestBody(CommunicationMessageAction, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`communications/messages`, {
+            this.buildClient(auth).post(`communications/messages:resend`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
                 102: { is: (_x: unknown): _x is unknown => true },
-                201: CommunicationMessage,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Resend failed communication message(s) asynchronously by date
-     */
-    public async enqueueByDate({
-        body,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: CommunicationMessageEnqueueAction
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(CommunicationMessageEnqueueAction, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`communications/messages:resendAsyncByDate`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                200: { is: (_x: unknown): _x is unknown => true },
+                202: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -170,63 +202,31 @@ export class MambuCommunications {
     }
 
     /**
-     * Resend failed communication message(s)
+     * Send communication message
      */
-    public async resend({
+    public async send({
         body,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: CommunicationMessageAction
+        body: CommunicationMessage
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(CommunicationMessageAction, body)
+        this.validateRequestBody(CommunicationMessage, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`communications/messages:resend`, {
+            this.buildClient(auth).post(`communications/messages`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
                 102: { is: (_x: unknown): _x is unknown => true },
-                202: { is: (_x: unknown): _x is unknown => true },
+                201: CommunicationMessage,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Resend failed communication message(s) asynchronously using keys
-     */
-    public async enqueueByKeys({
-        body,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: CommunicationMessageAction
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(CommunicationMessageAction, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`communications/messages:resendAsyncByKeys`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                200: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
             }
         )
     }

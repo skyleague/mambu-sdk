@@ -11,10 +11,6 @@ import { ValidationError } from 'ajv'
  */
 export interface ApiKey {
     /**
-     * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
-     */
-    id?: string
-    /**
      * A six character cleartext prefix of the API key. The prefix is not guaranteed to be unique. You must base any identification process on the API key ID, not the prefix.
      */
     apiKey?: string
@@ -22,6 +18,10 @@ export interface ApiKey {
      * The time to live (TTL) for the API key in seconds.
      */
     expirationTime?: number
+    /**
+     * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
+     */
+    id?: string
 }
 
 export const ApiKey = {
@@ -45,13 +45,13 @@ export const ApiKey = {
  */
 export interface ApiKeyRotationResult {
     /**
-     * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
-     */
-    id?: string
-    /**
      * The new API key created after rotating an existing API key.
      */
     apiKey?: string
+    /**
+     * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
+     */
+    id?: string
     /**
      * The new secret key created after rotating an existing API key.
      */
@@ -91,6 +91,6 @@ export const ErrorResponse = {
 
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

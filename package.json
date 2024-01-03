@@ -21,9 +21,9 @@
     "package.json"
   ],
   "scripts": {
-    "build": "npx ts-node --esm build.config.ts",
+    "build": "node --import tsx/esm build.config.ts",
     "build:docs": "npx typedoc",
-    "build:index": "npx ts-node scripts/build-index.ts",
+    "build:index": "node --import tsx/esm scripts/build-index.ts",
     "check:cost": "npx cost-of-modules --no-install --include-dev",
     "check:coverage": "npx vitest run --coverage=true",
     "check:full": "npm run lint && npm run check:types && npm run check:coverage && npm run check:project",
@@ -43,20 +43,20 @@
     "tslib": "^2.6.2"
   },
   "devDependencies": {
-    "@skyleague/axioms": "^2.5.1",
-    "@skyleague/node-standards": "^3.10.5",
-    "@skyleague/therefore": "^3.0.2",
-    "@types/split2": "^4.2.2",
+    "@skyleague/axioms": "^3.0.2",
+    "@skyleague/node-standards": "^4.1.0",
+    "@skyleague/therefore": "^4.1.0",
+    "@types/split2": "^4.2.3",
     "camelcase": "^8.0.0",
-    "got": "^13.0.0",
-    "nock": "^13.3.6",
-    "typescript": "^5.2.2"
+    "got": "^14.0.0",
+    "nock": "^13.4.0",
+    "typescript": "^5.3.3"
   },
   "peerDependencies": {
-    "got": "^13.0.0"
+    "got": "^14.0.0"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "publishConfig": {
     "access": "public",

@@ -6,17 +6,66 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
-export type GetAllResponse = CurrencyDetails[]
+/**
+ * Represents a currency.
+ */
+export interface CurrencyDetails {
+    /**
+     * `TRUE` if the currency is the base currency, `FALSE` otherwise. It cannot be changed and it's a read-only field not required for update operations.
+     */
+    baseCurrency: boolean
+    /**
+     * The currency code, which cannot be changed once the currency is created.
+     */
+    code: string
+    /**
+     * The date this currency was created. It cannot be changed and it's a read-only field not required for update operations.
+     */
+    creationDate?: string
+    /**
+     * The currency symbol position.
+     */
+    currencySymbolPosition: 'BEFORE_NUMBER' | 'AFTER_NUMBER'
+    /**
+     * The number of digits that are supported for a given currency.
+     */
+    digitsAfterDecimal?: number
+    /**
+     * The last date this currency was modified. It's updated automatically and it's a read-only field not required for update operations.
+     */
+    lastModifiedDate?: string
+    /**
+     * The name of the currency.
+     */
+    name: string
+    /**
+     * The currency numeric code.
+     */
+    numericCode?: string
+    /**
+     * The currency symbol.
+     */
+    symbol: string
+    /**
+     * The type of the currency.
+     */
+    type: 'FIAT_CURRENCY' | 'CRYPTOCURRENCY' | 'NON_TRADITIONAL_CURRENCY'
+}
 
-export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+export const CurrencyDetails = {
+    validate: (await import('./schemas/currency-details.schema.js')).validate as ValidateFunction<CurrencyDetails>,
     get schema() {
-        return GetAllResponse.validate.schema
+        return CurrencyDetails.validate.schema
     },
     get errors() {
-        return GetAllResponse.validate.errors ?? undefined
+        return CurrencyDetails.validate.errors ?? undefined
     },
-    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    is: (o: unknown): o is CurrencyDetails => CurrencyDetails.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!CurrencyDetails.validate(o)) {
+            throw new ValidationError(CurrencyDetails.errors ?? [])
+        }
+    },
 } as const
 
 export interface ErrorResponse {
@@ -39,70 +88,21 @@ export const ErrorResponse = {
     },
 } as const
 
-/**
- * Represents a currency.
- */
-export interface CurrencyDetails {
-    /**
-     * The currency symbol.
-     */
-    symbol: string
-    /**
-     * The currency code, which cannot be changed once the currency is created.
-     */
-    code: string
-    /**
-     * The number of digits that are supported for a given currency.
-     */
-    digitsAfterDecimal?: number
-    /**
-     * The last date this currency was modified. It's updated automatically and it's a read-only field not required for update operations.
-     */
-    lastModifiedDate?: string
-    /**
-     * The currency symbol position.
-     */
-    currencySymbolPosition: 'BEFORE_NUMBER' | 'AFTER_NUMBER'
-    /**
-     * The name of the currency.
-     */
-    name: string
-    /**
-     * The type of the currency.
-     */
-    type: 'FIAT_CURRENCY' | 'CRYPTOCURRENCY' | 'NON_TRADITIONAL_CURRENCY'
-    /**
-     * The date this currency was created. It cannot be changed and it's a read-only field not required for update operations.
-     */
-    creationDate?: string
-    /**
-     * `TRUE` if the currency is the base currency, `FALSE` otherwise. It cannot be changed and it's a read-only field not required for update operations.
-     */
-    baseCurrency: boolean
-    /**
-     * The currency numeric code.
-     */
-    numericCode?: string
-}
+export type GetAllResponse = CurrencyDetails[]
 
-export const CurrencyDetails = {
-    validate: (await import('./schemas/currency-details.schema.js')).validate as ValidateFunction<CurrencyDetails>,
+export const GetAllResponse = {
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
     get schema() {
-        return CurrencyDetails.validate.schema
+        return GetAllResponse.validate.schema
     },
     get errors() {
-        return CurrencyDetails.validate.errors ?? undefined
+        return GetAllResponse.validate.errors ?? undefined
     },
-    is: (o: unknown): o is CurrencyDetails => CurrencyDetails.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!CurrencyDetails.validate(o)) {
-            throw new ValidationError(CurrencyDetails.errors ?? [])
-        }
-    },
+    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

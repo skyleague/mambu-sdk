@@ -7,17 +7,171 @@ import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
 /**
+ * Account balances presented to inquirer such as card processor
+ */
+export interface AccountBalances {
+    /**
+     * The unique account identifier
+     */
+    accountId?: string
+    /**
+     * The available balance of a deposit or credit account
+     */
+    availableBalance?: number
+    /**
+     * The card type either DEBIT or CREDIT
+     */
+    cardType?: 'DEBIT' | 'CREDIT'
+    /**
+     * The overdraft limit of a deposit account or the loan amount in case of a credit account
+     */
+    creditLimit?: number
+    /**
+     * Currency code used for the account
+     */
+    currencyCode?: string
+    /**
+     * The current balance of a deposit account or principal balance of a revolving credit
+     */
+    totalBalance?: number
+}
+
+export const AccountBalances = {
+    validate: (await import('./schemas/account-balances.schema.js')).validate as ValidateFunction<AccountBalances>,
+    get schema() {
+        return AccountBalances.validate.schema
+    },
+    get errors() {
+        return AccountBalances.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is AccountBalances => AccountBalances.validate(o) === true,
+} as const
+
+/**
+ * The account currency and identification
+ */
+export interface AccountDetails {
+    /**
+     * The currency of the account
+     */
+    currency?: string
+    identification?: AccountIdentification
+}
+
+/**
+ * The account identification details
+ */
+export interface AccountIdentification {
+    /**
+     * The account unique identifier
+     */
+    iban?: string
+    other?: OtherAccountIdentification
+}
+
+/**
+ * The agent details for a party
+ */
+export interface Agent {
+    financialInstitutionIdentification?: FinancialInstitutionIdentification
+}
+
+/**
+ * The authorization hold corresponding to a card token
+ */
+export interface AuthorizationHold {
+    /**
+     * The key of the account linked with the authorization hold.
+     */
+    accountKey?: string
+    /**
+     * Whether the given request should be accepted without balance validations.
+     */
+    advice: boolean
+    /**
+     * The amount of money to be held as a result of the authorization hold request.
+     */
+    amount: number
+    balances?: AccountBalances
+    cardAcceptor?: CardAcceptor
+    /**
+     * The reference token of the card.
+     */
+    cardToken?: string
+    /**
+     * The organization time when the authorization hold was created
+     */
+    creationDate?: string
+    /**
+     * Indicates whether the authorization hold amount is credited or debited.If not provided, the default values is DBIT.
+     */
+    creditDebitIndicator?: 'DBIT' | 'CRDT'
+    /**
+     * The ISO currency code in which the hold was created. The amounts are stored in the base currency, but the user could have enter it in a foreign currency.
+     */
+    currencyCode?: string
+    /**
+     * The custom expiration period for the hold which overwrites mcc and default expiration periods
+     */
+    customExpirationPeriod?: number
+    /**
+     * The exchange rate for the original currency.
+     */
+    exchangeRate?: number
+    /**
+     * The external reference ID to be used to reference the account hold in subsequent requests.
+     */
+    externalReferenceId: string
+    /**
+     * The original amount of money to be held as a result of the authorization hold request.
+     */
+    originalAmount?: number
+    /**
+     * The original currency in which the hold was created.
+     */
+    originalCurrency?: string
+    /**
+     * The date to consider as start date when calculating the number of days passed until expiration
+     */
+    referenceDateForExpiration?: string
+    /**
+     * Indicates the source of the authorization hold, the default values is CARD.
+     */
+    source?: 'CARD' | 'ACCOUNT'
+    /**
+     * The authorization hold status.
+     */
+    status?: 'PENDING' | 'REVERSED' | 'SETTLED' | 'EXPIRED'
+    /**
+     * The formatted time at which the user made this authorization hold.
+     */
+    userTransactionTime?: string
+}
+
+export const AuthorizationHold = {
+    validate: (await import('./schemas/authorization-hold.schema.js')).validate as ValidateFunction<AuthorizationHold>,
+    get schema() {
+        return AuthorizationHold.validate.schema
+    },
+    get errors() {
+        return AuthorizationHold.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is AuthorizationHold => AuthorizationHold.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!AuthorizationHold.validate(o)) {
+            throw new ValidationError(AuthorizationHold.errors ?? [])
+        }
+    },
+} as const
+
+/**
  * A request to decrease/increase the amount of an authorization hold.
  */
 export interface AuthorizationHoldAmountAdjustmentRequest {
     /**
-     * The external reference ID of the decrease/increase request (not of the authorization hold).
+     * Whether the given request should be accepted without balance validations.
      */
-    externalReferenceId?: string
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
+    advice?: boolean
     /**
      * The amount of money to be subtracted/added to the authorization hold amount. For the decrease: if the amount is greater or equal to the authorization hold amount, then the authorization hold is reversed.
      */
@@ -27,9 +181,13 @@ export interface AuthorizationHoldAmountAdjustmentRequest {
      */
     currencyCode?: string
     /**
-     * Whether the given request should be accepted without balance validations.
+     * The encoded key of the entity, generated, globally unique
      */
-    advice?: boolean
+    encodedKey?: string
+    /**
+     * The external reference ID of the decrease/increase request (not of the authorization hold).
+     */
+    externalReferenceId?: string
 }
 
 export const AuthorizationHoldAmountAdjustmentRequest = {
@@ -49,6 +207,448 @@ export const AuthorizationHoldAmountAdjustmentRequest = {
         }
     },
 } as const
+
+/**
+ * The details of the card acceptor (merchant) in a transaction hold.
+ */
+export interface CardAcceptor {
+    /**
+     * The city in which the card acceptor has the business.
+     */
+    city?: string
+    /**
+     * The country in which the card acceptor has the business.
+     */
+    country?: string
+    /**
+     * The Merchant Category Code of the card acceptor.
+     */
+    mcc?: number
+    /**
+     * The name of the card acceptor.
+     */
+    name?: string
+    /**
+     * The state in which the card acceptor has the business.
+     */
+    state?: string
+    /**
+     * The street in which the card acceptor has the business.
+     */
+    street?: string
+    /**
+     * The ZIP code of the location in which the card acceptor has the business.
+     */
+    zip?: string
+}
+
+/**
+ * A card transaction entry which will have a corresponding a financial transaction performed.
+ */
+export interface CardTransaction {
+    /**
+     * Whether the given request should be accepted without balance validations.
+     */
+    advice: boolean
+    /**
+     * The amount of money to be withdrawn in the financial transaction.
+     */
+    amount: number
+    cardAcceptor?: CardAcceptor
+    /**
+     * The reference token of the card.
+     */
+    cardToken?: string
+    /**
+     * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
+     */
+    currencyCode?: string
+    /**
+     * The encoded key of the entity, generated, globally unique
+     */
+    encodedKey?: string
+    /**
+     * The external authorization hold reference ID, which relates this card transaction to a previous authorization hold.
+     */
+    externalAuthorizationReferenceId?: string
+    /**
+     * The external reference ID to be used to reference the card transaction in subsequent requests.
+     */
+    externalReferenceId: string
+    /**
+     * The formatted time at which the user made this card transaction.
+     */
+    userTransactionTime?: string
+}
+
+/**
+ * A card transaction entry which will have a corresponding a financial transaction performed.
+ */
+export interface CardTransactionInput {
+    /**
+     * Whether the given request should be accepted without balance validations.
+     */
+    advice: boolean
+    /**
+     * The amount of money to be withdrawn in the financial transaction.
+     */
+    amount: number
+    cardAcceptor?: CardAcceptor
+    /**
+     * The reference token of the card.
+     */
+    cardToken?: string
+    /**
+     * If present, indicates that the card transaction is a refund, and whether is credited or debited
+     */
+    creditDebitIndicator?: 'DBIT' | 'CRDT'
+    /**
+     * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
+     */
+    currencyCode?: string
+    /**
+     * The encoded key of the entity, generated, globally unique
+     */
+    encodedKey?: string
+    /**
+     * The external authorization hold reference ID, which relates this card transaction to a previous authorization hold.
+     */
+    externalAuthorizationReferenceId?: string
+    /**
+     * The external reference ID to be used to reference the card transaction in subsequent requests.
+     */
+    externalReferenceId: string
+    /**
+     * The date of the first repayment for the loan account (as Organization Time)
+     */
+    firstRepaymentDate?: string
+    /**
+     * Increase available amount if needed
+     */
+    increaseAmountIfNeeded?: boolean
+    /**
+     * Whether the given request should be a partial clearing or not.
+     */
+    partial?: boolean
+    /**
+     * The ID of the channel through which the payment is done.
+     */
+    transactionChannelId: string
+    /**
+     * The formatted time at which the user made this card transaction.
+     */
+    userTransactionTime?: string
+}
+
+export const CardTransactionInput = {
+    validate: (await import('./schemas/card-transaction-input.schema.js')).validate as ValidateFunction<CardTransactionInput>,
+    get schema() {
+        return CardTransactionInput.validate.schema
+    },
+    get errors() {
+        return CardTransactionInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CardTransactionInput => CardTransactionInput.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!CardTransactionInput.validate(o)) {
+            throw new ValidationError(CardTransactionInput.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * A card transaction output after a financial transaction was performed.
+ */
+export interface CardTransactionOutput {
+    /**
+     * Whether the given request should be accepted without balance validations.
+     */
+    advice: boolean
+    /**
+     * The amount of money to be withdrawn in the financial transaction.
+     */
+    amount: number
+    balances?: AccountBalances
+    cardAcceptor?: CardAcceptor
+    /**
+     * The reference token of the card.
+     */
+    cardToken?: string
+    /**
+     * If present, indicates that the card transaction is a refund, and whether is credited or debited
+     */
+    creditDebitIndicator?: 'DBIT' | 'CRDT'
+    /**
+     * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
+     */
+    currencyCode?: string
+    /**
+     * The encoded key of the entity, generated, globally unique
+     */
+    encodedKey?: string
+    /**
+     * The external authorization hold reference ID, which relates this card transaction to a previous authorization hold.
+     */
+    externalAuthorizationReferenceId?: string
+    /**
+     * The external reference ID to be used to reference the card transaction in subsequent requests.
+     */
+    externalReferenceId: string
+    /**
+     * The date of the first repayment for the loan account (as Organization Time)
+     */
+    firstRepaymentDate?: string
+    /**
+     * Increase available amount if needed
+     */
+    increaseAmountIfNeeded?: boolean
+    linkedTransaction?: LinkedTransaction
+    /**
+     * Whether the given request should be a partial clearing or not.
+     */
+    partial?: boolean
+    /**
+     * The ID of the channel through which the payment is done.
+     */
+    transactionChannelId: string
+    /**
+     * The formatted time at which the user made this card transaction.
+     */
+    userTransactionTime?: string
+}
+
+export const CardTransactionOutput = {
+    validate: (await import('./schemas/card-transaction-output.schema.js')).validate as ValidateFunction<CardTransactionOutput>,
+    get schema() {
+        return CardTransactionOutput.validate.schema
+    },
+    get errors() {
+        return CardTransactionOutput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CardTransactionOutput => CardTransactionOutput.validate(o) === true,
+} as const
+
+/**
+ * A full or partial reversal of a card transaction.
+ */
+export interface CardTransactionReversal {
+    /**
+     * The amount of money to be credited in the client's account from the original card transaction.
+     */
+    amount: number
+    /**
+     * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
+     */
+    currencyCode?: string
+    /**
+     * The encoded key of the entity, generated, globally unique
+     */
+    encodedKey?: string
+    /**
+     * The external reference ID to be used to reference the card reversal transaction in subsequent requests.
+     */
+    externalReferenceId: string
+    /**
+     * The id of the Deposit Transaction
+     */
+    id?: number
+    /**
+     * The ID of the channel through which the payment is done. If the value is not present, the value from the source card transaction is copied.
+     */
+    transactionChannelId?: string
+}
+
+export const CardTransactionReversal = {
+    validate: (await import('./schemas/card-transaction-reversal.schema.js'))
+        .validate as ValidateFunction<CardTransactionReversal>,
+    get schema() {
+        return CardTransactionReversal.validate.schema
+    },
+    get errors() {
+        return CardTransactionReversal.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CardTransactionReversal => CardTransactionReversal.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!CardTransactionReversal.validate(o)) {
+            throw new ValidationError(CardTransactionReversal.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Represents the reference to the underlying documents of the payment.
+ */
+export interface CreditorReferenceInformation {
+    /**
+     * The reference information of the creditor's underlying documents
+     */
+    reference?: string
+    /**
+     * The entity that assigns the reference type
+     */
+    referenceIssuer?: string
+    /**
+     * The type of creditor reference
+     */
+    referenceType?: string
+}
+
+/**
+ * The amounts affected after completing the deposit transaction
+ */
+export interface DepositAffectedAmounts {
+    /**
+     * Amount of fees involved in a transaction that affects an account with positive balance
+     */
+    feesAmount?: number
+    /**
+     * In the case of an LOAN_FRACTION_BOUGHT this represent the fraction amount which was bought from another investor
+     */
+    fractionAmount?: number
+    /**
+     * Balance change amount involved in a transaction that affects an account with positive balance
+     */
+    fundsAmount?: number
+    /**
+     * Amount of interest involved in a transaction that affects an account with positive balance
+     */
+    interestAmount?: number
+    /**
+     * The amount of money that was added/subtracted from the account by this transaction as overdraft
+     */
+    overdraftAmount?: number
+    /**
+     * Fees amount involved in a transaction that affects an overdraft
+     */
+    overdraftFeesAmount?: number
+    /**
+     * Interest amount involved in a transaction that affects an overdraft
+     */
+    overdraftInterestAmount?: number
+    /**
+     * The amount of money that was added/subtracted from the account by this transaction as technical overdraft
+     */
+    technicalOverdraftAmount?: number
+    /**
+     * The amount of money that was added/subtracted from the account by this transaction as technical overdraft interest
+     */
+    technicalOverdraftInterestAmount?: number
+}
+
+/**
+ * An amount of predefined fee that was applied or paid on an account.
+ */
+export interface DepositFee {
+    /**
+     * The amount of the fee that was applied/paid in the transaction for the given predefined fee.
+     */
+    amount?: number
+    /**
+     * The name of the predefined fee
+     */
+    name?: string
+    /**
+     * The encoded key of the predefined fee, auto generated, unique
+     */
+    predefinedFeeKey: string
+    /**
+     * The amount of the taxes on fee that was applied/paid in the transaction.
+     */
+    taxAmount?: number
+    /**
+     * Shows the event that will trigger a fee
+     */
+    trigger?: 'MANUAL' | 'MONTHLY_FEE' | 'ARBITRARY'
+}
+
+/**
+ * Represents the accrued interest amounts for an Interest Applied deposit transaction.
+ */
+export interface DepositInterestAccruedAmounts {
+    /**
+     * The amount of positive interest accrued since last interest application/activation date and applied within Interest Applied transaction
+     */
+    interestAccrued?: number
+    /**
+     * The amount of negative interest accrued since last interest application/activation date and applied within Interest Applied transaction
+     */
+    negativeInterestAccrued?: number
+    /**
+     * The amount of overdraft interest accrued since last interest application/activation date and applied within Interest Applied transaction
+     */
+    overdraftInterestAccrued?: number
+    /**
+     * The amount of technical overdraft interest accrued since last interest application/activation date and applied within Interest Applied transaction
+     */
+    technicalOverdraftInterestAccrued?: number
+}
+
+/**
+ * Holds the deposit overdraft interest settings
+ */
+export interface DepositOverdraftInterestSettings {
+    /**
+     * The value of the index interest rate set or changed in this transaction
+     */
+    indexInterestRate?: number
+    /**
+     * The interest rate that was set or changed in this transaction. Used on product interest rate changes or interest tier switches
+     */
+    interestRate?: number
+}
+
+/**
+ * Holds the deposit overdraft settings for a transaction
+ */
+export interface DepositOverdraftSettings {
+    /**
+     * The overdraft limit that was set or changed in this transaction
+     */
+    overdraftLimit?: number
+}
+
+/**
+ * The taxes applied within a transaction
+ */
+export interface DepositTaxes {
+    /**
+     * The tax rate that was set or changed in this transaction
+     */
+    taxRate?: number
+}
+
+/**
+ * The deposit transaction terms
+ */
+export interface DepositTerms {
+    interestSettings?: DepositTransactionInterestSettings
+    overdraftInterestSettings?: DepositOverdraftInterestSettings
+    overdraftSettings?: DepositOverdraftSettings
+}
+
+/**
+ * The balances changed within a transaction.
+ */
+export interface DepositTransactionBalances {
+    /**
+     * The running balance owed by deposit
+     */
+    totalBalance?: number
+}
+
+/**
+ * The interest settings, holds all the properties regarding interests for the deposit account
+ */
+export interface DepositTransactionInterestSettings {
+    /**
+     * The value of the index interest rate set or changed in this transaction
+     */
+    indexInterestRate?: number
+    /**
+     * The interest rate for the deposit account
+     */
+    interestRate?: number
+}
 
 export interface ErrorResponse {
     errors?: RestError[]
@@ -71,33 +671,195 @@ export const ErrorResponse = {
 } as const
 
 /**
+ * The identification of the financial institution
+ */
+export interface FinancialInstitutionIdentification {
+    /**
+     * Business identifier code
+     */
+    bic?: string
+}
+
+/**
+ * Details for retrieving a authorization hold. Deprecated due to encodedKey field.
+ */
+export interface GetAuthorizationHold {
+    /**
+     * The key of the account linked with the authorization hold.
+     */
+    accountKey?: string
+    /**
+     * Whether the given request should be accepted without balance validations.
+     */
+    advice: boolean
+    /**
+     * The amount of money to be held as a result of the authorization hold request.
+     */
+    amount: number
+    balances?: AccountBalances
+    cardAcceptor?: CardAcceptor
+    /**
+     * The reference token of the card.
+     */
+    cardToken?: string
+    /**
+     * The organization time when the authorization hold was created
+     */
+    creationDate?: string
+    /**
+     * Indicates whether the authorization hold amount is credited or debited.If not provided, the default values is DBIT.
+     */
+    creditDebitIndicator?: 'DBIT' | 'CRDT'
+    /**
+     * The ISO currency code in which the hold was created. The amounts are stored in the base currency, but the user could have enter it in a foreign currency.
+     */
+    currencyCode?: string
+    /**
+     * The custom expiration period for the hold which overwrites mcc and default expiration periods
+     */
+    customExpirationPeriod?: number
+    /**
+     * The internal ID of the authorization hold, auto generated, unique.
+     */
+    encodedKey?: string
+    /**
+     * The exchange rate for the original currency.
+     */
+    exchangeRate?: number
+    /**
+     * The external reference ID to be used to reference the account hold in subsequent requests.
+     */
+    externalReferenceId: string
+    /**
+     * The original amount of money to be held as a result of the authorization hold request.
+     */
+    originalAmount?: number
+    /**
+     * The original currency in which the hold was created.
+     */
+    originalCurrency?: string
+    /**
+     * The date to consider as start date when calculating the number of days passed until expiration
+     */
+    referenceDateForExpiration?: string
+    /**
+     * Indicates the source of the authorization hold, the default values is CARD.
+     */
+    source?: 'CARD' | 'ACCOUNT'
+    /**
+     * The authorization hold status.
+     */
+    status?: 'PENDING' | 'REVERSED' | 'SETTLED' | 'EXPIRED'
+    /**
+     * The formatted time at which the user made this authorization hold.
+     */
+    userTransactionTime?: string
+}
+
+export const GetAuthorizationHold = {
+    validate: (await import('./schemas/get-authorization-hold.schema.js')).validate as ValidateFunction<GetAuthorizationHold>,
+    get schema() {
+        return GetAuthorizationHold.validate.schema
+    },
+    get errors() {
+        return GetAuthorizationHold.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetAuthorizationHold => GetAuthorizationHold.validate(o) === true,
+} as const
+
+/**
  * Details for retrieving a card financial transaction.
  */
 export interface GetCardTransaction {
+    accountBalances?: DepositTransactionBalances
     /**
-     * The migration event encoded key associated with this deposit account. If this account was imported, track which 'migration event' they came from
+     * The key of the deposit transaction where the adjustment for this transaction was made (if any adjustment was involved)
      */
-    migrationEventKey?: string
-    transactionDetails?: TransactionDetails
+    adjustmentTransactionKey?: string
+    affectedAmounts?: DepositAffectedAmounts
+    /**
+     * How much was added/removed in account
+     */
+    amount?: number
+    /**
+     * The block fund id associated with the transaction
+     */
+    blockId?: string
+    /**
+     * The date when corresponding JE is booked (as Organization Time)
+     */
+    bookingDate?: string
+    /**
+     * The branch where the transaction was performed
+     */
+    branchKey?: string
+    cardTransaction?: CardTransaction
+    /**
+     * Object containing all the associated reversal transactions.
+     */
+    cardTransactionReversals?: CardTransactionReversal[]
+    /**
+     * The center where the transaction was performed
+     */
+    centreKey?: string
+    /**
+     * The date when this deposit transaction was created
+     */
+    creationDate?: string
+    /**
+     * The currency in which this transaction was posted
+     */
+    currencyCode?: string
+    /**
+     * The encoded key of the deposit transaction, auto generated, unique
+     */
+    encodedKey?: string
+    /**
+     * The external id of the deposit transaction, customizable, unique
+     */
+    externalId?: string
     /**
      * All the amounts that have been applied or paid within this transaction and involved predefined fees
      */
     fees?: DepositFee[]
     /**
+     * The external id of an account authorization hold
+     */
+    holdExternalReferenceId?: string
+    /**
+     * The id of the deposit transaction, auto generated, unique
+     */
+    id?: string
+    interestAccruedAmounts?: DepositInterestAccruedAmounts
+    /**
+     * The migration event encoded key associated with this deposit account. If this account was imported, track which 'migration event' they came from
+     */
+    migrationEventKey?: string
+    /**
      * Extra notes about this deposit transaction
      */
     notes?: string
-    affectedAmounts?: DepositAffectedAmounts
-    cardTransaction?: CardTransaction
+    /**
+     * The encodedKey of the transaction that was adjusted as part of this one. Available only for adjustment transactions
+     */
+    originalTransactionKey?: string
+    /**
+     * The key of the parent deposit account
+     */
+    parentAccountKey?: string
+    paymentDetails?: PaymentDetails
+    /**
+     * The payment order id of the deposit transaction, customizable
+     */
+    paymentOrderId?: string
     taxes?: DepositTaxes
+    terms?: DepositTerms
     /**
      * The till key associated with this transaction
      */
     tillKey?: string
-    /**
-     * The key of the deposit transaction where the adjustment for this transaction was made (if any adjustment was involved)
-     */
-    adjustmentTransactionKey?: string
+    transactionDetails?: TransactionDetails
+    transferDetails?: TransferDetails
     /**
      * The type of the deposit transaction
      */
@@ -136,78 +898,13 @@ export interface GetCardTransaction {
         | 'LOAN_FRACTION_SOLD_ADJUSTMENT'
         | 'SEIZED_AMOUNT'
     /**
-     * The branch where the transaction was performed
-     */
-    branchKey?: string
-    terms?: DepositTerms
-    transferDetails?: TransferDetails
-    /**
-     * The payment order id of the deposit transaction, customizable
-     */
-    paymentOrderId?: string
-    /**
-     * The encoded key of the deposit transaction, auto generated, unique
-     */
-    encodedKey?: string
-    /**
-     * The id of the deposit transaction, auto generated, unique
-     */
-    id?: string
-    paymentDetails?: PaymentDetails
-    /**
-     * Object containing all the associated reversal transactions.
-     */
-    cardTransactionReversals?: CardTransactionReversal[]
-    interestAccruedAmounts?: DepositInterestAccruedAmounts
-    /**
-     * The encodedKey of the transaction that was adjusted as part of this one. Available only for adjustment transactions
-     */
-    originalTransactionKey?: string
-    /**
-     * How much was added/removed in account
-     */
-    amount?: number
-    /**
-     * The center where the transaction was performed
-     */
-    centreKey?: string
-    /**
-     * The external id of the deposit transaction, customizable, unique
-     */
-    externalId?: string
-    /**
-     * Date of the entry (eg date of repayment or disbursal, etc.) (as Organization Time)
-     */
-    valueDate?: string
-    /**
-     * The date when this deposit transaction was created
-     */
-    creationDate?: string
-    /**
      * The person that performed the transaction
      */
     userKey?: string
     /**
-     * The block fund id associated with the transaction
+     * Date of the entry (eg date of repayment or disbursal, etc.) (as Organization Time)
      */
-    blockId?: string
-    /**
-     * The key of the parent deposit account
-     */
-    parentAccountKey?: string
-    accountBalances?: DepositTransactionBalances
-    /**
-     * The date when corresponding JE is booked (as Organization Time)
-     */
-    bookingDate?: string
-    /**
-     * The external id of an account authorization hold
-     */
-    holdExternalReferenceId?: string
-    /**
-     * The currency in which this transaction was posted
-     */
-    currencyCode?: string
+    valueDate?: string
 }
 
 export const GetCardTransaction = {
@@ -222,91 +919,42 @@ export const GetCardTransaction = {
 } as const
 
 /**
- * Details for retrieving a authorization hold. Deprecated due to encodedKey field.
+ * The details of the linked financial transaction triggered by the card transaction.
  */
-export interface GetAuthorizationHold {
+export interface LinkedTransaction {
     /**
-     * The custom expiration period for the hold which overwrites mcc and default expiration periods
+     * The encodedKey of the linked financial transaction.
      */
-    customExpirationPeriod?: number
+    linkedTransactionKey?: string
     /**
-     * The amount of money to be held as a result of the authorization hold request.
+     * The type of the linked transaction (Deposit / Loan).
      */
-    amount: number
-    /**
-     * Whether the given request should be accepted without balance validations.
-     */
-    advice: boolean
-    cardAcceptor?: CardAcceptor
-    /**
-     * Indicates the source of the authorization hold, the default values is CARD.
-     */
-    source?: 'CARD' | 'ACCOUNT'
-    /**
-     * The organization time when the authorization hold was created
-     */
-    creationDate?: string
-    /**
-     * Indicates whether the authorization hold amount is credited or debited.If not provided, the default values is DBIT.
-     */
-    creditDebitIndicator?: 'DBIT' | 'CRDT'
-    /**
-     * The reference token of the card.
-     */
-    cardToken?: string
-    /**
-     * The date to consider as start date when calculating the number of days passed until expiration
-     */
-    referenceDateForExpiration?: string
-    /**
-     * The key of the account linked with the authorization hold.
-     */
-    accountKey?: string
-    /**
-     * The external reference ID to be used to reference the account hold in subsequent requests.
-     */
-    externalReferenceId: string
-    balances?: AccountBalances
-    /**
-     * The original amount of money to be held as a result of the authorization hold request.
-     */
-    originalAmount?: number
-    /**
-     * The exchange rate for the original currency.
-     */
-    exchangeRate?: number
-    /**
-     * The internal ID of the authorization hold, auto generated, unique.
-     */
-    encodedKey?: string
-    /**
-     * The formatted time at which the user made this authorization hold.
-     */
-    userTransactionTime?: string
-    /**
-     * The original currency in which the hold was created.
-     */
-    originalCurrency?: string
-    /**
-     * The ISO currency code in which the hold was created. The amounts are stored in the base currency, but the user could have enter it in a foreign currency.
-     */
-    currencyCode?: string
-    /**
-     * The authorization hold status.
-     */
-    status?: 'PENDING' | 'REVERSED' | 'SETTLED' | 'EXPIRED'
+    linkedTransactionType?: 'LOAN' | 'DEPOSIT'
 }
 
-export const GetAuthorizationHold = {
-    validate: (await import('./schemas/get-authorization-hold.schema.js')).validate as ValidateFunction<GetAuthorizationHold>,
-    get schema() {
-        return GetAuthorizationHold.validate.schema
-    },
-    get errors() {
-        return GetAuthorizationHold.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAuthorizationHold => GetAuthorizationHold.validate(o) === true,
-} as const
+/**
+ * Represents other way of identification for the account.
+ */
+export interface OtherAccountIdentification {
+    /**
+     * The identification of the payer/payee
+     */
+    identification?: string
+    /**
+     * The identification scheme
+     */
+    scheme?: string
+}
+
+/**
+ * The details of the party for a transaction
+ */
+export interface Party {
+    /**
+     * The name of the party
+     */
+    name?: string
+}
 
 export type PatchAuthorizationHoldRequest = PatchOperation[]
 
@@ -328,332 +976,101 @@ export const PatchAuthorizationHoldRequest = {
 } as const
 
 /**
- * Account balances presented to inquirer such as card processor
+ * A single change that needs to be made to a resource
  */
-export interface AccountBalances {
+export interface PatchOperation {
     /**
-     * The unique account identifier
+     * The field from where a value should be moved, when using move
      */
-    accountId?: string
+    from?: string
     /**
-     * The current balance of a deposit account or principal balance of a revolving credit
+     * The change to perform
      */
-    totalBalance?: number
+    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
     /**
-     * The card type either DEBIT or CREDIT
+     * The field to perform the operation on
      */
-    cardType?: 'DEBIT' | 'CREDIT'
+    path: string
     /**
-     * The overdraft limit of a deposit account or the loan amount in case of a credit account
+     * The value of the field, can be null
      */
-    creditLimit?: number
-    /**
-     * Currency code used for the account
-     */
-    currencyCode?: string
-    /**
-     * The available balance of a deposit or credit account
-     */
-    availableBalance?: number
+    value?: {
+        [k: string]: unknown | undefined
+    }
 }
-
-export const AccountBalances = {
-    validate: (await import('./schemas/account-balances.schema.js')).validate as ValidateFunction<AccountBalances>,
-    get schema() {
-        return AccountBalances.validate.schema
-    },
-    get errors() {
-        return AccountBalances.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is AccountBalances => AccountBalances.validate(o) === true,
-} as const
 
 /**
- * A full or partial reversal of a card transaction.
+ * The payment information including account identification details
  */
-export interface CardTransactionReversal {
-    /**
-     * The external reference ID to be used to reference the card reversal transaction in subsequent requests.
-     */
-    externalReferenceId: string
-    /**
-     * The amount of money to be credited in the client's account from the original card transaction.
-     */
-    amount: number
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * The id of the Deposit Transaction
-     */
-    id?: number
-    /**
-     * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
-     */
-    currencyCode?: string
-    /**
-     * The ID of the channel through which the payment is done. If the value is not present, the value from the source card transaction is copied.
-     */
-    transactionChannelId?: string
+export interface PaymentDetails {
+    creditor?: Party
+    creditorAccount?: AccountDetails
+    creditorAgent?: Agent
+    debtor?: Party
+    debtorAccount?: AccountDetails
+    debtorAgent?: Agent
+    paymentIdentification?: PaymentIdentification
+    paymentTypeInformation?: PaymentTypeInformation
+    remittanceInformation?: RemittanceInformation
 }
-
-export const CardTransactionReversal = {
-    validate: (await import('./schemas/card-transaction-reversal.schema.js'))
-        .validate as ValidateFunction<CardTransactionReversal>,
-    get schema() {
-        return CardTransactionReversal.validate.schema
-    },
-    get errors() {
-        return CardTransactionReversal.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CardTransactionReversal => CardTransactionReversal.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!CardTransactionReversal.validate(o)) {
-            throw new ValidationError(CardTransactionReversal.errors ?? [])
-        }
-    },
-} as const
 
 /**
- * A card transaction entry which will have a corresponding a financial transaction performed.
+ * The payment identification details
  */
-export interface CardTransactionInput {
+export interface PaymentIdentification {
     /**
-     * Increase available amount if needed
+     * Identifier assigned by the initiating party to the transaction
      */
-    increaseAmountIfNeeded?: boolean
+    endToEndIdentification?: string
     /**
-     * The amount of money to be withdrawn in the financial transaction.
+     * Identifier of a payment instruction
      */
-    amount: number
+    instructionIdentification?: string
     /**
-     * Whether the given request should be accepted without balance validations.
+     * Identifier unique for a period assigned by the first initiating party to the transaction
      */
-    advice: boolean
-    cardAcceptor?: CardAcceptor
-    /**
-     * The ID of the channel through which the payment is done.
-     */
-    transactionChannelId: string
-    /**
-     * If present, indicates that the card transaction is a refund, and whether is credited or debited
-     */
-    creditDebitIndicator?: 'DBIT' | 'CRDT'
-    /**
-     * The reference token of the card.
-     */
-    cardToken?: string
-    /**
-     * The external reference ID to be used to reference the card transaction in subsequent requests.
-     */
-    externalReferenceId: string
-    /**
-     * The date of the first repayment for the loan account (as Organization Time)
-     */
-    firstRepaymentDate?: string
-    /**
-     * The external authorization hold reference ID, which relates this card transaction to a previous authorization hold.
-     */
-    externalAuthorizationReferenceId?: string
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * The formatted time at which the user made this card transaction.
-     */
-    userTransactionTime?: string
-    /**
-     * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
-     */
-    currencyCode?: string
-    /**
-     * Whether the given request should be a partial clearing or not.
-     */
-    partial?: boolean
+    transactionIdentification?: string
 }
-
-export const CardTransactionInput = {
-    validate: (await import('./schemas/card-transaction-input.schema.js')).validate as ValidateFunction<CardTransactionInput>,
-    get schema() {
-        return CardTransactionInput.validate.schema
-    },
-    get errors() {
-        return CardTransactionInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CardTransactionInput => CardTransactionInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!CardTransactionInput.validate(o)) {
-            throw new ValidationError(CardTransactionInput.errors ?? [])
-        }
-    },
-} as const
 
 /**
- * A card transaction output after a financial transaction was performed.
+ * The information specifying the type of transaction
  */
-export interface CardTransactionOutput {
-    /**
-     * Increase available amount if needed
-     */
-    increaseAmountIfNeeded?: boolean
-    /**
-     * The amount of money to be withdrawn in the financial transaction.
-     */
-    amount: number
-    /**
-     * Whether the given request should be accepted without balance validations.
-     */
-    advice: boolean
-    cardAcceptor?: CardAcceptor
-    /**
-     * The ID of the channel through which the payment is done.
-     */
-    transactionChannelId: string
-    /**
-     * If present, indicates that the card transaction is a refund, and whether is credited or debited
-     */
-    creditDebitIndicator?: 'DBIT' | 'CRDT'
-    /**
-     * The reference token of the card.
-     */
-    cardToken?: string
-    /**
-     * The external reference ID to be used to reference the card transaction in subsequent requests.
-     */
-    externalReferenceId: string
-    balances?: AccountBalances
-    /**
-     * The date of the first repayment for the loan account (as Organization Time)
-     */
-    firstRepaymentDate?: string
-    /**
-     * The external authorization hold reference ID, which relates this card transaction to a previous authorization hold.
-     */
-    externalAuthorizationReferenceId?: string
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * The formatted time at which the user made this card transaction.
-     */
-    userTransactionTime?: string
-    linkedTransaction?: LinkedTransaction
-    /**
-     * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
-     */
-    currencyCode?: string
-    /**
-     * Whether the given request should be a partial clearing or not.
-     */
-    partial?: boolean
+export interface PaymentTypeInformation {
+    serviceLevel?: ServiceLevel
 }
-
-export const CardTransactionOutput = {
-    validate: (await import('./schemas/card-transaction-output.schema.js')).validate as ValidateFunction<CardTransactionOutput>,
-    get schema() {
-        return CardTransactionOutput.validate.schema
-    },
-    get errors() {
-        return CardTransactionOutput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CardTransactionOutput => CardTransactionOutput.validate(o) === true,
-} as const
 
 /**
- * The authorization hold corresponding to a card token
+ * The information specifying the payment items that are intended to settle
  */
-export interface AuthorizationHold {
+export interface RemittanceInformation {
+    structured?: Structured
     /**
-     * The custom expiration period for the hold which overwrites mcc and default expiration periods
+     * Information supplied to match the items of the payment in an unstructured form
      */
-    customExpirationPeriod?: number
-    /**
-     * The amount of money to be held as a result of the authorization hold request.
-     */
-    amount: number
-    /**
-     * Whether the given request should be accepted without balance validations.
-     */
-    advice: boolean
-    cardAcceptor?: CardAcceptor
-    /**
-     * Indicates the source of the authorization hold, the default values is CARD.
-     */
-    source?: 'CARD' | 'ACCOUNT'
-    /**
-     * The organization time when the authorization hold was created
-     */
-    creationDate?: string
-    /**
-     * Indicates whether the authorization hold amount is credited or debited.If not provided, the default values is DBIT.
-     */
-    creditDebitIndicator?: 'DBIT' | 'CRDT'
-    /**
-     * The reference token of the card.
-     */
-    cardToken?: string
-    /**
-     * The date to consider as start date when calculating the number of days passed until expiration
-     */
-    referenceDateForExpiration?: string
-    /**
-     * The key of the account linked with the authorization hold.
-     */
-    accountKey?: string
-    /**
-     * The external reference ID to be used to reference the account hold in subsequent requests.
-     */
-    externalReferenceId: string
-    balances?: AccountBalances
-    /**
-     * The original amount of money to be held as a result of the authorization hold request.
-     */
-    originalAmount?: number
-    /**
-     * The exchange rate for the original currency.
-     */
-    exchangeRate?: number
-    /**
-     * The formatted time at which the user made this authorization hold.
-     */
-    userTransactionTime?: string
-    /**
-     * The original currency in which the hold was created.
-     */
-    originalCurrency?: string
-    /**
-     * The ISO currency code in which the hold was created. The amounts are stored in the base currency, but the user could have enter it in a foreign currency.
-     */
-    currencyCode?: string
-    /**
-     * The authorization hold status.
-     */
-    status?: 'PENDING' | 'REVERSED' | 'SETTLED' | 'EXPIRED'
+    unstructured?: string
 }
-
-export const AuthorizationHold = {
-    validate: (await import('./schemas/authorization-hold.schema.js')).validate as ValidateFunction<AuthorizationHold>,
-    get schema() {
-        return AuthorizationHold.validate.schema
-    },
-    get errors() {
-        return AuthorizationHold.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is AuthorizationHold => AuthorizationHold.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!AuthorizationHold.validate(o)) {
-            throw new ValidationError(AuthorizationHold.errors ?? [])
-        }
-    },
-} as const
 
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
+}
+
+/**
+ * The rules under which the transaction should be processed
+ */
+export interface ServiceLevel {
+    /**
+     * The code for a pre-agreed service or level of service between the parties
+     */
+    code?: string
+}
+
+/**
+ * The information specifying the payment items that are intended to settle
+ */
+export interface Structured {
+    creditorReferenceInformation?: CreditorReferenceInformation
 }
 
 /**
@@ -671,432 +1088,15 @@ export interface TransactionDetails {
 }
 
 /**
- * An amount of predefined fee that was applied or paid on an account.
- */
-export interface DepositFee {
-    /**
-     * The name of the predefined fee
-     */
-    name?: string
-    /**
-     * The amount of the fee that was applied/paid in the transaction for the given predefined fee.
-     */
-    amount?: number
-    /**
-     * Shows the event that will trigger a fee
-     */
-    trigger?: 'MANUAL' | 'MONTHLY_FEE' | 'ARBITRARY'
-    /**
-     * The amount of the taxes on fee that was applied/paid in the transaction.
-     */
-    taxAmount?: number
-    /**
-     * The encoded key of the predefined fee, auto generated, unique
-     */
-    predefinedFeeKey: string
-}
-
-/**
- * The amounts affected after completing the deposit transaction
- */
-export interface DepositAffectedAmounts {
-    /**
-     * Amount of fees involved in a transaction that affects an account with positive balance
-     */
-    feesAmount?: number
-    /**
-     * Interest amount involved in a transaction that affects an overdraft
-     */
-    overdraftInterestAmount?: number
-    /**
-     * Fees amount involved in a transaction that affects an overdraft
-     */
-    overdraftFeesAmount?: number
-    /**
-     * In the case of an LOAN_FRACTION_BOUGHT this represent the fraction amount which was bought from another investor
-     */
-    fractionAmount?: number
-    /**
-     * The amount of money that was added/subtracted from the account by this transaction as technical overdraft
-     */
-    technicalOverdraftAmount?: number
-    /**
-     * The amount of money that was added/subtracted from the account by this transaction as overdraft
-     */
-    overdraftAmount?: number
-    /**
-     * Amount of interest involved in a transaction that affects an account with positive balance
-     */
-    interestAmount?: number
-    /**
-     * The amount of money that was added/subtracted from the account by this transaction as technical overdraft interest
-     */
-    technicalOverdraftInterestAmount?: number
-    /**
-     * Balance change amount involved in a transaction that affects an account with positive balance
-     */
-    fundsAmount?: number
-}
-
-/**
- * A card transaction entry which will have a corresponding a financial transaction performed.
- */
-export interface CardTransaction {
-    /**
-     * The external reference ID to be used to reference the card transaction in subsequent requests.
-     */
-    externalReferenceId: string
-    /**
-     * The amount of money to be withdrawn in the financial transaction.
-     */
-    amount: number
-    /**
-     * Whether the given request should be accepted without balance validations.
-     */
-    advice: boolean
-    /**
-     * The external authorization hold reference ID, which relates this card transaction to a previous authorization hold.
-     */
-    externalAuthorizationReferenceId?: string
-    cardAcceptor?: CardAcceptor
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * The formatted time at which the user made this card transaction.
-     */
-    userTransactionTime?: string
-    /**
-     * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
-     */
-    currencyCode?: string
-    /**
-     * The reference token of the card.
-     */
-    cardToken?: string
-}
-
-/**
- * The details of the card acceptor (merchant) in a transaction hold.
- */
-export interface CardAcceptor {
-    /**
-     * The ZIP code of the location in which the card acceptor has the business.
-     */
-    zip?: string
-    /**
-     * The country in which the card acceptor has the business.
-     */
-    country?: string
-    /**
-     * The city in which the card acceptor has the business.
-     */
-    city?: string
-    /**
-     * The street in which the card acceptor has the business.
-     */
-    street?: string
-    /**
-     * The name of the card acceptor.
-     */
-    name?: string
-    /**
-     * The state in which the card acceptor has the business.
-     */
-    state?: string
-    /**
-     * The Merchant Category Code of the card acceptor.
-     */
-    mcc?: number
-}
-
-/**
- * The taxes applied within a transaction
- */
-export interface DepositTaxes {
-    /**
-     * The tax rate that was set or changed in this transaction
-     */
-    taxRate?: number
-}
-
-/**
- * The deposit transaction terms
- */
-export interface DepositTerms {
-    interestSettings?: DepositTransactionInterestSettings
-    overdraftSettings?: DepositOverdraftSettings
-    overdraftInterestSettings?: DepositOverdraftInterestSettings
-}
-
-/**
- * The interest settings, holds all the properties regarding interests for the deposit account
- */
-export interface DepositTransactionInterestSettings {
-    /**
-     * The interest rate for the deposit account
-     */
-    interestRate?: number
-    /**
-     * The value of the index interest rate set or changed in this transaction
-     */
-    indexInterestRate?: number
-}
-
-/**
- * Holds the deposit overdraft settings for a transaction
- */
-export interface DepositOverdraftSettings {
-    /**
-     * The overdraft limit that was set or changed in this transaction
-     */
-    overdraftLimit?: number
-}
-
-/**
- * Holds the deposit overdraft interest settings
- */
-export interface DepositOverdraftInterestSettings {
-    /**
-     * The interest rate that was set or changed in this transaction. Used on product interest rate changes or interest tier switches
-     */
-    interestRate?: number
-    /**
-     * The value of the index interest rate set or changed in this transaction
-     */
-    indexInterestRate?: number
-}
-
-/**
  * Represents the transfer details, such as the linked transaction key
  */
 export interface TransferDetails {
     /**
-     * The key of the related loan transaction
-     */
-    linkedLoanTransactionKey?: string
-    /**
      * The key of the related deposit transaction
      */
     linkedDepositTransactionKey?: string
-}
-
-/**
- * The payment information including account identification details
- */
-export interface PaymentDetails {
-    paymentIdentification?: PaymentIdentification
-    debtorAccount?: AccountDetails
-    debtor?: Party
-    debtorAgent?: Agent
-    creditorAgent?: Agent
-    remittanceInformation?: RemittanceInformation
-    creditorAccount?: AccountDetails
-    creditor?: Party
-    paymentTypeInformation?: PaymentTypeInformation
-}
-
-/**
- * The payment identification details
- */
-export interface PaymentIdentification {
     /**
-     * Identifier of a payment instruction
+     * The key of the related loan transaction
      */
-    instructionIdentification?: string
-    /**
-     * Identifier assigned by the initiating party to the transaction
-     */
-    endToEndIdentification?: string
-    /**
-     * Identifier unique for a period assigned by the first initiating party to the transaction
-     */
-    transactionIdentification?: string
-}
-
-/**
- * The account currency and identification
- */
-export interface AccountDetails {
-    /**
-     * The currency of the account
-     */
-    currency?: string
-    identification?: AccountIdentification
-}
-
-/**
- * The account identification details
- */
-export interface AccountIdentification {
-    other?: OtherAccountIdentification
-    /**
-     * The account unique identifier
-     */
-    iban?: string
-}
-
-/**
- * Represents other way of identification for the account.
- */
-export interface OtherAccountIdentification {
-    /**
-     * The identification scheme
-     */
-    scheme?: string
-    /**
-     * The identification of the payer/payee
-     */
-    identification?: string
-}
-
-/**
- * The details of the party for a transaction
- */
-export interface Party {
-    /**
-     * The name of the party
-     */
-    name?: string
-}
-
-/**
- * The agent details for a party
- */
-export interface Agent {
-    financialInstitutionIdentification?: FinancialInstitutionIdentification
-}
-
-/**
- * The identification of the financial institution
- */
-export interface FinancialInstitutionIdentification {
-    /**
-     * Business identifier code
-     */
-    bic?: string
-}
-
-/**
- * The information specifying the payment items that are intended to settle
- */
-export interface RemittanceInformation {
-    structured?: Structured
-    /**
-     * Information supplied to match the items of the payment in an unstructured form
-     */
-    unstructured?: string
-}
-
-/**
- * The information specifying the payment items that are intended to settle
- */
-export interface Structured {
-    creditorReferenceInformation?: CreditorReferenceInformation
-}
-
-/**
- * Represents the reference to the underlying documents of the payment.
- */
-export interface CreditorReferenceInformation {
-    /**
-     * The reference information of the creditor's underlying documents
-     */
-    reference?: string
-    /**
-     * The type of creditor reference
-     */
-    referenceType?: string
-    /**
-     * The entity that assigns the reference type
-     */
-    referenceIssuer?: string
-}
-
-/**
- * The information specifying the type of transaction
- */
-export interface PaymentTypeInformation {
-    serviceLevel?: ServiceLevel
-}
-
-/**
- * The rules under which the transaction should be processed
- */
-export interface ServiceLevel {
-    /**
-     * The code for a pre-agreed service or level of service between the parties
-     */
-    code?: string
-}
-
-/**
- * Represents the accrued interest amounts for an Interest Applied deposit transaction.
- */
-export interface DepositInterestAccruedAmounts {
-    /**
-     * The amount of overdraft interest accrued since last interest application/activation date and applied within Interest Applied transaction
-     */
-    overdraftInterestAccrued?: number
-    /**
-     * The amount of positive interest accrued since last interest application/activation date and applied within Interest Applied transaction
-     */
-    interestAccrued?: number
-    /**
-     * The amount of technical overdraft interest accrued since last interest application/activation date and applied within Interest Applied transaction
-     */
-    technicalOverdraftInterestAccrued?: number
-    /**
-     * The amount of negative interest accrued since last interest application/activation date and applied within Interest Applied transaction
-     */
-    negativeInterestAccrued?: number
-}
-
-/**
- * The balances changed within a transaction.
- */
-export interface DepositTransactionBalances {
-    /**
-     * The running balance owed by deposit
-     */
-    totalBalance?: number
-}
-
-/**
- * A single change that needs to be made to a resource
- */
-export interface PatchOperation {
-    /**
-     * The change to perform
-     */
-    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
-    /**
-     * The field to perform the operation on
-     */
-    path: string
-    /**
-     * The field from where a value should be moved, when using move
-     */
-    from?: string
-    /**
-     * The value of the field, can be null
-     */
-    value?: {
-        [k: string]: unknown | undefined
-    }
-}
-
-/**
- * The details of the linked financial transaction triggered by the card transaction.
- */
-export interface LinkedTransaction {
-    /**
-     * The type of the linked transaction (Deposit / Loan).
-     */
-    linkedTransactionType?: 'LOAN' | 'DEPOSIT'
-    /**
-     * The encodedKey of the linked financial transaction.
-     */
-    linkedTransactionKey?: string
+    linkedLoanTransactionKey?: string
 }

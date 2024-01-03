@@ -50,16 +50,30 @@ export class MambuIndexRateSources {
     }
 
     /**
-     * Get index rate sources
+     * Create index rate
      */
-    public async getAllIndexRateSources({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
+    public async createIndexRate({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: IndexRate
+        path: { indexRateSourceId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(IndexRate, body)
+
         return this.awaitResponse(
-            this.buildClient(auth).get(`indexratesources`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            this.buildClient(auth).post(`indexratesources/${path.indexRateSourceId}/indexrates`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: GetAllIndexRateSourcesResponse,
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: IndexRate,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -123,31 +137,6 @@ export class MambuIndexRateSources {
     }
 
     /**
-     * Get index rate sources
-     */
-    public async getIndexRateSourceById({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { indexRateSourceId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`indexratesources/${path.indexRateSourceId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: IndexRateSource,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Delete index rate source
      */
     public async deleteIndexRateSource({
@@ -197,33 +186,44 @@ export class MambuIndexRateSources {
     }
 
     /**
-     * Create index rate
+     * Get index rate sources
      */
-    public async createIndexRate({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: IndexRate
-        path: { indexRateSourceId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(IndexRate, body)
-
+    public async getAllIndexRateSources({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
-            this.buildClient(auth).post(`indexratesources/${path.indexRateSourceId}/indexrates`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+            this.buildClient(auth).get(`indexratesources`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: IndexRate,
+                200: GetAllIndexRateSourcesResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get index rate sources
+     */
+    public async getIndexRateSourceById({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { indexRateSourceId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`indexratesources/${path.indexRateSourceId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: IndexRateSource,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }

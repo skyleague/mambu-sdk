@@ -44,6 +44,39 @@ export class MambuDataImport {
     }
 
     /**
+     * Allows you to approve or reject a data import event
+     */
+    public async action({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: DataImportAction
+        path: { eventKey: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(DataImportAction, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`data/import/events/${path.eventKey}:action`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
      * Allows you to import data
      */
     public async dataImport({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
@@ -78,39 +111,6 @@ export class MambuDataImport {
             }),
             {
                 200: DataImportStatus,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Allows you to approve or reject a data import event
-     */
-    public async action({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: DataImportAction
-        path: { eventKey: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(DataImportAction, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`data/import/events/${path.eventKey}:action`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

@@ -84,31 +84,6 @@ export class MambuDepositProducts {
     }
 
     /**
-     * Get deposit products
-     */
-    public async getAll({
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string; branchId?: string }
-        auth?: string[][] | string[]
-    } = {}) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`depositproducts`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetAllResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Create deposit product
      */
     public async create({
@@ -131,6 +106,57 @@ export class MambuDepositProducts {
             {
                 102: { is: (_x: unknown): _x is unknown => true },
                 201: DepositProduct,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Delete deposit product
+     */
+    public async delete({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { depositProductId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).delete(`depositproducts/${path.depositProductId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+                409: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get deposit products
+     */
+    public async getAll({
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string; branchId?: string }
+        auth?: string[][] | string[]
+    } = {}) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`depositproducts`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetAllResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -167,63 +193,6 @@ export class MambuDepositProducts {
     }
 
     /**
-     * Update deposit product
-     */
-    public async update({
-        body,
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: DepositProduct
-        path: { depositProductId: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(DepositProduct, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).put(`depositproducts/${path.depositProductId}`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: DepositProduct,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-                409: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Delete deposit product
-     */
-    public async delete({
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { depositProductId: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).delete(`depositproducts/${path.depositProductId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-                409: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Partially update deposit product
      */
     public async patch({
@@ -245,6 +214,37 @@ export class MambuDepositProducts {
             }),
             {
                 204: { is: (_x: unknown): _x is unknown => true },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+                409: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Update deposit product
+     */
+    public async update({
+        body,
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: DepositProduct
+        path: { depositProductId: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(DepositProduct, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).put(`depositproducts/${path.depositProductId}`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: DepositProduct,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

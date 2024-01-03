@@ -44,34 +44,6 @@ export class MambuAccountingRates {
     }
 
     /**
-     * Get accounting rates
-     */
-    public async getAll({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { currencyCode: string }
-        query?: { offset?: string; limit?: string; paginationDetails?: string; from?: string; to?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`currencies/${path.currencyCode}/accountingRates`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetAllResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Create accounting rates
      */
     public async create({
@@ -96,6 +68,34 @@ export class MambuAccountingRates {
             {
                 102: { is: (_x: unknown): _x is unknown => true },
                 201: AccountingRate,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get accounting rates
+     */
+    public async getAll({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { currencyCode: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string; from?: string; to?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`currencies/${path.currencyCode}/accountingRates`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetAllResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

@@ -7,51 +7,42 @@ import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
 /**
- * Represents a user role.
+ * Represents the user permissions and access rights.
  */
-export interface Role {
+export interface BaseUserAccess {
     /**
-     * The notes about the role.
+     * `TRUE` if the user has the administrator user type, `FALSE` otherwise. Administrators (admins) have all permissions and can perform any action in Mambu.
      */
-    notes?: string
-    access?: BaseUserAccess
+    administratorAccess?: boolean
     /**
-     * The last time the role was modified in UTC.
+     * `TRUE` if the user can authenticate and interact with Mambu APIs, `FALSE` otherwise. The user may still require additional permissions for specific API requests.
      */
-    lastModifiedDate?: string
+    apiAccess?: boolean
     /**
-     * The unique name of the role.
+     * `TRUE` if the user has the credit officer user type, `FALSE` otherwise. Credit officers have the option of having clients and groups assigned to them.
      */
-    name: string
+    creditOfficerAccess?: boolean
     /**
-     * The encoded key of the entity, generated automatically, globally unique.
+     * `TRUE` if the user is part of the Mambu delivery team, `FALSE` otherwise.
      */
-    encodedKey?: string
+    deliveryAccess?: boolean
     /**
-     * The ID of the role, which can be generated and customized, but must be unique.
+     * TRUE` if the user can log in to the Mambu UI using their login credentials, `FALSE` otherwise.
      */
-    id?: string
+    mambuAccess?: boolean
     /**
-     * The date when the role was created in UTC.
+     * Permissions for the user. The non-admin users are authorized to do actions based a set of permissions in order to access Mambu features. Permissions may be relevant for the API and/or the Mambu UI.
      */
-    creationDate?: string
+    permissions?: Local0[]
+    /**
+     * `TRUE` if the user can provide Mambu technical support, `FALSE` otherwise.
+     */
+    supportAccess?: boolean
+    /**
+     * `TRUE` if the user has the teller user type, `FALSE` otherwise. Tellers have access to the teller module and specific tellering permissions, which allow them to take actions such as opening or closing tills, posting transactions on a till, and adding and removing cash from a till.
+     */
+    tellerAccess?: boolean
 }
-
-export const Role = {
-    validate: (await import('./schemas/role.schema.js')).validate as ValidateFunction<Role>,
-    get schema() {
-        return Role.validate.schema
-    },
-    get errors() {
-        return Role.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Role => Role.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Role.validate(o)) {
-            throw new ValidationError(Role.errors ?? [])
-        }
-    },
-} as const
 
 export interface ErrorResponse {
     errors?: RestError[]
@@ -73,24 +64,6 @@ export const ErrorResponse = {
     },
 } as const
 
-export type PatchRequest = PatchOperation[]
-
-export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
-    get schema() {
-        return PatchRequest.validate.schema
-    },
-    get errors() {
-        return PatchRequest.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
-        }
-    },
-} as const
-
 export type GetAllResponse = Role[]
 
 export const GetAllResponse = {
@@ -103,44 +76,6 @@ export const GetAllResponse = {
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
-
-/**
- * Represents the user permissions and access rights.
- */
-export interface BaseUserAccess {
-    /**
-     * TRUE` if the user can log in to the Mambu UI using their login credentials, `FALSE` otherwise.
-     */
-    mambuAccess?: boolean
-    /**
-     * `TRUE` if the user has the administrator user type, `FALSE` otherwise. Administrators (admins) have all permissions and can perform any action in Mambu.
-     */
-    administratorAccess?: boolean
-    /**
-     * `TRUE` if the user can authenticate and interact with Mambu APIs, `FALSE` otherwise. The user may still require additional permissions for specific API requests.
-     */
-    apiAccess?: boolean
-    /**
-     * Permissions for the user. The non-admin users are authorized to do actions based a set of permissions in order to access Mambu features. Permissions may be relevant for the API and/or the Mambu UI.
-     */
-    permissions?: Local0[]
-    /**
-     * `TRUE` if the user is part of the Mambu delivery team, `FALSE` otherwise.
-     */
-    deliveryAccess?: boolean
-    /**
-     * `TRUE` if the user has the credit officer user type, `FALSE` otherwise. Credit officers have the option of having clients and groups assigned to them.
-     */
-    creditOfficerAccess?: boolean
-    /**
-     * `TRUE` if the user can provide Mambu technical support, `FALSE` otherwise.
-     */
-    supportAccess?: boolean
-    /**
-     * `TRUE` if the user has the teller user type, `FALSE` otherwise. Tellers have access to the teller module and specific tellering permissions, which allow them to take actions such as opening or closing tills, posting transactions on a till, and adding and removing cash from a till.
-     */
-    tellerAccess?: boolean
-}
 
 type Local0 =
     | 'AUDIT_TRANSACTIONS'
@@ -336,6 +271,7 @@ type Local0 =
     | 'BOOKING_DATE_LOANS_GL'
     | 'BOOKING_DATE_SAVINGS_GL'
     | 'RECTIFY_ADJUSTMENT'
+    | 'MANAGE_INTERBRANCH_GLACCOUNT_RULES'
     | 'VIEW_ACCOUNTING_RATES'
     | 'CREATE_ACCOUNTING_RATES'
     | 'OPEN_TILL'
@@ -401,6 +337,14 @@ type Local0 =
     | 'CREATE_PROFIT_SHARING_INCOME_CATEGORIES'
     | 'EDIT_PROFIT_SHARING_INCOME_CATEGORIES'
     | 'DELETE_PROFIT_SHARING_INCOME_CATEGORIES'
+    | 'VIEW_PROFIT_SHARING_EXPENSES'
+    | 'CREATE_PROFIT_SHARING_EXPENSES'
+    | 'EDIT_PROFIT_SHARING_EXPENSES'
+    | 'DELETE_PROFIT_SHARING_EXPENSES'
+    | 'VIEW_PROFIT_SHARING_DEDUCTIONS'
+    | 'CREATE_PROFIT_SHARING_DEDUCTIONS'
+    | 'EDIT_PROFIT_SHARING_DEDUCTIONS'
+    | 'DELETE_PROFIT_SHARING_DEDUCTIONS'
     | 'VIEW_PROFIT_SHARING_PROPOSALS'
     | 'EDIT_PROFIT_SHARING_PROPOSALS'
     | 'CREATE_PROFIT_SHARING_PROPOSALS'
@@ -415,17 +359,16 @@ type Local0 =
     | 'VIEW_PROFIT_SHARING_ACCOUNTS_SETTINGS'
     | 'CREATE_PROFIT_SHARING_ACCOUNT_SETTINGS'
     | 'EDIT_PROFIT_SHARING_ACCOUNT_SETTINGS'
-
-export interface RestError {
-    errorCode?: number
-    errorSource?: string
-    errorReason?: string
-}
+    | 'MAKE_BULK_CHANGE_INTEREST_AVAILABILITY'
 
 /**
  * A single change that needs to be made to a resource
  */
 export interface PatchOperation {
+    /**
+     * The field from where a value should be moved, when using move
+     */
+    from?: string
     /**
      * The change to perform
      */
@@ -435,13 +378,80 @@ export interface PatchOperation {
      */
     path: string
     /**
-     * The field from where a value should be moved, when using move
-     */
-    from?: string
-    /**
      * The value of the field, can be null
      */
     value?: {
         [k: string]: unknown | undefined
     }
 }
+
+export type PatchRequest = PatchOperation[]
+
+export const PatchRequest = {
+    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
+    get schema() {
+        return PatchRequest.validate.schema
+    },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!PatchRequest.validate(o)) {
+            throw new ValidationError(PatchRequest.errors ?? [])
+        }
+    },
+} as const
+
+export interface RestError {
+    errorCode?: number
+    errorReason?: string
+    errorSource?: string
+}
+
+/**
+ * Represents a user role.
+ */
+export interface Role {
+    access?: BaseUserAccess
+    /**
+     * The date when the role was created in UTC.
+     */
+    creationDate?: string
+    /**
+     * The encoded key of the entity, generated automatically, globally unique.
+     */
+    encodedKey?: string
+    /**
+     * The ID of the role, which can be generated and customized, but must be unique.
+     */
+    id?: string
+    /**
+     * The last time the role was modified in UTC.
+     */
+    lastModifiedDate?: string
+    /**
+     * The unique name of the role.
+     */
+    name: string
+    /**
+     * The notes about the role.
+     */
+    notes?: string
+}
+
+export const Role = {
+    validate: (await import('./schemas/role.schema.js')).validate as ValidateFunction<Role>,
+    get schema() {
+        return Role.validate.schema
+    },
+    get errors() {
+        return Role.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Role => Role.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!Role.validate(o)) {
+            throw new ValidationError(Role.errors ?? [])
+        }
+    },
+} as const

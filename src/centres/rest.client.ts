@@ -44,34 +44,6 @@ export class MambuCentres {
     }
 
     /**
-     * Get centre
-     */
-    public async getById({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { centreId: string }
-        query?: { detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`centres/${path.centreId}`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: Centre,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
      * Get centres
      */
     public async getAll({
@@ -99,6 +71,34 @@ export class MambuCentres {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get centre
+     */
+    public async getById({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { centreId: string }
+        query?: { detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`centres/${path.centreId}`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: Centre,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }

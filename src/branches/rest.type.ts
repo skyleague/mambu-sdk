@@ -7,33 +7,75 @@ import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
 /**
+ * Represents an address.
+ */
+export interface Address {
+    /**
+     * The city for the address.
+     */
+    city?: string
+    /**
+     * The country.
+     */
+    country?: string
+    /**
+     * The address encoded key, which is unique and generated.
+     */
+    encodedKey?: string
+    /**
+     * The index of this address in the list of addresses.
+     */
+    indexInList?: number
+    /**
+     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
+     */
+    latitude?: number
+    /**
+     * The first line of the address.
+     */
+    line1?: string
+    /**
+     * The second line of the address.
+     */
+    line2?: string
+    /**
+     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
+     */
+    longitude?: number
+    /**
+     * The address parent key indicating the object owning this address. For example: client, centre, or branch.
+     */
+    parentKey?: string
+    /**
+     * The post code.
+     */
+    postcode?: string
+    /**
+     * The region for the address.
+     */
+    region?: string
+}
+
+/**
  * Represents a branch.
  */
 export interface Branch {
-    /**
-     * The branch email address.
-     */
-    emailAddress?: string
     /**
      * The list of branch addresses.
      */
     addresses?: Address[]
     /**
-     * The branch phone number.
+     * The list of branch holidays.
      */
-    phoneNumber?: string
+    branchHolidays?: Holiday[]
     /**
-     * The notes or description attached to this object.
+     * The creation date of the branch.
      */
-    notes?: string
+    creationDate?: string
     /**
-     * The last date when the branch was modified.
+     * The branch email address.
      */
-    lastModifiedDate?: string
-    /**
-     * The branch name.
-     */
-    name: string
+    emailAddress?: string
     /**
      * The encoded key of the entity, generated, globally unique
      */
@@ -43,17 +85,25 @@ export interface Branch {
      */
     id: string
     /**
+     * The last date when the branch was modified.
+     */
+    lastModifiedDate?: string
+    /**
+     * The branch name.
+     */
+    name: string
+    /**
+     * The notes or description attached to this object.
+     */
+    notes?: string
+    /**
+     * The branch phone number.
+     */
+    phoneNumber?: string
+    /**
      * The branch state.
      */
     state?: 'ACTIVE' | 'INACTIVE'
-    /**
-     * The creation date of the branch.
-     */
-    creationDate?: string
-    /**
-     * The list of branch holidays.
-     */
-    branchHolidays?: Holiday[]
 }
 
 export const Branch = {
@@ -106,71 +156,17 @@ export const GetAllResponse = {
 } as const
 
 /**
- * Represents an address.
- */
-export interface Address {
-    /**
-     * The country.
-     */
-    country?: string
-    /**
-     * The address parent key indicating the object owning this address. For example: client, centre, or branch.
-     */
-    parentKey?: string
-    /**
-     * The city for the address.
-     */
-    city?: string
-    /**
-     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
-     */
-    latitude?: number
-    /**
-     * The post code.
-     */
-    postcode?: string
-    /**
-     * The index of this address in the list of addresses.
-     */
-    indexInList?: number
-    /**
-     * The address encoded key, which is unique and generated.
-     */
-    encodedKey?: string
-    /**
-     * The region for the address.
-     */
-    region?: string
-    /**
-     * The second line of the address.
-     */
-    line2?: string
-    /**
-     * The first line of the address.
-     */
-    line1?: string
-    /**
-     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
-     */
-    longitude?: number
-}
-
-/**
  * Represents the holiday.
  */
 export interface Holiday {
     /**
+     * The date when the holiday was created.
+     */
+    creationDate?: string
+    /**
      * The date the holiday takes place.
      */
     date?: string
-    /**
-     * `TRUE` if a holiday is annually recurring, `FALSE` otherwise.
-     */
-    isAnnuallyRecurring?: boolean
-    /**
-     * The name of the holiday.
-     */
-    name?: string
     /**
      * The encoded key of the entity, generated, globally unique
      */
@@ -180,13 +176,17 @@ export interface Holiday {
      */
     id?: number
     /**
-     * The date when the holiday was created.
+     * `TRUE` if a holiday is annually recurring, `FALSE` otherwise.
      */
-    creationDate?: string
+    isAnnuallyRecurring?: boolean
+    /**
+     * The name of the holiday.
+     */
+    name?: string
 }
 
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

@@ -6,20 +6,6 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
-export type GetAllIndexRateSourcesResponse = IndexRateSource[]
-
-export const GetAllIndexRateSourcesResponse = {
-    validate: (await import('./schemas/get-all-index-rate-sources-response.schema.js'))
-        .validate as ValidateFunction<GetAllIndexRateSourcesResponse>,
-    get schema() {
-        return GetAllIndexRateSourcesResponse.validate.schema
-    },
-    get errors() {
-        return GetAllIndexRateSourcesResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAllIndexRateSourcesResponse => GetAllIndexRateSourcesResponse.validate(o) === true,
-} as const
-
 export interface ErrorResponse {
     errors?: RestError[]
 }
@@ -40,54 +26,18 @@ export const ErrorResponse = {
     },
 } as const
 
-/**
- * Represents an index rate source.
- */
-export interface IndexRateSource {
-    /**
-     * The notes about the the index rate source.
-     */
-    notes?: string
-    /**
-     * The last date this rate source was modified
-     */
-    lastModifiedDate?: string
-    /**
-     * The name of the index rate source.
-     */
-    name?: string
-    /**
-     * The encoded key of the index rate source, which is auto generated, and unique.
-     */
-    encodedKey?: string
-    /**
-     * The ID of the index rate source, which can be generated and customized, and must be unique.
-     */
-    id?: string
-    /**
-     * The type of index rate source.
-     */
-    type?: 'INTEREST_RATE' | 'TAX_RATE' | 'WITHHOLDING_TAX_RATE' | 'PRINCIPAL_TAX_RATE'
-    /**
-     * The creation date of the index rate source
-     */
-    creationDate?: string
-}
+export type GetAllIndexRateSourcesResponse = IndexRateSource[]
 
-export const IndexRateSource = {
-    validate: (await import('./schemas/index-rate-source.schema.js')).validate as ValidateFunction<IndexRateSource>,
+export const GetAllIndexRateSourcesResponse = {
+    validate: (await import('./schemas/get-all-index-rate-sources-response.schema.js'))
+        .validate as ValidateFunction<GetAllIndexRateSourcesResponse>,
     get schema() {
-        return IndexRateSource.validate.schema
+        return GetAllIndexRateSourcesResponse.validate.schema
     },
     get errors() {
-        return IndexRateSource.validate.errors ?? undefined
+        return GetAllIndexRateSourcesResponse.validate.errors ?? undefined
     },
-    is: (o: unknown): o is IndexRateSource => IndexRateSource.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!IndexRateSource.validate(o)) {
-            throw new ValidationError(IndexRateSource.errors ?? [])
-        }
-    },
+    is: (o: unknown): o is GetAllIndexRateSourcesResponse => GetAllIndexRateSourcesResponse.validate(o) === true,
 } as const
 
 export type GetAllIndexRatesResponse = IndexRate[]
@@ -109,14 +59,6 @@ export const GetAllIndexRatesResponse = {
  */
 export interface IndexRate {
     /**
-     * The notes or description attached to this object.
-     */
-    notes?: string
-    /**
-     * The percentage value of the index rate.
-     */
-    rate?: number
-    /**
      * The index rate source that the index rate belongs to.
      */
     assignedIndexRateSourceKey?: string
@@ -129,13 +71,21 @@ export interface IndexRate {
      */
     id?: string
     /**
-     * The key for the user that last modified the index rate.
+     * The notes or description attached to this object.
      */
-    userKey?: string
+    notes?: string
+    /**
+     * The percentage value of the index rate.
+     */
+    rate?: number
     /**
      * The date when the index rate starts being the active rate for its source.
      */
     startDate?: string
+    /**
+     * The key for the user that last modified the index rate.
+     */
+    userKey?: string
 }
 
 export const IndexRate = {
@@ -154,8 +104,58 @@ export const IndexRate = {
     },
 } as const
 
+/**
+ * Represents an index rate source.
+ */
+export interface IndexRateSource {
+    /**
+     * The creation date of the index rate source
+     */
+    creationDate?: string
+    /**
+     * The encoded key of the index rate source, which is auto generated, and unique.
+     */
+    encodedKey?: string
+    /**
+     * The ID of the index rate source, which can be generated and customized, and must be unique.
+     */
+    id?: string
+    /**
+     * The last date this rate source was modified
+     */
+    lastModifiedDate?: string
+    /**
+     * The name of the index rate source.
+     */
+    name?: string
+    /**
+     * The notes about the the index rate source.
+     */
+    notes?: string
+    /**
+     * The type of index rate source.
+     */
+    type?: 'INTEREST_RATE' | 'TAX_RATE' | 'WITHHOLDING_TAX_RATE' | 'PRINCIPAL_TAX_RATE'
+}
+
+export const IndexRateSource = {
+    validate: (await import('./schemas/index-rate-source.schema.js')).validate as ValidateFunction<IndexRateSource>,
+    get schema() {
+        return IndexRateSource.validate.schema
+    },
+    get errors() {
+        return IndexRateSource.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is IndexRateSource => IndexRateSource.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!IndexRateSource.validate(o)) {
+            throw new ValidationError(IndexRateSource.errors ?? [])
+        }
+    },
+} as const
+
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

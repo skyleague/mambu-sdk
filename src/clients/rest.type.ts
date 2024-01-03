@@ -7,17 +7,168 @@ import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
 /**
+ * Represents an address.
+ */
+export interface Address {
+    /**
+     * The city for the address.
+     */
+    city?: string
+    /**
+     * The country.
+     */
+    country?: string
+    /**
+     * The address encoded key, which is unique and generated.
+     */
+    encodedKey?: string
+    /**
+     * The index of this address in the list of addresses.
+     */
+    indexInList?: number
+    /**
+     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
+     */
+    latitude?: number
+    /**
+     * The first line of the address.
+     */
+    line1?: string
+    /**
+     * The second line of the address.
+     */
+    line2?: string
+    /**
+     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
+     */
+    longitude?: number
+    /**
+     * The address parent key indicating the object owning this address. For example: client, centre, or branch.
+     */
+    parentKey?: string
+    /**
+     * The post code.
+     */
+    postcode?: string
+    /**
+     * The region for the address.
+     */
+    region?: string
+}
+
+/**
  * Represents a client.
  */
 export interface Client {
+    /**
+     * The date when a client was set as active for the first time.
+     */
+    activationDate?: string
+    /**
+     * The addresses associated with this client.
+     */
+    addresses?: Address[]
+    /**
+     * The date when a client was approved.
+     */
+    approvedDate?: string
+    /**
+     * The encoded key of the branch a client is assigned to.
+     */
+    assignedBranchKey?: string
+    /**
+     * The encoded key of the centre a client is assigned to.
+     */
+    assignedCentreKey?: string
+    /**
+     * The encoded key of the user a client is assigned to.
+     */
+    assignedUserKey?: string
+    /**
+     * The client's date of birth.
+     */
+    birthDate?: string
+    /**
+     * A role which describes the intended use of a client in the system.
+     */
+    clientRoleKey?: string
+    /**
+     * The date when the client state was changed to closed.
+     */
+    closedDate?: string
+    /**
+     * The date a client was created.
+     */
+    creationDate?: string
+    /**
+     * The client's email address.
+     */
+    emailAddress?: string
+    /**
+     * The encoded key of the client, which is unique and generated.
+     */
+    encodedKey?: string
+    /**
+     * The first name, personal name, given name, or forename of the client.
+     */
+    firstName: string
+    /**
+     * The client's gender, the options are male or female.
+     */
+    gender?: 'MALE' | 'FEMALE'
+    /**
+     * The groups to which this client belongs.
+     */
+    groupKeys?: string[]
+    /**
+     * Number of paid and closed (with 'obligations met') accounts for a client's group; when the closing operation is reverted, this is reduced.
+     */
+    groupLoanCycle?: number
+    /**
+     * The client's home phone number.
+     */
+    homePhone?: string
+    /**
+     * The ID of the client, which can be generated and customized - but must be unique.
+     */
+    id?: string
+    /**
+     * The identification documents for this client.
+     */
+    idDocuments?: IdentificationDocument[]
+    /**
+     * The last date a client was modified.
+     */
+    lastModifiedDate?: string
     /**
      * The last name, surname, or family name of the client.
      */
     lastName: string
     /**
+     * Number of paid and closed (with 'obligations met') accounts for a client; when the closing operation is reverted, this is reduced.
+     */
+    loanCycle?: number
+    /**
+     * The middle name of the client.
+     */
+    middleName?: string
+    /**
      * The migration event encoded key associated with a client.
      */
     migrationEventKey?: string
+    /**
+     * The client's mobile phone number.
+     */
+    mobilePhone?: string
+    /**
+     * The client's second mobile phone number.
+     */
+    mobilePhone2?: string
+    /**
+     * The additional notes about a client.
+     */
+    notes?: string
+    portalSettings?: PortalSettings
     /**
      * The client's preferred language. This will determine the language for the reports, schedules, and account statements you generate for the client.
      */
@@ -38,95 +189,6 @@ export interface Client {
         | 'ITALIAN'
         | 'PHRASE'
     /**
-     * The addresses associated with this client.
-     */
-    addresses?: Address[]
-    /**
-     * The additional notes about a client.
-     */
-    notes?: string
-    /**
-     * The client's gender, the options are male or female.
-     */
-    gender?: 'MALE' | 'FEMALE'
-    /**
-     * The groups to which this client belongs.
-     */
-    groupKeys?: string[]
-    /**
-     * The client's second mobile phone number.
-     */
-    mobilePhone2?: string
-    /**
-     * Number of paid and closed (with 'obligations met') accounts for a client's group; when the closing operation is reverted, this is reduced.
-     */
-    groupLoanCycle?: number
-    portalSettings?: PortalSettings
-    /**
-     * The encoded key of the branch a client is assigned to.
-     */
-    assignedBranchKey?: string
-    /**
-     * Number of paid and closed (with 'obligations met') accounts for a client; when the closing operation is reverted, this is reduced.
-     */
-    loanCycle?: number
-    /**
-     * The client's email address.
-     */
-    emailAddress?: string
-    /**
-     * The encoded key of the client, which is unique and generated.
-     */
-    encodedKey?: string
-    /**
-     * The ID of the client, which can be generated and customized - but must be unique.
-     */
-    id?: string
-    /**
-     * The state of a client. It shows where the client is in the client life cycle.
-     */
-    state?: 'PENDING_APPROVAL' | 'INACTIVE' | 'ACTIVE' | 'EXITED' | 'BLACKLISTED' | 'REJECTED'
-    /**
-     * The encoded key of the user a client is assigned to.
-     */
-    assignedUserKey?: string
-    /**
-     * A role which describes the intended use of a client in the system.
-     */
-    clientRoleKey?: string
-    /**
-     * The last date a client was modified.
-     */
-    lastModifiedDate?: string
-    /**
-     * The client's home phone number.
-     */
-    homePhone?: string
-    /**
-     * The date a client was created.
-     */
-    creationDate?: string
-    /**
-     * The client's date of birth.
-     */
-    birthDate?: string
-    /**
-     * The encoded key of the centre a client is assigned to.
-     */
-    assignedCentreKey?: string
-    /**
-     * The date when a client was approved.
-     */
-    approvedDate?: string
-    /**
-     * The first name, personal name, given name, or forename of the client.
-     */
-    firstName: string
-    /**
-     * The identification documents for this client.
-     */
-    idDocuments?: IdentificationDocument[]
-    /**
      * The encoded key of a client's profile picture.
      */
     profilePictureKey?: string
@@ -135,21 +197,9 @@ export interface Client {
      */
     profileSignatureKey?: string
     /**
-     * The client's mobile phone number.
+     * The state of a client. It shows where the client is in the client life cycle.
      */
-    mobilePhone?: string
-    /**
-     * The date when the client state was changed to closed.
-     */
-    closedDate?: string
-    /**
-     * The middle name of the client.
-     */
-    middleName?: string
-    /**
-     * The date when a client was set as active for the first time.
-     */
-    activationDate?: string
+    state?: 'PENDING_APPROVAL' | 'INACTIVE' | 'ACTIVE' | 'EXITED' | 'BLACKLISTED' | 'REJECTED'
 }
 
 export const Client = {
@@ -167,415 +217,6 @@ export const Client = {
         }
     },
 } as const
-
-export interface ErrorResponse {
-    errors?: RestError[]
-}
-
-export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
-    get schema() {
-        return ErrorResponse.validate.schema
-    },
-    get errors() {
-        return ErrorResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
-        }
-    },
-} as const
-
-export type PatchRequest = PatchOperation[]
-
-export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
-    get schema() {
-        return PatchRequest.validate.schema
-    },
-    get errors() {
-        return PatchRequest.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
-        }
-    },
-} as const
-
-export type GetAllResponse = Client[]
-
-export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
-    get schema() {
-        return GetAllResponse.validate.schema
-    },
-    get errors() {
-        return GetAllResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
-} as const
-
-/**
- * Wrapper that holds a list of filtering criteria and a sorting criteria for clients
- */
-export interface ClientSearchCriteria {
-    sortingCriteria?: ClientSortingCriteria
-    /**
-     * The list of filtering criteria
-     */
-    filterCriteria: ClientFilterCriteria[]
-}
-
-export const ClientSearchCriteria = {
-    validate: (await import('./schemas/client-search-criteria.schema.js')).validate as ValidateFunction<ClientSearchCriteria>,
-    get schema() {
-        return ClientSearchCriteria.validate.schema
-    },
-    get errors() {
-        return ClientSearchCriteria.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ClientSearchCriteria => ClientSearchCriteria.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ClientSearchCriteria.validate(o)) {
-            throw new ValidationError(ClientSearchCriteria.errors ?? [])
-        }
-    },
-} as const
-
-export type SearchResponse = Client[]
-
-export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
-    get schema() {
-        return SearchResponse.validate.schema
-    },
-    get errors() {
-        return SearchResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
-} as const
-
-/**
- * Represents a client or group role.
- */
-export interface ClientRole {
-    /**
-     * The type of the client for which this role was created.
-     */
-    clientType?: 'CLIENT' | 'GROUP'
-    /**
-     * `TRUE` if identification documents must be provided for the client to be created, `FALSE` otherwise. Does not apply for groups.
-     */
-    requireID?: boolean
-    /**
-     * `TRUE` if clients with this client role can be used as guarantors, `FALSE` otherwise.
-     */
-    canGuarantee?: boolean
-    /**
-     * `TRUE` if the Mambu default address section is available, `FALSE` otherwise.
-     */
-    useDefaultAddress?: boolean
-    /**
-     * The name of the client role.
-     */
-    name?: string
-    /**
-     * `TRUE` if new accounts for this client type can be created, `FALSE` otherwise.
-     */
-    canOpenAccounts?: boolean
-    /**
-     * The text description for this client role.
-     */
-    description?: string
-    /**
-     * The encoded key of the client, which is unique and generated.
-     */
-    encodedKey?: string
-    /**
-     * The ID of the client role, which can be generated and customized - but must be unique.
-     */
-    id?: string
-    /**
-     * The creation date of the client role.
-     */
-    creationDate?: string
-    /**
-     * The pattern used in generating the client ID.
-     */
-    idPattern?: string
-}
-
-export const ClientRole = {
-    validate: (await import('./schemas/client-role.schema.js')).validate as ValidateFunction<ClientRole>,
-    get schema() {
-        return ClientRole.validate.schema
-    },
-    get errors() {
-        return ClientRole.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ClientRole => ClientRole.validate(o) === true,
-} as const
-
-export type GetCreditArrangementsByClientIdOrKeyResponse = CreditArrangement[]
-
-export const GetCreditArrangementsByClientIdOrKeyResponse = {
-    validate: (await import('./schemas/get-credit-arrangements-by-client-id-or-key-response.schema.js'))
-        .validate as ValidateFunction<GetCreditArrangementsByClientIdOrKeyResponse>,
-    get schema() {
-        return GetCreditArrangementsByClientIdOrKeyResponse.validate.schema
-    },
-    get errors() {
-        return GetCreditArrangementsByClientIdOrKeyResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetCreditArrangementsByClientIdOrKeyResponse =>
-        GetCreditArrangementsByClientIdOrKeyResponse.validate(o) === true,
-} as const
-
-/**
- * Represents an address.
- */
-export interface Address {
-    /**
-     * The country.
-     */
-    country?: string
-    /**
-     * The address parent key indicating the object owning this address. For example: client, centre, or branch.
-     */
-    parentKey?: string
-    /**
-     * The city for the address.
-     */
-    city?: string
-    /**
-     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
-     */
-    latitude?: number
-    /**
-     * The post code.
-     */
-    postcode?: string
-    /**
-     * The index of this address in the list of addresses.
-     */
-    indexInList?: number
-    /**
-     * The address encoded key, which is unique and generated.
-     */
-    encodedKey?: string
-    /**
-     * The region for the address.
-     */
-    region?: string
-    /**
-     * The second line of the address.
-     */
-    line2?: string
-    /**
-     * The first line of the address.
-     */
-    line1?: string
-    /**
-     * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
-     */
-    longitude?: number
-}
-
-/**
- * Represents portal settings for an individual client.
- */
-export interface PortalSettings {
-    /**
-     * The encoded key of the entity, generated, globally unique
-     */
-    encodedKey?: string
-    /**
-     * The state of the client's portal preferences.
-     */
-    portalState?: 'ENABLED' | 'DISABLED'
-    /**
-     * The last date the client logged in to the portal.
-     */
-    lastLoggedInDate?: string
-}
-
-/**
- * An Id document represents a document that can be used to identify a person like a passport, a drivers license an id card etc.
- */
-export interface IdentificationDocument {
-    /**
-     * Encoded key of the template used for this document
-     */
-    identificationDocumentTemplateKey?: string
-    /**
-     * Authority that issued the document, eg. Police
-     */
-    issuingAuthority?: string
-    /**
-     * A list containing information about the attached files for this document
-     */
-    attachments?: Document[]
-    /**
-     * The encoded key of the client that owns this document
-     */
-    clientKey?: string
-    /**
-     * The type of the document, Passport, Id card Drivers license, etc.
-     */
-    documentType: string
-    /**
-     * This document's index in the list of documents
-     */
-    indexInList?: number
-    /**
-     * Date when the validity of the document ends
-     */
-    validUntil?: string
-    /**
-     * The encoded key of the document, generated, unique
-     */
-    encodedKey?: string
-    /**
-     * The id of the document
-     */
-    documentId: string
-}
-
-/**
- * Holds information regarding the documents uploaded as attachments
- */
-export interface Document {
-    /**
-     * Determines the owner type of the document
-     */
-    ownerType?:
-        | 'CLIENT'
-        | 'GROUP'
-        | 'LOAN_PRODUCT'
-        | 'SAVINGS_PRODUCT'
-        | 'CENTRE'
-        | 'BRANCH'
-        | 'USER'
-        | 'LOAN_ACCOUNT'
-        | 'DEPOSIT_ACCOUNT'
-        | 'ID_DOCUMENT'
-        | 'LINE_OF_CREDIT'
-        | 'GL_JOURNAL_ENTRY'
-    /**
-     * The original file name of the document
-     */
-    fileName?: string
-    /**
-     * Detailed notes about the document
-     */
-    notes?: string
-    /**
-     * The last modified date of the document, stored as UTC
-     */
-    lastModifiedDate?: string
-    /**
-     * The creation date of the document, stored as UTC
-     */
-    creationDate?: string
-    /**
-     * The extension of the document
-     */
-    type: string
-    /**
-     * Represents the holder of this document. If null, means nobody is the owner of this document
-     */
-    ownerKey?: string
-    /**
-     * The file size of the document
-     */
-    fileSize?: number
-    /**
-     * The name of the document
-     */
-    name: string
-    /**
-     * The document encodedKey
-     */
-    encodedKey?: string
-    /**
-     * Location where the document can be found, eg /myfiles/mypicture.jpeg
-     */
-    location?: string
-    /**
-     * The document id
-     */
-    id: number
-}
-
-export interface RestError {
-    errorCode?: number
-    errorSource?: string
-    errorReason?: string
-}
-
-/**
- * A single change that needs to be made to a resource
- */
-export interface PatchOperation {
-    /**
-     * The change to perform
-     */
-    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
-    /**
-     * The field to perform the operation on
-     */
-    path: string
-    /**
-     * The field from where a value should be moved, when using move
-     */
-    from?: string
-    /**
-     * The value of the field, can be null
-     */
-    value?: {
-        [k: string]: unknown | undefined
-    }
-}
-
-/**
- * The sorting criteria used for Clients
- */
-export interface ClientSortingCriteria {
-    /**
-     * The field to sort by. It can be native (one from the provided list) or otherwise can specify a custom field definition using the format [customFieldSetId].[customFieldId].
-     */
-    field:
-        | 'encodedKey'
-        | 'id'
-        | 'fullName'
-        | 'firstName'
-        | 'middleName'
-        | 'lastName'
-        | 'creationDate'
-        | 'lastModifiedDate'
-        | 'depositsBalance'
-        | 'loansBalance'
-        | 'pendingLoanAmount'
-        | 'approvedLoanAmount'
-        | 'totalBalance'
-        | 'totalDue'
-        | 'homePhoneNumber'
-        | 'mobilePhoneNumber'
-        | 'mobilePhoneNumber2'
-        | 'emailAddress'
-        | 'birthdate'
-        | 'loanCycle'
-        | 'groupLoanCycle'
-        | 'portalState'
-    /**
-     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
-     */
-    order?: 'ASC' | 'DESC'
-}
 
 /**
  * The unit that composes the list used for Clients searching
@@ -615,10 +256,6 @@ export interface ClientFilterCriteria {
         | 'preferredLanguage'
         | 'groupId'
         | string
-    /**
-     * The value to match the searching criteria.
-     */
-    value?: string
     /**
      * | **Operator**                | **Affected values**  | **Available for**                                                    |
      * |---------------               |----------------------|----------------------------------------------------------------------|
@@ -669,9 +306,137 @@ export interface ClientFilterCriteria {
      */
     secondValue?: string
     /**
+     * The value to match the searching criteria.
+     */
+    value?: string
+    /**
      * List of values when the `IN` operator is used.
      */
     values?: string[]
+}
+
+/**
+ * Represents a client or group role.
+ */
+export interface ClientRole {
+    /**
+     * `TRUE` if clients with this client role can be used as guarantors, `FALSE` otherwise.
+     */
+    canGuarantee?: boolean
+    /**
+     * `TRUE` if new accounts for this client type can be created, `FALSE` otherwise.
+     */
+    canOpenAccounts?: boolean
+    /**
+     * The type of the client for which this role was created.
+     */
+    clientType?: 'CLIENT' | 'GROUP'
+    /**
+     * The creation date of the client role.
+     */
+    creationDate?: string
+    /**
+     * The text description for this client role.
+     */
+    description?: string
+    /**
+     * The encoded key of the client, which is unique and generated.
+     */
+    encodedKey?: string
+    /**
+     * The ID of the client role, which can be generated and customized - but must be unique.
+     */
+    id?: string
+    /**
+     * The pattern used in generating the client ID.
+     */
+    idPattern?: string
+    /**
+     * The name of the client role.
+     */
+    name?: string
+    /**
+     * `TRUE` if identification documents must be provided for the client to be created, `FALSE` otherwise. Does not apply for groups.
+     */
+    requireID?: boolean
+    /**
+     * `TRUE` if the Mambu default address section is available, `FALSE` otherwise.
+     */
+    useDefaultAddress?: boolean
+}
+
+export const ClientRole = {
+    validate: (await import('./schemas/client-role.schema.js')).validate as ValidateFunction<ClientRole>,
+    get schema() {
+        return ClientRole.validate.schema
+    },
+    get errors() {
+        return ClientRole.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ClientRole => ClientRole.validate(o) === true,
+} as const
+
+/**
+ * Wrapper that holds a list of filtering criteria and a sorting criteria for clients
+ */
+export interface ClientSearchCriteria {
+    /**
+     * The list of filtering criteria
+     */
+    filterCriteria: ClientFilterCriteria[]
+    sortingCriteria?: ClientSortingCriteria
+}
+
+export const ClientSearchCriteria = {
+    validate: (await import('./schemas/client-search-criteria.schema.js')).validate as ValidateFunction<ClientSearchCriteria>,
+    get schema() {
+        return ClientSearchCriteria.validate.schema
+    },
+    get errors() {
+        return ClientSearchCriteria.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ClientSearchCriteria => ClientSearchCriteria.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ClientSearchCriteria.validate(o)) {
+            throw new ValidationError(ClientSearchCriteria.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * The sorting criteria used for Clients
+ */
+export interface ClientSortingCriteria {
+    /**
+     * The field to sort by. It can be native (one from the provided list) or otherwise can specify a custom field definition using the format [customFieldSetId].[customFieldId].
+     */
+    field:
+        | 'encodedKey'
+        | 'id'
+        | 'fullName'
+        | 'firstName'
+        | 'middleName'
+        | 'lastName'
+        | 'creationDate'
+        | 'lastModifiedDate'
+        | 'depositsBalance'
+        | 'loansBalance'
+        | 'pendingLoanAmount'
+        | 'approvedLoanAmount'
+        | 'totalBalance'
+        | 'totalDue'
+        | 'homePhoneNumber'
+        | 'mobilePhoneNumber'
+        | 'mobilePhoneNumber2'
+        | 'emailAddress'
+        | 'birthdate'
+        | 'loanCycle'
+        | 'groupLoanCycle'
+        | 'portalState'
+    /**
+     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
+     */
+    order?: 'ASC' | 'DESC'
 }
 
 /**
@@ -679,25 +444,21 @@ export interface ClientFilterCriteria {
  */
 export interface CreditArrangement {
     /**
-     * The available amount of the credit arrangement.
-     */
-    availableCreditAmount?: number
-    /**
      * The maximum credit amount the client can be exposed to.
      */
     amount: number
     /**
-     * The notes or description of the credit arrangement.
+     * The date when the credit arrangement was approved.
      */
-    notes?: string
+    approvedDate?: string
     /**
-     * The last date when the credit arrangement was modified.
+     * The available amount of the credit arrangement.
      */
-    lastModifiedDate?: string
+    availableCreditAmount?: number
     /**
-     * The encoded key of the credit arrangement holder (individual client or group).
+     * The date when the credit arrangement was closed.
      */
-    holderKey?: string
+    closedDate?: string
     /**
      * The consumed amount of the credit arrangement, which is calculated as the difference between the amount and available amount.
      */
@@ -706,22 +467,7 @@ export interface CreditArrangement {
      * The date when the credit arrangement was created.
      */
     creationDate?: string
-    /**
-     * The date when the credit arrangement was approved.
-     */
-    approvedDate?: string
-    /**
-     * The substate of credit arrangement.
-     */
-    subState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
-    /**
-     * The date when the credit arrangement was closed.
-     */
-    closedDate?: string
-    /**
-     * The type of exposure limit calculation method used for the credit arrangement.
-     */
-    exposureLimitType?: 'APPROVED_AMOUNT' | 'OUTSTANDING_AMOUNT'
+    currency?: Currency
     /**
      * The encoded key of the credit arrangement, it is auto generated, and unique.
      */
@@ -730,33 +476,48 @@ export interface CreditArrangement {
      * The date when the credit arrangement expires.
      */
     expireDate: string
-    currency?: Currency
     /**
-     * The ID of credit arrangement, can be generated and customized, and must be unique.
+     * The type of exposure limit calculation method used for the credit arrangement.
      */
-    id?: string
+    exposureLimitType?: 'APPROVED_AMOUNT' | 'OUTSTANDING_AMOUNT'
     /**
-     * The state of the credit arrangement.
+     * The encoded key of the credit arrangement holder (individual client or group).
      */
-    state?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
+    holderKey?: string
     /**
      * The type of the credit arrangement holder (individual client or group).
      */
     holderType: 'CLIENT' | 'GROUP'
     /**
+     * The ID of credit arrangement, can be generated and customized, and must be unique.
+     */
+    id?: string
+    /**
+     * The last date when the credit arrangement was modified.
+     */
+    lastModifiedDate?: string
+    /**
+     * The notes or description of the credit arrangement.
+     */
+    notes?: string
+    /**
      * The start date from which the credit arrangement became active.
      */
     startDate: string
+    /**
+     * The state of the credit arrangement.
+     */
+    state?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
+    /**
+     * The substate of credit arrangement.
+     */
+    subState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
 }
 
 /**
  * Represents a currency eg. USD, EUR.
  */
 export interface Currency {
-    /**
-     * Currency code for NON_FIAT currency.
-     */
-    currencyCode?: string
     /**
      * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
@@ -949,4 +710,243 @@ export interface Currency {
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+    /**
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
 }
+
+/**
+ * Holds information regarding the documents uploaded as attachments
+ */
+export interface Document {
+    /**
+     * The creation date of the document, stored as UTC
+     */
+    creationDate?: string
+    /**
+     * The document encodedKey
+     */
+    encodedKey?: string
+    /**
+     * The original file name of the document
+     */
+    fileName?: string
+    /**
+     * The file size of the document
+     */
+    fileSize?: number
+    /**
+     * The document id
+     */
+    id: number
+    /**
+     * The last modified date of the document, stored as UTC
+     */
+    lastModifiedDate?: string
+    /**
+     * Location where the document can be found, eg /myfiles/mypicture.jpeg
+     */
+    location?: string
+    /**
+     * The name of the document
+     */
+    name: string
+    /**
+     * Detailed notes about the document
+     */
+    notes?: string
+    /**
+     * Represents the holder of this document. If null, means nobody is the owner of this document
+     */
+    ownerKey?: string
+    /**
+     * Determines the owner type of the document
+     */
+    ownerType?:
+        | 'CLIENT'
+        | 'GROUP'
+        | 'LOAN_PRODUCT'
+        | 'SAVINGS_PRODUCT'
+        | 'CENTRE'
+        | 'BRANCH'
+        | 'USER'
+        | 'LOAN_ACCOUNT'
+        | 'DEPOSIT_ACCOUNT'
+        | 'ID_DOCUMENT'
+        | 'LINE_OF_CREDIT'
+        | 'GL_JOURNAL_ENTRY'
+    /**
+     * The extension of the document
+     */
+    type: string
+}
+
+export interface ErrorResponse {
+    errors?: RestError[]
+}
+
+export const ErrorResponse = {
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    get schema() {
+        return ErrorResponse.validate.schema
+    },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
+} as const
+
+export type GetAllResponse = Client[]
+
+export const GetAllResponse = {
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    get schema() {
+        return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+} as const
+
+export type GetCreditArrangementsByClientIdOrKeyResponse = CreditArrangement[]
+
+export const GetCreditArrangementsByClientIdOrKeyResponse = {
+    validate: (await import('./schemas/get-credit-arrangements-by-client-id-or-key-response.schema.js'))
+        .validate as ValidateFunction<GetCreditArrangementsByClientIdOrKeyResponse>,
+    get schema() {
+        return GetCreditArrangementsByClientIdOrKeyResponse.validate.schema
+    },
+    get errors() {
+        return GetCreditArrangementsByClientIdOrKeyResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetCreditArrangementsByClientIdOrKeyResponse =>
+        GetCreditArrangementsByClientIdOrKeyResponse.validate(o) === true,
+} as const
+
+/**
+ * An Id document represents a document that can be used to identify a person like a passport, a drivers license an id card etc.
+ */
+export interface IdentificationDocument {
+    /**
+     * A list containing information about the attached files for this document
+     */
+    attachments?: Document[]
+    /**
+     * The encoded key of the client that owns this document
+     */
+    clientKey?: string
+    /**
+     * The id of the document
+     */
+    documentId: string
+    /**
+     * The type of the document, Passport, Id card Drivers license, etc.
+     */
+    documentType: string
+    /**
+     * The encoded key of the document, generated, unique
+     */
+    encodedKey?: string
+    /**
+     * Encoded key of the template used for this document
+     */
+    identificationDocumentTemplateKey?: string
+    /**
+     * This document's index in the list of documents
+     */
+    indexInList?: number
+    /**
+     * Authority that issued the document, eg. Police
+     */
+    issuingAuthority?: string
+    /**
+     * Date when the validity of the document ends
+     */
+    validUntil?: string
+}
+
+/**
+ * A single change that needs to be made to a resource
+ */
+export interface PatchOperation {
+    /**
+     * The field from where a value should be moved, when using move
+     */
+    from?: string
+    /**
+     * The change to perform
+     */
+    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
+    /**
+     * The field to perform the operation on
+     */
+    path: string
+    /**
+     * The value of the field, can be null
+     */
+    value?: {
+        [k: string]: unknown | undefined
+    }
+}
+
+export type PatchRequest = PatchOperation[]
+
+export const PatchRequest = {
+    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
+    get schema() {
+        return PatchRequest.validate.schema
+    },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!PatchRequest.validate(o)) {
+            throw new ValidationError(PatchRequest.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * Represents portal settings for an individual client.
+ */
+export interface PortalSettings {
+    /**
+     * The encoded key of the entity, generated, globally unique
+     */
+    encodedKey?: string
+    /**
+     * The last date the client logged in to the portal.
+     */
+    lastLoggedInDate?: string
+    /**
+     * The state of the client's portal preferences.
+     */
+    portalState?: 'ENABLED' | 'DISABLED'
+}
+
+export interface RestError {
+    errorCode?: number
+    errorReason?: string
+    errorSource?: string
+}
+
+export type SearchResponse = Client[]
+
+export const SearchResponse = {
+    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
+    get schema() {
+        return SearchResponse.validate.schema
+    },
+    get errors() {
+        return SearchResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
+} as const

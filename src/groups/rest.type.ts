@@ -6,311 +6,54 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
-export type GetAllResponse = Group[]
-
-export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
-    get schema() {
-        return GetAllResponse.validate.schema
-    },
-    get errors() {
-        return GetAllResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[]
-}
-
-export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
-    get schema() {
-        return ErrorResponse.validate.schema
-    },
-    get errors() {
-        return ErrorResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Represents a group. A group is a type of client that can represent a non-physical person such as a company client or a grouping of individual clients. A group can have its own accounts and can optionally have individual clients as members, in which case they also need to have an individual profile in Mambu.
- */
-export interface Group {
-    /**
-     * The members of this group.
-     */
-    groupMembers?: GroupMember[]
-    /**
-     * The migration event encoded key associated with this group.
-     */
-    migrationEventKey?: string
-    /**
-     * The preferred language associated with the group (used for the notifications).
-     */
-    preferredLanguage?:
-        | 'ENGLISH'
-        | 'PORTUGESE'
-        | 'SPANISH'
-        | 'RUSSIAN'
-        | 'FRENCH'
-        | 'GEORGIAN'
-        | 'CHINESE'
-        | 'INDONESIAN'
-        | 'ROMANIAN'
-        | 'BURMESE'
-        | 'GERMAN'
-        | 'PORTUGUESE_BRAZIL'
-        | 'VIETNAMESE'
-        | 'ITALIAN'
-        | 'PHRASE'
-    /**
-     * The addresses associated with this group.
-     */
-    addresses?: Address[]
-    /**
-     * Extra notes about this group.
-     */
-    notes?: string
-    /**
-     * The last date the group was updated.
-     */
-    lastModifiedDate?: string
-    /**
-     * The home phone number associated with the group.
-     */
-    homePhone?: string
-    /**
-     * The date the group was created.
-     */
-    creationDate?: string
-    /**
-     * Key of the branch this group is assigned to.
-     */
-    assignedBranchKey?: string
-    /**
-     * Number of paid and closed (with 'obligations met') accounts for this client. When the closing operation is reverted, this is reduced.
-     */
-    loanCycle?: number
-    /**
-     * Key of the centre this group is assigned to.
-     */
-    assignedCentreKey?: string
-    /**
-     * The name of the group.
-     */
-    groupName: string
-    /**
-     * The email address associated with the group.
-     */
-    emailAddress?: string
-    /**
-     * The mobile phone number associated with the group.
-     */
-    mobilePhone?: string
-    /**
-     * A role which describes the intended use of a group in the system.
-     */
-    groupRoleKey?: string
-    /**
-     * The encoded key of the group, which is auto generated, and must be unique.
-     */
-    encodedKey?: string
-    /**
-     * The ID of the group, which can be generated and customized, but must be unique.
-     */
-    id?: string
-    /**
-     * Key of the user this group is assigned to.
-     */
-    assignedUserKey?: string
-}
-
-export const Group = {
-    validate: (await import('./schemas/group.schema.js')).validate as ValidateFunction<Group>,
-    get schema() {
-        return Group.validate.schema
-    },
-    get errors() {
-        return Group.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Group => Group.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Group.validate(o)) {
-            throw new ValidationError(Group.errors ?? [])
-        }
-    },
-} as const
-
-export type GetCreditArrangementsByGroupIdOrKeyResponse = CreditArrangement[]
-
-export const GetCreditArrangementsByGroupIdOrKeyResponse = {
-    validate: (await import('./schemas/get-credit-arrangements-by-group-id-or-key-response.schema.js'))
-        .validate as ValidateFunction<GetCreditArrangementsByGroupIdOrKeyResponse>,
-    get schema() {
-        return GetCreditArrangementsByGroupIdOrKeyResponse.validate.schema
-    },
-    get errors() {
-        return GetCreditArrangementsByGroupIdOrKeyResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetCreditArrangementsByGroupIdOrKeyResponse =>
-        GetCreditArrangementsByGroupIdOrKeyResponse.validate(o) === true,
-} as const
-
-export type PatchRequest = PatchOperation[]
-
-export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
-    get schema() {
-        return PatchRequest.validate.schema
-    },
-    get errors() {
-        return PatchRequest.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
-        }
-    },
-} as const
-
-/**
- * Wrapper that holds a list of filtering criteria and a sorting criteria for Groups client directed query
- */
-export interface GroupSearchCriteria {
-    sortingCriteria?: GroupSortingCriteria
-    /**
-     * The list of filtering criteria
-     */
-    filterCriteria: GroupFilterCriteria[]
-}
-
-export const GroupSearchCriteria = {
-    validate: (await import('./schemas/group-search-criteria.schema.js')).validate as ValidateFunction<GroupSearchCriteria>,
-    get schema() {
-        return GroupSearchCriteria.validate.schema
-    },
-    get errors() {
-        return GroupSearchCriteria.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GroupSearchCriteria => GroupSearchCriteria.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!GroupSearchCriteria.validate(o)) {
-            throw new ValidationError(GroupSearchCriteria.errors ?? [])
-        }
-    },
-} as const
-
-export type SearchResponse = Group[]
-
-export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
-    get schema() {
-        return SearchResponse.validate.schema
-    },
-    get errors() {
-        return SearchResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
-} as const
-
-export interface RestError {
-    errorCode?: number
-    errorSource?: string
-    errorReason?: string
-}
-
-/**
- * Represents a group member. A group member is person that uses the services of the bank and is member of a group. Group members may have associated information, such as their client key and a list of roles they have within the group.
- */
-export interface GroupMember {
-    /**
-     * The encoded key of the client assigned as member of the group.
-     */
-    clientKey: string
-    /**
-     * The group role name associated with a group member.
-     */
-    roles?: GroupRole[]
-}
-
-/**
- * Represents a group role. A group role, or group role name, is the role of a group member within the group - for example, money collector. One member could have many roles within a group.
- */
-export interface GroupRole {
-    /**
-     * The group role name.
-     */
-    roleName?: string
-    /**
-     * The encoded key of the group role name, which is auto generated, and unique.
-     */
-    encodedKey?: string
-    /**
-     * The group role name key.
-     */
-    groupRoleNameKey: string
-    /**
-     * The group role name ID.
-     */
-    roleNameId?: string
-}
-
 /**
  * Represents an address.
  */
 export interface Address {
     /**
-     * The country.
-     */
-    country?: string
-    /**
-     * The address parent key indicating the object owning this address. For example: client, centre, or branch.
-     */
-    parentKey?: string
-    /**
      * The city for the address.
      */
     city?: string
     /**
-     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
+     * The country.
      */
-    latitude?: number
-    /**
-     * The post code.
-     */
-    postcode?: string
-    /**
-     * The index of this address in the list of addresses.
-     */
-    indexInList?: number
+    country?: string
     /**
      * The address encoded key, which is unique and generated.
      */
     encodedKey?: string
     /**
-     * The region for the address.
+     * The index of this address in the list of addresses.
      */
-    region?: string
+    indexInList?: number
     /**
-     * The second line of the address.
+     * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
      */
-    line2?: string
+    latitude?: number
     /**
      * The first line of the address.
      */
     line1?: string
     /**
+     * The second line of the address.
+     */
+    line2?: string
+    /**
      * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
      */
     longitude?: number
+    /**
+     * The address parent key indicating the object owning this address. For example: client, centre, or branch.
+     */
+    parentKey?: string
+    /**
+     * The post code.
+     */
+    postcode?: string
+    /**
+     * The region for the address.
+     */
+    region?: string
 }
 
 /**
@@ -318,25 +61,21 @@ export interface Address {
  */
 export interface CreditArrangement {
     /**
-     * The available amount of the credit arrangement.
-     */
-    availableCreditAmount?: number
-    /**
      * The maximum credit amount the client can be exposed to.
      */
     amount: number
     /**
-     * The notes or description of the credit arrangement.
+     * The date when the credit arrangement was approved.
      */
-    notes?: string
+    approvedDate?: string
     /**
-     * The last date when the credit arrangement was modified.
+     * The available amount of the credit arrangement.
      */
-    lastModifiedDate?: string
+    availableCreditAmount?: number
     /**
-     * The encoded key of the credit arrangement holder (individual client or group).
+     * The date when the credit arrangement was closed.
      */
-    holderKey?: string
+    closedDate?: string
     /**
      * The consumed amount of the credit arrangement, which is calculated as the difference between the amount and available amount.
      */
@@ -345,22 +84,7 @@ export interface CreditArrangement {
      * The date when the credit arrangement was created.
      */
     creationDate?: string
-    /**
-     * The date when the credit arrangement was approved.
-     */
-    approvedDate?: string
-    /**
-     * The substate of credit arrangement.
-     */
-    subState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
-    /**
-     * The date when the credit arrangement was closed.
-     */
-    closedDate?: string
-    /**
-     * The type of exposure limit calculation method used for the credit arrangement.
-     */
-    exposureLimitType?: 'APPROVED_AMOUNT' | 'OUTSTANDING_AMOUNT'
+    currency?: Currency
     /**
      * The encoded key of the credit arrangement, it is auto generated, and unique.
      */
@@ -369,33 +93,48 @@ export interface CreditArrangement {
      * The date when the credit arrangement expires.
      */
     expireDate: string
-    currency?: Currency
     /**
-     * The ID of credit arrangement, can be generated and customized, and must be unique.
+     * The type of exposure limit calculation method used for the credit arrangement.
      */
-    id?: string
+    exposureLimitType?: 'APPROVED_AMOUNT' | 'OUTSTANDING_AMOUNT'
     /**
-     * The state of the credit arrangement.
+     * The encoded key of the credit arrangement holder (individual client or group).
      */
-    state?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
+    holderKey?: string
     /**
      * The type of the credit arrangement holder (individual client or group).
      */
     holderType: 'CLIENT' | 'GROUP'
     /**
+     * The ID of credit arrangement, can be generated and customized, and must be unique.
+     */
+    id?: string
+    /**
+     * The last date when the credit arrangement was modified.
+     */
+    lastModifiedDate?: string
+    /**
+     * The notes or description of the credit arrangement.
+     */
+    notes?: string
+    /**
      * The start date from which the credit arrangement became active.
      */
     startDate: string
+    /**
+     * The state of the credit arrangement.
+     */
+    state?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
+    /**
+     * The substate of credit arrangement.
+     */
+    subState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
 }
 
 /**
  * Represents a currency eg. USD, EUR.
  */
 export interface Currency {
-    /**
-     * Currency code for NON_FIAT currency.
-     */
-    currencyCode?: string
     /**
      * Fiat(ISO-4217) currency code or NON_FIAT for non fiat currencies.
      */
@@ -588,54 +327,168 @@ export interface Currency {
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+    /**
+     * Currency code for NON_FIAT currency.
+     */
+    currencyCode?: string
 }
 
-/**
- * A single change that needs to be made to a resource
- */
-export interface PatchOperation {
-    /**
-     * The change to perform
-     */
-    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
-    /**
-     * The field to perform the operation on
-     */
-    path: string
-    /**
-     * The field from where a value should be moved, when using move
-     */
-    from?: string
-    /**
-     * The value of the field, can be null
-     */
-    value?: {
-        [k: string]: unknown | undefined
-    }
+export interface ErrorResponse {
+    errors?: RestError[]
 }
 
+export const ErrorResponse = {
+    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    get schema() {
+        return ErrorResponse.validate.schema
+    },
+    get errors() {
+        return ErrorResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!ErrorResponse.validate(o)) {
+            throw new ValidationError(ErrorResponse.errors ?? [])
+        }
+    },
+} as const
+
+export type GetAllResponse = Group[]
+
+export const GetAllResponse = {
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    get schema() {
+        return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+} as const
+
+export type GetCreditArrangementsByGroupIdOrKeyResponse = CreditArrangement[]
+
+export const GetCreditArrangementsByGroupIdOrKeyResponse = {
+    validate: (await import('./schemas/get-credit-arrangements-by-group-id-or-key-response.schema.js'))
+        .validate as ValidateFunction<GetCreditArrangementsByGroupIdOrKeyResponse>,
+    get schema() {
+        return GetCreditArrangementsByGroupIdOrKeyResponse.validate.schema
+    },
+    get errors() {
+        return GetCreditArrangementsByGroupIdOrKeyResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetCreditArrangementsByGroupIdOrKeyResponse =>
+        GetCreditArrangementsByGroupIdOrKeyResponse.validate(o) === true,
+} as const
+
 /**
- * The sorting criteria used for Groups search
+ * Represents a group. A group is a type of client that can represent a non-physical person such as a company client or a grouping of individual clients. A group can have its own accounts and can optionally have individual clients as members, in which case they also need to have an individual profile in Mambu.
  */
-export interface GroupSortingCriteria {
+export interface Group {
     /**
-     * The field to sort by. It can be a native field (one from the provided list) or otherwise can specify a custom field definitionusing the format [customFieldSetId].[customFieldId].
+     * The addresses associated with this group.
      */
-    field:
-        | 'encodedKey'
-        | 'id'
-        | 'creationDate'
-        | 'groupName'
-        | 'lastModifiedDate'
-        | 'depositsBalance'
-        | 'loansBalance'
-        | 'totalBalance'
-        | 'loanCycle'
+    addresses?: Address[]
     /**
-     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
+     * Key of the branch this group is assigned to.
      */
-    order?: 'ASC' | 'DESC'
+    assignedBranchKey?: string
+    /**
+     * Key of the centre this group is assigned to.
+     */
+    assignedCentreKey?: string
+    /**
+     * Key of the user this group is assigned to.
+     */
+    assignedUserKey?: string
+    /**
+     * The date the group was created.
+     */
+    creationDate?: string
+    /**
+     * The email address associated with the group.
+     */
+    emailAddress?: string
+    /**
+     * The encoded key of the group, which is auto generated, and must be unique.
+     */
+    encodedKey?: string
+    /**
+     * The members of this group.
+     */
+    groupMembers?: GroupMember[]
+    /**
+     * The name of the group.
+     */
+    groupName: string
+    /**
+     * A role which describes the intended use of a group in the system.
+     */
+    groupRoleKey?: string
+    /**
+     * The home phone number associated with the group.
+     */
+    homePhone?: string
+    /**
+     * The ID of the group, which can be generated and customized, but must be unique.
+     */
+    id?: string
+    /**
+     * The last date the group was updated.
+     */
+    lastModifiedDate?: string
+    /**
+     * Number of paid and closed (with 'obligations met') accounts for this client. When the closing operation is reverted, this is reduced.
+     */
+    loanCycle?: number
+    /**
+     * The migration event encoded key associated with this group.
+     */
+    migrationEventKey?: string
+    /**
+     * The mobile phone number associated with the group.
+     */
+    mobilePhone?: string
+    /**
+     * Extra notes about this group.
+     */
+    notes?: string
+    /**
+     * The preferred language associated with the group (used for the notifications).
+     */
+    preferredLanguage?:
+        | 'ENGLISH'
+        | 'PORTUGESE'
+        | 'SPANISH'
+        | 'RUSSIAN'
+        | 'FRENCH'
+        | 'GEORGIAN'
+        | 'CHINESE'
+        | 'INDONESIAN'
+        | 'ROMANIAN'
+        | 'BURMESE'
+        | 'GERMAN'
+        | 'PORTUGUESE_BRAZIL'
+        | 'VIETNAMESE'
+        | 'ITALIAN'
+        | 'PHRASE'
 }
+
+export const Group = {
+    validate: (await import('./schemas/group.schema.js')).validate as ValidateFunction<Group>,
+    get schema() {
+        return Group.validate.schema
+    },
+    get errors() {
+        return Group.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Group => Group.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!Group.validate(o)) {
+            throw new ValidationError(Group.errors ?? [])
+        }
+    },
+} as const
 
 /**
  * The unit that composes the list used for Groups searching
@@ -658,10 +511,6 @@ export interface GroupFilterCriteria {
         | 'numberOfMembers'
         | 'loanCycle'
         | string
-    /**
-     * The value to match the searching criteria.
-     */
-    value?: string
     /**
      * | **Operator**                | **Affected values**  | **Available for**                                                    |
      * |---------------               |----------------------|----------------------------------------------------------------------|
@@ -712,7 +561,158 @@ export interface GroupFilterCriteria {
      */
     secondValue?: string
     /**
+     * The value to match the searching criteria.
+     */
+    value?: string
+    /**
      * List of values when the `IN` operator is used.
      */
     values?: string[]
 }
+
+/**
+ * Represents a group member. A group member is person that uses the services of the bank and is member of a group. Group members may have associated information, such as their client key and a list of roles they have within the group.
+ */
+export interface GroupMember {
+    /**
+     * The encoded key of the client assigned as member of the group.
+     */
+    clientKey: string
+    /**
+     * The group role name associated with a group member.
+     */
+    roles?: GroupRole[]
+}
+
+/**
+ * Represents a group role. A group role, or group role name, is the role of a group member within the group - for example, money collector. One member could have many roles within a group.
+ */
+export interface GroupRole {
+    /**
+     * The encoded key of the group role name, which is auto generated, and unique.
+     */
+    encodedKey?: string
+    /**
+     * The group role name key.
+     */
+    groupRoleNameKey: string
+    /**
+     * The group role name.
+     */
+    roleName?: string
+    /**
+     * The group role name ID.
+     */
+    roleNameId?: string
+}
+
+/**
+ * Wrapper that holds a list of filtering criteria and a sorting criteria for Groups client directed query
+ */
+export interface GroupSearchCriteria {
+    /**
+     * The list of filtering criteria
+     */
+    filterCriteria: GroupFilterCriteria[]
+    sortingCriteria?: GroupSortingCriteria
+}
+
+export const GroupSearchCriteria = {
+    validate: (await import('./schemas/group-search-criteria.schema.js')).validate as ValidateFunction<GroupSearchCriteria>,
+    get schema() {
+        return GroupSearchCriteria.validate.schema
+    },
+    get errors() {
+        return GroupSearchCriteria.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GroupSearchCriteria => GroupSearchCriteria.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!GroupSearchCriteria.validate(o)) {
+            throw new ValidationError(GroupSearchCriteria.errors ?? [])
+        }
+    },
+} as const
+
+/**
+ * The sorting criteria used for Groups search
+ */
+export interface GroupSortingCriteria {
+    /**
+     * The field to sort by. It can be a native field (one from the provided list) or otherwise can specify a custom field definitionusing the format [customFieldSetId].[customFieldId].
+     */
+    field:
+        | 'encodedKey'
+        | 'id'
+        | 'creationDate'
+        | 'groupName'
+        | 'lastModifiedDate'
+        | 'depositsBalance'
+        | 'loansBalance'
+        | 'totalBalance'
+        | 'loanCycle'
+    /**
+     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
+     */
+    order?: 'ASC' | 'DESC'
+}
+
+/**
+ * A single change that needs to be made to a resource
+ */
+export interface PatchOperation {
+    /**
+     * The field from where a value should be moved, when using move
+     */
+    from?: string
+    /**
+     * The change to perform
+     */
+    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
+    /**
+     * The field to perform the operation on
+     */
+    path: string
+    /**
+     * The value of the field, can be null
+     */
+    value?: {
+        [k: string]: unknown | undefined
+    }
+}
+
+export type PatchRequest = PatchOperation[]
+
+export const PatchRequest = {
+    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
+    get schema() {
+        return PatchRequest.validate.schema
+    },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!PatchRequest.validate(o)) {
+            throw new ValidationError(PatchRequest.errors ?? [])
+        }
+    },
+} as const
+
+export interface RestError {
+    errorCode?: number
+    errorReason?: string
+    errorSource?: string
+}
+
+export type SearchResponse = Group[]
+
+export const SearchResponse = {
+    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
+    get schema() {
+        return SearchResponse.validate.schema
+    },
+    get errors() {
+        return SearchResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
+} as const

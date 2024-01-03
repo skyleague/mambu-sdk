@@ -62,11 +62,11 @@ export class MambuOrganizationConfiguration {
     }
 
     /**
-     * Update organization details configuration
+     * Get organization details configuration template
      */
-    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
+    public async getTemplate({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
-            this.buildClient(auth).put(`configuration/organization.yaml`, {
+            this.buildClient(auth).get(`configuration/organization/template.yaml`, {
                 headers: { Accept: 'application/vnd.mambu.v2+yaml' },
                 responseType: 'text',
             }),
@@ -81,11 +81,11 @@ export class MambuOrganizationConfiguration {
     }
 
     /**
-     * Get organization details configuration template
+     * Update organization details configuration
      */
-    public async getTemplate({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
+    public async update({ auth = [['apiKey'], ['basic']] }: { auth?: string[][] | string[] } = {}) {
         return this.awaitResponse(
-            this.buildClient(auth).get(`configuration/organization/template.yaml`, {
+            this.buildClient(auth).put(`configuration/organization.yaml`, {
                 headers: { Accept: 'application/vnd.mambu.v2+yaml' },
                 responseType: 'text',
             }),

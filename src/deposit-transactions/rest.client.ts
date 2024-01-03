@@ -59,63 +59,30 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Create withdrawal transaction
+     * Adjust a deposit transaction, which may bulk adjust multiple transactions
      */
-    public async makeWithdrawalAsync({
+    public async adjust({
         body,
         path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: WithdrawalDepositTransactionInput
-        path: { depositAccountId: string }
+        body: DepositTransactionAdjustmentDetails
+        path: { depositTransactionId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(WithdrawalDepositTransactionInput, body)
+        this.validateRequestBody(DepositTransactionAdjustmentDetails, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`deposits/${path.depositAccountId}/transactions/withdrawals`, {
+            this.buildClient(auth).post(`deposits/transactions/${path.depositTransactionId}:adjust`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
                 102: { is: (_x: unknown): _x is unknown => true },
-                202: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create withdrawal transaction
-     */
-    public async makeWithdrawal({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: WithdrawalDepositTransactionInput
-        path: { depositAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(WithdrawalDepositTransactionInput, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`deposits/${path.depositAccountId}/withdrawal-transactions`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: DepositTransaction,
+                200: DepositTransaction,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -160,35 +127,111 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Seize a block amount on a deposit account
+     * Edit custom information or notes for deposit transaction
      */
-    public async makeSeizure({
+    public async editTransactionDetails({
         body,
         path,
-        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: SeizeBlockAmount
-        path: { depositAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        body: EditTransactionDetailsRequest
+        path: { depositTransactionId: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(SeizeBlockAmount, body)
+        this.validateRequestBody(EditTransactionDetailsRequest, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`deposits/${path.depositAccountId}/seizure-transactions`, {
+            this.buildClient(auth).patch(`deposits/transactions/${path.depositTransactionId}`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: DepositTransaction,
+                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-                409: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get deposit transactions
+     */
+    public async getAll({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { depositAccountId: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`deposits/${path.depositAccountId}/transactions`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetAllResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get deposit transaction
+     */
+    public async getById({
+        path,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { depositTransactionId: string }
+        query?: { detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`deposits/transactions/${path.depositTransactionId}`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: DepositTransaction,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Get deposit transaction document
+     */
+    public async getDepositTransactionDocument({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        path: { depositTransactionId: string; templateId: string }
+        auth?: string[][] | string[]
+    }) {
+        return this.awaitResponse(
+            this.buildClient(auth).get(`deposits/transactions/${path.depositTransactionId}/templates/${path.templateId}`, {
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: GetDepositTransactionDocumentResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             }
         )
     }
@@ -224,30 +267,30 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Adjust a deposit transaction, which may bulk adjust multiple transactions
+     * Create deposit transaction
      */
-    public async adjust({
+    public async makeDeposit({
         body,
         path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: DepositTransactionAdjustmentDetails
-        path: { depositTransactionId: string }
+        body: DepositTransactionInput
+        path: { depositAccountId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(DepositTransactionAdjustmentDetails, body)
+        this.validateRequestBody(DepositTransactionInput, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`deposits/transactions/${path.depositTransactionId}:adjust`, {
+            this.buildClient(auth).post(`deposits/${path.depositAccountId}/deposit-transactions`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
                 102: { is: (_x: unknown): _x is unknown => true },
-                200: DepositTransaction,
+                201: DepositTransaction,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -258,26 +301,68 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Get deposit transaction document
+     * Create deposit transaction
      */
-    public async getDepositTransactionDocument({
+    public async makeDepositAsync({
+        body,
         path,
+        headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        path: { depositTransactionId: string; templateId: string }
+        body: DepositTransactionInput
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
+        this.validateRequestBody(DepositTransactionInput, body)
+
         return this.awaitResponse(
-            this.buildClient(auth).get(`deposits/transactions/${path.depositTransactionId}/templates/${path.templateId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            this.buildClient(auth).post(`deposits/${path.depositAccountId}/transactions/deposits`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                200: GetDepositTransactionDocumentResponse,
+                102: { is: (_x: unknown): _x is unknown => true },
+                202: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Seize a block amount on a deposit account
+     */
+    public async makeSeizure({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: SeizeBlockAmount
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(SeizeBlockAmount, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`deposits/${path.depositAccountId}/seizure-transactions`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: DepositTransaction,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+                409: ErrorResponse,
             }
         )
     }
@@ -317,50 +402,57 @@ export class MambuDepositTransactions {
     }
 
     /**
-     * Get deposit transactions
+     * Create withdrawal transaction
      */
-    public async getAll({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { depositAccountId: string }
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`deposits/${path.depositAccountId}/transactions`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: GetAllResponse,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create deposit transaction
-     */
-    public async makeDepositAsync({
+    public async makeWithdrawal({
         body,
         path,
         headers,
         auth = [['apiKey'], ['basic']],
     }: {
-        body: DepositTransactionInput
+        body: WithdrawalDepositTransactionInput
         path: { depositAccountId: string }
         headers?: { ['Idempotency-Key']?: string }
         auth?: string[][] | string[]
     }) {
-        this.validateRequestBody(DepositTransactionInput, body)
+        this.validateRequestBody(WithdrawalDepositTransactionInput, body)
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`deposits/${path.depositAccountId}/transactions/deposits`, {
+            this.buildClient(auth).post(`deposits/${path.depositAccountId}/withdrawal-transactions`, {
+                json: body,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+                responseType: 'json',
+            }),
+            {
+                102: { is: (_x: unknown): _x is unknown => true },
+                201: DepositTransaction,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+                409: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Create withdrawal transaction
+     */
+    public async makeWithdrawalAsync({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: WithdrawalDepositTransactionInput
+        path: { depositAccountId: string }
+        headers?: { ['Idempotency-Key']?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(WithdrawalDepositTransactionInput, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`deposits/${path.depositAccountId}/transactions/withdrawals`, {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
@@ -368,64 +460,6 @@ export class MambuDepositTransactions {
             {
                 102: { is: (_x: unknown): _x is unknown => true },
                 202: { is: (_x: unknown): _x is unknown => true },
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Get deposit transaction
-     */
-    public async getById({
-        path,
-        query,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        path: { depositTransactionId: string }
-        query?: { detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
-        return this.awaitResponse(
-            this.buildClient(auth).get(`deposits/transactions/${path.depositTransactionId}`, {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                200: DepositTransaction,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Edit custom information or notes for deposit transaction
-     */
-    public async editTransactionDetails({
-        body,
-        path,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: EditTransactionDetailsRequest
-        path: { depositTransactionId: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(EditTransactionDetailsRequest, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).patch(`deposits/transactions/${path.depositTransactionId}`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
-            }),
-            {
-                204: { is: (_x: unknown): _x is unknown => true },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
@@ -460,40 +494,6 @@ export class MambuDepositTransactions {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-            }
-        )
-    }
-
-    /**
-     * Create deposit transaction
-     */
-    public async makeDeposit({
-        body,
-        path,
-        headers,
-        auth = [['apiKey'], ['basic']],
-    }: {
-        body: DepositTransactionInput
-        path: { depositAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(DepositTransactionInput, body)
-
-        return this.awaitResponse(
-            this.buildClient(auth).post(`deposits/${path.depositAccountId}/deposit-transactions`, {
-                json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
-            }),
-            {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: DepositTransaction,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-                409: ErrorResponse,
             }
         )
     }

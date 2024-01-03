@@ -6,18 +6,23 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
-export type GetAllResponse = TransactionChannel[]
-
-export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
-    get schema() {
-        return GetAllResponse.validate.schema
-    },
-    get errors() {
-        return GetAllResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
-} as const
+/**
+ * The constraints applied to the transaction channel
+ */
+export interface Constraint {
+    /**
+     * Holds the custom constraints, only for the limited usage case. For the unconstrainedcase, no constraints are applied
+     */
+    constraints?: TransactionChannelConstraint[]
+    /**
+     * Holds the match filter option for the constraints. It can be ALL so all the constraints must match, or ANY so at least one must match
+     */
+    matchFiltersOption?: 'ALL' | 'ANY'
+    /**
+     * States the limited/unconstrained usage of the transaction channel
+     */
+    usage?: 'UNCONSTRAINED' | 'LIMITED'
+}
 
 export interface ErrorResponse {
     errors?: RestError[]
@@ -39,40 +44,59 @@ export const ErrorResponse = {
     },
 } as const
 
+export type GetAllResponse = TransactionChannel[]
+
+export const GetAllResponse = {
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    get schema() {
+        return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+} as const
+
+export interface RestError {
+    errorCode?: number
+    errorReason?: string
+    errorSource?: string
+}
+
 /**
  * Represents a transaction channel.
  */
 export interface TransactionChannel {
+    /**
+     * `TRUE` if the transaction channel is available for all users, `FALSE` otherwise.
+     */
+    availableForAll?: boolean
     depositConstraints: Constraint
-    /**
-     * `TRUE` if the transaction channel is set as the default, `FALSE` otherwise.
-     */
-    isDefault?: boolean
-    /**
-     * The name of the transaction channel.
-     */
-    name: string
     /**
      * The encoded key of the entity, generated, globally unique
      */
     encodedKey?: string
     /**
-     * The ID of the transaction channel.
-     */
-    id: string
-    /**
-     * The state of the transaction channel.
-     */
-    state?: 'ACTIVE' | 'INACTIVE'
-    /**
      * The general ledger (GL) account associated with the transaction channel.
      */
     glAccount: string
     /**
-     * `TRUE` if the transaction channel is available for all users, `FALSE` otherwise.
+     * The ID of the transaction channel.
      */
-    availableForAll?: boolean
+    id: string
+    /**
+     * `TRUE` if the transaction channel is set as the default, `FALSE` otherwise.
+     */
+    isDefault?: boolean
     loanConstraints: Constraint
+    /**
+     * The name of the transaction channel.
+     */
+    name: string
+    /**
+     * The state of the transaction channel.
+     */
+    state?: 'ACTIVE' | 'INACTIVE'
     /**
      * The usage rights that describe the transaction channel.
      */
@@ -95,38 +119,10 @@ export const TransactionChannel = {
     },
 } as const
 
-export interface RestError {
-    errorCode?: number
-    errorSource?: string
-    errorReason?: string
-}
-
-/**
- * The constraints applied to the transaction channel
- */
-export interface Constraint {
-    /**
-     * Holds the custom constraints, only for the limited usage case. For the unconstrainedcase, no constraints are applied
-     */
-    constraints?: TransactionChannelConstraint[]
-    /**
-     * States the limited/unconstrained usage of the transaction channel
-     */
-    usage?: 'UNCONSTRAINED' | 'LIMITED'
-    /**
-     * Holds the match filter option for the constraints. It can be ALL so all the constraints must match, or ANY so at least one must match
-     */
-    matchFiltersOption?: 'ALL' | 'ANY'
-}
-
 /**
  * The constraints applied on the transaction channel
  */
 export interface TransactionChannelConstraint {
-    /**
-     * The first filtering value of the filter constraint. Example: it represents 'Disbursement' from 'Type equals Disbursement' and it also represents 100 from 'Amount Between 100 and 500'
-     */
-    value?: string
     /**
      * Defines the criteria on which the constraint is applied
      */
@@ -139,6 +135,10 @@ export interface TransactionChannelConstraint {
      * The second filtering value of the filter parameter (constraint). It might not exist. Example: it represents '500' from 'Amount Between 100 and 500'
      */
     secondValue?: string
+    /**
+     * The first filtering value of the filter constraint. Example: it represents 'Disbursement' from 'Type equals Disbursement' and it also represents 100 from 'Amount Between 100 and 500'
+     */
+    value?: string
     /**
      * Filtering values used for the Product and Type criteria, where filtering might be applied on one or more values
      */

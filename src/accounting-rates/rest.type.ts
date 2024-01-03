@@ -6,17 +6,45 @@
 import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
-export type GetAllResponse = AccountingRate[]
+/**
+ * Represents the conversion rate used in accounting to convert amounts from one currency to organisation currency
+ */
+export interface AccountingRate {
+    /**
+     * The encoded key of the accounting rate, auto generated, unique
+     */
+    encodedKey?: string
+    /**
+     * Rate validity end date (as Organization Time)
+     */
+    endDate?: string
+    /**
+     * Organisation currency code
+     */
+    fromCurrencyCode?: string
+    /**
+     * Value of rate to be used for accounting conversions
+     */
+    rate?: number
+    /**
+     * Rate validity start date (as Organization Time)
+     */
+    startDate?: string
+    /**
+     * Foreign currency code
+     */
+    toCurrencyCode?: string
+}
 
-export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+export const AccountingRate = {
+    validate: (await import('./schemas/accounting-rate.schema.js')).validate as ValidateFunction<AccountingRate>,
     get schema() {
-        return GetAllResponse.validate.schema
+        return AccountingRate.validate.schema
     },
     get errors() {
-        return GetAllResponse.validate.errors ?? undefined
+        return AccountingRate.validate.errors ?? undefined
     },
-    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    is: (o: unknown): o is AccountingRate => AccountingRate.validate(o) === true,
 } as const
 
 export interface ErrorResponse {
@@ -37,6 +65,19 @@ export const ErrorResponse = {
             throw new ValidationError(ErrorResponse.errors ?? [])
         }
     },
+} as const
+
+export type GetAllResponse = AccountingRate[]
+
+export const GetAllResponse = {
+    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    get schema() {
+        return GetAllResponse.validate.schema
+    },
+    get errors() {
+        return GetAllResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
 } as const
 
 /**
@@ -69,49 +110,8 @@ export const PostAccountingRateDTO = {
     },
 } as const
 
-/**
- * Represents the conversion rate used in accounting to convert amounts from one currency to organisation currency
- */
-export interface AccountingRate {
-    /**
-     * Value of rate to be used for accounting conversions
-     */
-    rate?: number
-    /**
-     * Rate validity end date (as Organization Time)
-     */
-    endDate?: string
-    /**
-     * Foreign currency code
-     */
-    toCurrencyCode?: string
-    /**
-     * The encoded key of the accounting rate, auto generated, unique
-     */
-    encodedKey?: string
-    /**
-     * Organisation currency code
-     */
-    fromCurrencyCode?: string
-    /**
-     * Rate validity start date (as Organization Time)
-     */
-    startDate?: string
-}
-
-export const AccountingRate = {
-    validate: (await import('./schemas/accounting-rate.schema.js')).validate as ValidateFunction<AccountingRate>,
-    get schema() {
-        return AccountingRate.validate.schema
-    },
-    get errors() {
-        return AccountingRate.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is AccountingRate => AccountingRate.validate(o) === true,
-} as const
-
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }

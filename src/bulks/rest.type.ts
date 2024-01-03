@@ -7,6 +7,50 @@ import type { ValidateFunction } from 'ajv'
 import { ValidationError } from 'ajv'
 
 /**
+ * Holds information about the error encountered processing an item in bulk
+ */
+export interface BulkProcessingError {
+    /**
+     * Numeric value associated to the error reason
+     */
+    errorCode?: number
+    /**
+     * Error reason
+     */
+    errorReason?: string
+    /**
+     * Details about the error
+     */
+    errorSource?: string
+    /**
+     * Optional field populated only when request payload contains an externalId
+     */
+    externalId?: string
+    /**
+     * The index of the entity/item from bulk request that failed on processing
+     */
+    indexInRequest?: number
+}
+
+/**
+ * Holds details about successful processed item
+ */
+export interface BulkProcessingSuccess {
+    /**
+     * Optional field populated only when request payload contains an externalId
+     */
+    externalId?: string
+    /**
+     * Unique identifier for the newly created resource
+     */
+    id?: string
+    /**
+     * The index of the entity/item from bulk request that failed on processing
+     */
+    indexInRequest?: number
+}
+
+/**
  * Holds information about the status of a bulk process
  */
 export interface BulkProcessStatus {
@@ -66,52 +110,8 @@ export const ErrorResponse = {
     },
 } as const
 
-/**
- * Holds information about the error encountered processing an item in bulk
- */
-export interface BulkProcessingError {
-    /**
-     * Optional field populated only when request payload contains an externalId
-     */
-    externalId?: string
-    /**
-     * Numeric value associated to the error reason
-     */
-    errorCode?: number
-    /**
-     * The index of the entity/item from bulk request that failed on processing
-     */
-    indexInRequest?: number
-    /**
-     * Details about the error
-     */
-    errorSource?: string
-    /**
-     * Error reason
-     */
-    errorReason?: string
-}
-
-/**
- * Holds details about successful processed item
- */
-export interface BulkProcessingSuccess {
-    /**
-     * Optional field populated only when request payload contains an externalId
-     */
-    externalId?: string
-    /**
-     * Unique identifier for the newly created resource
-     */
-    id?: string
-    /**
-     * The index of the entity/item from bulk request that failed on processing
-     */
-    indexInRequest?: number
-}
-
 export interface RestError {
     errorCode?: number
-    errorSource?: string
     errorReason?: string
+    errorSource?: string
 }
