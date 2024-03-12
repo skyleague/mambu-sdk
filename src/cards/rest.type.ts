@@ -131,6 +131,10 @@ export interface AuthorizationHold {
      */
     originalCurrency?: string
     /**
+     * Indicates whether the authorization is partial or not
+     */
+    partial?: boolean
+    /**
      * The date to consider as start date when calculating the number of days passed until expiration
      */
     referenceDateForExpiration?: string
@@ -738,6 +742,10 @@ export interface GetAuthorizationHold {
      * The original currency in which the hold was created.
      */
     originalCurrency?: string
+    /**
+     * Indicates whether the authorization is partial or not
+     */
+    partial?: boolean
     /**
      * The date to consider as start date when calculating the number of days passed until expiration
      */

@@ -11,7 +11,9 @@ import {
     CommunicationMessage,
     CommunicationMessageAction,
     CommunicationMessageEnqueueAction,
+    CommunicationMessagesSearchSortCriteria,
     ErrorResponse,
+    Search1Response,
     SearchRequest,
     SearchResponse,
 } from './rest.type.js'
@@ -194,6 +196,36 @@ export class MambuCommunications {
             }),
             {
                 200: SearchResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            }
+        )
+    }
+
+    /**
+     * Searching sorted communication messages
+     */
+    public async search1({
+        body,
+        query,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: CommunicationMessagesSearchSortCriteria
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
+        auth?: string[][] | string[]
+    }) {
+        this.validateRequestBody(CommunicationMessagesSearchSortCriteria, body)
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`communications/messages:searchSorted`, {
+                json: body,
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+                responseType: 'json',
+            }),
+            {
+                200: Search1Response,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,

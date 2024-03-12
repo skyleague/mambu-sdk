@@ -1,7 +1,7 @@
 import { BaseMambuStreaming } from './base-streaming.client.js'
 import { SubscriptionEventStreamBatch } from './base-streaming.type.js'
 
-import AjvValidator from 'ajv'
+import { ValidationError } from 'ajv'
 import split2 from 'split2'
 
 import https from 'node:https'
@@ -58,7 +58,7 @@ export class MambuStreaming extends BaseMambuStreaming {
             if (SubscriptionEventStreamBatch.is(batch)) {
                 yield { batch: batch, streamId }
             } else {
-                throw new AjvValidator.ValidationError(SubscriptionEventStreamBatch.validate.errors ?? [])
+                throw new ValidationError(SubscriptionEventStreamBatch.validate.errors ?? [])
             }
         }
         await response

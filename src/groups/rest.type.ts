@@ -471,6 +471,8 @@ export interface Group {
         | 'PORTUGUESE_BRAZIL'
         | 'VIETNAMESE'
         | 'ITALIAN'
+        | 'THAI'
+        | 'NORWEGIAN'
         | 'PHRASE'
 }
 

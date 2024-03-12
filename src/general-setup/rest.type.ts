@@ -103,6 +103,7 @@ export interface DuplicateFieldConstraint {
         | 'MCC_EXPIRATION'
         | 'PRODUCT_ARREARS_SETTINGS'
         | 'ACCOUNT_INTEREST_RATE_SETTINGS'
+        | 'LENDING_ACCOUNT_CONTRACT'
         | 'REVOLVING_ACCOUNT'
     /**
      * The encoded key of the duplicate field constraint, auto generated, unique

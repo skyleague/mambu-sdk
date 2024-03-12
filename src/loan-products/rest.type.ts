@@ -313,6 +313,20 @@ export interface Currency {
 }
 
 /**
+ * Enumeration for days of month and method of handling shorter months.
+ */
+export interface DaysInMonth {
+    /**
+     * Specifies the day(s) of the month when the interest application dates should be. Only available if the Interest Application Method is InterestApplicationMethodDTO#FIXED_DAYS_OF_MONTH. Currently only 1 value can be specified.
+     */
+    daysInMonth?: number[]
+    /**
+     * Determines how to handle the short months, if they select a fixed day of month > 28. Will be null if no such date is selected. Only available if the Interest Application Method is InterestApplicationMethodDTO#FIXED_DAYS_OF_MONTH.
+     */
+    shortMonthHandlingMethod?: 'LAST_DAY_IN_MONTH' | 'FIRST_DAY_OF_NEXT_MONTH'
+}
+
+/**
  * Decimal constraints, like min/max/default.
  */
 export interface DecimalConstraints {
@@ -611,6 +625,20 @@ export interface InterestProductSettings {
 }
 
 /**
+ * Represents interest rate change threshold settings for loan accounts and loan products.
+ */
+export interface InterestRateChangePMTAdjustmentThreshold {
+    /**
+     * The method used to calculate the interest rate change threshold. Supported value is CALENDAR_DAYS
+     */
+    method?: 'WORKING_DAYS' | 'CALENDAR_DAYS'
+    /**
+     * The number of days that trigger an interest rate change.
+     */
+    numberOfDays?: number
+}
+
+/**
  * Used or TIERED interest rates, holds the values to define how the interest is computed
  */
 export interface InterestRateTier {
@@ -719,7 +747,13 @@ export interface LoanProduct {
     /**
      * The type of the loan product.
      */
-    type: 'FIXED_TERM_LOAN' | 'DYNAMIC_TERM_LOAN' | 'INTEREST_FREE_LOAN' | 'TRANCHED_LOAN' | 'REVOLVING_CREDIT'
+    type:
+        | 'FIXED_TERM_LOAN'
+        | 'DYNAMIC_TERM_LOAN'
+        | 'INTEREST_FREE_LOAN'
+        | 'TRANCHED_LOAN'
+        | 'REVOLVING_CREDIT'
+        | 'INTEREST_ONLY_EQUAL_INSTALLMENTS'
 }
 
 export const LoanProduct = {
@@ -742,6 +776,7 @@ export const LoanProduct = {
  * Defines the settings and constraints for schedule for the loans that are created based on this product.
  */
 export interface LoanProductScheduleSettings {
+    amortizationPeriod?: ProductAmortizationPeriod
     billingCycles?: BillingCyclesProductSettings
     /**
      * Interval Repayment Methodology Settings.
@@ -1111,6 +1146,24 @@ export interface PrincipalPaymentProductSettings {
 }
 
 /**
+ * It holds information about the loan product amortization period. The PMT is calculated as the loan would have [amortisationPeriod] instalments
+ */
+export interface ProductAmortizationPeriod {
+    /**
+     * default value
+     */
+    defaultValue?: number
+    /**
+     * max value
+     */
+    maxValue?: number
+    /**
+     * min value
+     */
+    minValue?: number
+}
+
+/**
  * The product arrears settings, shows whether the non working days are taken in consideration or not when applying penalties/late fees or when setting an account into arrears
  */
 export interface ProductArrearsSettings {
@@ -1208,10 +1261,11 @@ export interface ProductInterestSettings {
      */
     daysInYear: 'ACTUAL_365_FIXED' | 'ACTUAL_364' | 'ACTUAL_360' | 'ACTUAL_ACTUAL_ISDA' | 'E30_360' | 'BUS_252' | 'E30_42_365'
     indexRateSettings?: InterestProductSettings
+    interestApplicationDays?: DaysInMonth
     /**
      * The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.
      */
-    interestApplicationMethod?: 'AFTER_DISBURSEMENT' | 'REPAYMENT_DUE_DATE'
+    interestApplicationMethod?: 'AFTER_DISBURSEMENT' | 'REPAYMENT_DUE_DATE' | 'FIXED_DAYS_OF_MONTH'
     /**
      * The interest balance calculation method. Represents the option which determines the way the balance for the account's interest is computed.
      */
@@ -1219,7 +1273,8 @@ export interface ProductInterestSettings {
     /**
      * The interest calculation method. Holds the type of interest calculation method.
      */
-    interestCalculationMethod: 'FLAT' | 'DECLINING_BALANCE' | 'DECLINING_BALANCE_DISCOUNTED'
+    interestCalculationMethod: 'FLAT' | 'DECLINING_BALANCE' | 'DECLINING_BALANCE_DISCOUNTED' | 'EQUAL_INSTALLMENTS'
+    interestRateChangePMTAdjustmentThreshold?: InterestRateChangePMTAdjustmentThreshold
     /**
      * Adjustable interest rates settings
      */
@@ -1261,6 +1316,10 @@ export interface ProductPrepaymentSettings {
      * The elements recalculation method, indicates how the declining balance with equal installments repayments are recalculated
      */
     elementsRecalculationMethod?: 'PRINCIPAL_EXPECTED_FIXED' | 'TOTAL_EXPECTED_FIXED'
+    /**
+     * ERC free allowance in percentage
+     */
+    ercFreeAllowance?: number
     /**
      * Shows whether the future payments are allowed or not for this product (repayment transactions with entry date set in the future)
      */

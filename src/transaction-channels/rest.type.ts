@@ -79,7 +79,7 @@ export interface TransactionChannel {
     /**
      * The general ledger (GL) account associated with the transaction channel.
      */
-    glAccount: string
+    glAccount?: string
     /**
      * The ID of the transaction channel.
      */

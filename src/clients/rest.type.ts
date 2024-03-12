@@ -187,6 +187,8 @@ export interface Client {
         | 'PORTUGUESE_BRAZIL'
         | 'VIETNAMESE'
         | 'ITALIAN'
+        | 'THAI'
+        | 'NORWEGIAN'
         | 'PHRASE'
     /**
      * The encoded key of a client's profile picture.

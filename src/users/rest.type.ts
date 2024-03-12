@@ -193,6 +193,8 @@ type Local0 =
     | 'BULK_DEPOSIT_CORRECTIONS'
     | 'BLOCK_AND_SEIZE_FUNDS'
     | 'WITHDRAW_BLOCKED_FUNDS'
+    | 'MANAGE_DEPOSIT_ACCOUNT_RECIPIENT'
+    | 'MANAGE_DEPOSIT_ASSOCIATION'
     | 'CREATE_CARDS'
     | 'VIEW_CARDS'
     | 'DELETE_CARDS'
@@ -312,6 +314,7 @@ type Local0 =
     | 'CREATE_PROFIT_SHARING_PROPOSALS'
     | 'APPROVE_PROFIT_SHARING_PROPOSALS'
     | 'ADJUST_PROFIT_SHARING_PROPOSALS'
+    | 'TRIGGER_COMPUTATION'
     | 'VIEW_PROFIT_SHARING_SYSTEM_OPTIONS'
     | 'CREATE_PROFIT_SHARING_SYSTEM_OPTIONS'
     | 'EDIT_PROFIT_SHARING_SYSTEM_OPTIONS'
@@ -321,6 +324,8 @@ type Local0 =
     | 'VIEW_PROFIT_SHARING_ACCOUNTS_SETTINGS'
     | 'CREATE_PROFIT_SHARING_ACCOUNT_SETTINGS'
     | 'EDIT_PROFIT_SHARING_ACCOUNT_SETTINGS'
+    | 'VIEW_PROFIT_SHARING_GL_ACCOUNTS'
+    | 'VIEW_PROFIT_SHARING_BRANCHES'
     | 'MAKE_BULK_CHANGE_INTEREST_AVAILABILITY'
 
 /**
@@ -436,6 +441,8 @@ export interface User {
         | 'PORTUGUESE_BRAZIL'
         | 'VIETNAMESE'
         | 'ITALIAN'
+        | 'THAI'
+        | 'NORWEGIAN'
         | 'PHRASE'
     /**
      * The last time the user logged in in UTC.
@@ -541,6 +548,8 @@ export interface UserRequest {
         | 'PORTUGUESE_BRAZIL'
         | 'VIETNAMESE'
         | 'ITALIAN'
+        | 'THAI'
+        | 'NORWEGIAN'
         | 'PHRASE'
     /**
      * The last name of the user.
