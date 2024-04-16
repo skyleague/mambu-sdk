@@ -3,15 +3,21 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
+import { validate as PatchRequestValidator } from './schemas/patch-request.schema.js'
+import { validate as UserRequestValidator } from './schemas/user_request.schema.js'
+import { validate as UserValidator } from './schemas/user.schema.js'
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -19,17 +25,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetAllResponse = User[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -37,9 +44,56 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
-type Local0 =
+/**
+ * A single change that needs to be made to a resource
+ */
+export interface PatchOperation {
+    /**
+     * The field from where a value should be moved, when using move
+     */
+    from?: string | undefined
+    /**
+     * The change to perform
+     */
+    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
+    /**
+     * The field to perform the operation on
+     */
+    path: string
+    /**
+     * The value of the field, can be null
+     */
+    value?: unknown
+}
+
+export type PatchRequest = PatchOperation[]
+
+export const PatchRequest = {
+    validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
+    get schema() {
+        return PatchRequest.validate.schema
+    },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
+    parse: (o: unknown): { right: PatchRequest } | { left: DefinedError[] } => {
+        if (PatchRequest.is(o)) {
+            return { right: o }
+        }
+        return { left: (PatchRequest.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+type Permissions =
     | 'AUDIT_TRANSACTIONS'
     | 'VIEW_COMMENTS'
     | 'CREATE_COMMENTS'
@@ -328,52 +382,10 @@ type Local0 =
     | 'VIEW_PROFIT_SHARING_BRANCHES'
     | 'MAKE_BULK_CHANGE_INTEREST_AVAILABILITY'
 
-/**
- * A single change that needs to be made to a resource
- */
-export interface PatchOperation {
-    /**
-     * The field from where a value should be moved, when using move
-     */
-    from?: string
-    /**
-     * The change to perform
-     */
-    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
-    /**
-     * The field to perform the operation on
-     */
-    path: string
-    /**
-     * The value of the field, can be null
-     */
-    value?: {
-        [k: string]: unknown | undefined
-    }
-}
-
-export type PatchRequest = PatchOperation[]
-
-export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
-    get schema() {
-        return PatchRequest.validate.schema
-    },
-    get errors() {
-        return PatchRequest.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
-        }
-    },
-} as const
-
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
 
 /**
@@ -383,11 +395,11 @@ export interface RoleIdentifier {
     /**
      * The encoded key of the entity, generated automatically, globally unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The ID of the role, which can be generated and customized, but must be unique.
      */
-    id?: string
+    id?: string | undefined
 }
 
 /**
@@ -398,19 +410,19 @@ export interface User {
     /**
      * The encoded key of the branch this user is assigned to.
      */
-    assignedBranchKey?: string
+    assignedBranchKey?: string | undefined
     /**
      * The date the user was created in UTC.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The user email address. Used by Mambu for sending automated notifications or for getting passwords.
      */
-    email?: string
+    email?: string | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The first name of the user.
      */
@@ -418,11 +430,11 @@ export interface User {
     /**
      * The user's home phone number, which can also contain characters.
      */
-    homePhone?: string
+    homePhone?: string | undefined
     /**
      * The ID of the user, which is generated automatically, but must be unique.
      */
-    id?: string
+    id?: string | undefined
     /**
      * The Mambu display language for the user. The Mambu UI will be displayed in the selected language. Please note: for portuguese, you must use the incorrect spelling `PORTUGESE`.
      */
@@ -444,41 +456,44 @@ export interface User {
         | 'THAI'
         | 'NORWEGIAN'
         | 'PHRASE'
+        | undefined
     /**
      * The last time the user logged in in UTC.
      */
-    lastLoggedInDate?: string
+    lastLoggedInDate?: string | undefined
     /**
      * The last time the user was modified in UTC.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The last name of the user.
      */
-    lastName?: string
+    lastName?: string | undefined
     /**
      * The user's mobile phone number, which can also contain characters.
      */
-    mobilePhone?: string
+    mobilePhone?: string | undefined
     /**
      * The additional information for the user.
      */
-    notes?: string
-    role?: RoleIdentifier
+    notes?: string | undefined
+    role?: RoleIdentifier | undefined
     /**
      * The user title.
      */
-    title?: string
+    title?: string | undefined
     /**
      * The user transaction limits.
      */
-    transactionLimits?: {
-        [k: string]: number
-    }
+    transactionLimits?:
+        | {
+              [k: string]: number | undefined
+          }
+        | undefined
     /**
      * `TRUE` if the user has two-factor authentication setup, `FALSE` otherwise. If two-factor authentication is enabled, a user will be sent an SMS to their registered mobile number, which they will need to enter in the Mambu login screen, in addition to their password.
      */
-    twoFactorAuthentication?: boolean
+    twoFactorAuthentication?: boolean | undefined
     /**
      * The Mambu login user name.
      */
@@ -486,11 +501,11 @@ export interface User {
     /**
      * The current state of the user.
      */
-    userState?: 'ACTIVE' | 'INACTIVE' | 'LOCKED'
+    userState?: 'ACTIVE' | 'INACTIVE' | 'LOCKED' | undefined
 }
 
 export const User = {
-    validate: (await import('./schemas/user.schema.js')).validate as ValidateFunction<User>,
+    validate: UserValidator as ValidateFunction<User>,
     get schema() {
         return User.validate.schema
     },
@@ -498,10 +513,11 @@ export const User = {
         return User.validate.errors ?? undefined
     },
     is: (o: unknown): o is User => User.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!User.validate(o)) {
-            throw new ValidationError(User.errors ?? [])
+    parse: (o: unknown): { right: User } | { left: DefinedError[] } => {
+        if (User.is(o)) {
+            return { right: o }
         }
+        return { left: (User.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -513,15 +529,15 @@ export interface UserRequest {
     /**
      * The encoded key of the branch this user is assigned to.
      */
-    assignedBranchKey?: string
+    assignedBranchKey?: string | undefined
     /**
      * The user email address. Used by Mambu for sending automated notifications or for getting passwords.
      */
-    email?: string
+    email?: string | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The first name of the user.
      */
@@ -529,7 +545,7 @@ export interface UserRequest {
     /**
      * The user's home phone number, which can also contain characters.
      */
-    homePhone?: string
+    homePhone?: string | undefined
     /**
      * The Mambu display language for the user. The Mambu UI will be displayed in the selected language. Please note: for portuguese, you must use the incorrect spelling `PORTUGESE`.
      */
@@ -551,37 +567,40 @@ export interface UserRequest {
         | 'THAI'
         | 'NORWEGIAN'
         | 'PHRASE'
+        | undefined
     /**
      * The last name of the user.
      */
-    lastName?: string
+    lastName?: string | undefined
     /**
      * The user's mobile phone number, which can also contain characters.
      */
-    mobilePhone?: string
+    mobilePhone?: string | undefined
     /**
      * The additional information for the user.
      */
-    notes?: string
+    notes?: string | undefined
     /**
      * Password used by the user
      */
     password: string
-    role?: RoleIdentifier
+    role?: RoleIdentifier | undefined
     /**
      * The user title.
      */
-    title?: string
+    title?: string | undefined
     /**
      * The user transaction limits.
      */
-    transactionLimits?: {
-        [k: string]: number
-    }
+    transactionLimits?:
+        | {
+              [k: string]: number | undefined
+          }
+        | undefined
     /**
      * `TRUE` if the user has two-factor authentication setup, `FALSE` otherwise. If two-factor authentication is enabled, a user will be sent an SMS to their registered mobile number, which they will need to enter in the Mambu login screen, in addition to their password.
      */
-    twoFactorAuthentication?: boolean
+    twoFactorAuthentication?: boolean | undefined
     /**
      * The Mambu login user name.
      */
@@ -589,7 +608,7 @@ export interface UserRequest {
 }
 
 export const UserRequest = {
-    validate: (await import('./schemas/user_request.schema.js')).validate as ValidateFunction<UserRequest>,
+    validate: UserRequestValidator as ValidateFunction<UserRequest>,
     get schema() {
         return UserRequest.validate.schema
     },
@@ -597,10 +616,11 @@ export const UserRequest = {
         return UserRequest.validate.errors ?? undefined
     },
     is: (o: unknown): o is UserRequest => UserRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!UserRequest.validate(o)) {
-            throw new ValidationError(UserRequest.errors ?? [])
+    parse: (o: unknown): { right: UserRequest } | { left: DefinedError[] } => {
+        if (UserRequest.is(o)) {
+            return { right: o }
         }
+        return { left: (UserRequest.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -611,11 +631,11 @@ export interface UserAccess {
     /**
      * `TRUE` if the user has the administrator user type, `FALSE` otherwise. Administrators (admins) have all permissions and can perform any action in Mambu.
      */
-    administratorAccess?: boolean
+    administratorAccess?: boolean | undefined
     /**
      * `TRUE` if the user can authenticate and interact with Mambu APIs, `FALSE` otherwise. The user may still require additional permissions for specific API requests.
      */
-    apiAccess?: boolean
+    apiAccess?: boolean | undefined
     /**
      * `TRUE` if the user has access to all branches, `FALSE` if the user only has access to specific branches.
      */
@@ -627,31 +647,31 @@ export interface UserAccess {
     /**
      * `TRUE` if the user has the credit officer user type, `FALSE` otherwise. Credit officers have the option of having clients and groups assigned to them.
      */
-    creditOfficerAccess?: boolean
+    creditOfficerAccess?: boolean | undefined
     /**
      * `TRUE` if the user is part of the Mambu delivery team, `FALSE` otherwise.
      */
-    deliveryAccess?: boolean
+    deliveryAccess?: boolean | undefined
     /**
      * TRUE` if the user can log in to the Mambu UI using their login credentials, `FALSE` otherwise.
      */
-    mambuAccess?: boolean
+    mambuAccess?: boolean | undefined
     /**
      * The list of branches that can be managed by the user. If the user has the `canManageAllBranches` property set to `TRUE`, this list does not apply.
      */
-    managedBranches?: UserManagedBranch[]
+    managedBranches?: UserManagedBranch[] | undefined
     /**
      * Permissions for the user. The non-admin users are authorized to do actions based a set of permissions in order to access Mambu features. Permissions may be relevant for the API and/or the Mambu UI.
      */
-    permissions?: Local0[]
+    permissions?: Permissions[] | undefined
     /**
      * `TRUE` if the user can provide Mambu technical support, `FALSE` otherwise.
      */
-    supportAccess?: boolean
+    supportAccess?: boolean | undefined
     /**
      * `TRUE` if the user has the teller user type, `FALSE` otherwise. Tellers have access to the teller module and specific tellering permissions, which allow them to take actions such as opening or closing tills, posting transactions on a till, and adding and removing cash from a till.
      */
-    tellerAccess?: boolean
+    tellerAccess?: boolean | undefined
 }
 
 /**
@@ -661,5 +681,5 @@ export interface UserManagedBranch {
     /**
      * The encoded key of the branch, it is automatically generated.
      */
-    branchKey?: string
+    branchKey?: string | undefined
 }

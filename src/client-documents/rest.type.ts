@@ -3,8 +3,12 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as DocumentValidator } from './schemas/document.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetDocumentsByClientIdResponseValidator } from './schemas/get-documents-by-client-id-response.schema.js'
 
 /**
  * Holds information regarding the documents uploaded as attachments
@@ -13,19 +17,19 @@ export interface Document {
     /**
      * The creation date of the document, stored as UTC
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The document encodedKey
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The original file name of the document
      */
-    fileName?: string
+    fileName?: string | undefined
     /**
      * The file size of the document
      */
-    fileSize?: number
+    fileSize?: number | undefined
     /**
      * The document id
      */
@@ -33,11 +37,11 @@ export interface Document {
     /**
      * The last modified date of the document, stored as UTC
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * Location where the document can be found, eg /myfiles/mypicture.jpeg
      */
-    location?: string
+    location?: string | undefined
     /**
      * The name of the document
      */
@@ -45,11 +49,11 @@ export interface Document {
     /**
      * Detailed notes about the document
      */
-    notes?: string
+    notes?: string | undefined
     /**
      * Represents the holder of this document. If null, means nobody is the owner of this document
      */
-    ownerKey?: string
+    ownerKey?: string | undefined
     /**
      * Determines the owner type of the document
      */
@@ -66,6 +70,7 @@ export interface Document {
         | 'ID_DOCUMENT'
         | 'LINE_OF_CREDIT'
         | 'GL_JOURNAL_ENTRY'
+        | undefined
     /**
      * The extension of the document
      */
@@ -73,7 +78,7 @@ export interface Document {
 }
 
 export const Document = {
-    validate: (await import('./schemas/document.schema.js')).validate as ValidateFunction<Document>,
+    validate: DocumentValidator as ValidateFunction<Document>,
     get schema() {
         return Document.validate.schema
     },
@@ -81,19 +86,20 @@ export const Document = {
         return Document.validate.errors ?? undefined
     },
     is: (o: unknown): o is Document => Document.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Document.validate(o)) {
-            throw new ValidationError(Document.errors ?? [])
+    parse: (o: unknown): { right: Document } | { left: DefinedError[] } => {
+        if (Document.is(o)) {
+            return { right: o }
         }
+        return { left: (Document.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -101,18 +107,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetDocumentsByClientIdResponse = Document[]
 
 export const GetDocumentsByClientIdResponse = {
-    validate: (await import('./schemas/get-documents-by-client-id-response.schema.js'))
-        .validate as ValidateFunction<GetDocumentsByClientIdResponse>,
+    validate: GetDocumentsByClientIdResponseValidator as ValidateFunction<GetDocumentsByClientIdResponse>,
     get schema() {
         return GetDocumentsByClientIdResponse.validate.schema
     },
@@ -120,10 +126,16 @@ export const GetDocumentsByClientIdResponse = {
         return GetDocumentsByClientIdResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetDocumentsByClientIdResponse => GetDocumentsByClientIdResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetDocumentsByClientIdResponse } | { left: DefinedError[] } => {
+        if (GetDocumentsByClientIdResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetDocumentsByClientIdResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

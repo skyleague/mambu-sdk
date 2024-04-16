@@ -1,1 +1,1 @@
-export * from './rest.client.js'
+export { MambuHolidaysConfiguration } from './rest.client.js'

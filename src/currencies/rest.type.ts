@@ -3,8 +3,12 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as CurrencyDetailsValidator } from './schemas/currency-details.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
 
 /**
  * Represents a currency.
@@ -21,7 +25,11 @@ export interface CurrencyDetails {
     /**
      * The date this currency was created. It cannot be changed and it's a read-only field not required for update operations.
      */
-    creationDate?: string
+    creationDate?: string | undefined
+    /**
+     * The list of holidays for this currency.
+     */
+    currencyHolidays?: Holiday[] | undefined
     /**
      * The currency symbol position.
      */
@@ -29,11 +37,11 @@ export interface CurrencyDetails {
     /**
      * The number of digits that are supported for a given currency.
      */
-    digitsAfterDecimal?: number
+    digitsAfterDecimal?: number | undefined
     /**
      * The last date this currency was modified. It's updated automatically and it's a read-only field not required for update operations.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The name of the currency.
      */
@@ -41,7 +49,7 @@ export interface CurrencyDetails {
     /**
      * The currency numeric code.
      */
-    numericCode?: string
+    numericCode?: string | undefined
     /**
      * The currency symbol.
      */
@@ -53,7 +61,7 @@ export interface CurrencyDetails {
 }
 
 export const CurrencyDetails = {
-    validate: (await import('./schemas/currency-details.schema.js')).validate as ValidateFunction<CurrencyDetails>,
+    validate: CurrencyDetailsValidator as ValidateFunction<CurrencyDetails>,
     get schema() {
         return CurrencyDetails.validate.schema
     },
@@ -61,19 +69,20 @@ export const CurrencyDetails = {
         return CurrencyDetails.validate.errors ?? undefined
     },
     is: (o: unknown): o is CurrencyDetails => CurrencyDetails.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!CurrencyDetails.validate(o)) {
-            throw new ValidationError(CurrencyDetails.errors ?? [])
+    parse: (o: unknown): { right: CurrencyDetails } | { left: DefinedError[] } => {
+        if (CurrencyDetails.is(o)) {
+            return { right: o }
         }
+        return { left: (CurrencyDetails.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -81,17 +90,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetAllResponse = CurrencyDetails[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -99,10 +109,46 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
+/**
+ * Represents the holiday.
+ */
+export interface Holiday {
+    /**
+     * The date when the holiday was created.
+     */
+    creationDate?: string | undefined
+    /**
+     * The date the holiday takes place.
+     */
+    date?: string | undefined
+    /**
+     * The encoded key of the entity, generated, globally unique
+     */
+    encodedKey?: string | undefined
+    /**
+     * The ID of the holiday.
+     */
+    id?: number | undefined
+    /**
+     * `TRUE` if a holiday is annually recurring, `FALSE` otherwise.
+     */
+    isAnnuallyRecurring?: boolean | undefined
+    /**
+     * The name of the holiday.
+     */
+    name?: string | undefined
+}
+
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

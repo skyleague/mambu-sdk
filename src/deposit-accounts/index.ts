@@ -1,2 +1,2 @@
-export * from './rest.client.js'
+export { MambuDepositAccounts } from './rest.client.js'
 export * as depositAccounts from './rest.type.js'

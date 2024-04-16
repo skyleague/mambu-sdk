@@ -3,8 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as DataImportActionValidator } from './schemas/data-import-action.schema.js'
+import { validate as DataImportResponseValidator } from './schemas/data-import-response.schema.js'
+import { validate as DataImportStatusValidator } from './schemas/data-import-status.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
 
 /**
  * Holds information about the data import action
@@ -17,7 +22,7 @@ export interface DataImportAction {
 }
 
 export const DataImportAction = {
-    validate: (await import('./schemas/data-import-action.schema.js')).validate as ValidateFunction<DataImportAction>,
+    validate: DataImportActionValidator as ValidateFunction<DataImportAction>,
     get schema() {
         return DataImportAction.validate.schema
     },
@@ -25,10 +30,11 @@ export const DataImportAction = {
         return DataImportAction.validate.errors ?? undefined
     },
     is: (o: unknown): o is DataImportAction => DataImportAction.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!DataImportAction.validate(o)) {
-            throw new ValidationError(DataImportAction.errors ?? [])
+    parse: (o: unknown): { right: DataImportAction } | { left: DefinedError[] } => {
+        if (DataImportAction.is(o)) {
+            return { right: o }
         }
+        return { left: (DataImportAction.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -36,19 +42,19 @@ export const DataImportAction = {
  * Holds information about the data import error
  */
 export interface DataImportError {
-    column?: DataImportErrorColumn
+    column?: DataImportErrorColumn | undefined
     /**
      * Error message
      */
-    errorMessage?: string
+    errorMessage?: string | undefined
     /**
      * Row index
      */
-    row?: number
+    row?: number | undefined
     /**
      * Sheet name
      */
-    sheet?: string
+    sheet?: string | undefined
 }
 
 /**
@@ -58,11 +64,11 @@ export interface DataImportErrorColumn {
     /**
      * Column index
      */
-    index?: number
+    index?: number | undefined
     /**
      * Column name
      */
-    name?: string
+    name?: string | undefined
 }
 
 /**
@@ -72,7 +78,7 @@ export interface DataImportResponse {
     /**
      * Import key
      */
-    importKey?: string
+    importKey?: string | undefined
     /**
      * Background process state
      */
@@ -88,10 +94,11 @@ export interface DataImportResponse {
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
         | 'RECOVERABLE_ERROR'
+        | undefined
 }
 
 export const DataImportResponse = {
-    validate: (await import('./schemas/data-import-response.schema.js')).validate as ValidateFunction<DataImportResponse>,
+    validate: DataImportResponseValidator as ValidateFunction<DataImportResponse>,
     get schema() {
         return DataImportResponse.validate.schema
     },
@@ -99,6 +106,12 @@ export const DataImportResponse = {
         return DataImportResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is DataImportResponse => DataImportResponse.validate(o) === true,
+    parse: (o: unknown): { right: DataImportResponse } | { left: DefinedError[] } => {
+        if (DataImportResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (DataImportResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -108,11 +121,11 @@ export interface DataImportStatus {
     /**
      * List of errors
      */
-    errors?: DataImportError[]
+    errors?: DataImportError[] | undefined
     /**
      * Event key
      */
-    eventKey?: string
+    eventKey?: string | undefined
     /**
      * Background process state
      */
@@ -128,10 +141,11 @@ export interface DataImportStatus {
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
         | 'RECOVERABLE_ERROR'
+        | undefined
 }
 
 export const DataImportStatus = {
-    validate: (await import('./schemas/data-import-status.schema.js')).validate as ValidateFunction<DataImportStatus>,
+    validate: DataImportStatusValidator as ValidateFunction<DataImportStatus>,
     get schema() {
         return DataImportStatus.validate.schema
     },
@@ -139,14 +153,20 @@ export const DataImportStatus = {
         return DataImportStatus.validate.errors ?? undefined
     },
     is: (o: unknown): o is DataImportStatus => DataImportStatus.validate(o) === true,
+    parse: (o: unknown): { right: DataImportStatus } | { left: DefinedError[] } => {
+        if (DataImportStatus.is(o)) {
+            return { right: o }
+        }
+        return { left: (DataImportStatus.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -154,15 +174,16 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

@@ -3,8 +3,12 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as BranchValidator } from './schemas/branch.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
 
 /**
  * Represents an address.
@@ -13,47 +17,47 @@ export interface Address {
     /**
      * The city for the address.
      */
-    city?: string
+    city?: string | undefined
     /**
      * The country.
      */
-    country?: string
+    country?: string | undefined
     /**
      * The address encoded key, which is unique and generated.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The index of this address in the list of addresses.
      */
-    indexInList?: number
+    indexInList?: number | undefined
     /**
      * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
      */
-    latitude?: number
+    latitude?: number | undefined
     /**
      * The first line of the address.
      */
-    line1?: string
+    line1?: string | undefined
     /**
      * The second line of the address.
      */
-    line2?: string
+    line2?: string | undefined
     /**
      * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
      */
-    longitude?: number
+    longitude?: number | undefined
     /**
      * The address parent key indicating the object owning this address. For example: client, centre, or branch.
      */
-    parentKey?: string
+    parentKey?: string | undefined
     /**
      * The post code.
      */
-    postcode?: string
+    postcode?: string | undefined
     /**
      * The region for the address.
      */
-    region?: string
+    region?: string | undefined
 }
 
 /**
@@ -63,23 +67,23 @@ export interface Branch {
     /**
      * The list of branch addresses.
      */
-    addresses?: Address[]
+    addresses?: Address[] | undefined
     /**
      * The list of branch holidays.
      */
-    branchHolidays?: Holiday[]
+    branchHolidays?: Holiday[] | undefined
     /**
      * The creation date of the branch.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The branch email address.
      */
-    emailAddress?: string
+    emailAddress?: string | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The branch ID, which must be unique.
      */
@@ -87,7 +91,7 @@ export interface Branch {
     /**
      * The last date when the branch was modified.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The branch name.
      */
@@ -95,19 +99,19 @@ export interface Branch {
     /**
      * The notes or description attached to this object.
      */
-    notes?: string
+    notes?: string | undefined
     /**
      * The branch phone number.
      */
-    phoneNumber?: string
+    phoneNumber?: string | undefined
     /**
      * The branch state.
      */
-    state?: 'ACTIVE' | 'INACTIVE'
+    state?: 'ACTIVE' | 'INACTIVE' | undefined
 }
 
 export const Branch = {
-    validate: (await import('./schemas/branch.schema.js')).validate as ValidateFunction<Branch>,
+    validate: BranchValidator as ValidateFunction<Branch>,
     get schema() {
         return Branch.validate.schema
     },
@@ -115,19 +119,20 @@ export const Branch = {
         return Branch.validate.errors ?? undefined
     },
     is: (o: unknown): o is Branch => Branch.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Branch.validate(o)) {
-            throw new ValidationError(Branch.errors ?? [])
+    parse: (o: unknown): { right: Branch } | { left: DefinedError[] } => {
+        if (Branch.is(o)) {
+            return { right: o }
         }
+        return { left: (Branch.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -135,17 +140,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetAllResponse = Branch[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -153,6 +159,12 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -162,31 +174,31 @@ export interface Holiday {
     /**
      * The date when the holiday was created.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The date the holiday takes place.
      */
-    date?: string
+    date?: string | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The ID of the holiday.
      */
-    id?: number
+    id?: number | undefined
     /**
      * `TRUE` if a holiday is annually recurring, `FALSE` otherwise.
      */
-    isAnnuallyRecurring?: boolean
+    isAnnuallyRecurring?: boolean | undefined
     /**
      * The name of the holiday.
      */
-    name?: string
+    name?: string | undefined
 }
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

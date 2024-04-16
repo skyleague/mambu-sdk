@@ -1,1 +1,1 @@
-export * from './rest.client.js'
+export { MambuCustomFieldsConfiguration } from './rest.client.js'

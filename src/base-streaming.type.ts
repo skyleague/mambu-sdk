@@ -3,19 +3,26 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as CommitSubscriptionCursorsRequestValidator } from './schemas/commit-subscription-cursors-request.schema.js'
+import { validate as CommitSubscriptionCursorsResponse200Validator } from './schemas/commit-subscription-cursors-response200.schema.js'
+import { validate as DeleteSubscriptionBySubscriptionIdResponse404Validator } from './schemas/delete-subscription-by-subscription-id-response404.schema.js'
+import { validate as GetSubscriptionStatsResponseValidator } from './schemas/get-subscription-stats-response.schema.js'
+import { validate as ProblemValidator } from './schemas/problem.schema.js'
+import { validate as SubscriptionEventStreamBatchValidator } from './schemas/subscription-event-stream-batch.schema.js'
+import { validate as SubscriptionValidator } from './schemas/subscription.schema.js'
 
 export interface CommitSubscriptionCursorsRequest {
     /**
      * List of cursors that the consumer acknowledges to have successfully processed.
      */
-    items: [CommitSubscriptionCursorsRequestItemsArray, ...CommitSubscriptionCursorsRequestItemsArray[]]
+    items: [Items, ...Items[]]
 }
 
 export const CommitSubscriptionCursorsRequest = {
-    validate: (await import('./schemas/commit-subscription-cursors-request.schema.js'))
-        .validate as ValidateFunction<CommitSubscriptionCursorsRequest>,
+    validate: CommitSubscriptionCursorsRequestValidator as ValidateFunction<CommitSubscriptionCursorsRequest>,
     get schema() {
         return CommitSubscriptionCursorsRequest.validate.schema
     },
@@ -23,47 +30,20 @@ export const CommitSubscriptionCursorsRequest = {
         return CommitSubscriptionCursorsRequest.validate.errors ?? undefined
     },
     is: (o: unknown): o is CommitSubscriptionCursorsRequest => CommitSubscriptionCursorsRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!CommitSubscriptionCursorsRequest.validate(o)) {
-            throw new ValidationError(CommitSubscriptionCursorsRequest.errors ?? [])
+    parse: (o: unknown): { right: CommitSubscriptionCursorsRequest } | { left: DefinedError[] } => {
+        if (CommitSubscriptionCursorsRequest.is(o)) {
+            return { right: o }
         }
+        return { left: (CommitSubscriptionCursorsRequest.errors ?? []) as DefinedError[] }
     },
 } as const
-
-interface CommitSubscriptionCursorsRequestItemsArray {
-    /**
-     * An opaque value defined by the server.
-     */
-    cursor_token: string
-    /**
-     * The name of the event type this partition's events belong to.
-     */
-    event_type: string
-    /**
-     * Offset of the event being pointed to. Note that if you want to specify beginning position of a stream with first event at offset `N`, you should specify offset `N-1`.
-     *
-     * This applies in cases when you create new subscription or reset subscription offsets.
-     *
-     * Also for stream start offsets one can use two special values:
-     *
-     * - `begin` - read from the oldest available event.
-     *
-     * - `end` - read from the most recent offset.
-     */
-    offset: string
-    /**
-     * Id of the partition pointed to by this cursor.
-     */
-    partition: string
-}
 
 export interface CommitSubscriptionCursorsResponse200 {
     items: [CursorCommitResult, ...CursorCommitResult[]]
 }
 
 export const CommitSubscriptionCursorsResponse200 = {
-    validate: (await import('./schemas/commit-subscription-cursors-response200.schema.js'))
-        .validate as ValidateFunction<CommitSubscriptionCursorsResponse200>,
+    validate: CommitSubscriptionCursorsResponse200Validator as ValidateFunction<CommitSubscriptionCursorsResponse200>,
     get schema() {
         return CommitSubscriptionCursorsResponse200.validate.schema
     },
@@ -71,6 +51,12 @@ export const CommitSubscriptionCursorsResponse200 = {
         return CommitSubscriptionCursorsResponse200.validate.errors ?? undefined
     },
     is: (o: unknown): o is CommitSubscriptionCursorsResponse200 => CommitSubscriptionCursorsResponse200.validate(o) === true,
+    parse: (o: unknown): { right: CommitSubscriptionCursorsResponse200 } | { left: DefinedError[] } => {
+        if (CommitSubscriptionCursorsResponse200.is(o)) {
+            return { right: o }
+        }
+        return { left: (CommitSubscriptionCursorsResponse200.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -100,8 +86,8 @@ export interface DeleteSubscriptionBySubscriptionIdResponse404 {
 }
 
 export const DeleteSubscriptionBySubscriptionIdResponse404 = {
-    validate: (await import('./schemas/delete-subscription-by-subscription-id-response404.schema.js'))
-        .validate as ValidateFunction<DeleteSubscriptionBySubscriptionIdResponse404>,
+    validate:
+        DeleteSubscriptionBySubscriptionIdResponse404Validator as ValidateFunction<DeleteSubscriptionBySubscriptionIdResponse404>,
     get schema() {
         return DeleteSubscriptionBySubscriptionIdResponse404.validate.schema
     },
@@ -110,17 +96,19 @@ export const DeleteSubscriptionBySubscriptionIdResponse404 = {
     },
     is: (o: unknown): o is DeleteSubscriptionBySubscriptionIdResponse404 =>
         DeleteSubscriptionBySubscriptionIdResponse404.validate(o) === true,
+    parse: (o: unknown): { right: DeleteSubscriptionBySubscriptionIdResponse404 } | { left: DefinedError[] } => {
+        if (DeleteSubscriptionBySubscriptionIdResponse404.is(o)) {
+            return { right: o }
+        }
+        return { left: (DeleteSubscriptionBySubscriptionIdResponse404.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
  * Payload of an Event. Usually represents a status transition in a Business process.
  */
 export interface Event {
-    body:
-        | string
-        | {
-              [k: string]: unknown | undefined
-          }
+    body: string | {}
     metadata: EventMetadata
     /**
      * Name of the notification template.
@@ -162,8 +150,7 @@ export interface GetSubscriptionStatsResponse {
 }
 
 export const GetSubscriptionStatsResponse = {
-    validate: (await import('./schemas/get-subscription-stats-response.schema.js'))
-        .validate as ValidateFunction<GetSubscriptionStatsResponse>,
+    validate: GetSubscriptionStatsResponseValidator as ValidateFunction<GetSubscriptionStatsResponse>,
     get schema() {
         return GetSubscriptionStatsResponse.validate.schema
     },
@@ -171,7 +158,40 @@ export const GetSubscriptionStatsResponse = {
         return GetSubscriptionStatsResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetSubscriptionStatsResponse => GetSubscriptionStatsResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetSubscriptionStatsResponse } | { left: DefinedError[] } => {
+        if (GetSubscriptionStatsResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetSubscriptionStatsResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
+
+interface Items {
+    /**
+     * An opaque value defined by the server.
+     */
+    cursor_token: string
+    /**
+     * The name of the event type this partition's events belong to.
+     */
+    event_type: string
+    /**
+     * Offset of the event being pointed to. Note that if you want to specify beginning position of a stream with first event at offset `N`, you should specify offset `N-1`.
+     *
+     * This applies in cases when you create new subscription or reset subscription offsets.
+     *
+     * Also for stream start offsets one can use two special values:
+     *
+     * - `begin` - read from the oldest available event.
+     *
+     * - `end` - read from the most recent offset.
+     */
+    offset: string
+    /**
+     * Id of the partition pointed to by this cursor.
+     */
+    partition: string
+}
 
 /**
  * Statistics of partition within a subscription context.
@@ -180,7 +200,7 @@ export interface PartitionStats {
     /**
      * Subscription consumer lag for this partition in seconds. Measured as the age of the oldest event of this partition that is not yet consumed within this subscription.
      */
-    consumer_lag_seconds?: number
+    consumer_lag_seconds?: number | undefined
     /**
      * The partition id.
      */
@@ -207,11 +227,11 @@ export interface Problem {
     /**
      * A human readable explanation specific to this occurrence of the problem.
      */
-    detail?: string
+    detail?: string | undefined
     /**
      * An absolute URI that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced.
      */
-    instance?: string
+    instance?: string | undefined
     /**
      * The HTTP status code generated by the origin server for this occurrence of the problem.
      */
@@ -227,7 +247,7 @@ export interface Problem {
 }
 
 export const Problem = {
-    validate: (await import('./schemas/problem.schema.js')).validate as ValidateFunction<Problem>,
+    validate: ProblemValidator as ValidateFunction<Problem>,
     get schema() {
         return Problem.validate.schema
     },
@@ -235,10 +255,11 @@ export const Problem = {
         return Problem.validate.errors ?? undefined
     },
     is: (o: unknown): o is Problem => Problem.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Problem.validate(o)) {
-            throw new ValidationError(Problem.errors ?? [])
+    parse: (o: unknown): { right: Problem } | { left: DefinedError[] } => {
+        if (Problem.is(o)) {
+            return { right: o }
         }
+        return { left: (Problem.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -247,9 +268,7 @@ export const Problem = {
  *
  * Clients should not parse this structure.
  */
-export interface StreamInfo {
-    [k: string]: unknown | undefined
-}
+export interface StreamInfo {}
 
 /**
  * Subscription is a high level consumption unit. Subscriptions allow applications to easily scale the number of clients by managing consumed event offsets and distributing load between instances. The key properties that identify a subscription are `owning_application`, `event_types` and `consumer_group`. It is not possible to have two different subscriptions with these properties being the same.
@@ -258,11 +277,11 @@ export interface Subscription {
     /**
      * The value describing the use case of this subscription. In general that is an additional identifier used to differ subscriptions having the same `owning_application` and `event_types`.
      */
-    consumer_group?: string
+    consumer_group?: string | undefined
     /**
      * Timestamp of creation of the subscription. This is generated by Mambu. It should not be specified when creating subscription and sending it may result in a client error.
      */
-    created_at?: string
+    created_at?: string | undefined
     /**
      * EventTypes to subscribe to. The order is not important. Subscriptions that differ only by the order of EventTypes will be considered the same and will have the same id. The size of the `event_type`s list is limited by the total number of partitions within these event types. Default limit for partition count is `100`.
      */
@@ -270,11 +289,11 @@ export interface Subscription {
     /**
      * ID of subscription that was created. Is generated by Mambu, should not be specified when creating a subscription.
      */
-    id?: string
+    id?: string | undefined
     /**
      * List of cursors to start reading from. This property is required when `read_from` = cursors. The `initial` cursors should cover all partitions of subscription. Clients will get events starting from next offset positions.
      */
-    initial_cursors?: SubscriptionCursorWithoutToken[]
+    initial_cursors?: SubscriptionCursorWithoutToken[] | undefined
     /**
      * The id of application owning the subscription.
      */
@@ -282,15 +301,15 @@ export interface Subscription {
     /**
      * Position to start reading events from. Currently supported values: - `begin` - read from the oldest available event. - `end` - read from the most recent offset. - `cursors` - read from cursors provided in initial_cursors property. Applied when the client starts reading from a subscription.
      */
-    read_from?: string
+    read_from?: string | undefined
     /**
      * Timestamp of last update of the subscription. This is generated by Mambu. It should not be specified when creating subscription and sending it may result in a client error. Its initial value is same as `created_at`.
      */
-    updated_at?: string
+    updated_at?: string | undefined
 }
 
 export const Subscription = {
-    validate: (await import('./schemas/subscription.schema.js')).validate as ValidateFunction<Subscription>,
+    validate: SubscriptionValidator as ValidateFunction<Subscription>,
     get schema() {
         return Subscription.validate.schema
     },
@@ -298,10 +317,11 @@ export const Subscription = {
         return Subscription.validate.errors ?? undefined
     },
     is: (o: unknown): o is Subscription => Subscription.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Subscription.validate(o)) {
-            throw new ValidationError(Subscription.errors ?? [])
+    parse: (o: unknown): { right: Subscription } | { left: DefinedError[] } => {
+        if (Subscription.is(o)) {
+            return { right: o }
         }
+        return { left: (Subscription.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -328,7 +348,7 @@ export interface SubscriptionCursorWithoutToken {
     /**
      * The name of the event type this partition's events belong to.
      */
-    event_type?: string
+    event_type?: string | undefined
     /**
      * Offset of the event being pointed to. Note that if you want to specify beginning position of a stream with first event at offset `N`, you should specify offset `N-1`. This applies in cases when you create new subscription or reset subscription offsets. Also for stream start offsets one can use two special values: - `begin` - read from the oldest available event. - `end` - read from the most recent offset.
      */
@@ -351,13 +371,12 @@ export interface SubscriptionEventStreamBatch {
     /**
      * [Payload of an Event. Usually represents a status transition in a Business process.]
      */
-    events?: [Event, ...Event[]]
-    info?: StreamInfo
+    events?: [Event, ...Event[]] | undefined
+    info?: StreamInfo | undefined
 }
 
 export const SubscriptionEventStreamBatch = {
-    validate: (await import('./schemas/subscription-event-stream-batch.schema.js'))
-        .validate as ValidateFunction<SubscriptionEventStreamBatch>,
+    validate: SubscriptionEventStreamBatchValidator as ValidateFunction<SubscriptionEventStreamBatch>,
     get schema() {
         return SubscriptionEventStreamBatch.validate.schema
     },
@@ -365,6 +384,12 @@ export const SubscriptionEventStreamBatch = {
         return SubscriptionEventStreamBatch.validate.errors ?? undefined
     },
     is: (o: unknown): o is SubscriptionEventStreamBatch => SubscriptionEventStreamBatch.validate(o) === true,
+    parse: (o: unknown): { right: SubscriptionEventStreamBatch } | { left: DefinedError[] } => {
+        if (SubscriptionEventStreamBatch.is(o)) {
+            return { right: o }
+        }
+        return { left: (SubscriptionEventStreamBatch.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**

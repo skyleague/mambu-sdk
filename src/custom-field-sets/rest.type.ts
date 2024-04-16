@@ -3,8 +3,12 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllBySetIdResponseValidator } from './schemas/get-all-by-set-id-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
 
 /**
  * Represents one option of a selection custom field definition.
@@ -13,15 +17,15 @@ export interface CustomFieldAvailableOption {
     /**
      * The score of the option.
      */
-    score?: number
+    score?: number | undefined
     /**
      * The system-generated ID of the option.
      */
-    selectionKey?: string
+    selectionKey?: string | undefined
     /**
      * The name of the option.
      */
-    value?: string
+    value?: string | undefined
 }
 
 /**
@@ -41,22 +45,23 @@ export interface CustomFieldDisplaySettings {
         | 'MOBILE_PHONE_2'
         | 'HOME_PHONE'
         | 'EMAIL_ADDRESS'
+        | undefined
     /**
      * The user-provided description of the custom field definition.
      */
-    description?: string
+    description?: string | undefined
     /**
      * The user-provided name of the custom field definition.
      */
-    displayName?: string
+    displayName?: string | undefined
     /**
      * The custom field value display size in the UI.
      */
-    fieldSize?: 'SHORT' | 'LONG'
+    fieldSize?: 'SHORT' | 'LONG' | undefined
     /**
      * The custom field definition position in the custom field set.
      */
-    position?: number
+    position?: number | undefined
 }
 
 /**
@@ -66,11 +71,11 @@ export interface CustomFieldEditRights {
     /**
      * `TRUE` if custom field values of a custom field definition can be edited by all users, `FALSE` if custom field values of a custom field definition can only be edited by users with the specified roles.
      */
-    allUsers?: boolean
+    allUsers?: boolean | undefined
     /**
      * The list of IDs of the roles that have edit rights for the custom field values of a custom field definition if it is not accessible by all users.
      */
-    roles?: string[]
+    roles?: string[] | undefined
 }
 
 /**
@@ -80,11 +85,11 @@ export interface CustomFieldIdentity {
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * User-provided ID of the custom field
      */
-    id?: string
+    id?: string | undefined
 }
 
 /**
@@ -108,46 +113,57 @@ export interface CustomFieldMeta {
         | 'BRANCH'
         | 'CENTRE'
         | 'USER'
+        | undefined
     /**
      * The date the custom field definition was created.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * Can be defined only for selection custom field definitions. Indicates the parent custom field definition on which the dependency is based upon.
      */
-    dependentFieldKey?: string
-    displaySettings?: CustomFieldDisplaySettings
-    editRights?: CustomFieldEditRights
+    dependentFieldKey?: string | undefined
+    displaySettings?: CustomFieldDisplaySettings | undefined
+    editRights?: CustomFieldEditRights | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The user-defined ID, which is globally unique.
      */
-    id?: string
+    id?: string | undefined
     /**
      * The date the latest update was performed for this custom field definition.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * Can be defined only for selection custom field definitions. Indicates that the field has predefined selections and only those can be used to populate it.
      */
-    selectionOptions?: CustomFieldSelectionOption[]
+    selectionOptions?: CustomFieldSelectionOption[] | undefined
     /**
      * Indicates whether the custom field definition is active or inactive.
      */
-    state?: 'ACTIVE' | 'INACTIVE'
+    state?: 'ACTIVE' | 'INACTIVE' | undefined
     /**
      * The type of custom field definition.
      */
-    type?: 'FREE_TEXT' | 'SELECTION' | 'NUMBER' | 'CHECKBOX' | 'DATE' | 'DATE_TIME' | 'CLIENT_LINK' | 'GROUP_LINK' | 'USER_LINK'
+    type?:
+        | 'FREE_TEXT'
+        | 'SELECTION'
+        | 'NUMBER'
+        | 'CHECKBOX'
+        | 'DATE'
+        | 'DATE_TIME'
+        | 'CLIENT_LINK'
+        | 'GROUP_LINK'
+        | 'USER_LINK'
+        | undefined
     /**
      * Represents the usage settings of a custom field definition.
      */
-    usage?: CustomFieldUsage[]
-    valueValidationSettings?: CustomFieldValueValidationSettings
-    viewRights?: CustomFieldViewRights
+    usage?: CustomFieldUsage[] | undefined
+    valueValidationSettings?: CustomFieldValueValidationSettings | undefined
+    viewRights?: CustomFieldViewRights | undefined
 }
 
 /**
@@ -157,15 +173,15 @@ export interface CustomFieldSelectionOption {
     /**
      * The list of options that that are available for the dependent selection custom field value based on the selected parent custom field value.
      */
-    availableOptions?: CustomFieldAvailableOption[]
+    availableOptions?: CustomFieldAvailableOption[] | undefined
     /**
      * The key for the parent selection custom field value.
      */
-    forSelectionKey?: string
+    forSelectionKey?: string | undefined
     /**
      * The parent selection custom field value.
      */
-    forValue?: string
+    forValue?: string | undefined
 }
 
 /**
@@ -177,15 +193,15 @@ export interface CustomFieldSetDisplaySettings {
      * True - when this is a "mambu" field set,
      * False - when this is a tenant-defined field set
      */
-    builtIn?: boolean
+    builtIn?: boolean | undefined
     /**
      * User-provided name of the custom field set
      */
-    displayName?: string
+    displayName?: string | undefined
     /**
      * Represents the order of the custom field set (starts from 0)
      */
-    position?: number
+    position?: number | undefined
 }
 
 /**
@@ -209,31 +225,32 @@ export interface CustomFieldSetMeta {
         | 'BRANCH'
         | 'CENTRE'
         | 'USER'
+        | undefined
     /**
      * Date at which the custom field set was created
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * This section lists all the custom fields associated with this set
      */
-    customFields?: CustomFieldIdentity[]
+    customFields?: CustomFieldIdentity[] | undefined
     /**
      * Free text field to store eventual notes with regard to custom field group purpose/details
      */
-    description?: string
-    displaySettings?: CustomFieldSetDisplaySettings
+    description?: string | undefined
+    displaySettings?: CustomFieldSetDisplaySettings | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The usage decides how the custom field set will be used in the UI and how the custom field values will be stored. For STANDARD set type the custom field set can be used only once (i.e Personal Information). For GROUPED set type the custom field set can be used multiple times (i.e Addresses). For further details please see [here](https://support.mambu.com/customer/en/portal/articles/1986000-custom-fields?b_id=873#2)
      */
-    fieldSetType?: 'STANDARD' | 'GROUPED'
+    fieldSetType?: 'STANDARD' | 'GROUPED' | undefined
     /**
      * User-defined ID, gobally unique
      */
-    id?: string
+    id?: string | undefined
 }
 
 /**
@@ -243,15 +260,15 @@ export interface CustomFieldUsage {
     /**
      * `TRUE` if the field is displayed by default on create or edit pages for this record type, `FALSE` otherwise.
      */
-    default?: boolean
+    default?: boolean | undefined
     /**
      * The key of the record type.
      */
-    objectKey?: string
+    objectKey?: string | undefined
     /**
      * `TRUE` if the field is required for this record type, `FALSE` otherwise.
      */
-    required?: boolean
+    required?: boolean | undefined
 }
 
 /**
@@ -261,11 +278,11 @@ export interface CustomFieldValueValidationSettings {
     /**
      * `TRUE` if this field does not allow duplicate values, `FALSE` otherwise.
      */
-    unique?: boolean
+    unique?: boolean | undefined
     /**
      * The expected format for the input.
      */
-    validationPattern?: string
+    validationPattern?: string | undefined
 }
 
 /**
@@ -275,19 +292,19 @@ export interface CustomFieldViewRights {
     /**
      * `TRUE` if custom field values of a custom field definition can be viewed by all users, `FALSE` if custom field values of a custom field definition can only be viewed by users with the specified roles.
      */
-    allUsers?: boolean
+    allUsers?: boolean | undefined
     /**
      * Lists the IDs of the roles that have view rights for the custom field values of a custom field definition if it is not accessible by all users.
      */
-    roles?: string[]
+    roles?: string[] | undefined
 }
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -295,18 +312,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetAllBySetIdResponse = CustomFieldMeta[]
 
 export const GetAllBySetIdResponse = {
-    validate: (await import('./schemas/get-all-by-set-id-response.schema.js'))
-        .validate as ValidateFunction<GetAllBySetIdResponse>,
+    validate: GetAllBySetIdResponseValidator as ValidateFunction<GetAllBySetIdResponse>,
     get schema() {
         return GetAllBySetIdResponse.validate.schema
     },
@@ -314,12 +331,18 @@ export const GetAllBySetIdResponse = {
         return GetAllBySetIdResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllBySetIdResponse => GetAllBySetIdResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllBySetIdResponse } | { left: DefinedError[] } => {
+        if (GetAllBySetIdResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllBySetIdResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export type GetAllResponse = CustomFieldSetMeta[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -327,10 +350,16 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

@@ -3,8 +3,12 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as SellFundingSourceActionValidator } from './schemas/sell-funding-source-action.schema.js'
+import { validate as SellResponseValidator } from './schemas/sell-response.schema.js'
 
 /**
  * The account currency and identification
@@ -13,8 +17,8 @@ export interface AccountDetails {
     /**
      * The currency of the account
      */
-    currency?: string
-    identification?: AccountIdentification
+    currency?: string | undefined
+    identification?: AccountIdentification | undefined
 }
 
 /**
@@ -24,15 +28,15 @@ export interface AccountIdentification {
     /**
      * The account unique identifier
      */
-    iban?: string
-    other?: OtherAccountIdentification
+    iban?: string | undefined
+    other?: OtherAccountIdentification | undefined
 }
 
 /**
  * The agent details for a party
  */
 export interface Agent {
-    financialInstitutionIdentification?: FinancialInstitutionIdentification
+    financialInstitutionIdentification?: FinancialInstitutionIdentification | undefined
 }
 
 /**
@@ -42,31 +46,31 @@ export interface CardAcceptor {
     /**
      * The city in which the card acceptor has the business.
      */
-    city?: string
+    city?: string | undefined
     /**
      * The country in which the card acceptor has the business.
      */
-    country?: string
+    country?: string | undefined
     /**
      * The Merchant Category Code of the card acceptor.
      */
-    mcc?: number
+    mcc?: number | undefined
     /**
      * The name of the card acceptor.
      */
-    name?: string
+    name?: string | undefined
     /**
      * The state in which the card acceptor has the business.
      */
-    state?: string
+    state?: string | undefined
     /**
      * The street in which the card acceptor has the business.
      */
-    street?: string
+    street?: string | undefined
     /**
      * The ZIP code of the location in which the card acceptor has the business.
      */
-    zip?: string
+    zip?: string | undefined
 }
 
 /**
@@ -81,23 +85,23 @@ export interface CardTransaction {
      * The amount of money to be withdrawn in the financial transaction.
      */
     amount: number
-    cardAcceptor?: CardAcceptor
+    cardAcceptor?: CardAcceptor | undefined
     /**
      * The reference token of the card.
      */
-    cardToken?: string
+    cardToken?: string | undefined
     /**
      * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
      */
-    currencyCode?: string
+    currencyCode?: string | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The external authorization hold reference ID, which relates this card transaction to a previous authorization hold.
      */
-    externalAuthorizationReferenceId?: string
+    externalAuthorizationReferenceId?: string | undefined
     /**
      * The external reference ID to be used to reference the card transaction in subsequent requests.
      */
@@ -105,7 +109,7 @@ export interface CardTransaction {
     /**
      * The formatted time at which the user made this card transaction.
      */
-    userTransactionTime?: string
+    userTransactionTime?: string | undefined
 }
 
 /**
@@ -115,15 +119,15 @@ export interface CreditorReferenceInformation {
     /**
      * The reference information of the creditor's underlying documents
      */
-    reference?: string
+    reference?: string | undefined
     /**
      * The entity that assigns the reference type
      */
-    referenceIssuer?: string
+    referenceIssuer?: string | undefined
     /**
      * The type of creditor reference
      */
-    referenceType?: string
+    referenceType?: string | undefined
 }
 
 /**
@@ -133,39 +137,39 @@ export interface DepositAffectedAmounts {
     /**
      * Amount of fees involved in a transaction that affects an account with positive balance
      */
-    feesAmount?: number
+    feesAmount?: number | undefined
     /**
      * In the case of an LOAN_FRACTION_BOUGHT this represent the fraction amount which was bought from another investor
      */
-    fractionAmount?: number
+    fractionAmount?: number | undefined
     /**
      * Balance change amount involved in a transaction that affects an account with positive balance
      */
-    fundsAmount?: number
+    fundsAmount?: number | undefined
     /**
      * Amount of interest involved in a transaction that affects an account with positive balance
      */
-    interestAmount?: number
+    interestAmount?: number | undefined
     /**
      * The amount of money that was added/subtracted from the account by this transaction as overdraft
      */
-    overdraftAmount?: number
+    overdraftAmount?: number | undefined
     /**
      * Fees amount involved in a transaction that affects an overdraft
      */
-    overdraftFeesAmount?: number
+    overdraftFeesAmount?: number | undefined
     /**
      * Interest amount involved in a transaction that affects an overdraft
      */
-    overdraftInterestAmount?: number
+    overdraftInterestAmount?: number | undefined
     /**
      * The amount of money that was added/subtracted from the account by this transaction as technical overdraft
      */
-    technicalOverdraftAmount?: number
+    technicalOverdraftAmount?: number | undefined
     /**
      * The amount of money that was added/subtracted from the account by this transaction as technical overdraft interest
      */
-    technicalOverdraftInterestAmount?: number
+    technicalOverdraftInterestAmount?: number | undefined
 }
 
 /**
@@ -175,11 +179,11 @@ export interface DepositFee {
     /**
      * The amount of the fee that was applied/paid in the transaction for the given predefined fee.
      */
-    amount?: number
+    amount?: number | undefined
     /**
      * The name of the predefined fee
      */
-    name?: string
+    name?: string | undefined
     /**
      * The encoded key of the predefined fee, auto generated, unique
      */
@@ -187,11 +191,11 @@ export interface DepositFee {
     /**
      * The amount of the taxes on fee that was applied/paid in the transaction.
      */
-    taxAmount?: number
+    taxAmount?: number | undefined
     /**
      * Shows the event that will trigger a fee
      */
-    trigger?: 'MANUAL' | 'MONTHLY_FEE' | 'ARBITRARY'
+    trigger?: 'MANUAL' | 'MONTHLY_FEE' | 'ARBITRARY' | undefined
 }
 
 /**
@@ -201,19 +205,19 @@ export interface DepositInterestAccruedAmounts {
     /**
      * The amount of positive interest accrued since last interest application/activation date and applied within Interest Applied transaction
      */
-    interestAccrued?: number
+    interestAccrued?: number | undefined
     /**
      * The amount of negative interest accrued since last interest application/activation date and applied within Interest Applied transaction
      */
-    negativeInterestAccrued?: number
+    negativeInterestAccrued?: number | undefined
     /**
      * The amount of overdraft interest accrued since last interest application/activation date and applied within Interest Applied transaction
      */
-    overdraftInterestAccrued?: number
+    overdraftInterestAccrued?: number | undefined
     /**
      * The amount of technical overdraft interest accrued since last interest application/activation date and applied within Interest Applied transaction
      */
-    technicalOverdraftInterestAccrued?: number
+    technicalOverdraftInterestAccrued?: number | undefined
 }
 
 /**
@@ -223,11 +227,11 @@ export interface DepositOverdraftInterestSettings {
     /**
      * The value of the index interest rate set or changed in this transaction
      */
-    indexInterestRate?: number
+    indexInterestRate?: number | undefined
     /**
      * The interest rate that was set or changed in this transaction. Used on product interest rate changes or interest tier switches
      */
-    interestRate?: number
+    interestRate?: number | undefined
 }
 
 /**
@@ -237,7 +241,7 @@ export interface DepositOverdraftSettings {
     /**
      * The overdraft limit that was set or changed in this transaction
      */
-    overdraftLimit?: number
+    overdraftLimit?: number | undefined
 }
 
 /**
@@ -247,107 +251,107 @@ export interface DepositTaxes {
     /**
      * The tax rate that was set or changed in this transaction
      */
-    taxRate?: number
+    taxRate?: number | undefined
 }
 
 /**
  * The deposit transaction terms
  */
 export interface DepositTerms {
-    interestSettings?: DepositTransactionInterestSettings
-    overdraftInterestSettings?: DepositOverdraftInterestSettings
-    overdraftSettings?: DepositOverdraftSettings
+    interestSettings?: DepositTransactionInterestSettings | undefined
+    overdraftInterestSettings?: DepositOverdraftInterestSettings | undefined
+    overdraftSettings?: DepositOverdraftSettings | undefined
 }
 
 /**
  * Represents the action performed on an Deposit Account after which the account's amount changes its value.
  */
 export interface DepositTransaction {
-    accountBalances?: DepositTransactionBalances
+    accountBalances?: DepositTransactionBalances | undefined
     /**
      * The key of the deposit transaction where the adjustment for this transaction was made (if any adjustment was involved)
      */
-    adjustmentTransactionKey?: string
-    affectedAmounts?: DepositAffectedAmounts
+    adjustmentTransactionKey?: string | undefined
+    affectedAmounts?: DepositAffectedAmounts | undefined
     /**
      * How much was added/removed in account
      */
-    amount?: number
+    amount?: number | undefined
     /**
      * The block fund id associated with the transaction
      */
-    blockId?: string
+    blockId?: string | undefined
     /**
      * The date when corresponding JE is booked (as Organization Time)
      */
-    bookingDate?: string
+    bookingDate?: string | undefined
     /**
      * The branch where the transaction was performed
      */
-    branchKey?: string
-    cardTransaction?: CardTransaction
+    branchKey?: string | undefined
+    cardTransaction?: CardTransaction | undefined
     /**
      * The center where the transaction was performed
      */
-    centreKey?: string
+    centreKey?: string | undefined
     /**
      * The date when this deposit transaction was created
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The currency in which this transaction was posted
      */
-    currencyCode?: string
+    currencyCode?: string | undefined
     /**
      * The encoded key of the deposit transaction, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The external id of the deposit transaction, customizable, unique
      */
-    externalId?: string
+    externalId?: string | undefined
     /**
      * All the amounts that have been applied or paid within this transaction and involved predefined fees
      */
-    fees?: DepositFee[]
+    fees?: DepositFee[] | undefined
     /**
      * The external id of an account authorization hold
      */
-    holdExternalReferenceId?: string
+    holdExternalReferenceId?: string | undefined
     /**
      * The id of the deposit transaction, auto generated, unique
      */
-    id?: string
-    interestAccruedAmounts?: DepositInterestAccruedAmounts
+    id?: string | undefined
+    interestAccruedAmounts?: DepositInterestAccruedAmounts | undefined
     /**
      * The migration event encoded key associated with this deposit account. If this account was imported, track which 'migration event' they came from
      */
-    migrationEventKey?: string
+    migrationEventKey?: string | undefined
     /**
      * Extra notes about this deposit transaction
      */
-    notes?: string
+    notes?: string | undefined
     /**
      * The encodedKey of the transaction that was adjusted as part of this one. Available only for adjustment transactions
      */
-    originalTransactionKey?: string
+    originalTransactionKey?: string | undefined
     /**
      * The key of the parent deposit account
      */
-    parentAccountKey?: string
-    paymentDetails?: PaymentDetails
+    parentAccountKey?: string | undefined
+    paymentDetails?: PaymentDetails | undefined
     /**
      * The payment order id of the deposit transaction, customizable
      */
-    paymentOrderId?: string
-    taxes?: DepositTaxes
-    terms?: DepositTerms
+    paymentOrderId?: string | undefined
+    taxes?: DepositTaxes | undefined
+    terms?: DepositTerms | undefined
     /**
      * The till key associated with this transaction
      */
-    tillKey?: string
-    transactionDetails?: TransactionDetails
-    transferDetails?: TransferDetails
+    tillKey?: string | undefined
+    transactionDetails?: TransactionDetails | undefined
+    transferDetails?: TransferDetails | undefined
     /**
      * The type of the deposit transaction
      */
@@ -385,14 +389,15 @@ export interface DepositTransaction {
         | 'LOAN_FRACTION_SOLD'
         | 'LOAN_FRACTION_SOLD_ADJUSTMENT'
         | 'SEIZED_AMOUNT'
+        | undefined
     /**
      * The person that performed the transaction
      */
-    userKey?: string
+    userKey?: string | undefined
     /**
      * Date of the entry (eg date of repayment or disbursal, etc.) (as Organization Time)
      */
-    valueDate?: string
+    valueDate?: string | undefined
 }
 
 /**
@@ -402,7 +407,7 @@ export interface DepositTransactionBalances {
     /**
      * The running balance owed by deposit
      */
-    totalBalance?: number
+    totalBalance?: number | undefined
 }
 
 /**
@@ -412,19 +417,19 @@ export interface DepositTransactionInterestSettings {
     /**
      * The value of the index interest rate set or changed in this transaction
      */
-    indexInterestRate?: number
+    indexInterestRate?: number | undefined
     /**
      * The interest rate for the deposit account
      */
-    interestRate?: number
+    interestRate?: number | undefined
 }
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -432,10 +437,11 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -446,7 +452,7 @@ export interface FinancialInstitutionIdentification {
     /**
      * Business identifier code
      */
-    bic?: string
+    bic?: string | undefined
 }
 
 /**
@@ -460,7 +466,7 @@ export interface FundingSourcePurchase {
     /**
      * The buyer funding account (savings account) key
      */
-    depositAccountKey?: string
+    depositAccountKey?: string | undefined
     /**
      * The price paid for the amount
      */
@@ -474,11 +480,11 @@ export interface OtherAccountIdentification {
     /**
      * The identification of the payer/payee
      */
-    identification?: string
+    identification?: string | undefined
     /**
      * The identification scheme
      */
-    scheme?: string
+    scheme?: string | undefined
 }
 
 /**
@@ -488,22 +494,22 @@ export interface Party {
     /**
      * The name of the party
      */
-    name?: string
+    name?: string | undefined
 }
 
 /**
  * The payment information including account identification details
  */
 export interface PaymentDetails {
-    creditor?: Party
-    creditorAccount?: AccountDetails
-    creditorAgent?: Agent
-    debtor?: Party
-    debtorAccount?: AccountDetails
-    debtorAgent?: Agent
-    paymentIdentification?: PaymentIdentification
-    paymentTypeInformation?: PaymentTypeInformation
-    remittanceInformation?: RemittanceInformation
+    creditor?: Party | undefined
+    creditorAccount?: AccountDetails | undefined
+    creditorAgent?: Agent | undefined
+    debtor?: Party | undefined
+    debtorAccount?: AccountDetails | undefined
+    debtorAgent?: Agent | undefined
+    paymentIdentification?: PaymentIdentification | undefined
+    paymentTypeInformation?: PaymentTypeInformation | undefined
+    remittanceInformation?: RemittanceInformation | undefined
 }
 
 /**
@@ -513,39 +519,39 @@ export interface PaymentIdentification {
     /**
      * Identifier assigned by the initiating party to the transaction
      */
-    endToEndIdentification?: string
+    endToEndIdentification?: string | undefined
     /**
      * Identifier of a payment instruction
      */
-    instructionIdentification?: string
+    instructionIdentification?: string | undefined
     /**
      * Identifier unique for a period assigned by the first initiating party to the transaction
      */
-    transactionIdentification?: string
+    transactionIdentification?: string | undefined
 }
 
 /**
  * The information specifying the type of transaction
  */
 export interface PaymentTypeInformation {
-    serviceLevel?: ServiceLevel
+    serviceLevel?: ServiceLevel | undefined
 }
 
 /**
  * The information specifying the payment items that are intended to settle
  */
 export interface RemittanceInformation {
-    structured?: Structured
+    structured?: Structured | undefined
     /**
      * Information supplied to match the items of the payment in an unstructured form
      */
-    unstructured?: string
+    unstructured?: string | undefined
 }
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
 
 /**
@@ -555,12 +561,11 @@ export interface SellFundingSourceAction {
     /**
      * Funding source purchase list
      */
-    purchases?: FundingSourcePurchase[]
+    purchases?: FundingSourcePurchase[] | undefined
 }
 
 export const SellFundingSourceAction = {
-    validate: (await import('./schemas/sell-funding-source-action.schema.js'))
-        .validate as ValidateFunction<SellFundingSourceAction>,
+    validate: SellFundingSourceActionValidator as ValidateFunction<SellFundingSourceAction>,
     get schema() {
         return SellFundingSourceAction.validate.schema
     },
@@ -568,17 +573,18 @@ export const SellFundingSourceAction = {
         return SellFundingSourceAction.validate.errors ?? undefined
     },
     is: (o: unknown): o is SellFundingSourceAction => SellFundingSourceAction.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!SellFundingSourceAction.validate(o)) {
-            throw new ValidationError(SellFundingSourceAction.errors ?? [])
+    parse: (o: unknown): { right: SellFundingSourceAction } | { left: DefinedError[] } => {
+        if (SellFundingSourceAction.is(o)) {
+            return { right: o }
         }
+        return { left: (SellFundingSourceAction.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type SellResponse = DepositTransaction[]
 
 export const SellResponse = {
-    validate: (await import('./schemas/sell-response.schema.js')).validate as ValidateFunction<SellResponse>,
+    validate: SellResponseValidator as ValidateFunction<SellResponse>,
     get schema() {
         return SellResponse.validate.schema
     },
@@ -586,6 +592,12 @@ export const SellResponse = {
         return SellResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is SellResponse => SellResponse.validate(o) === true,
+    parse: (o: unknown): { right: SellResponse } | { left: DefinedError[] } => {
+        if (SellResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (SellResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -595,14 +607,14 @@ export interface ServiceLevel {
     /**
      * The code for a pre-agreed service or level of service between the parties
      */
-    code?: string
+    code?: string | undefined
 }
 
 /**
  * The information specifying the payment items that are intended to settle
  */
 export interface Structured {
-    creditorReferenceInformation?: CreditorReferenceInformation
+    creditorReferenceInformation?: CreditorReferenceInformation | undefined
 }
 
 /**
@@ -612,11 +624,11 @@ export interface TransactionDetails {
     /**
      * The id of the transaction channel associated with the transaction details.
      */
-    transactionChannelId?: string
+    transactionChannelId?: string | undefined
     /**
      * The encoded key of the transaction channel associated with the transaction details.
      */
-    transactionChannelKey?: string
+    transactionChannelKey?: string | undefined
 }
 
 /**
@@ -626,9 +638,9 @@ export interface TransferDetails {
     /**
      * The key of the related deposit transaction
      */
-    linkedDepositTransactionKey?: string
+    linkedDepositTransactionKey?: string | undefined
     /**
      * The key of the related loan transaction
      */
-    linkedLoanTransactionKey?: string
+    linkedLoanTransactionKey?: string | undefined
 }

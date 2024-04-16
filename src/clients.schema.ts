@@ -1,7 +1,7 @@
 import { groupBy, hasPropertiesDefined, pick, valuesOf } from '@skyleague/axioms'
 import type { OpenapiV3 } from '@skyleague/therefore'
 import { $restclient } from '@skyleague/therefore'
-import type { PathItem } from '@skyleague/therefore/src/lib/primitives/restclient/openapi.type.js'
+import type { PathItem } from '@skyleague/therefore/src/types/openapi.type.js'
 import camelCase from 'camelcase'
 import got from 'got'
 
@@ -46,7 +46,12 @@ const exports: Record<string, unknown> = {}
 for (const item of clientList) {
     const openapi = await client.get(item.jsonPath).json<OpenapiV3>()
 
-    const node = await $restclient(openapi, {
+    let clientName = item.label.replace(/[_\s]/g, '-').toLowerCase()
+    clientName = clientName.includes('a-p-i') ? clientName.replace('a-p-i', 'api') : clientName
+    clientName = clientName.includes('i-d-') ? clientName.replace('i-d-', 'id-') : clientName
+
+    exports[camelCase(`mambu_${clientName}`)] = $restclient(openapi, {
+        filename: `${clientName}/rest.client.ts`,
         strict: false,
         transformOpenapi: (api: OpenapiV3) => {
             const securitySchemes = api.components?.securitySchemes
@@ -64,25 +69,38 @@ for (const item of clientList) {
                 for (const path of valuesOf(api.paths)) {
                     const pathItem = path as PathItem
                     for (const method of valuesOf(
-                        pick(pathItem, ['get', 'delete', 'put', 'head', 'options', 'trace', 'patch', 'post'])
+                        pick(pathItem, ['get', 'delete', 'put', 'head', 'options', 'trace', 'patch', 'post']),
                     ).filter(hasPropertiesDefined('security'))) {
                         method.security.unshift({ apiKey: [] })
                     }
                 }
             }
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            // biome-ignore lint/suspicious/noExplicitAny: ignoe
             if ((api.components?.schemas?.RestError as any)?.properties?.errorReason?.enum !== undefined) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                // biome-ignore lint/performance/noDelete: This is necessary
+                // biome-ignore lint/suspicious/noExplicitAny: ignore
                 delete (api.components?.schemas?.RestError as any)?.properties?.errorReason?.enum
             }
 
             for (const [name, definition] of Object.entries(api.components?.schemas ?? {})) {
                 if (name.endsWith('FilterCriteria')) {
-                    if ('properties' in definition && definition.properties.field !== undefined) {
+                    if ('properties' in definition && definition.properties?.field !== undefined) {
                         if ('type' in definition.properties.field && definition.properties.field.type === 'string') {
                             definition.properties.field = {
                                 anyOf: [definition.properties.field, { type: 'string' }],
                             }
+                        }
+                    }
+                }
+                if (name === 'PatchOperation') {
+                    if ('properties' in definition && definition.properties?.value !== undefined) {
+                        if (
+                            'type' in definition.properties.value &&
+                            definition.properties.value.type === 'object' &&
+                            !('properties' in definition.properties.value)
+                        ) {
+                            // biome-ignore lint/performance/noDelete: This is necessary
+                            delete definition.properties.value.type
                         }
                     }
                 }
@@ -92,12 +110,6 @@ for (const item of clientList) {
         },
         explicitContentNegotiation: true,
     })
-    let clientName = item.label.replace(/[_\s]/g, '-').toLowerCase()
-    clientName = clientName.includes('a-p-i') ? clientName.replace('a-p-i', 'api') : clientName
-    clientName = clientName.includes('i-d-') ? clientName.replace('i-d-', 'id-') : clientName
-
-    node.value.filePath = `${clientName}/rest`
-    exports[camelCase(`mambu_${clientName}`)] = node
 }
 
 export default exports

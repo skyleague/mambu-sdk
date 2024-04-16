@@ -3,15 +3,18 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as HolidaysValidator } from './schemas/holidays.schema.js'
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -19,10 +22,11 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -33,27 +37,27 @@ export interface Holiday {
     /**
      * The date when the holiday was created.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The date the holiday takes place.
      */
-    date?: string
+    date?: string | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The ID of the holiday.
      */
-    id?: number
+    id?: number | undefined
     /**
      * `TRUE` if a holiday is annually recurring, `FALSE` otherwise.
      */
-    isAnnuallyRecurring?: boolean
+    isAnnuallyRecurring?: boolean | undefined
     /**
      * The name of the holiday.
      */
-    name?: string
+    name?: string | undefined
 }
 
 /**
@@ -63,15 +67,15 @@ export interface Holidays {
     /**
      * The general holidays of the organization.
      */
-    holidays?: Holiday[]
+    holidays?: Holiday[] | undefined
     /**
      * The non-working days of the organization.
      */
-    nonWorkingDays?: HolidaysNonWorkingDaysArray[]
+    nonWorkingDays?: NonWorkingDays[] | undefined
 }
 
 export const Holidays = {
-    validate: (await import('./schemas/holidays.schema.js')).validate as ValidateFunction<Holidays>,
+    validate: HolidaysValidator as ValidateFunction<Holidays>,
     get schema() {
         return Holidays.validate.schema
     },
@@ -79,17 +83,18 @@ export const Holidays = {
         return Holidays.validate.errors ?? undefined
     },
     is: (o: unknown): o is Holidays => Holidays.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Holidays.validate(o)) {
-            throw new ValidationError(Holidays.errors ?? [])
+    parse: (o: unknown): { right: Holidays } | { left: DefinedError[] } => {
+        if (Holidays.is(o)) {
+            return { right: o }
         }
+        return { left: (Holidays.errors ?? []) as DefinedError[] }
     },
 } as const
 
-type HolidaysNonWorkingDaysArray = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
+type NonWorkingDays = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

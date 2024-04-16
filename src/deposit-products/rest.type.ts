@@ -3,8 +3,15 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as DepositProductActionResponseValidator } from './schemas/deposit-product-action-response.schema.js'
+import { validate as DepositProductActionValidator } from './schemas/deposit-product-action.schema.js'
+import { validate as DepositProductValidator } from './schemas/deposit-product.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
+import { validate as PatchRequestValidator } from './schemas/patch-request.schema.js'
 
 /**
  * Decimal constraints, like min/max/default.
@@ -13,15 +20,15 @@ export interface AmountDecimalInterval {
     /**
      * The default value, will be used in case no other value was filled in by the user.
      */
-    defaultValue?: number
+    defaultValue?: number | undefined
     /**
      * The maximum value.
      */
-    maxValue?: number
+    maxValue?: number | undefined
     /**
      * The minimum value.
      */
-    minValue?: number
+    minValue?: number | undefined
 }
 
 /**
@@ -31,11 +38,11 @@ export interface BranchSettings {
     /**
      * Holds the encoded keys of the branches this product should be available for.
      */
-    availableProductBranches?: string[]
+    availableProductBranches?: string[] | undefined
     /**
      * Indicates if this product should be available for all branches
      */
-    forAllBranches?: boolean
+    forAllBranches?: boolean | undefined
 }
 
 /**
@@ -45,7 +52,7 @@ export interface CreditArrangementSettings {
     /**
      * Shows whether accounts created after this product can/should be part of a line of credit.
      */
-    creditArrangementRequirement?: 'OPTIONAL' | 'REQUIRED' | 'NOT_REQUIRED'
+    creditArrangementRequirement?: 'OPTIONAL' | 'REQUIRED' | 'NOT_REQUIRED' | undefined
 }
 
 /**
@@ -239,15 +246,17 @@ export interface Currency {
         | 'XXX'
         | 'YER'
         | 'ZAR'
+        | 'ZIG'
         | 'ZMK'
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+        | undefined
     /**
      * Currency code for NON_FIAT currency.
      */
-    currencyCode?: string
+    currencyCode?: string | undefined
 }
 
 /**
@@ -257,15 +266,15 @@ export interface DecimalInterval {
     /**
      * The default value, will be used in case no other value was filled in by the user.
      */
-    defaultValue?: number
+    defaultValue?: number | undefined
     /**
      * The maximum value.
      */
-    maxValue?: number
+    maxValue?: number | undefined
     /**
      * The minimum value.
      */
-    minValue?: number
+    minValue?: number | undefined
 }
 
 /**
@@ -275,7 +284,7 @@ export interface DepositGLAccountingRule {
     /**
      * The encoded key of the accounting rule, auto generated, unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * General Ledger Financial Resources used to setup the product accounting rules and determine the credit and debit accounts when logging journal entries
      */
@@ -317,11 +326,11 @@ export interface DepositGLAccountingRule {
  * The maturity settings for the product.
  */
 export interface DepositMaturitySettings {
-    maturityPeriod?: IntegerInterval
+    maturityPeriod?: IntegerInterval | undefined
     /**
      * maturity period measurement unit
      */
-    maturityPeriodUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
+    maturityPeriodUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | undefined
 }
 
 /**
@@ -343,7 +352,7 @@ export interface DepositNewAccountSettings {
  */
 export interface DepositProduct {
     accountingSettings: DepositProductAccountingSettings
-    availabilitySettings?: DepositProductAvailabilitySettings
+    availabilitySettings?: DepositProductAvailabilitySettings | undefined
     /**
      * Indicates the category that the product belongs to
      */
@@ -354,28 +363,29 @@ export interface DepositProduct {
         | 'BUSINESS_BANKING_ACCOUNTS'
         | 'STORED_VALUE_ACCOUNTS'
         | 'UNCATEGORIZED'
+        | undefined
     /**
      * The date this product was created
      */
-    creationDate?: string
-    creditArrangementSettings?: CreditArrangementSettings
-    currencySettings?: DepositProductCurrencySettings
+    creationDate?: string | undefined
+    creditArrangementSettings?: CreditArrangementSettings | undefined
+    currencySettings?: DepositProductCurrencySettings | undefined
     /**
      * The encoded key of the deposit product, auto generated, unique
      */
-    encodedKey?: string
-    feesSettings?: DepositProductFeeSettings
+    encodedKey?: string | undefined
+    feesSettings?: DepositProductFeeSettings | undefined
     /**
      * The id of the product, can be generated and customized, unique
      */
     id: string
-    interestSettings?: DepositProductInterestSettings
-    internalControls?: DepositProductInternalControls
+    interestSettings?: DepositProductInterestSettings | undefined
+    internalControls?: DepositProductInternalControls | undefined
     /**
      * The last date the product was updated
      */
-    lastModifiedDate?: string
-    maturitySettings?: DepositMaturitySettings
+    lastModifiedDate?: string | undefined
+    maturitySettings?: DepositMaturitySettings | undefined
     /**
      * The name of the product
      */
@@ -384,19 +394,19 @@ export interface DepositProduct {
     /**
      * Some notes/a description about the product
      */
-    notes?: string
-    offsetSettings?: DepositProductOffsetSettings
-    overdraftInterestSettings?: OverdraftInterestSettings
-    overdraftSettings?: DepositProductOverdraftSettings
+    notes?: string | undefined
+    offsetSettings?: DepositProductOffsetSettings | undefined
+    overdraftInterestSettings?: OverdraftInterestSettings | undefined
+    overdraftSettings?: DepositProductOverdraftSettings | undefined
     /**
      * Indicates the current state of the product
      */
     state: 'ACTIVE' | 'INACTIVE'
-    taxSettings?: DepositProductTaxSettings
+    taxSettings?: DepositProductTaxSettings | undefined
     /**
      * Template documents of the product.
      */
-    templates?: DocumentTemplate[]
+    templates?: DocumentTemplate[] | undefined
     /**
      * Indicates the type of product.
      */
@@ -404,7 +414,7 @@ export interface DepositProduct {
 }
 
 export const DepositProduct = {
-    validate: (await import('./schemas/deposit-product.schema.js')).validate as ValidateFunction<DepositProduct>,
+    validate: DepositProductValidator as ValidateFunction<DepositProduct>,
     get schema() {
         return DepositProduct.validate.schema
     },
@@ -412,10 +422,11 @@ export const DepositProduct = {
         return DepositProduct.validate.errors ?? undefined
     },
     is: (o: unknown): o is DepositProduct => DepositProduct.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!DepositProduct.validate(o)) {
-            throw new ValidationError(DepositProduct.errors ?? [])
+    parse: (o: unknown): { right: DepositProduct } | { left: DefinedError[] } => {
+        if (DepositProduct.is(o)) {
+            return { right: o }
         }
+        return { left: (DepositProduct.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -430,11 +441,11 @@ export interface DepositProductAccountingSettings {
     /**
      * A list of accounting rules for the product.
      */
-    accountingRules?: DepositGLAccountingRule[]
+    accountingRules?: DepositGLAccountingRule[] | undefined
     /**
      * A list of accounting rules for a product.
      */
-    interestAccruedAccountingMethod?: 'NONE' | 'DAILY' | 'END_OF_MONTH'
+    interestAccruedAccountingMethod?: 'NONE' | 'DAILY' | 'END_OF_MONTH' | undefined
 }
 
 /**
@@ -448,7 +459,7 @@ export interface DepositProductAction {
 }
 
 export const DepositProductAction = {
-    validate: (await import('./schemas/deposit-product-action.schema.js')).validate as ValidateFunction<DepositProductAction>,
+    validate: DepositProductActionValidator as ValidateFunction<DepositProductAction>,
     get schema() {
         return DepositProductAction.validate.schema
     },
@@ -456,10 +467,11 @@ export const DepositProductAction = {
         return DepositProductAction.validate.errors ?? undefined
     },
     is: (o: unknown): o is DepositProductAction => DepositProductAction.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!DepositProductAction.validate(o)) {
-            throw new ValidationError(DepositProductAction.errors ?? [])
+    parse: (o: unknown): { right: DepositProductAction } | { left: DefinedError[] } => {
+        if (DepositProductAction.is(o)) {
+            return { right: o }
         }
+        return { left: (DepositProductAction.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -470,12 +482,11 @@ export interface DepositProductActionResponse {
     /**
      * The state of the deposit product action
      */
-    state?: 'QUEUED'
+    state?: 'QUEUED' | undefined
 }
 
 export const DepositProductActionResponse = {
-    validate: (await import('./schemas/deposit-product-action-response.schema.js'))
-        .validate as ValidateFunction<DepositProductActionResponse>,
+    validate: DepositProductActionResponseValidator as ValidateFunction<DepositProductActionResponse>,
     get schema() {
         return DepositProductActionResponse.validate.schema
     },
@@ -483,6 +494,12 @@ export const DepositProductActionResponse = {
         return DepositProductActionResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is DepositProductActionResponse => DepositProductActionResponse.validate(o) === true,
+    parse: (o: unknown): { right: DepositProductActionResponse } | { left: DefinedError[] } => {
+        if (DepositProductActionResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (DepositProductActionResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -492,8 +509,8 @@ export interface DepositProductAvailabilitySettings {
     /**
      * Holds the entities this product is available for. i.e Individuals
      */
-    availableFor?: ('INDIVIDUALS' | 'PURE_GROUPS')[]
-    branchSettings?: BranchSettings
+    availableFor?: ('INDIVIDUALS' | 'PURE_GROUPS')[] | undefined
+    branchSettings?: BranchSettings | undefined
 }
 
 /**
@@ -503,7 +520,7 @@ export interface DepositProductCurrencySettings {
     /**
      * Currencies that can be used by accounts of this product
      */
-    currencies?: Currency[]
+    currencies?: Currency[] | undefined
 }
 
 /**
@@ -513,11 +530,11 @@ export interface DepositProductFeeSettings {
     /**
      * Only if true users will be able to apply fees, for current object, of type 'Other'; these fees can have any amount.
      */
-    allowArbitraryFees?: boolean
+    allowArbitraryFees?: boolean | undefined
     /**
      * List of all fees that can be applied for accounts of this loan product.
      */
-    fees?: DepositProductPredefinedFee[]
+    fees?: DepositProductPredefinedFee[] | undefined
 }
 
 /**
@@ -527,48 +544,55 @@ export interface DepositProductInterestRateSettings {
     /**
      * If the product supports this option, specify if the interest should be accrued after the account maturity date
      */
-    accrueInterestAfterMaturity?: boolean
+    accrueInterestAfterMaturity?: boolean | undefined
     /**
      * Indicator whether the deposit product allows negative values for interest rate
      */
-    allowNegativeInterestRate?: boolean
+    allowNegativeInterestRate?: boolean | undefined
     /**
      * The encoded key of the interest rate tier, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * Index rate source key.
      */
-    indexSourceKey?: string
+    indexSourceKey?: string | undefined
     /**
      * The interval used for determining how often is interest charged
      */
-    interestChargeFrequency?: 'ANNUALIZED' | 'EVERY_MONTH' | 'EVERY_FOUR_WEEKS' | 'EVERY_WEEK' | 'EVERY_DAY' | 'EVERY_X_DAYS'
+    interestChargeFrequency?:
+        | 'ANNUALIZED'
+        | 'EVERY_MONTH'
+        | 'EVERY_FOUR_WEEKS'
+        | 'EVERY_WEEK'
+        | 'EVERY_DAY'
+        | 'EVERY_X_DAYS'
+        | undefined
     /**
      * the count of units to apply over the interval
      */
-    interestChargeFrequencyCount?: number
-    interestRate?: DecimalInterval
+    interestChargeFrequencyCount?: number | undefined
+    interestRate?: DecimalInterval | undefined
     /**
      * Interest rate review frequency unit count
      */
-    interestRateReviewCount?: number
+    interestRateReviewCount?: number | undefined
     /**
      * Interest rate review frequency measurement unit
      */
-    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
+    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | undefined
     /**
      * Interest calculation method: fixed or (interest spread + active organization index interest rate)
      */
-    interestRateSource?: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE'
+    interestRateSource?: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE' | undefined
     /**
      * The option for how is the interest rate determined when being accrued for an account
      */
-    interestRateTerms?: 'FIXED' | 'TIERED' | 'TIERED_PERIOD' | 'TIERED_BAND'
+    interestRateTerms?: 'FIXED' | 'TIERED' | 'TIERED_PERIOD' | 'TIERED_BAND' | undefined
     /**
      * The list of interest rate tiers available for the current settings instance
      */
-    interestRateTiers?: DepositProductInterestRateTier[]
+    interestRateTiers?: DepositProductInterestRateTier[] | undefined
 }
 
 /**
@@ -578,15 +602,15 @@ export interface DepositProductInterestRateTier {
     /**
      * The encoded key of the interest rate tier, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The top-limit value for the account balance in order to determine if this tier is used or not
      */
-    endingBalance?: number
+    endingBalance?: number | undefined
     /**
      * The top-limit value for the account period since activation in order to determine if this tier is used or not
      */
-    endingDay?: number
+    endingDay?: number | undefined
     /**
      * The rate used for computing the interest for an account which has the balance less than the ending balance
      */
@@ -600,33 +624,39 @@ export interface DepositProductInterestSettings {
     /**
      * Whether locked accounts still collect Interest or not
      */
-    collectInterestWhenLocked?: boolean
+    collectInterestWhenLocked?: boolean | undefined
     /**
      * How many days in a year should be used for interest calculations
      */
-    daysInYear?: 'ACTUAL_365_FIXED' | 'ACTUAL_360' | 'ACTUAL_ACTUAL_ISDA' | 'E30_360' | 'E30_42_365' | 'BUS_252'
+    daysInYear?: 'ACTUAL_365_FIXED' | 'ACTUAL_360' | 'ACTUAL_ACTUAL_ISDA' | 'E30_360' | 'E30_42_365' | 'BUS_252' | undefined
     /**
      * The balance which is used for the Interest calculation
      */
-    interestCalculationBalance?: 'MINIMUM' | 'AVERAGE' | 'END_OF_DAY' | 'MINIMUM_TO_END_OF_DAY' | 'FRENCH_INTEREST_ACCRUAL'
+    interestCalculationBalance?:
+        | 'MINIMUM'
+        | 'AVERAGE'
+        | 'END_OF_DAY'
+        | 'MINIMUM_TO_END_OF_DAY'
+        | 'FRENCH_INTEREST_ACCRUAL'
+        | undefined
     /**
      * The date when the accounts under this product, will no longer have interest gains provided
      */
-    interestGainsProvidedEndDate?: string
+    interestGainsProvidedEndDate?: string | undefined
     /**
      * The date when the accounts of this product will start to have interest gains provided. Starting with this date 0 interest rate is enforced on the accounts of this product.
      */
-    interestGainsProvidedStartDate?: string
+    interestGainsProvidedStartDate?: string | undefined
     /**
      * If interest should be payed into the deposit account
      */
-    interestPaidIntoAccount?: boolean
-    interestPaymentSettings?: InterestPaymentSettings
-    interestRateSettings?: DepositProductInterestRateSettings
+    interestPaidIntoAccount?: boolean | undefined
+    interestPaymentSettings?: InterestPaymentSettings | undefined
+    interestRateSettings?: DepositProductInterestRateSettings | undefined
     /**
      * The maximum balance used for Interest calculation
      */
-    maximumBalance?: number
+    maximumBalance?: number | undefined
 }
 
 /**
@@ -636,16 +666,16 @@ export interface DepositProductInternalControls {
     /**
      * Specifies the number of days for an account to be fully paid in order to auto close it.
      */
-    dormancyPeriodDays?: number
+    dormancyPeriodDays?: number | undefined
     /**
      * Max amount per withdrawal
      */
-    maxWithdrawalAmount?: number
-    openingBalance?: AmountDecimalInterval
+    maxWithdrawalAmount?: number | undefined
+    openingBalance?: AmountDecimalInterval | undefined
     /**
      * Recommended amount for a deposit
      */
-    recommendedDepositAmount?: number
+    recommendedDepositAmount?: number | undefined
 }
 
 /**
@@ -655,7 +685,7 @@ export interface DepositProductOffsetSettings {
     /**
      * Specify if the product allow to create accounts which can be used as offset for loans
      */
-    allowOffset?: boolean
+    allowOffset?: boolean | undefined
 }
 
 /**
@@ -665,36 +695,43 @@ export interface DepositProductOverdraftInterestRateSettings {
     /**
      * Index rate source key.
      */
-    indexSourceKey?: string
+    indexSourceKey?: string | undefined
     /**
      * The interval used for determining how often is interest charged
      */
-    interestChargeFrequency?: 'ANNUALIZED' | 'EVERY_MONTH' | 'EVERY_FOUR_WEEKS' | 'EVERY_WEEK' | 'EVERY_DAY' | 'EVERY_X_DAYS'
+    interestChargeFrequency?:
+        | 'ANNUALIZED'
+        | 'EVERY_MONTH'
+        | 'EVERY_FOUR_WEEKS'
+        | 'EVERY_WEEK'
+        | 'EVERY_DAY'
+        | 'EVERY_X_DAYS'
+        | undefined
     /**
      * the count of units to apply over the interval
      */
-    interestChargeFrequencyCount?: number
-    interestRate?: DecimalInterval
+    interestChargeFrequencyCount?: number | undefined
+    interestRate?: DecimalInterval | undefined
     /**
      * Interest rate review frequency unit count
      */
-    interestRateReviewCount?: number
+    interestRateReviewCount?: number | undefined
     /**
      * Interest rate review frequency measurement unit
      */
-    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
+    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | undefined
     /**
      * Interest calculation method: fixed or (interest spread + active organization index interest rate)
      */
-    interestRateSource?: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE'
+    interestRateSource?: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE' | undefined
     /**
      * The option for how is the interest rate determined when being accrued for an account
      */
-    interestRateTerms?: 'FIXED' | 'TIERED' | 'TIERED_PERIOD' | 'TIERED_BAND'
+    interestRateTerms?: 'FIXED' | 'TIERED' | 'TIERED_PERIOD' | 'TIERED_BAND' | undefined
     /**
      * The list of interest rate tiers available for the current settings instance
      */
-    interestRateTiers?: DepositProductOverdraftInterestRateTier[]
+    interestRateTiers?: DepositProductOverdraftInterestRateTier[] | undefined
 }
 
 /**
@@ -704,11 +741,11 @@ export interface DepositProductOverdraftInterestRateTier {
     /**
      * The encoded key of the interest rate tier, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The top-limit value for the account balance in order to determine if this tier is used or not
      */
-    endingBalance?: number
+    endingBalance?: number | undefined
     /**
      * The rate used for computing the interest for an account which has the balance less than the ending balance
      */
@@ -722,15 +759,15 @@ export interface DepositProductOverdraftSettings {
     /**
      * Whether the accounts for this product may have overdraft
      */
-    allowOverdraft?: boolean
+    allowOverdraft?: boolean | undefined
     /**
      * Whether the accounts for this product may have technical overdraft
      */
-    allowTechnicalOverdraft?: boolean
+    allowTechnicalOverdraft?: boolean | undefined
     /**
      * How much money may be taken out for the account to go negative
      */
-    maxOverdraftLimit?: number
+    maxOverdraftLimit?: number | undefined
 }
 
 /**
@@ -740,31 +777,31 @@ export interface DepositProductPredefinedFee {
     /**
      * A list of accounting rules defined for this fee. If null, product default rules are selected.
      */
-    accountingRules?: DepositGLAccountingRule[]
+    accountingRules?: DepositGLAccountingRule[] | undefined
     /**
      * The amount of the fee
      */
-    amount?: number
+    amount?: number | undefined
     /**
      * External function
      */
-    amountCalculationFunctionName?: string
+    amountCalculationFunctionName?: string | undefined
     /**
      * The amount from which the fee is calculated using percentageAmount
      */
-    amountCalculationMethod?: 'FLAT' | 'MAMBU_FUNCTION'
+    amountCalculationMethod?: 'FLAT' | 'MAMBU_FUNCTION' | undefined
     /**
      * Shows when a fee should be applied; to be used with monthly deposit fees
      */
-    applyDateMethod?: 'MONTHLY_FROM_ACTIVATION' | 'FIRST_OF_EVERY_MONTH'
+    applyDateMethod?: 'MONTHLY_FROM_ACTIVATION' | 'FIRST_OF_EVERY_MONTH' | undefined
     /**
      * Shows the creation date of the fee
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The encoded key of the predefined fee, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The type of fee application when disbursement is applied
      */
@@ -772,15 +809,15 @@ export interface DepositProductPredefinedFee {
     /**
      * The id of the fee
      */
-    id?: string
+    id?: string | undefined
     /**
      * Shows the last modified date of the fee
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The name of the fee
      */
-    name?: string
+    name?: string | undefined
     /**
      * Indicates the state of the fee
      */
@@ -798,7 +835,7 @@ export interface DepositProductTaxSettings {
     /**
      * Whether withholding taxes are enabled for this product or not
      */
-    withholdingTaxEnabled?: boolean
+    withholdingTaxEnabled?: boolean | undefined
 }
 
 /**
@@ -808,31 +845,31 @@ export interface DocumentTemplate {
     /**
      * The creation date of the document
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The document encodedKey
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The last modified date of the document
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The name the document
      */
-    name?: string
+    name?: string | undefined
     /**
      * The type of the template
      */
-    type?: 'ACCOUNT' | 'TRANSACTION' | 'ACCOUNT_WITH_TRANSACTIONS'
+    type?: 'ACCOUNT' | 'TRANSACTION' | 'ACCOUNT_WITH_TRANSACTIONS' | undefined
 }
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -840,17 +877,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetAllResponse = DepositProduct[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -858,6 +896,12 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -867,15 +911,15 @@ export interface IntegerInterval {
     /**
      * The default value, will be used in case no other value was filled in by the user.
      */
-    defaultValue?: number
+    defaultValue?: number | undefined
     /**
      * The maximum value.
      */
-    maxValue?: number
+    maxValue?: number | undefined
     /**
      * The minimum value.
      */
-    minValue?: number
+    minValue?: number | undefined
 }
 
 /**
@@ -885,7 +929,7 @@ export interface InterestPaymentSettings {
     /**
      * List of all dates on which the interest is payed into deposit account
      */
-    interestPaymentDates?: MonthAndDay[]
+    interestPaymentDates?: MonthAndDay[] | undefined
     /**
      * Specifies when the interest should be paid to the deposit account
      */
@@ -900,6 +944,7 @@ export interface InterestPaymentSettings {
         | 'ANNUALLY'
         | 'BI_ANNUALLY'
         | 'ON_ACCOUNT_MATURITY'
+        | undefined
 }
 
 /**
@@ -909,11 +954,11 @@ export interface MonthAndDay {
     /**
      * The day in the month
      */
-    day?: number
+    day?: number | undefined
     /**
      * The month of the year
      */
-    month?: number
+    month?: number | undefined
 }
 
 /**
@@ -923,12 +968,18 @@ export interface OverdraftInterestSettings {
     /**
      * How many days in a year should be used for interest calculations
      */
-    daysInYear?: 'ACTUAL_365_FIXED' | 'ACTUAL_360' | 'ACTUAL_ACTUAL_ISDA' | 'E30_360' | 'E30_42_365' | 'BUS_252'
+    daysInYear?: 'ACTUAL_365_FIXED' | 'ACTUAL_360' | 'ACTUAL_ACTUAL_ISDA' | 'E30_360' | 'E30_42_365' | 'BUS_252' | undefined
     /**
      * The balance which is used for the overdraft interest calculation. Default value is MINIMUM. If set to null on a PUT call and the product allows overdrafts, the null value is ignored and not changed.
      */
-    interestCalculationBalance?: 'MINIMUM' | 'AVERAGE' | 'END_OF_DAY' | 'MINIMUM_TO_END_OF_DAY' | 'FRENCH_INTEREST_ACCRUAL'
-    interestRateSettings?: DepositProductOverdraftInterestRateSettings
+    interestCalculationBalance?:
+        | 'MINIMUM'
+        | 'AVERAGE'
+        | 'END_OF_DAY'
+        | 'MINIMUM_TO_END_OF_DAY'
+        | 'FRENCH_INTEREST_ACCRUAL'
+        | undefined
+    interestRateSettings?: DepositProductOverdraftInterestRateSettings | undefined
 }
 
 /**
@@ -938,7 +989,7 @@ export interface PatchOperation {
     /**
      * The field from where a value should be moved, when using move
      */
-    from?: string
+    from?: string | undefined
     /**
      * The change to perform
      */
@@ -950,15 +1001,13 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: {
-        [k: string]: unknown | undefined
-    }
+    value?: unknown
 }
 
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
+    validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -966,15 +1015,16 @@ export const PatchRequest = {
         return PatchRequest.validate.errors ?? undefined
     },
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
+    parse: (o: unknown): { right: PatchRequest } | { left: DefinedError[] } => {
+        if (PatchRequest.is(o)) {
+            return { right: o }
         }
+        return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

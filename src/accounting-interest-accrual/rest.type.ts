@@ -3,8 +3,12 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as InterestAccrualSearchCriteriaValidator } from './schemas/interest-accrual-search-criteria.schema.js'
+import { validate as SearchResponseValidator } from './schemas/search-response.schema.js'
 
 /**
  * Represents the conversion rate used in accounting to convert amounts from one currency to organisation currency
@@ -13,27 +17,27 @@ export interface AccountingRate {
     /**
      * The encoded key of the accounting rate, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * Rate validity end date (as Organization Time)
      */
-    endDate?: string
+    endDate?: string | undefined
     /**
      * Organisation currency code
      */
-    fromCurrencyCode?: string
+    fromCurrencyCode?: string | undefined
     /**
      * Value of rate to be used for accounting conversions
      */
-    rate?: number
+    rate?: number | undefined
     /**
      * Rate validity start date (as Organization Time)
      */
-    startDate?: string
+    startDate?: string | undefined
     /**
      * Foreign currency code
      */
-    toCurrencyCode?: string
+    toCurrencyCode?: string | undefined
 }
 
 /**
@@ -227,23 +231,25 @@ export interface Currency {
         | 'XXX'
         | 'YER'
         | 'ZAR'
+        | 'ZIG'
         | 'ZMK'
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+        | undefined
     /**
      * Currency code for NON_FIAT currency.
      */
-    currencyCode?: string
+    currencyCode?: string | undefined
 }
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -251,10 +257,11 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -262,12 +269,12 @@ export const ErrorResponse = {
  * Represents the details of general ledger journal entries posted in foreign currency.
  */
 export interface ForeignAmount {
-    accountingRate?: AccountingRate
+    accountingRate?: AccountingRate | undefined
     /**
      * The foreign currency amount of the accounting entry.
      */
-    amount?: number
-    currency?: Currency
+    amount?: number | undefined
+    currency?: Currency | undefined
 }
 
 /**
@@ -277,76 +284,76 @@ export interface InterestAccrualBreakdown {
     /**
      * The loan or deposit account ID for which interest is accrued.
      */
-    accountId?: string
+    accountId?: string | undefined
     /**
      * The encoded key of the loan or deposit account for which interest is accrued.
      */
-    accountKey?: string
+    accountKey?: string | undefined
     /**
      * The interest accrued amount for the account in this entry.
      */
-    amount?: number
+    amount?: number | undefined
     /**
      * The booking date in the organization's timezone.
      */
-    bookingDate?: string
+    bookingDate?: string | undefined
     /**
      * The encoded key of the account's branch.
      */
-    branchKey?: string
+    branchKey?: string | undefined
     /**
      * The name of the account's branch
      */
-    branchName?: string
+    branchName?: string | undefined
     /**
      * The creation date and time of the entry in UTC.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The generated ID of the interest accrual per account entry.
      */
-    entryId?: number
+    entryId?: number | undefined
     /**
      * Debit or Credit.
      */
-    entryType?: string
-    foreignAmount?: ForeignAmount
+    entryType?: string | undefined
+    foreignAmount?: ForeignAmount | undefined
     /**
      * The ID of the general ledger account.
      */
-    glAccountId?: string
+    glAccountId?: string | undefined
     /**
      * The encoded key of the general ledger account used for logging the interest accrual.
      */
-    glAccountKey?: string
+    glAccountKey?: string | undefined
     /**
      * The name of the general ledger account.
      */
-    glAccountName?: string
+    glAccountName?: string | undefined
     /**
      * The general ledger account type, which can be: `ASSET`, `LIABILITY`, `EQUITY`, `INCOME`, or `EXPENSE`.
      */
-    glAccountType?: string
+    glAccountType?: string | undefined
     /**
      * The ID of the general ledger journal entry that logged the interest accrual sum for all accounts of the same product.
      */
-    parentEntryId?: number
+    parentEntryId?: number | undefined
     /**
      * The ID of the account's product.
      */
-    productId?: string
+    productId?: string | undefined
     /**
      * The encoded key of the account's product.
      */
-    productKey?: string
+    productKey?: string | undefined
     /**
      * The product type.
      */
-    productType?: string
+    productType?: string | undefined
     /**
      * The journal entry transaction ID.
      */
-    transactionId?: string
+    transactionId?: string | undefined
 }
 
 /**
@@ -421,15 +428,15 @@ export interface InterestAccrualFilterCriteria {
     /**
      * The second value to match the searching criteria, when the `BETWEEN` operator is used.
      */
-    secondValue?: string
+    secondValue?: string | undefined
     /**
      * The value to match the searching criteria.
      */
-    value?: string
+    value?: string | undefined
     /**
      * List of values when the `IN` operator is used.
      */
-    values?: string[]
+    values?: string[] | undefined
 }
 
 /**
@@ -439,13 +446,12 @@ export interface InterestAccrualSearchCriteria {
     /**
      * The list of filtering criteria.
      */
-    filterCriteria?: InterestAccrualFilterCriteria[]
-    sortingCriteria?: InterestAccrualSortingCriteria
+    filterCriteria?: InterestAccrualFilterCriteria[] | undefined
+    sortingCriteria?: InterestAccrualSortingCriteria | undefined
 }
 
 export const InterestAccrualSearchCriteria = {
-    validate: (await import('./schemas/interest-accrual-search-criteria.schema.js'))
-        .validate as ValidateFunction<InterestAccrualSearchCriteria>,
+    validate: InterestAccrualSearchCriteriaValidator as ValidateFunction<InterestAccrualSearchCriteria>,
     get schema() {
         return InterestAccrualSearchCriteria.validate.schema
     },
@@ -453,10 +459,11 @@ export const InterestAccrualSearchCriteria = {
         return InterestAccrualSearchCriteria.validate.errors ?? undefined
     },
     is: (o: unknown): o is InterestAccrualSearchCriteria => InterestAccrualSearchCriteria.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!InterestAccrualSearchCriteria.validate(o)) {
-            throw new ValidationError(InterestAccrualSearchCriteria.errors ?? [])
+    parse: (o: unknown): { right: InterestAccrualSearchCriteria } | { left: DefinedError[] } => {
+        if (InterestAccrualSearchCriteria.is(o)) {
+            return { right: o }
         }
+        return { left: (InterestAccrualSearchCriteria.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -483,19 +490,19 @@ export interface InterestAccrualSortingCriteria {
     /**
      * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
      */
-    order?: 'ASC' | 'DESC'
+    order?: 'ASC' | 'DESC' | undefined
 }
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
 
 export type SearchResponse = InterestAccrualBreakdown[]
 
 export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
+    validate: SearchResponseValidator as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -503,4 +510,10 @@ export const SearchResponse = {
         return SearchResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
+    parse: (o: unknown): { right: SearchResponse } | { left: DefinedError[] } => {
+        if (SearchResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (SearchResponse.errors ?? []) as DefinedError[] }
+    },
 } as const

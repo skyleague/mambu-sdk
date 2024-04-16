@@ -1,2 +1,2 @@
-export * from './rest.client.js'
+export { MambuUsers } from './rest.client.js'
 export * as users from './rest.type.js'

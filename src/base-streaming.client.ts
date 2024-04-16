@@ -3,10 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import got from 'got'
+
+import type { IncomingHttpHeaders } from 'node:http'
+
+import type { DefinedError } from 'ajv'
+import { got } from 'got'
 import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
-import type { ValidateFunction, ErrorObject } from 'ajv'
-import type { IncomingHttpHeaders } from 'http'
+
 import {
     CommitSubscriptionCursorsRequest,
     CommitSubscriptionCursorsResponse200,
@@ -60,16 +63,33 @@ export class BaseMambuStreaming {
      *
      * - When a batch is committed, that also automatically commits all previous batches that were sent in a stream for this partition.
      */
-    public async commitSubscriptionCursors({
+    public commitSubscriptionCursors({
         body,
         path,
         headers,
     }: {
         body: CommitSubscriptionCursorsRequest
         path: { subscriptionId: string }
-        headers: { ['X-Mambu-StreamId']: string; apikey?: string }
-    }) {
-        this.validateRequestBody(CommitSubscriptionCursorsRequest, body)
+        headers: { 'X-Mambu-StreamId': string; apikey?: string }
+    }): Promise<
+        | SuccessResponse<'200', CommitSubscriptionCursorsResponse200>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'403', Problem, 'response:statuscode'>
+        | FailureResponse<'404', Problem, 'response:statuscode'>
+        | FailureResponse<'422', Problem, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '403' | '404' | '422'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(CommitSubscriptionCursorsRequest, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient().post(`subscriptions/${path.subscriptionId}/cursors`, {
@@ -79,12 +99,12 @@ export class BaseMambuStreaming {
             }),
             {
                 200: CommitSubscriptionCursorsResponse200,
-                204: { is: (_x: unknown): _x is unknown => true },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 403: Problem,
                 404: Problem,
                 422: Problem,
-            }
-        )
+            },
+        ) as ReturnType<this['commitSubscriptionCursors']>
     }
 
     /**
@@ -98,11 +118,25 @@ export class BaseMambuStreaming {
      *
      * - If this endpoint is invoked several times with the same key subscription properties in body (order of even_types is not important) - the subscription will be created only once and for all other calls it will just return the subscription that was already created.
      */
-    public async createSubscription({ body, headers }: { body: Subscription; headers?: { apikey?: string } }) {
-        this.validateRequestBody(Subscription, body)
+    public createSubscription({
+        body,
+        headers,
+    }: { body: Subscription; headers?: { apikey?: string } }): Promise<
+        | SuccessResponse<'200', Subscription>
+        | SuccessResponse<'201', Subscription>
+        | FailureResponse<'400', Problem, 'response:statuscode'>
+        | FailureResponse<'422', Problem, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '422'>, string, 'response:statuscode', IncomingHttpHeaders>
+    > {
+        const _body = this.validateRequestBody(Subscription, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
-            this.buildClient().post(`subscriptions`, {
+            this.buildClient().post('subscriptions', {
                 json: body,
                 headers: headers ?? {},
                 responseType: 'json',
@@ -112,8 +146,8 @@ export class BaseMambuStreaming {
                 201: Subscription,
                 400: Problem,
                 422: Problem,
-            }
-        )
+            },
+        ) as ReturnType<this['createSubscription']>
     }
 
     /**
@@ -129,23 +163,25 @@ export class BaseMambuStreaming {
      *
      * - In case the subscription is not needed anymore, it can be manually deleted by providing its unique subscription id.
      */
-    public async deleteSubscriptionBySubscriptionId({
+    public deleteSubscriptionBySubscriptionId({
         path,
         headers,
-    }: {
-        path: { subscriptionId: string }
-        headers?: { apikey?: string }
-    }) {
+    }: { path: { subscriptionId: string }; headers?: { apikey?: string } }): Promise<
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'404', DeleteSubscriptionBySubscriptionIdResponse404, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '404'>, string, 'response:statuscode', IncomingHttpHeaders>
+    > {
         return this.awaitResponse(
             this.buildClient().delete(`subscriptions/${path.subscriptionId}`, {
                 headers: headers ?? {},
-                responseType: 'json',
+                responseType: 'text',
             }),
             {
-                204: { is: (_x: unknown): _x is unknown => true },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 404: DeleteSubscriptionBySubscriptionIdResponse404,
-            }
-        )
+            },
+        ) as ReturnType<this['deleteSubscriptionBySubscriptionId']>
     }
 
     /**
@@ -171,9 +207,10 @@ export class BaseMambuStreaming {
      * - If you need more than one client for your subscription to distribute load or increase throughput - you can read the subscription with multiple clients and Mambu will automatically balance the load across them.
      * - Currently, the maximum number of supported clients per subscription is equal to the number of event types in the subscription multiplied by `3`.
      * - For example if there are two event types in the subscription, the total number of clients for the subscription is `6`. The total of all the partitions within a subscription cannot be more than `100`. This gives a maximum of `33` event types per subscription.
+     * - Recommendation: to improve throughput, maintain the same number of partitions and consumer clients from the start. This ensures a balanced distribution of the workload, minimises delays and simplifies rebalancing.
      * - The API provides a guarantee of at-least-once delivery, this means that there are cases where duplicate events may be sent if there are errors committing events - a useful technique to detect and handle duplicates is to be idempotent and to check the `eid` field of event metadata.
      */
-    public async getSubscriptionEvents({
+    public getSubscriptionEvents({
         path,
         query,
         headers,
@@ -188,8 +225,21 @@ export class BaseMambuStreaming {
             stream_keep_alive_limit?: string
             commit_timeout?: string
         }
-        headers?: { ['X-Flow-Id']?: string; apikey?: string }
-    }) {
+        headers?: { 'X-Flow-Id'?: string; apikey?: string }
+    }): Promise<
+        | SuccessResponse<'200', SubscriptionEventStreamBatch>
+        | FailureResponse<'400', Problem, 'response:statuscode'>
+        | FailureResponse<'403', Problem, 'response:statuscode'>
+        | FailureResponse<'404', Problem, 'response:statuscode'>
+        | FailureResponse<'409', Problem, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '403' | '404' | '409'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient().get(`subscriptions/${path.subscriptionId}/events`, {
                 searchParams: query ?? {},
@@ -202,8 +252,8 @@ export class BaseMambuStreaming {
                 403: Problem,
                 404: Problem,
                 409: Problem,
-            }
-        )
+            },
+        ) as ReturnType<this['getSubscriptionEvents']>
     }
 
     /**
@@ -222,15 +272,16 @@ export class BaseMambuStreaming {
      *
      * The latest offset is compared with committed offset in order to calculate unconsumed events count for specific partition.
      */
-    public async getSubscriptionStats({
+    public getSubscriptionStats({
         path,
         query,
         headers,
-    }: {
-        path: { subscriptionId: string }
-        query?: { show_time_lag?: string }
-        headers?: { apikey?: string }
-    }) {
+    }: { path: { subscriptionId: string }; query?: { show_time_lag?: string }; headers?: { apikey?: string } }): Promise<
+        | SuccessResponse<'200', GetSubscriptionStatsResponse>
+        | FailureResponse<'404', Problem, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '404'>, string, 'response:statuscode', IncomingHttpHeaders>
+    > {
         return this.awaitResponse(
             this.buildClient().get(`subscriptions/${path.subscriptionId}/stats`, {
                 searchParams: query ?? {},
@@ -240,45 +291,66 @@ export class BaseMambuStreaming {
             {
                 200: GetSubscriptionStatsResponse,
                 404: Problem,
-            }
-        )
+            },
+        ) as ReturnType<this['getSubscriptionStats']>
     }
 
-    public validateRequestBody<T>(schema: { is: (o: unknown) => o is T; assert: (o: unknown) => void }, body: T) {
-        schema.assert(body)
-        return body
+    public validateRequestBody<Parser extends { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } }, Body>(
+        parser: Parser,
+        body: unknown,
+    ) {
+        const _body = parser.parse(body)
+        if ('left' in _body) {
+            return {
+                statusCode: undefined,
+                status: undefined,
+                headers: undefined,
+                left: body,
+                validationErrors: _body.left,
+                where: 'request:body',
+            } satisfies FailureResponse<undefined, unknown, 'request:body', undefined>
+        }
+        return _body
     }
 
     public async awaitResponse<
-        T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
-    >(response: CancelableRequest<Response<unknown>>, schemas: S) {
-        type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
-            ? `${S}` extends `${T}${infer _X}`
-                ? S
-                : never
-            : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
+        I,
+        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } } | undefined>,
+    >(response: CancelableRequest<Response<I>>, schemas: S) {
         const result = await response
+        const status =
+            result.statusCode < 200
+                ? 'informational'
+                : result.statusCode < 300
+                  ? 'success'
+                  : result.statusCode < 400
+                    ? 'redirection'
+                    : result.statusCode < 500
+                      ? 'client-error'
+                      : 'server-error'
         const validator = schemas[result.statusCode] ?? schemas.default
-        if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {
+        const body = validator?.parse?.(result.body)
+        if (result.statusCode < 200 || result.statusCode >= 300) {
             return {
-                statusCode: result.statusCode,
+                statusCode: result.statusCode.toString(),
+                status,
                 headers: result.headers,
-                left: result.body,
-                validationErrors: validator?.validate?.errors ?? undefined,
-            } as {
-                statusCode: number
-                headers: IncomingHttpHeaders
-                left: InferSchemaType<S[keyof S]>
-                validationErrors?: ErrorObject[]
+                left: body !== undefined && 'right' in body ? body.right : result.body,
+                validationErrors: body !== undefined && 'left' in body ? body.left : undefined,
+                where: 'response:statuscode',
             }
         }
-        return { statusCode: result.statusCode, headers: result.headers, right: result.body } as {
-            statusCode: number
-            headers: IncomingHttpHeaders
-            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2' | 'default'>>]>
+        if (body === undefined || 'left' in body) {
+            return {
+                statusCode: result.statusCode.toString(),
+                status,
+                headers: result.headers,
+                left: result.body,
+                validationErrors: body?.left,
+                where: 'response:body',
+            }
         }
+        return { statusCode: result.statusCode.toString(), status, headers: result.headers, right: result.body }
     }
 
     protected buildApiKeyAuthClient(client: Got) {
@@ -288,22 +360,50 @@ export class BaseMambuStreaming {
                     async (options) => {
                         const apiKeyAuth = this.auth.apiKeyAuth
                         const key = typeof apiKeyAuth === 'function' ? await apiKeyAuth() : apiKeyAuth
-                        options.headers['apikey'] = key
+                        options.headers.apikey = key
                     },
                 ],
             },
         })
     }
 
-    protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
+    protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client?: Got): Got {
         const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
+        let chosenClient = client ?? this.client
         for (const chosen of auth[0] ?? []) {
             if (chosen === 'apiKeyAuth') {
-                client = this.buildApiKeyAuthClient(client)
+                chosenClient = this.buildApiKeyAuthClient(chosenClient)
             }
         }
-        return client
+        return chosenClient
     }
 }
+
+export type Status<Major> = Major extends string
+    ? Major extends `1${number}`
+        ? 'informational'
+        : Major extends `2${number}`
+          ? 'success'
+          : Major extends `3${number}`
+            ? 'redirection'
+            : Major extends `4${number}`
+              ? 'client-error'
+              : 'server-error'
+    : undefined
+export interface SuccessResponse<StatusCode extends string, T> {
+    statusCode: StatusCode
+    status: Status<StatusCode>
+    headers: IncomingHttpHeaders
+    right: T
+}
+export interface FailureResponse<StatusCode = string, T = unknown, Where = never, Headers = IncomingHttpHeaders> {
+    statusCode: StatusCode
+    status: Status<StatusCode>
+    headers: Headers
+    validationErrors: DefinedError[] | undefined
+    left: T
+    where: Where
+}
+export type StatusCode<Major extends number = 1 | 2 | 3 | 4 | 5> = `${Major}${number}`

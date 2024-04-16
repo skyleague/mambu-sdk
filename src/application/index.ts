@@ -1,2 +1,2 @@
-export * from './rest.client.js'
+export { MambuApplication } from './rest.client.js'
 export * as application from './rest.type.js'

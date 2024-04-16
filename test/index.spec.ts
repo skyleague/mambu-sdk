@@ -3,7 +3,7 @@ import type { streaming } from '../src/index.js'
 
 import { eitherToError } from '@skyleague/axioms'
 import nock from 'nock'
-import { expect, describe, afterEach, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 const prefixUrl = 'http://www.example.com'
 

@@ -3,8 +3,16 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
+import { validate as GetCreditArrangementsByGroupIdOrKeyResponseValidator } from './schemas/get-credit-arrangements-by-group-id-or-key-response.schema.js'
+import { validate as GroupSearchCriteriaValidator } from './schemas/group-search-criteria.schema.js'
+import { validate as GroupValidator } from './schemas/group.schema.js'
+import { validate as PatchRequestValidator } from './schemas/patch-request.schema.js'
+import { validate as SearchResponseValidator } from './schemas/search-response.schema.js'
 
 /**
  * Represents an address.
@@ -13,47 +21,47 @@ export interface Address {
     /**
      * The city for the address.
      */
-    city?: string
+    city?: string | undefined
     /**
      * The country.
      */
-    country?: string
+    country?: string | undefined
     /**
      * The address encoded key, which is unique and generated.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The index of this address in the list of addresses.
      */
-    indexInList?: number
+    indexInList?: number | undefined
     /**
      * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
      */
-    latitude?: number
+    latitude?: number | undefined
     /**
      * The first line of the address.
      */
-    line1?: string
+    line1?: string | undefined
     /**
      * The second line of the address.
      */
-    line2?: string
+    line2?: string | undefined
     /**
      * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
      */
-    longitude?: number
+    longitude?: number | undefined
     /**
      * The address parent key indicating the object owning this address. For example: client, centre, or branch.
      */
-    parentKey?: string
+    parentKey?: string | undefined
     /**
      * The post code.
      */
-    postcode?: string
+    postcode?: string | undefined
     /**
      * The region for the address.
      */
-    region?: string
+    region?: string | undefined
 }
 
 /**
@@ -67,28 +75,28 @@ export interface CreditArrangement {
     /**
      * The date when the credit arrangement was approved.
      */
-    approvedDate?: string
+    approvedDate?: string | undefined
     /**
      * The available amount of the credit arrangement.
      */
-    availableCreditAmount?: number
+    availableCreditAmount?: number | undefined
     /**
      * The date when the credit arrangement was closed.
      */
-    closedDate?: string
+    closedDate?: string | undefined
     /**
      * The consumed amount of the credit arrangement, which is calculated as the difference between the amount and available amount.
      */
-    consumedCreditAmount?: number
+    consumedCreditAmount?: number | undefined
     /**
      * The date when the credit arrangement was created.
      */
-    creationDate?: string
-    currency?: Currency
+    creationDate?: string | undefined
+    currency?: Currency | undefined
     /**
      * The encoded key of the credit arrangement, it is auto generated, and unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The date when the credit arrangement expires.
      */
@@ -96,11 +104,11 @@ export interface CreditArrangement {
     /**
      * The type of exposure limit calculation method used for the credit arrangement.
      */
-    exposureLimitType?: 'APPROVED_AMOUNT' | 'OUTSTANDING_AMOUNT'
+    exposureLimitType?: 'APPROVED_AMOUNT' | 'OUTSTANDING_AMOUNT' | undefined
     /**
      * The encoded key of the credit arrangement holder (individual client or group).
      */
-    holderKey?: string
+    holderKey?: string | undefined
     /**
      * The type of the credit arrangement holder (individual client or group).
      */
@@ -108,15 +116,15 @@ export interface CreditArrangement {
     /**
      * The ID of credit arrangement, can be generated and customized, and must be unique.
      */
-    id?: string
+    id?: string | undefined
     /**
      * The last date when the credit arrangement was modified.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The notes or description of the credit arrangement.
      */
-    notes?: string
+    notes?: string | undefined
     /**
      * The start date from which the credit arrangement became active.
      */
@@ -124,11 +132,11 @@ export interface CreditArrangement {
     /**
      * The state of the credit arrangement.
      */
-    state?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
+    state?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED' | undefined
     /**
      * The substate of credit arrangement.
      */
-    subState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
+    subState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED' | undefined
 }
 
 /**
@@ -322,23 +330,25 @@ export interface Currency {
         | 'XXX'
         | 'YER'
         | 'ZAR'
+        | 'ZIG'
         | 'ZMK'
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+        | undefined
     /**
      * Currency code for NON_FIAT currency.
      */
-    currencyCode?: string
+    currencyCode?: string | undefined
 }
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -346,17 +356,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetAllResponse = Group[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -364,13 +375,19 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export type GetCreditArrangementsByGroupIdOrKeyResponse = CreditArrangement[]
 
 export const GetCreditArrangementsByGroupIdOrKeyResponse = {
-    validate: (await import('./schemas/get-credit-arrangements-by-group-id-or-key-response.schema.js'))
-        .validate as ValidateFunction<GetCreditArrangementsByGroupIdOrKeyResponse>,
+    validate:
+        GetCreditArrangementsByGroupIdOrKeyResponseValidator as ValidateFunction<GetCreditArrangementsByGroupIdOrKeyResponse>,
     get schema() {
         return GetCreditArrangementsByGroupIdOrKeyResponse.validate.schema
     },
@@ -379,6 +396,12 @@ export const GetCreditArrangementsByGroupIdOrKeyResponse = {
     },
     is: (o: unknown): o is GetCreditArrangementsByGroupIdOrKeyResponse =>
         GetCreditArrangementsByGroupIdOrKeyResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetCreditArrangementsByGroupIdOrKeyResponse } | { left: DefinedError[] } => {
+        if (GetCreditArrangementsByGroupIdOrKeyResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetCreditArrangementsByGroupIdOrKeyResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -388,35 +411,35 @@ export interface Group {
     /**
      * The addresses associated with this group.
      */
-    addresses?: Address[]
+    addresses?: Address[] | undefined
     /**
      * Key of the branch this group is assigned to.
      */
-    assignedBranchKey?: string
+    assignedBranchKey?: string | undefined
     /**
      * Key of the centre this group is assigned to.
      */
-    assignedCentreKey?: string
+    assignedCentreKey?: string | undefined
     /**
      * Key of the user this group is assigned to.
      */
-    assignedUserKey?: string
+    assignedUserKey?: string | undefined
     /**
      * The date the group was created.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The email address associated with the group.
      */
-    emailAddress?: string
+    emailAddress?: string | undefined
     /**
      * The encoded key of the group, which is auto generated, and must be unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The members of this group.
      */
-    groupMembers?: GroupMember[]
+    groupMembers?: GroupMember[] | undefined
     /**
      * The name of the group.
      */
@@ -424,35 +447,35 @@ export interface Group {
     /**
      * A role which describes the intended use of a group in the system.
      */
-    groupRoleKey?: string
+    groupRoleKey?: string | undefined
     /**
      * The home phone number associated with the group.
      */
-    homePhone?: string
+    homePhone?: string | undefined
     /**
      * The ID of the group, which can be generated and customized, but must be unique.
      */
-    id?: string
+    id?: string | undefined
     /**
      * The last date the group was updated.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * Number of paid and closed (with 'obligations met') accounts for this client. When the closing operation is reverted, this is reduced.
      */
-    loanCycle?: number
+    loanCycle?: number | undefined
     /**
      * The migration event encoded key associated with this group.
      */
-    migrationEventKey?: string
+    migrationEventKey?: string | undefined
     /**
      * The mobile phone number associated with the group.
      */
-    mobilePhone?: string
+    mobilePhone?: string | undefined
     /**
      * Extra notes about this group.
      */
-    notes?: string
+    notes?: string | undefined
     /**
      * The preferred language associated with the group (used for the notifications).
      */
@@ -474,10 +497,11 @@ export interface Group {
         | 'THAI'
         | 'NORWEGIAN'
         | 'PHRASE'
+        | undefined
 }
 
 export const Group = {
-    validate: (await import('./schemas/group.schema.js')).validate as ValidateFunction<Group>,
+    validate: GroupValidator as ValidateFunction<Group>,
     get schema() {
         return Group.validate.schema
     },
@@ -485,10 +509,11 @@ export const Group = {
         return Group.validate.errors ?? undefined
     },
     is: (o: unknown): o is Group => Group.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Group.validate(o)) {
-            throw new ValidationError(Group.errors ?? [])
+    parse: (o: unknown): { right: Group } | { left: DefinedError[] } => {
+        if (Group.is(o)) {
+            return { right: o }
         }
+        return { left: (Group.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -561,15 +586,15 @@ export interface GroupFilterCriteria {
     /**
      * The second value to match the searching criteria, when the `BETWEEN` operator is used.
      */
-    secondValue?: string
+    secondValue?: string | undefined
     /**
      * The value to match the searching criteria.
      */
-    value?: string
+    value?: string | undefined
     /**
      * List of values when the `IN` operator is used.
      */
-    values?: string[]
+    values?: string[] | undefined
 }
 
 /**
@@ -583,7 +608,7 @@ export interface GroupMember {
     /**
      * The group role name associated with a group member.
      */
-    roles?: GroupRole[]
+    roles?: GroupRole[] | undefined
 }
 
 /**
@@ -593,7 +618,7 @@ export interface GroupRole {
     /**
      * The encoded key of the group role name, which is auto generated, and unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The group role name key.
      */
@@ -601,11 +626,11 @@ export interface GroupRole {
     /**
      * The group role name.
      */
-    roleName?: string
+    roleName?: string | undefined
     /**
      * The group role name ID.
      */
-    roleNameId?: string
+    roleNameId?: string | undefined
 }
 
 /**
@@ -616,11 +641,11 @@ export interface GroupSearchCriteria {
      * The list of filtering criteria
      */
     filterCriteria: GroupFilterCriteria[]
-    sortingCriteria?: GroupSortingCriteria
+    sortingCriteria?: GroupSortingCriteria | undefined
 }
 
 export const GroupSearchCriteria = {
-    validate: (await import('./schemas/group-search-criteria.schema.js')).validate as ValidateFunction<GroupSearchCriteria>,
+    validate: GroupSearchCriteriaValidator as ValidateFunction<GroupSearchCriteria>,
     get schema() {
         return GroupSearchCriteria.validate.schema
     },
@@ -628,10 +653,11 @@ export const GroupSearchCriteria = {
         return GroupSearchCriteria.validate.errors ?? undefined
     },
     is: (o: unknown): o is GroupSearchCriteria => GroupSearchCriteria.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!GroupSearchCriteria.validate(o)) {
-            throw new ValidationError(GroupSearchCriteria.errors ?? [])
+    parse: (o: unknown): { right: GroupSearchCriteria } | { left: DefinedError[] } => {
+        if (GroupSearchCriteria.is(o)) {
+            return { right: o }
         }
+        return { left: (GroupSearchCriteria.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -655,7 +681,7 @@ export interface GroupSortingCriteria {
     /**
      * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
      */
-    order?: 'ASC' | 'DESC'
+    order?: 'ASC' | 'DESC' | undefined
 }
 
 /**
@@ -665,7 +691,7 @@ export interface PatchOperation {
     /**
      * The field from where a value should be moved, when using move
      */
-    from?: string
+    from?: string | undefined
     /**
      * The change to perform
      */
@@ -677,15 +703,13 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: {
-        [k: string]: unknown | undefined
-    }
+    value?: unknown
 }
 
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
+    validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -693,23 +717,24 @@ export const PatchRequest = {
         return PatchRequest.validate.errors ?? undefined
     },
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
+    parse: (o: unknown): { right: PatchRequest } | { left: DefinedError[] } => {
+        if (PatchRequest.is(o)) {
+            return { right: o }
         }
+        return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
 
 export type SearchResponse = Group[]
 
 export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
+    validate: SearchResponseValidator as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -717,4 +742,10 @@ export const SearchResponse = {
         return SearchResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
+    parse: (o: unknown): { right: SearchResponse } | { left: DefinedError[] } => {
+        if (SearchResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (SearchResponse.errors ?? []) as DefinedError[] }
+    },
 } as const

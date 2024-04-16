@@ -3,15 +3,18 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as NonWorkingDaysValidator } from './schemas/non-working-days.schema.js'
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -19,12 +22,15 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+type NonWorkingDays2 = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
 
 /**
  * Represents the non-working days of the organization.
@@ -33,11 +39,11 @@ export interface NonWorkingDays {
     /**
      * The non-working days of the organization.
      */
-    nonWorkingDays: NonWorkingDaysNonWorkingDaysArray[]
+    nonWorkingDays: NonWorkingDays2[]
 }
 
 export const NonWorkingDays = {
-    validate: (await import('./schemas/non-working-days.schema.js')).validate as ValidateFunction<NonWorkingDays>,
+    validate: NonWorkingDaysValidator as ValidateFunction<NonWorkingDays>,
     get schema() {
         return NonWorkingDays.validate.schema
     },
@@ -45,17 +51,16 @@ export const NonWorkingDays = {
         return NonWorkingDays.validate.errors ?? undefined
     },
     is: (o: unknown): o is NonWorkingDays => NonWorkingDays.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!NonWorkingDays.validate(o)) {
-            throw new ValidationError(NonWorkingDays.errors ?? [])
+    parse: (o: unknown): { right: NonWorkingDays } | { left: DefinedError[] } => {
+        if (NonWorkingDays.is(o)) {
+            return { right: o }
         }
+        return { left: (NonWorkingDays.errors ?? []) as DefinedError[] }
     },
 } as const
 
-type NonWorkingDaysNonWorkingDaysArray = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
-
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

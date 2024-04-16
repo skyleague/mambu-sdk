@@ -3,8 +3,11 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as OrganizationSetupValidator } from './schemas/organization-setup.schema.js'
 
 /**
  * Represents an address.
@@ -13,55 +16,55 @@ export interface Address {
     /**
      * The city for the address.
      */
-    city?: string
+    city?: string | undefined
     /**
      * The country.
      */
-    country?: string
+    country?: string | undefined
     /**
      * The address encoded key, which is unique and generated.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The index of this address in the list of addresses.
      */
-    indexInList?: number
+    indexInList?: number | undefined
     /**
      * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
      */
-    latitude?: number
+    latitude?: number | undefined
     /**
      * The first line of the address.
      */
-    line1?: string
+    line1?: string | undefined
     /**
      * The second line of the address.
      */
-    line2?: string
+    line2?: string | undefined
     /**
      * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
      */
-    longitude?: number
+    longitude?: number | undefined
     /**
      * The address parent key indicating the object owning this address. For example: client, centre, or branch.
      */
-    parentKey?: string
+    parentKey?: string | undefined
     /**
      * The post code.
      */
-    postcode?: string
+    postcode?: string | undefined
     /**
      * The region for the address.
      */
-    region?: string
+    region?: string | undefined
 }
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -69,10 +72,11 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -80,15 +84,15 @@ export const ErrorResponse = {
  * Response representation of the organization setup details
  */
 export interface OrganizationSetup {
-    address?: Address
+    address?: Address | undefined
     /**
      * The creation date of the organization
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The currency of the organization, must be the same as the existing one
      */
-    currency?: string
+    currency?: string | undefined
     /**
      * The format used to represent the date
      */
@@ -104,7 +108,7 @@ export interface OrganizationSetup {
     /**
      * The email address of the organization
      */
-    emailAddress?: string
+    emailAddress?: string | undefined
     /**
      * The name of the organization
      */
@@ -112,19 +116,19 @@ export interface OrganizationSetup {
     /**
      * The last modified date of the organization
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The phone number of the organization
      */
-    phoneNumber?: string
+    phoneNumber?: string | undefined
     /**
      * The timezone id, must be the same as the existing one
      */
-    timeZoneID?: string
+    timeZoneID?: string | undefined
 }
 
 export const OrganizationSetup = {
-    validate: (await import('./schemas/organization-setup.schema.js')).validate as ValidateFunction<OrganizationSetup>,
+    validate: OrganizationSetupValidator as ValidateFunction<OrganizationSetup>,
     get schema() {
         return OrganizationSetup.validate.schema
     },
@@ -132,15 +136,16 @@ export const OrganizationSetup = {
         return OrganizationSetup.validate.errors ?? undefined
     },
     is: (o: unknown): o is OrganizationSetup => OrganizationSetup.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!OrganizationSetup.validate(o)) {
-            throw new ValidationError(OrganizationSetup.errors ?? [])
+    parse: (o: unknown): { right: OrganizationSetup } | { left: DefinedError[] } => {
+        if (OrganizationSetup.is(o)) {
+            return { right: o }
         }
+        return { left: (OrganizationSetup.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

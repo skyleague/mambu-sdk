@@ -3,8 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as EditTranchesRequestValidator } from './schemas/edit-tranches-request.schema.js'
+import { validate as EditTranchesResponseValidator } from './schemas/edit-tranches-response.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetTranchesResponseValidator } from './schemas/get-tranches-response.schema.js'
 
 /**
  * The custom predefined fees, they may be used as the expected predefined fees that will be applied on the disbursement.
@@ -13,25 +18,25 @@ export interface CustomPredefinedFee {
     /**
      * The amount of the custom fee.
      */
-    amount?: number
+    amount?: number | undefined
     /**
      * The encoded key of the custom predefined fee, auto generated, unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The percentage of the custom fee.
      */
-    percentage?: number
+    percentage?: number | undefined
     /**
      * The encoded key of the predefined fee
      */
-    predefinedFeeEncodedKey?: string
+    predefinedFeeEncodedKey?: string | undefined
 }
 
 export type EditTranchesRequest = LoanTranche[]
 
 export const EditTranchesRequest = {
-    validate: (await import('./schemas/edit-tranches-request.schema.js')).validate as ValidateFunction<EditTranchesRequest>,
+    validate: EditTranchesRequestValidator as ValidateFunction<EditTranchesRequest>,
     get schema() {
         return EditTranchesRequest.validate.schema
     },
@@ -39,17 +44,18 @@ export const EditTranchesRequest = {
         return EditTranchesRequest.validate.errors ?? undefined
     },
     is: (o: unknown): o is EditTranchesRequest => EditTranchesRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!EditTranchesRequest.validate(o)) {
-            throw new ValidationError(EditTranchesRequest.errors ?? [])
+    parse: (o: unknown): { right: EditTranchesRequest } | { left: DefinedError[] } => {
+        if (EditTranchesRequest.is(o)) {
+            return { right: o }
         }
+        return { left: (EditTranchesRequest.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type EditTranchesResponse = LoanTranche[]
 
 export const EditTranchesResponse = {
-    validate: (await import('./schemas/edit-tranches-response.schema.js')).validate as ValidateFunction<EditTranchesResponse>,
+    validate: EditTranchesResponseValidator as ValidateFunction<EditTranchesResponse>,
     get schema() {
         return EditTranchesResponse.validate.schema
     },
@@ -57,14 +63,20 @@ export const EditTranchesResponse = {
         return EditTranchesResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is EditTranchesResponse => EditTranchesResponse.validate(o) === true,
+    parse: (o: unknown): { right: EditTranchesResponse } | { left: DefinedError[] } => {
+        if (EditTranchesResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (EditTranchesResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -72,17 +84,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetTranchesResponse = LoanTranche[]
 
 export const GetTranchesResponse = {
-    validate: (await import('./schemas/get-tranches-response.schema.js')).validate as ValidateFunction<GetTranchesResponse>,
+    validate: GetTranchesResponseValidator as ValidateFunction<GetTranchesResponse>,
     get schema() {
         return GetTranchesResponse.validate.schema
     },
@@ -90,6 +103,12 @@ export const GetTranchesResponse = {
         return GetTranchesResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetTranchesResponse => GetTranchesResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetTranchesResponse } | { left: DefinedError[] } => {
+        if (GetTranchesResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetTranchesResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -100,25 +119,25 @@ export interface LoanTranche {
      * The amount this tranche has available for disburse
      */
     amount: number
-    disbursementDetails?: TrancheDisbursementDetails
+    disbursementDetails?: TrancheDisbursementDetails | undefined
     /**
      * The encoded key of the transaction details , auto generated, unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * Fees that are associated with this tranche
      */
-    fees?: CustomPredefinedFee[]
+    fees?: CustomPredefinedFee[] | undefined
     /**
      * Index indicating the tranche number
      */
-    trancheNumber?: number
+    trancheNumber?: number | undefined
 }
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
 
 /**
@@ -128,9 +147,9 @@ export interface TrancheDisbursementDetails {
     /**
      * The key of the disbursement transaction logged when this tranche was disbursed. This field will be null until the tranche disbursement
      */
-    disbursementTransactionKey?: string
+    disbursementTransactionKey?: string | undefined
     /**
      * The date when this tranche is supposed to be disbursed (as Organization Time)
      */
-    expectedDisbursementDate?: string
+    expectedDisbursementDate?: string | undefined
 }

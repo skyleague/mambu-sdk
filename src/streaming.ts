@@ -23,7 +23,7 @@ export class MambuStreaming extends BaseMambuStreaming {
             stream_keep_alive_limit?: string
             commit_timeout?: string
         }
-        headers?: { ['X-Flow-Id']?: string; apikey?: string }
+        headers?: { 'X-Flow-Id'?: string; apikey?: string }
     }) {
         const apiKey = typeof this.auth.apiKeyAuth === 'string' ? this.auth.apiKeyAuth : await this.auth.apiKeyAuth?.()
         const stream = new PassThrough()
@@ -46,7 +46,7 @@ export class MambuStreaming extends BaseMambuStreaming {
                     res.on('data', (chunk) => stream.write(chunk))
                     res.on('end', resolve)
                     res.on('error', reject)
-                }
+                },
             )
             req.on('error', reject)
         })

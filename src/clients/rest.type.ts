@@ -3,8 +3,17 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ClientRoleValidator } from './schemas/client-role.schema.js'
+import { validate as ClientSearchCriteriaValidator } from './schemas/client-search-criteria.schema.js'
+import { validate as ClientValidator } from './schemas/client.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
+import { validate as GetCreditArrangementsByClientIdOrKeyResponseValidator } from './schemas/get-credit-arrangements-by-client-id-or-key-response.schema.js'
+import { validate as PatchRequestValidator } from './schemas/patch-request.schema.js'
+import { validate as SearchResponseValidator } from './schemas/search-response.schema.js'
 
 /**
  * Represents an address.
@@ -13,47 +22,47 @@ export interface Address {
     /**
      * The city for the address.
      */
-    city?: string
+    city?: string | undefined
     /**
      * The country.
      */
-    country?: string
+    country?: string | undefined
     /**
      * The address encoded key, which is unique and generated.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The index of this address in the list of addresses.
      */
-    indexInList?: number
+    indexInList?: number | undefined
     /**
      * The GPS latitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -90 to +90.
      */
-    latitude?: number
+    latitude?: number | undefined
     /**
      * The first line of the address.
      */
-    line1?: string
+    line1?: string | undefined
     /**
      * The second line of the address.
      */
-    line2?: string
+    line2?: string | undefined
     /**
      * The GPS longitude of this address in signed degrees format (DDD.dddd) with 6 decimal positions, ranging from -180 to +180.
      */
-    longitude?: number
+    longitude?: number | undefined
     /**
      * The address parent key indicating the object owning this address. For example: client, centre, or branch.
      */
-    parentKey?: string
+    parentKey?: string | undefined
     /**
      * The post code.
      */
-    postcode?: string
+    postcode?: string | undefined
     /**
      * The region for the address.
      */
-    region?: string
+    region?: string | undefined
 }
 
 /**
@@ -63,51 +72,51 @@ export interface Client {
     /**
      * The date when a client was set as active for the first time.
      */
-    activationDate?: string
+    activationDate?: string | undefined
     /**
      * The addresses associated with this client.
      */
-    addresses?: Address[]
+    addresses?: Address[] | undefined
     /**
      * The date when a client was approved.
      */
-    approvedDate?: string
+    approvedDate?: string | undefined
     /**
      * The encoded key of the branch a client is assigned to.
      */
-    assignedBranchKey?: string
+    assignedBranchKey?: string | undefined
     /**
      * The encoded key of the centre a client is assigned to.
      */
-    assignedCentreKey?: string
+    assignedCentreKey?: string | undefined
     /**
      * The encoded key of the user a client is assigned to.
      */
-    assignedUserKey?: string
+    assignedUserKey?: string | undefined
     /**
      * The client's date of birth.
      */
-    birthDate?: string
+    birthDate?: string | undefined
     /**
      * A role which describes the intended use of a client in the system.
      */
-    clientRoleKey?: string
+    clientRoleKey?: string | undefined
     /**
      * The date when the client state was changed to closed.
      */
-    closedDate?: string
+    closedDate?: string | undefined
     /**
      * The date a client was created.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The client's email address.
      */
-    emailAddress?: string
+    emailAddress?: string | undefined
     /**
      * The encoded key of the client, which is unique and generated.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The first name, personal name, given name, or forename of the client.
      */
@@ -115,31 +124,31 @@ export interface Client {
     /**
      * The client's gender, the options are male or female.
      */
-    gender?: 'MALE' | 'FEMALE'
+    gender?: 'MALE' | 'FEMALE' | undefined
     /**
      * The groups to which this client belongs.
      */
-    groupKeys?: string[]
+    groupKeys?: string[] | undefined
     /**
      * Number of paid and closed (with 'obligations met') accounts for a client's group; when the closing operation is reverted, this is reduced.
      */
-    groupLoanCycle?: number
+    groupLoanCycle?: number | undefined
     /**
      * The client's home phone number.
      */
-    homePhone?: string
+    homePhone?: string | undefined
     /**
      * The ID of the client, which can be generated and customized - but must be unique.
      */
-    id?: string
+    id?: string | undefined
     /**
      * The identification documents for this client.
      */
-    idDocuments?: IdentificationDocument[]
+    idDocuments?: IdentificationDocument[] | undefined
     /**
      * The last date a client was modified.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The last name, surname, or family name of the client.
      */
@@ -147,28 +156,28 @@ export interface Client {
     /**
      * Number of paid and closed (with 'obligations met') accounts for a client; when the closing operation is reverted, this is reduced.
      */
-    loanCycle?: number
+    loanCycle?: number | undefined
     /**
      * The middle name of the client.
      */
-    middleName?: string
+    middleName?: string | undefined
     /**
      * The migration event encoded key associated with a client.
      */
-    migrationEventKey?: string
+    migrationEventKey?: string | undefined
     /**
      * The client's mobile phone number.
      */
-    mobilePhone?: string
+    mobilePhone?: string | undefined
     /**
      * The client's second mobile phone number.
      */
-    mobilePhone2?: string
+    mobilePhone2?: string | undefined
     /**
      * The additional notes about a client.
      */
-    notes?: string
-    portalSettings?: PortalSettings
+    notes?: string | undefined
+    portalSettings?: PortalSettings | undefined
     /**
      * The client's preferred language. This will determine the language for the reports, schedules, and account statements you generate for the client.
      */
@@ -190,22 +199,23 @@ export interface Client {
         | 'THAI'
         | 'NORWEGIAN'
         | 'PHRASE'
+        | undefined
     /**
      * The encoded key of a client's profile picture.
      */
-    profilePictureKey?: string
+    profilePictureKey?: string | undefined
     /**
      * The encoded key of the client's profile signature.
      */
-    profileSignatureKey?: string
+    profileSignatureKey?: string | undefined
     /**
      * The state of a client. It shows where the client is in the client life cycle.
      */
-    state?: 'PENDING_APPROVAL' | 'INACTIVE' | 'ACTIVE' | 'EXITED' | 'BLACKLISTED' | 'REJECTED'
+    state?: 'PENDING_APPROVAL' | 'INACTIVE' | 'ACTIVE' | 'EXITED' | 'BLACKLISTED' | 'REJECTED' | undefined
 }
 
 export const Client = {
-    validate: (await import('./schemas/client.schema.js')).validate as ValidateFunction<Client>,
+    validate: ClientValidator as ValidateFunction<Client>,
     get schema() {
         return Client.validate.schema
     },
@@ -213,10 +223,11 @@ export const Client = {
         return Client.validate.errors ?? undefined
     },
     is: (o: unknown): o is Client => Client.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Client.validate(o)) {
-            throw new ValidationError(Client.errors ?? [])
+    parse: (o: unknown): { right: Client } | { left: DefinedError[] } => {
+        if (Client.is(o)) {
+            return { right: o }
         }
+        return { left: (Client.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -306,15 +317,15 @@ export interface ClientFilterCriteria {
     /**
      * The second value to match the searching criteria, when the `BETWEEN` operator is used.
      */
-    secondValue?: string
+    secondValue?: string | undefined
     /**
      * The value to match the searching criteria.
      */
-    value?: string
+    value?: string | undefined
     /**
      * List of values when the `IN` operator is used.
      */
-    values?: string[]
+    values?: string[] | undefined
 }
 
 /**
@@ -324,51 +335,51 @@ export interface ClientRole {
     /**
      * `TRUE` if clients with this client role can be used as guarantors, `FALSE` otherwise.
      */
-    canGuarantee?: boolean
+    canGuarantee?: boolean | undefined
     /**
      * `TRUE` if new accounts for this client type can be created, `FALSE` otherwise.
      */
-    canOpenAccounts?: boolean
+    canOpenAccounts?: boolean | undefined
     /**
      * The type of the client for which this role was created.
      */
-    clientType?: 'CLIENT' | 'GROUP'
+    clientType?: 'CLIENT' | 'GROUP' | undefined
     /**
      * The creation date of the client role.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The text description for this client role.
      */
-    description?: string
+    description?: string | undefined
     /**
      * The encoded key of the client, which is unique and generated.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The ID of the client role, which can be generated and customized - but must be unique.
      */
-    id?: string
+    id?: string | undefined
     /**
      * The pattern used in generating the client ID.
      */
-    idPattern?: string
+    idPattern?: string | undefined
     /**
      * The name of the client role.
      */
-    name?: string
+    name?: string | undefined
     /**
      * `TRUE` if identification documents must be provided for the client to be created, `FALSE` otherwise. Does not apply for groups.
      */
-    requireID?: boolean
+    requireID?: boolean | undefined
     /**
      * `TRUE` if the Mambu default address section is available, `FALSE` otherwise.
      */
-    useDefaultAddress?: boolean
+    useDefaultAddress?: boolean | undefined
 }
 
 export const ClientRole = {
-    validate: (await import('./schemas/client-role.schema.js')).validate as ValidateFunction<ClientRole>,
+    validate: ClientRoleValidator as ValidateFunction<ClientRole>,
     get schema() {
         return ClientRole.validate.schema
     },
@@ -376,6 +387,12 @@ export const ClientRole = {
         return ClientRole.validate.errors ?? undefined
     },
     is: (o: unknown): o is ClientRole => ClientRole.validate(o) === true,
+    parse: (o: unknown): { right: ClientRole } | { left: DefinedError[] } => {
+        if (ClientRole.is(o)) {
+            return { right: o }
+        }
+        return { left: (ClientRole.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -386,11 +403,11 @@ export interface ClientSearchCriteria {
      * The list of filtering criteria
      */
     filterCriteria: ClientFilterCriteria[]
-    sortingCriteria?: ClientSortingCriteria
+    sortingCriteria?: ClientSortingCriteria | undefined
 }
 
 export const ClientSearchCriteria = {
-    validate: (await import('./schemas/client-search-criteria.schema.js')).validate as ValidateFunction<ClientSearchCriteria>,
+    validate: ClientSearchCriteriaValidator as ValidateFunction<ClientSearchCriteria>,
     get schema() {
         return ClientSearchCriteria.validate.schema
     },
@@ -398,10 +415,11 @@ export const ClientSearchCriteria = {
         return ClientSearchCriteria.validate.errors ?? undefined
     },
     is: (o: unknown): o is ClientSearchCriteria => ClientSearchCriteria.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ClientSearchCriteria.validate(o)) {
-            throw new ValidationError(ClientSearchCriteria.errors ?? [])
+    parse: (o: unknown): { right: ClientSearchCriteria } | { left: DefinedError[] } => {
+        if (ClientSearchCriteria.is(o)) {
+            return { right: o }
         }
+        return { left: (ClientSearchCriteria.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -438,7 +456,7 @@ export interface ClientSortingCriteria {
     /**
      * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
      */
-    order?: 'ASC' | 'DESC'
+    order?: 'ASC' | 'DESC' | undefined
 }
 
 /**
@@ -452,28 +470,28 @@ export interface CreditArrangement {
     /**
      * The date when the credit arrangement was approved.
      */
-    approvedDate?: string
+    approvedDate?: string | undefined
     /**
      * The available amount of the credit arrangement.
      */
-    availableCreditAmount?: number
+    availableCreditAmount?: number | undefined
     /**
      * The date when the credit arrangement was closed.
      */
-    closedDate?: string
+    closedDate?: string | undefined
     /**
      * The consumed amount of the credit arrangement, which is calculated as the difference between the amount and available amount.
      */
-    consumedCreditAmount?: number
+    consumedCreditAmount?: number | undefined
     /**
      * The date when the credit arrangement was created.
      */
-    creationDate?: string
-    currency?: Currency
+    creationDate?: string | undefined
+    currency?: Currency | undefined
     /**
      * The encoded key of the credit arrangement, it is auto generated, and unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The date when the credit arrangement expires.
      */
@@ -481,11 +499,11 @@ export interface CreditArrangement {
     /**
      * The type of exposure limit calculation method used for the credit arrangement.
      */
-    exposureLimitType?: 'APPROVED_AMOUNT' | 'OUTSTANDING_AMOUNT'
+    exposureLimitType?: 'APPROVED_AMOUNT' | 'OUTSTANDING_AMOUNT' | undefined
     /**
      * The encoded key of the credit arrangement holder (individual client or group).
      */
-    holderKey?: string
+    holderKey?: string | undefined
     /**
      * The type of the credit arrangement holder (individual client or group).
      */
@@ -493,15 +511,15 @@ export interface CreditArrangement {
     /**
      * The ID of credit arrangement, can be generated and customized, and must be unique.
      */
-    id?: string
+    id?: string | undefined
     /**
      * The last date when the credit arrangement was modified.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The notes or description of the credit arrangement.
      */
-    notes?: string
+    notes?: string | undefined
     /**
      * The start date from which the credit arrangement became active.
      */
@@ -509,11 +527,11 @@ export interface CreditArrangement {
     /**
      * The state of the credit arrangement.
      */
-    state?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
+    state?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED' | undefined
     /**
      * The substate of credit arrangement.
      */
-    subState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED'
+    subState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED' | undefined
 }
 
 /**
@@ -707,15 +725,17 @@ export interface Currency {
         | 'XXX'
         | 'YER'
         | 'ZAR'
+        | 'ZIG'
         | 'ZMK'
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+        | undefined
     /**
      * Currency code for NON_FIAT currency.
      */
-    currencyCode?: string
+    currencyCode?: string | undefined
 }
 
 /**
@@ -725,19 +745,19 @@ export interface Document {
     /**
      * The creation date of the document, stored as UTC
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The document encodedKey
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The original file name of the document
      */
-    fileName?: string
+    fileName?: string | undefined
     /**
      * The file size of the document
      */
-    fileSize?: number
+    fileSize?: number | undefined
     /**
      * The document id
      */
@@ -745,11 +765,11 @@ export interface Document {
     /**
      * The last modified date of the document, stored as UTC
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * Location where the document can be found, eg /myfiles/mypicture.jpeg
      */
-    location?: string
+    location?: string | undefined
     /**
      * The name of the document
      */
@@ -757,11 +777,11 @@ export interface Document {
     /**
      * Detailed notes about the document
      */
-    notes?: string
+    notes?: string | undefined
     /**
      * Represents the holder of this document. If null, means nobody is the owner of this document
      */
-    ownerKey?: string
+    ownerKey?: string | undefined
     /**
      * Determines the owner type of the document
      */
@@ -778,6 +798,7 @@ export interface Document {
         | 'ID_DOCUMENT'
         | 'LINE_OF_CREDIT'
         | 'GL_JOURNAL_ENTRY'
+        | undefined
     /**
      * The extension of the document
      */
@@ -785,11 +806,11 @@ export interface Document {
 }
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -797,17 +818,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetAllResponse = Client[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -815,13 +837,19 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export type GetCreditArrangementsByClientIdOrKeyResponse = CreditArrangement[]
 
 export const GetCreditArrangementsByClientIdOrKeyResponse = {
-    validate: (await import('./schemas/get-credit-arrangements-by-client-id-or-key-response.schema.js'))
-        .validate as ValidateFunction<GetCreditArrangementsByClientIdOrKeyResponse>,
+    validate:
+        GetCreditArrangementsByClientIdOrKeyResponseValidator as ValidateFunction<GetCreditArrangementsByClientIdOrKeyResponse>,
     get schema() {
         return GetCreditArrangementsByClientIdOrKeyResponse.validate.schema
     },
@@ -830,6 +858,12 @@ export const GetCreditArrangementsByClientIdOrKeyResponse = {
     },
     is: (o: unknown): o is GetCreditArrangementsByClientIdOrKeyResponse =>
         GetCreditArrangementsByClientIdOrKeyResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetCreditArrangementsByClientIdOrKeyResponse } | { left: DefinedError[] } => {
+        if (GetCreditArrangementsByClientIdOrKeyResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetCreditArrangementsByClientIdOrKeyResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -839,11 +873,11 @@ export interface IdentificationDocument {
     /**
      * A list containing information about the attached files for this document
      */
-    attachments?: Document[]
+    attachments?: Document[] | undefined
     /**
      * The encoded key of the client that owns this document
      */
-    clientKey?: string
+    clientKey?: string | undefined
     /**
      * The id of the document
      */
@@ -855,23 +889,23 @@ export interface IdentificationDocument {
     /**
      * The encoded key of the document, generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * Encoded key of the template used for this document
      */
-    identificationDocumentTemplateKey?: string
+    identificationDocumentTemplateKey?: string | undefined
     /**
      * This document's index in the list of documents
      */
-    indexInList?: number
+    indexInList?: number | undefined
     /**
      * Authority that issued the document, eg. Police
      */
-    issuingAuthority?: string
+    issuingAuthority?: string | undefined
     /**
      * Date when the validity of the document ends
      */
-    validUntil?: string
+    validUntil?: string | undefined
 }
 
 /**
@@ -881,7 +915,7 @@ export interface PatchOperation {
     /**
      * The field from where a value should be moved, when using move
      */
-    from?: string
+    from?: string | undefined
     /**
      * The change to perform
      */
@@ -893,15 +927,13 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: {
-        [k: string]: unknown | undefined
-    }
+    value?: unknown
 }
 
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
+    validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -909,10 +941,11 @@ export const PatchRequest = {
         return PatchRequest.validate.errors ?? undefined
     },
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
+    parse: (o: unknown): { right: PatchRequest } | { left: DefinedError[] } => {
+        if (PatchRequest.is(o)) {
+            return { right: o }
         }
+        return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -923,27 +956,27 @@ export interface PortalSettings {
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The last date the client logged in to the portal.
      */
-    lastLoggedInDate?: string
+    lastLoggedInDate?: string | undefined
     /**
      * The state of the client's portal preferences.
      */
-    portalState?: 'ENABLED' | 'DISABLED'
+    portalState?: 'ENABLED' | 'DISABLED' | undefined
 }
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
 
 export type SearchResponse = Client[]
 
 export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
+    validate: SearchResponseValidator as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -951,4 +984,10 @@ export const SearchResponse = {
         return SearchResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
+    parse: (o: unknown): { right: SearchResponse } | { left: DefinedError[] } => {
+        if (SearchResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (SearchResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
