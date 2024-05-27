@@ -130,6 +130,7 @@ export interface CommunicationMessage {
         | 'HTTP_ERROR_WHILE_SENDING'
         | 'INVALID_JSON_BODY_SYNTAX'
         | 'MISSING_TEMPLATE_KEY'
+        | 'MAX_MESSAGE_SIZE_LIMIT_EXCEEDED'
         | 'UNDEFINED_DESTINATION'
         | 'INVALID_HTTP_PROTOCOL'
         | 'BLACKLISTED_URL'
@@ -346,6 +347,49 @@ export interface CommunicationMessageFilterCriteria {
     values?: string[]
 }
 
+/**
+ * The sorting criteria used for Messages search.
+ */
+export interface CommunicationMessageSearchSortingCriteria {
+    /**
+     * Sort Messages By
+     */
+    field: 'encodedKey' | 'creationDate' | 'sendDate' | 'senderKey' | 'clientKey' | 'groupKey' | 'userKey' | 'type'
+    /**
+     * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
+     */
+    order?: 'ASC' | 'DESC'
+}
+
+/**
+ * The unit that composes the body used used for communication messages client directed searching.
+ */
+export interface CommunicationMessagesSearchSortCriteria {
+    /**
+     * The list of filtering criteria.
+     */
+    filterCriteria: CommunicationMessageFilterCriteria[]
+    sortingCriteria: CommunicationMessageSearchSortingCriteria
+}
+
+export const CommunicationMessagesSearchSortCriteria = {
+    validate: (await import('./schemas/communication-messages-search-sort-criteria.schema.js'))
+        .validate as ValidateFunction<CommunicationMessagesSearchSortCriteria>,
+    get schema() {
+        return CommunicationMessagesSearchSortCriteria.validate.schema
+    },
+    get errors() {
+        return CommunicationMessagesSearchSortCriteria.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CommunicationMessagesSearchSortCriteria =>
+        CommunicationMessagesSearchSortCriteria.validate(o) === true,
+    assert: (o: unknown) => {
+        if (!CommunicationMessagesSearchSortCriteria.validate(o)) {
+            throw new ValidationError(CommunicationMessagesSearchSortCriteria.errors ?? [])
+        }
+    },
+} as const
+
 export interface ErrorResponse {
     errors?: RestError[]
 }
@@ -371,6 +415,19 @@ export interface RestError {
     errorReason?: string
     errorSource?: string
 }
+
+export type Search1Response = CommunicationMessage[]
+
+export const Search1Response = {
+    validate: (await import('./schemas/search1-response.schema.js')).validate as ValidateFunction<Search1Response>,
+    get schema() {
+        return Search1Response.validate.schema
+    },
+    get errors() {
+        return Search1Response.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Search1Response => Search1Response.validate(o) === true,
+} as const
 
 export type SearchRequest = CommunicationMessageFilterCriteria[]
 

@@ -1012,6 +1012,20 @@ export interface CustomPredefinedFee {
 }
 
 /**
+ * Enumeration for days of month and method of handling shorter months.
+ */
+export interface DaysInMonth {
+    /**
+     * Specifies the day(s) of the month when the interest application dates should be. Only available if the Interest Application Method is InterestApplicationMethodDTO#FIXED_DAYS_OF_MONTH. Currently only 1 value can be specified.
+     */
+    daysInMonth?: number[]
+    /**
+     * Determines how to handle the short months, if they select a fixed day of month > 28. Will be null if no such date is selected. Only available if the Interest Application Method is InterestApplicationMethodDTO#FIXED_DAYS_OF_MONTH.
+     */
+    shortMonthHandlingMethod?: 'LAST_DAY_IN_MONTH' | 'FIRST_DAY_OF_NEXT_MONTH'
+}
+
+/**
  * The the disbursement details it holds the information related to the disbursement details as disbursement date, first repayment date, disbursement fees.
  */
 export interface DisbursementDetails {
@@ -1248,6 +1262,10 @@ export interface GetAuthorizationHold {
      */
     originalCurrency?: string
     /**
+     * Indicates whether the authorization is partial or not
+     */
+    partial?: boolean
+    /**
      * The date to consider as start date when calculating the number of days passed until expiration
      */
     referenceDateForExpiration?: string
@@ -1335,12 +1353,20 @@ export interface Installment {
      * The encoded key of the installment, which is auto generated, and unique.
      */
     encodedKey?: string
+    /**
+     * The expected closing balance is the remaining amount per installment only applicable for interest only equal installment products.
+     */
+    expectedClosingBalance?: number
     fee?: InstallmentFee
     /**
      * The breakdown of the fee amounts that have been applied to the loan account.
      */
     feeDetails?: InstallmentFeeDetails[]
     interest?: InstallmentAllocationElementTaxableAmount
+    /**
+     * The interest accrued calculated on previous repayment closing balance only applicable interest only equal installment products.
+     */
+    interestAccrued?: number
     /**
      * `TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.
      */
@@ -1413,6 +1439,20 @@ export interface InstallmentFeeDetails {
 }
 
 /**
+ * Represents interest rate change threshold settings for loan accounts and loan products.
+ */
+export interface InterestRateChangePMTAdjustmentThreshold {
+    /**
+     * The method used to calculate the interest rate change threshold. Supported value is CALENDAR_DAYS
+     */
+    method?: 'WORKING_DAYS' | 'CALENDAR_DAYS'
+    /**
+     * The number of days that trigger an interest rate change.
+     */
+    numberOfDays?: number
+}
+
+/**
  * The interest settings, holds all the properties regarding interests for the loan account.
  */
 export interface InterestSettings {
@@ -1428,10 +1468,11 @@ export interface InterestSettings {
      * Indicates whether late interest is accrued for this loan account
      */
     accrueLateInterest?: boolean
+    interestApplicationDays?: DaysInMonth
     /**
      * The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.
      */
-    interestApplicationMethod?: 'AFTER_DISBURSEMENT' | 'REPAYMENT_DUE_DATE'
+    interestApplicationMethod?: 'AFTER_DISBURSEMENT' | 'REPAYMENT_DUE_DATE' | 'FIXED_DAYS_OF_MONTH'
     /**
      * The interest balance calculation method. Represents the option which determines the way the balance for the account's interest is computed.
      */
@@ -1439,7 +1480,7 @@ export interface InterestSettings {
     /**
      * The interest calculation method. Holds the type of interest calculation method.
      */
-    interestCalculationMethod?: 'FLAT' | 'DECLINING_BALANCE' | 'DECLINING_BALANCE_DISCOUNTED'
+    interestCalculationMethod?: 'FLAT' | 'DECLINING_BALANCE' | 'DECLINING_BALANCE_DISCOUNTED' | 'EQUAL_INSTALLMENTS'
     /**
      * The interest change frequency. Holds the possible values for how often is interest charged on loan or deposit accounts
      */
@@ -1448,6 +1489,7 @@ export interface InterestSettings {
      * The interest rate. Represents the interest rate for the loan account. The interest on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.
      */
     interestRate?: number
+    interestRateChangePMTAdjustmentThreshold?: InterestRateChangePMTAdjustmentThreshold
     /**
      * Interest rate update frequency unit count.
      */
@@ -2620,6 +2662,11 @@ export interface PrepaymentSettings {
      * The elements recalculation method, indicates how the declining balance with equal installments repayments are recalculated.
      */
     elementsRecalculationMethod?: 'PRINCIPAL_EXPECTED_FIXED' | 'TOTAL_EXPECTED_FIXED'
+    ercFreeAllowanceAmount?: number
+    /**
+     * Early repayment charge fee free allowance in percentage per year
+     */
+    ercFreeAllowancePercentage?: number
     /**
      * Prepayment recalculation method copied from the loan product on which this account is based.
      */
@@ -3099,6 +3146,10 @@ export interface RestructureScheduleSettings {
      */
     gracePeriod?: number
     /**
+     * A list of periodic payments for the current loan account.
+     */
+    paymentPlan?: PeriodicPayment[]
+    /**
      * The periodic payment
      */
     periodicPayment?: number
@@ -3131,6 +3182,10 @@ export interface RevolvingAccountSettings {
  * The schedule settings, holds all schedule properties.
  */
 export interface ScheduleSettings {
+    /**
+     * The PMT is calculated as the loan would have [amortizationPeriod] installments.
+     */
+    amortizationPeriod?: number
     billingCycle?: BillingCycleDays
     /**
      * The default first repayment due date offset, indicates how many days the first repayment due date should be extended(all other due dates from the schedule are relative to first repayment due date - they will also be affected by the offset)

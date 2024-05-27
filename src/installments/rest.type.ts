@@ -113,12 +113,20 @@ export interface Installment {
      * The encoded key of the installment, which is auto generated, and unique.
      */
     encodedKey?: string
+    /**
+     * The expected closing balance is the remaining amount per installment only applicable for interest only equal installment products.
+     */
+    expectedClosingBalance?: number
     fee?: InstallmentFee
     /**
      * The breakdown of the fee amounts that have been applied to the loan account.
      */
     feeDetails?: InstallmentFeeDetails[]
     interest?: InstallmentAllocationElementTaxableAmount
+    /**
+     * The interest accrued calculated on previous repayment closing balance only applicable interest only equal installment products.
+     */
+    interestAccrued?: number
     /**
      * `TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.
      */

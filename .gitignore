@@ -6,6 +6,7 @@ yalc.lock
 !.github
 !.vscode
 !.npmrc
+!.husky
 
 !.gitignore
 !.gitkeep
