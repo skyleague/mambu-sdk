@@ -3,8 +3,11 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as BulkProcessStatusValidator } from './schemas/bulk-process-status.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
 
 /**
  * Holds information about the error encountered processing an item in bulk
@@ -13,23 +16,23 @@ export interface BulkProcessingError {
     /**
      * Numeric value associated to the error reason
      */
-    errorCode?: number
+    errorCode?: number | undefined
     /**
      * Error reason
      */
-    errorReason?: string
+    errorReason?: string | undefined
     /**
      * Details about the error
      */
-    errorSource?: string
+    errorSource?: string | undefined
     /**
      * Optional field populated only when request payload contains an externalId
      */
-    externalId?: string
+    externalId?: string | undefined
     /**
      * The index of the entity/item from bulk request that failed on processing
      */
-    indexInRequest?: number
+    indexInRequest?: number | undefined
 }
 
 /**
@@ -39,15 +42,15 @@ export interface BulkProcessingSuccess {
     /**
      * Optional field populated only when request payload contains an externalId
      */
-    externalId?: string
+    externalId?: string | undefined
     /**
      * Unique identifier for the newly created resource
      */
-    id?: string
+    id?: string | undefined
     /**
      * The index of the entity/item from bulk request that failed on processing
      */
-    indexInRequest?: number
+    indexInRequest?: number | undefined
 }
 
 /**
@@ -57,11 +60,11 @@ export interface BulkProcessStatus {
     /**
      * List of errors
      */
-    errors?: BulkProcessingError[]
+    errors?: BulkProcessingError[] | undefined
     /**
      * List of successful processed items
      */
-    processedItems?: BulkProcessingSuccess[]
+    processedItems?: BulkProcessingSuccess[] | undefined
     /**
      * Bulk process status
      */
@@ -77,10 +80,11 @@ export interface BulkProcessStatus {
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
         | 'RECOVERABLE_ERROR'
+        | undefined
 }
 
 export const BulkProcessStatus = {
-    validate: (await import('./schemas/bulk-process-status.schema.js')).validate as ValidateFunction<BulkProcessStatus>,
+    validate: BulkProcessStatusValidator as ValidateFunction<BulkProcessStatus>,
     get schema() {
         return BulkProcessStatus.validate.schema
     },
@@ -88,14 +92,20 @@ export const BulkProcessStatus = {
         return BulkProcessStatus.validate.errors ?? undefined
     },
     is: (o: unknown): o is BulkProcessStatus => BulkProcessStatus.validate(o) === true,
+    parse: (o: unknown): { right: BulkProcessStatus } | { left: DefinedError[] } => {
+        if (BulkProcessStatus.is(o)) {
+            return { right: o }
+        }
+        return { left: (BulkProcessStatus.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -103,15 +113,16 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

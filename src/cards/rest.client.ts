@@ -3,10 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import got from 'got'
+
+import type { IncomingHttpHeaders } from 'node:http'
+
+import type { DefinedError } from 'ajv'
+import { got } from 'got'
 import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
-import type { ValidateFunction, ErrorObject } from 'ajv'
-import type { IncomingHttpHeaders } from 'http'
+
 import {
     AccountBalances,
     AuthorizationHold,
@@ -57,7 +60,7 @@ export class MambuCards {
     /**
      * Create an authorization hold corresponding to a given card.
      */
-    public async createAuthorizationHold({
+    public createAuthorizationHold({
         body,
         path,
         headers,
@@ -65,10 +68,29 @@ export class MambuCards {
     }: {
         body: AuthorizationHold
         path: { cardReferenceToken: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(AuthorizationHold, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'201', AuthorizationHold>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'409', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(AuthorizationHold, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`cards/${path.cardReferenceToken}/authorizationholds`, {
@@ -77,21 +99,21 @@ export class MambuCards {
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
                 201: AuthorizationHold,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
                 409: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['createAuthorizationHold']>
     }
 
     /**
      * Create a financial transaction corresponding to a given card
      */
-    public async createCardTransaction({
+    public createCardTransaction({
         body,
         path,
         headers,
@@ -99,10 +121,29 @@ export class MambuCards {
     }: {
         body: CardTransactionInput
         path: { cardReferenceToken: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(CardTransactionInput, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'201', CardTransactionOutput>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'409', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(CardTransactionInput, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`cards/${path.cardReferenceToken}/financialtransactions`, {
@@ -111,21 +152,21 @@ export class MambuCards {
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
                 201: CardTransactionOutput,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
                 409: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['createCardTransaction']>
     }
 
     /**
      * Decreases the amount of an authorization hold. If the amount is greater or equal to the authorization hold amount, then the authorization hold is reversed.
      */
-    public async decreaseAuthorizationHold({
+    public decreaseAuthorizationHold({
         body,
         path,
         headers,
@@ -133,42 +174,70 @@ export class MambuCards {
     }: {
         body: AuthorizationHoldAmountAdjustmentRequest
         path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(AuthorizationHoldAmountAdjustmentRequest, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'409', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(AuthorizationHoldAmountAdjustmentRequest, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(
                 `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}:decrease`,
                 {
                     json: body,
-                    headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                    responseType: 'json',
-                }
+                    headers: headers ?? {},
+                    responseType: 'text',
+                },
             ),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
                 409: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['decreaseAuthorizationHold']>
     }
 
     /**
      * Get account balances using card tokens
      */
-    public async getAccountBalances({
+    public getAccountBalances({
         path,
         auth = [['apiKey'], ['basic']],
-    }: {
-        path: { cardReferenceToken: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { path: { cardReferenceToken: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'200', AccountBalances>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).get(`cards/${path.cardReferenceToken}/balanceInquiry`, {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
@@ -179,27 +248,40 @@ export class MambuCards {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['getAccountBalances']>
     }
 
     /**
      * Get card authorization hold
      */
-    public async getAuthorizationHoldById({
+    public getAuthorizationHoldById({
         path,
         auth = [['apiKey'], ['basic']],
     }: {
         path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
         auth?: string[][] | string[]
-    }) {
+    }): Promise<
+        | SuccessResponse<'200', GetAuthorizationHold>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).get(
                 `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}`,
                 {
                     headers: { Accept: 'application/vnd.mambu.v2+json' },
                     responseType: 'json',
-                }
+                },
             ),
             {
                 200: GetAuthorizationHold,
@@ -207,14 +289,14 @@ export class MambuCards {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['getAuthorizationHoldById']>
     }
 
     /**
      * Get card transaction
      */
-    public async getCardTransaction({
+    public getCardTransaction({
         path,
         query,
         auth = [['apiKey'], ['basic']],
@@ -222,7 +304,20 @@ export class MambuCards {
         path: { cardReferenceToken: string; cardTransactionExternalReferenceId: string }
         query?: { detailsLevel?: string }
         auth?: string[][] | string[]
-    }) {
+    }): Promise<
+        | SuccessResponse<'200', GetCardTransaction>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).get(
                 `cards/${path.cardReferenceToken}/financialtransactions/${path.cardTransactionExternalReferenceId}`,
@@ -230,7 +325,7 @@ export class MambuCards {
                     searchParams: query ?? {},
                     headers: { Accept: 'application/vnd.mambu.v2+json' },
                     responseType: 'json',
-                }
+                },
             ),
             {
                 200: GetCardTransaction,
@@ -238,14 +333,14 @@ export class MambuCards {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['getCardTransaction']>
     }
 
     /**
      * Increase authorization hold amount
      */
-    public async increaseAuthorizationHold({
+    public increaseAuthorizationHold({
         body,
         path,
         headers,
@@ -253,36 +348,55 @@ export class MambuCards {
     }: {
         body: AuthorizationHoldAmountAdjustmentRequest
         path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(AuthorizationHoldAmountAdjustmentRequest, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'409', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(AuthorizationHoldAmountAdjustmentRequest, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(
                 `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}:increase`,
                 {
                     json: body,
-                    headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                    responseType: 'json',
-                }
+                    headers: headers ?? {},
+                    responseType: 'text',
+                },
             ),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
                 409: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['increaseAuthorizationHold']>
     }
 
     /**
      * Partially update an authorization hold
      */
-    public async patchAuthorizationHold({
+    public patchAuthorizationHold({
         body,
         path,
         headers,
@@ -290,64 +404,95 @@ export class MambuCards {
     }: {
         body: PatchAuthorizationHoldRequest
         path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PatchAuthorizationHoldRequest, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(PatchAuthorizationHoldRequest, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).patch(
                 `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}`,
                 {
                     json: body,
-                    headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                    responseType: 'json',
-                }
+                    headers: headers ?? {},
+                    responseType: 'text',
+                },
             ),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['patchAuthorizationHold']>
     }
 
     /**
      * Reverse a card authorization hold.
      */
-    public async reverseAuthorizationHold({
+    public reverseAuthorizationHold({
         path,
         auth = [['apiKey'], ['basic']],
     }: {
         path: { cardReferenceToken: string; authorizationHoldExternalReferenceId: string }
         auth?: string[][] | string[]
-    }) {
+    }): Promise<
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'409', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404' | '409'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).delete(
                 `cards/${path.cardReferenceToken}/authorizationholds/${path.authorizationHoldExternalReferenceId}`,
                 {
-                    headers: { Accept: 'application/vnd.mambu.v2+json' },
-                    responseType: 'json',
-                }
+                    responseType: 'text',
+                },
             ),
             {
-                204: { is: (_x: unknown): _x is unknown => true },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
                 409: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['reverseAuthorizationHold']>
     }
 
     /**
      * Reverse card transaction
      */
-    public async reverseCardTransaction({
+    public reverseCardTransaction({
         body,
         path,
         headers,
@@ -355,67 +500,107 @@ export class MambuCards {
     }: {
         body: CardTransactionReversal
         path: { cardReferenceToken: string; cardTransactionExternalReferenceId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(CardTransactionReversal, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'409', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(CardTransactionReversal, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(
                 `cards/${path.cardReferenceToken}/financialtransactions/${path.cardTransactionExternalReferenceId}:decrease`,
                 {
                     json: body,
-                    headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                    responseType: 'json',
-                }
+                    headers: headers ?? {},
+                    responseType: 'text',
+                },
             ),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
                 409: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['reverseCardTransaction']>
     }
 
-    public validateRequestBody<T>(schema: { is: (o: unknown) => o is T; assert: (o: unknown) => void }, body: T) {
-        schema.assert(body)
-        return body
+    public validateRequestBody<Parser extends { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } }, Body>(
+        parser: Parser,
+        body: unknown,
+    ) {
+        const _body = parser.parse(body)
+        if ('left' in _body) {
+            return {
+                statusCode: undefined,
+                status: undefined,
+                headers: undefined,
+                left: body,
+                validationErrors: _body.left,
+                where: 'request:body',
+            } satisfies FailureResponse<undefined, unknown, 'request:body', undefined>
+        }
+        return _body
     }
 
     public async awaitResponse<
-        T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
-    >(response: CancelableRequest<Response<unknown>>, schemas: S) {
-        type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
-            ? `${S}` extends `${T}${infer _X}`
-                ? S
-                : never
-            : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
+        I,
+        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } } | undefined>,
+    >(response: CancelableRequest<Response<I>>, schemas: S) {
         const result = await response
+        const status =
+            result.statusCode < 200
+                ? 'informational'
+                : result.statusCode < 300
+                  ? 'success'
+                  : result.statusCode < 400
+                    ? 'redirection'
+                    : result.statusCode < 500
+                      ? 'client-error'
+                      : 'server-error'
         const validator = schemas[result.statusCode] ?? schemas.default
-        if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {
+        const body = validator?.parse?.(result.body)
+        if (result.statusCode < 200 || result.statusCode >= 300) {
             return {
-                statusCode: result.statusCode,
+                statusCode: result.statusCode.toString(),
+                status,
                 headers: result.headers,
-                left: result.body,
-                validationErrors: validator?.validate?.errors ?? undefined,
-            } as {
-                statusCode: number
-                headers: IncomingHttpHeaders
-                left: InferSchemaType<S[keyof S]>
-                validationErrors?: ErrorObject[]
+                left: body !== undefined && 'right' in body ? body.right : result.body,
+                validationErrors: body !== undefined && 'left' in body ? body.left : undefined,
+                where: 'response:statuscode',
             }
         }
-        return { statusCode: result.statusCode, headers: result.headers, right: result.body } as {
-            statusCode: number
-            headers: IncomingHttpHeaders
-            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2' | 'default'>>]>
+        if (body === undefined || 'left' in body) {
+            return {
+                statusCode: result.statusCode.toString(),
+                status,
+                headers: result.headers,
+                left: result.body,
+                validationErrors: body?.left,
+                where: 'response:body',
+            }
         }
+        return { statusCode: result.statusCode.toString(), status, headers: result.headers, right: result.body }
     }
 
     protected buildBasicClient(client: Got) {
@@ -442,24 +627,52 @@ export class MambuCards {
                     async (options) => {
                         const apiKey = this.auth.apiKey
                         const key = typeof apiKey === 'function' ? await apiKey() : apiKey
-                        options.headers['apiKey'] = key
+                        options.headers.apiKey = key
                     },
                 ],
             },
         })
     }
 
-    protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
+    protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client?: Got): Got {
         const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
+        let chosenClient = client ?? this.client
         for (const chosen of auth[0] ?? []) {
             if (chosen === 'basic') {
-                client = this.buildBasicClient(client)
+                chosenClient = this.buildBasicClient(chosenClient)
             } else if (chosen === 'apiKey') {
-                client = this.buildApiKeyClient(client)
+                chosenClient = this.buildApiKeyClient(chosenClient)
             }
         }
-        return client
+        return chosenClient
     }
 }
+
+export type Status<Major> = Major extends string
+    ? Major extends `1${number}`
+        ? 'informational'
+        : Major extends `2${number}`
+          ? 'success'
+          : Major extends `3${number}`
+            ? 'redirection'
+            : Major extends `4${number}`
+              ? 'client-error'
+              : 'server-error'
+    : undefined
+export interface SuccessResponse<StatusCode extends string, T> {
+    statusCode: StatusCode
+    status: Status<StatusCode>
+    headers: IncomingHttpHeaders
+    right: T
+}
+export interface FailureResponse<StatusCode = string, T = unknown, Where = never, Headers = IncomingHttpHeaders> {
+    statusCode: StatusCode
+    status: Status<StatusCode>
+    headers: Headers
+    validationErrors: DefinedError[] | undefined
+    left: T
+    where: Where
+}
+export type StatusCode<Major extends number = 1 | 2 | 3 | 4 | 5> = `${Major}${number}`

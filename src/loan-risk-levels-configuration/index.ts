@@ -1,1 +1,1 @@
-export * from './rest.client.js'
+export { MambuLoanRiskLevelsConfiguration } from './rest.client.js'

@@ -3,8 +3,12 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as CommentValidator } from './schemas/comment.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetCommentsResponseValidator } from './schemas/get-comments-response.schema.js'
 
 /**
  * Represents information about the comment data transfer object.
@@ -13,19 +17,19 @@ export interface Comment {
     /**
      * The creation date of the comment.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The comments's encoded key, which is auto-generated and unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The last date when this comment was modified.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The encoded key of the entity that owns this comment.
      */
-    ownerKey?: string
+    ownerKey?: string | undefined
     /**
      * The type of the entity that owns this comment.
      */
@@ -42,18 +46,19 @@ export interface Comment {
         | 'ID_DOCUMENT'
         | 'LINE_OF_CREDIT'
         | 'GL_JOURNAL_ENTRY'
+        | undefined
     /**
      * The message in the comment.
      */
-    text?: string
+    text?: string | undefined
     /**
      * The user's key.
      */
-    userKey?: string
+    userKey?: string | undefined
 }
 
 export const Comment = {
-    validate: (await import('./schemas/comment.schema.js')).validate as ValidateFunction<Comment>,
+    validate: CommentValidator as ValidateFunction<Comment>,
     get schema() {
         return Comment.validate.schema
     },
@@ -61,19 +66,20 @@ export const Comment = {
         return Comment.validate.errors ?? undefined
     },
     is: (o: unknown): o is Comment => Comment.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Comment.validate(o)) {
-            throw new ValidationError(Comment.errors ?? [])
+    parse: (o: unknown): { right: Comment } | { left: DefinedError[] } => {
+        if (Comment.is(o)) {
+            return { right: o }
         }
+        return { left: (Comment.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -81,17 +87,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetCommentsResponse = Comment[]
 
 export const GetCommentsResponse = {
-    validate: (await import('./schemas/get-comments-response.schema.js')).validate as ValidateFunction<GetCommentsResponse>,
+    validate: GetCommentsResponseValidator as ValidateFunction<GetCommentsResponse>,
     get schema() {
         return GetCommentsResponse.validate.schema
     },
@@ -99,10 +106,16 @@ export const GetCommentsResponse = {
         return GetCommentsResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetCommentsResponse => GetCommentsResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetCommentsResponse } | { left: DefinedError[] } => {
+        if (GetCommentsResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetCommentsResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

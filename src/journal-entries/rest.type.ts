@@ -3,8 +3,15 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as CreateResponseValidator } from './schemas/create-response.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
+import { validate as GLJournalEntrySearchCriteriaValidator } from './schemas/gl-journal-entry-search-criteria.schema.js'
+import { validate as PostGLJournalEntriesDTOValidator } from './schemas/post-gl-journal-entries-dto.schema.js'
+import { validate as SearchResponseValidator } from './schemas/search-response.schema.js'
 
 /**
  * Represents the conversion rate used in accounting to convert amounts from one currency to organisation currency
@@ -13,33 +20,33 @@ export interface AccountingRate {
     /**
      * The encoded key of the accounting rate, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * Rate validity end date
      */
-    endDate?: string
+    endDate?: string | undefined
     /**
      * Organisation currency code
      */
-    fromCurrencyCode?: string
+    fromCurrencyCode?: string | undefined
     /**
      * Value of rate to be used for accounting conversions
      */
-    rate?: number
+    rate?: number | undefined
     /**
      * Rate validity start date
      */
-    startDate?: string
+    startDate?: string | undefined
     /**
      * Foreign currency code
      */
-    toCurrencyCode?: string
+    toCurrencyCode?: string | undefined
 }
 
 export type CreateResponse = GLJournalEntry[]
 
 export const CreateResponse = {
-    validate: (await import('./schemas/create-response.schema.js')).validate as ValidateFunction<CreateResponse>,
+    validate: CreateResponseValidator as ValidateFunction<CreateResponse>,
     get schema() {
         return CreateResponse.validate.schema
     },
@@ -47,6 +54,12 @@ export const CreateResponse = {
         return CreateResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is CreateResponse => CreateResponse.validate(o) === true,
+    parse: (o: unknown): { right: CreateResponse } | { left: DefinedError[] } => {
+        if (CreateResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (CreateResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -240,23 +253,25 @@ export interface Currency {
         | 'XXX'
         | 'YER'
         | 'ZAR'
+        | 'ZIG'
         | 'ZMK'
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+        | undefined
     /**
      * Currency code for NON_FIAT currency.
      */
-    currencyCode?: string
+    currencyCode?: string | undefined
 }
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -264,17 +279,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetAllResponse = GLJournalEntry[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -282,6 +298,12 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -291,56 +313,56 @@ export interface GLAccount {
     /**
      * `TRUE` if the account is activated and may be used, `FALSE` otherwise.
      */
-    activated?: boolean
+    activated?: boolean | undefined
     /**
      * `TRUE` if manual journal entries are allowed, `FALSE` otherwise.
      */
-    allowManualJournalEntries?: boolean
+    allowManualJournalEntries?: boolean | undefined
     /**
      * The balance of the general ledger account, which is only populated for the GET /glaccounts endpoint.
      */
-    balance?: number
+    balance?: number | undefined
     /**
      * The creation date for this account, which is stored as UTC.
      */
-    creationDate?: string
-    currency?: Currency
+    creationDate?: string | undefined
+    currency?: Currency | undefined
     /**
      * A description of the general ledger account.
      */
-    description?: string
+    description?: string | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The general ledger code used to identify different account types. Also used for grouping and categorizing accounts. For example: an account code of '3201' is considered a subtype of '3200'.
      */
-    glCode?: string
+    glCode?: string | undefined
     /**
      * The last modification date and time, which is stored as UTC.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The data migration event key if the general ledger account was created as a part of a data migration event.
      */
-    migrationEventKey?: string
+    migrationEventKey?: string | undefined
     /**
      * The name of the general ledger account.
      */
-    name?: string
+    name?: string | undefined
     /**
      * `TRUE` if trailing zeros are stripped, `FALSE` otherwise.
      */
-    stripTrailingZeros?: boolean
+    stripTrailingZeros?: boolean | undefined
     /**
      * The general ledger account type.
      */
-    type?: 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE'
+    type?: 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE' | undefined
     /**
      * The usage type of the general ledger account. `DETAIL` accounts are used to stores transaction balances. `HEADER` accounts are used to organise and group detail accounts for reporting purposes.
      */
-    usage?: 'DETAIL' | 'HEADER'
+    usage?: 'DETAIL' | 'HEADER' | undefined
 }
 
 /**
@@ -350,11 +372,11 @@ export interface GLAccountAmount {
     /**
      * The amount which was debited or credited.
      */
-    amount?: number
+    amount?: number | undefined
     /**
      * Represents the general ledger account code of the the general ledger account that was debited or credited.
      */
-    glAccount?: string
+    glAccount?: string | undefined
 }
 
 /**
@@ -364,61 +386,61 @@ export interface GLJournalEntry {
     /**
      * The account associated with this journal entry. `Null` if the journal entry is not associated to any account.
      */
-    accountKey?: string
+    accountKey?: string | undefined
     /**
      * The amount which was debited or credited in the organization's currency.
      */
-    amount?: number
+    amount?: number | undefined
     /**
      * The key of the assigned branch for this general ledger journal entry.
      */
-    assignedBranchKey?: string
+    assignedBranchKey?: string | undefined
     /**
      * The date and time when the general ledger journal entry was recorded.
      */
-    bookingDate?: string
+    bookingDate?: string | undefined
     /**
      * The creation date of the general ledger journal entry.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The ID of the general ledger journal entry.
      */
-    entryID?: number
-    foreignAmount?: GLJournalEntryForeignAmount
-    glAccount?: GLAccount
+    entryID?: number | undefined
+    foreignAmount?: GLJournalEntryForeignAmount | undefined
+    glAccount?: GLAccount | undefined
     /**
      * Optional notes entered by the user when they performed the journal entry.
      */
-    notes?: string
+    notes?: string | undefined
     /**
      * The product associated with this journal entry. `Null` if the journal entry is not associated with any product.
      */
-    productKey?: string
+    productKey?: string | undefined
     /**
      * The product type that is referenced by the account key. `Null` if the journal entry is not associated to any product.
      */
-    productType?: 'LOAN' | 'SAVINGS'
+    productType?: 'LOAN' | 'SAVINGS' | undefined
     /**
      * The entry key of the general ledger journal entry that reverses this general ledger journal entry. Null if the general ledger journal entry isn't reversed.
      */
-    reversalEntryKey?: string
+    reversalEntryKey?: string | undefined
     /**
      * The transation ID, which is not unique.
      */
-    transactionId?: string
+    transactionId?: string | undefined
     /**
      * The general ledger journal entry type, which may be debit or credit.
      */
-    type?: 'DEBIT' | 'CREDIT'
+    type?: 'DEBIT' | 'CREDIT' | undefined
     /**
      * The encoded key of the user that performed the transaction.
      */
-    userKey?: string
+    userKey?: string | undefined
 }
 
 /**
@@ -493,27 +515,27 @@ export interface GLJournalEntryFilterCriteria {
     /**
      * The second value to match the searching criteria, when the `BETWEEN` operator is used.
      */
-    secondValue?: string
+    secondValue?: string | undefined
     /**
      * The value to match the searching criteria.
      */
-    value?: string
+    value?: string | undefined
     /**
      * List of values when the `IN` operator is used.
      */
-    values?: string[]
+    values?: string[] | undefined
 }
 
 /**
  * Represents the details of the general ledger journal entry amount posted in foreign currency.
  */
 export interface GLJournalEntryForeignAmount {
-    accountingRate?: AccountingRate
+    accountingRate?: AccountingRate | undefined
     /**
      * The amount of an accounting entry in foreign currency.
      */
-    amount?: number
-    currency?: Currency
+    amount?: number | undefined
+    currency?: Currency | undefined
 }
 
 /**
@@ -523,13 +545,12 @@ export interface GLJournalEntrySearchCriteria {
     /**
      * The list of filtering criteria.
      */
-    filterCriteria?: GLJournalEntryFilterCriteria[]
-    sortingCriteria?: GLJournalEntrySortingCriteria
+    filterCriteria?: GLJournalEntryFilterCriteria[] | undefined
+    sortingCriteria?: GLJournalEntrySortingCriteria | undefined
 }
 
 export const GLJournalEntrySearchCriteria = {
-    validate: (await import('./schemas/gl-journal-entry-search-criteria.schema.js'))
-        .validate as ValidateFunction<GLJournalEntrySearchCriteria>,
+    validate: GLJournalEntrySearchCriteriaValidator as ValidateFunction<GLJournalEntrySearchCriteria>,
     get schema() {
         return GLJournalEntrySearchCriteria.validate.schema
     },
@@ -537,10 +558,11 @@ export const GLJournalEntrySearchCriteria = {
         return GLJournalEntrySearchCriteria.validate.errors ?? undefined
     },
     is: (o: unknown): o is GLJournalEntrySearchCriteria => GLJournalEntrySearchCriteria.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!GLJournalEntrySearchCriteria.validate(o)) {
-            throw new ValidationError(GLJournalEntrySearchCriteria.errors ?? [])
+    parse: (o: unknown): { right: GLJournalEntrySearchCriteria } | { left: DefinedError[] } => {
+        if (GLJournalEntrySearchCriteria.is(o)) {
+            return { right: o }
         }
+        return { left: (GLJournalEntrySearchCriteria.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -572,7 +594,7 @@ export interface GLJournalEntrySortingCriteria {
     /**
      * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
      */
-    order?: 'ASC' | 'DESC'
+    order?: 'ASC' | 'DESC' | undefined
 }
 
 /**
@@ -582,11 +604,11 @@ export interface PostGLJournalEntriesDTO {
     /**
      * The ID of the assigned branch for the journal entries.
      */
-    branchId?: string
+    branchId?: string | undefined
     /**
      * The list of general ledger accounts to be credited with corresponding amounts.
      */
-    credits?: GLAccountAmount[]
+    credits?: GLAccountAmount[] | undefined
     /**
      * The date and time when the general ledger journal entries were recorded, also known as the booking date.
      */
@@ -594,20 +616,19 @@ export interface PostGLJournalEntriesDTO {
     /**
      * The list of general ledger accounts to be debited with corresponding amounts.
      */
-    debits?: GLAccountAmount[]
+    debits?: GLAccountAmount[] | undefined
     /**
      * The notes entered when the journal entry was posted.
      */
-    notes?: string
+    notes?: string | undefined
     /**
      * A non-unique trasanction ID. This will be autogenerated if an ID is not provided.
      */
-    transactionId?: string
+    transactionId?: string | undefined
 }
 
 export const PostGLJournalEntriesDTO = {
-    validate: (await import('./schemas/post-gl-journal-entries-dto.schema.js'))
-        .validate as ValidateFunction<PostGLJournalEntriesDTO>,
+    validate: PostGLJournalEntriesDTOValidator as ValidateFunction<PostGLJournalEntriesDTO>,
     get schema() {
         return PostGLJournalEntriesDTO.validate.schema
     },
@@ -615,23 +636,24 @@ export const PostGLJournalEntriesDTO = {
         return PostGLJournalEntriesDTO.validate.errors ?? undefined
     },
     is: (o: unknown): o is PostGLJournalEntriesDTO => PostGLJournalEntriesDTO.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PostGLJournalEntriesDTO.validate(o)) {
-            throw new ValidationError(PostGLJournalEntriesDTO.errors ?? [])
+    parse: (o: unknown): { right: PostGLJournalEntriesDTO } | { left: DefinedError[] } => {
+        if (PostGLJournalEntriesDTO.is(o)) {
+            return { right: o }
         }
+        return { left: (PostGLJournalEntriesDTO.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
 
 export type SearchResponse = GLJournalEntry[]
 
 export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
+    validate: SearchResponseValidator as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -639,4 +661,10 @@ export const SearchResponse = {
         return SearchResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
+    parse: (o: unknown): { right: SearchResponse } | { left: DefinedError[] } => {
+        if (SearchResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (SearchResponse.errors ?? []) as DefinedError[] }
+    },
 } as const

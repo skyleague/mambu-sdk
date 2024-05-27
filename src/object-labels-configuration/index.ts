@@ -1,1 +1,1 @@
-export * from './rest.client.js'
+export { MambuObjectLabelsConfiguration } from './rest.client.js'

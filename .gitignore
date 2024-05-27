@@ -1,7 +1,6 @@
 .*
 __pycache__
 node_modules
-yalc.lock
 
 !.github
 !.vscode
@@ -10,6 +9,3 @@ yalc.lock
 
 !.gitignore
 !.gitkeep
-!.eslintrc.*
-!.prettierignore
-!.eslintignore

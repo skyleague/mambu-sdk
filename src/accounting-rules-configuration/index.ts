@@ -1,1 +1,1 @@
-export * from './rest.client.js'
+export { MambuAccountingRulesConfiguration } from './rest.client.js'

@@ -3,10 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import got from 'got'
+
+import type { IncomingHttpHeaders } from 'node:http'
+
+import type { DefinedError } from 'ajv'
+import { got } from 'got'
 import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
-import type { ValidateFunction, ErrorObject } from 'ajv'
-import type { IncomingHttpHeaders } from 'http'
+
 import {
     ApplyInterestInput,
     ApplyPlannedFeesResponse,
@@ -88,7 +91,7 @@ export class MambuLoanAccounts {
     /**
      * Apply accrued interest
      */
-    public async applyInterest({
+    public applyInterest({
         body,
         path,
         headers,
@@ -96,32 +99,50 @@ export class MambuLoanAccounts {
     }: {
         body: ApplyInterestInput
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ApplyInterestInput, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(ApplyInterestInput, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:applyInterest`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+                headers: headers ?? {},
+                responseType: 'text',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['applyInterest']>
     }
 
     /**
      * ApplY planned fees from the past installments, as backdated or from future installments, on the first pending installment
      */
-    public async applyPlannedFees({
+    public applyPlannedFees({
         body,
         path,
         headers,
@@ -129,10 +150,28 @@ export class MambuLoanAccounts {
     }: {
         body: PlannedFeeKeys
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PlannedFeeKeys, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'201', ApplyPlannedFeesResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(PlannedFeeKeys, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/plannedfees:apply`, {
@@ -141,20 +180,20 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
                 201: ApplyPlannedFeesResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['applyPlannedFees']>
     }
 
     /**
      * Change arrears settings for loan account
      */
-    public async changeArrearsSettings({
+    public changeArrearsSettings({
         body,
         path,
         headers,
@@ -162,32 +201,50 @@ export class MambuLoanAccounts {
     }: {
         body: ChangeArrearsSettingsInput
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ChangeArrearsSettingsInput, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(ChangeArrearsSettingsInput, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:changeArrearsSettings`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+                headers: headers ?? {},
+                responseType: 'text',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['changeArrearsSettings']>
     }
 
     /**
      * Change due dates settings for loan account
      */
-    public async changeDueDatesSettings({
+    public changeDueDatesSettings({
         body,
         path,
         headers,
@@ -195,32 +252,50 @@ export class MambuLoanAccounts {
     }: {
         body: ChangeDueDatesSettingsInput
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ChangeDueDatesSettingsInput, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(ChangeDueDatesSettingsInput, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:changeDueDatesSettings`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+                headers: headers ?? {},
+                responseType: 'text',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['changeDueDatesSettings']>
     }
 
     /**
      * Change loan account interest rate
      */
-    public async changeInterestRate({
+    public changeInterestRate({
         body,
         path,
         headers,
@@ -228,32 +303,50 @@ export class MambuLoanAccounts {
     }: {
         body: ChangeInterestRateLoanAccountInput
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ChangeInterestRateLoanAccountInput, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(ChangeInterestRateLoanAccountInput, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:changeInterestRate`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+                headers: headers ?? {},
+                responseType: 'text',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['changeInterestRate']>
     }
 
     /**
      * Change the periodic payment amount for an active loan, so that it is still possible to have principal and interest installments, but with a smaller or greater total due amount than the initial one.
      */
-    public async changePeriodicPayment({
+    public changePeriodicPayment({
         body,
         path,
         headers,
@@ -261,32 +354,50 @@ export class MambuLoanAccounts {
     }: {
         body: ChangePeriodicPaymentLoanAccountInput
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ChangePeriodicPaymentLoanAccountInput, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(ChangePeriodicPaymentLoanAccountInput, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:changePeriodicPayment`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+                headers: headers ?? {},
+                responseType: 'text',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['changePeriodicPayment']>
     }
 
     /**
      * Change repayment value for loan account
      */
-    public async changeRepaymentValue({
+    public changeRepaymentValue({
         body,
         path,
         headers,
@@ -294,32 +405,50 @@ export class MambuLoanAccounts {
     }: {
         body: ChangeRepaymentValueLoanAccountInput
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(ChangeRepaymentValueLoanAccountInput, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(ChangeRepaymentValueLoanAccountInput, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:changeRepaymentValue`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+                headers: headers ?? {},
+                responseType: 'text',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['changeRepaymentValue']>
     }
 
     /**
      * Change loan account state
      */
-    public async changeState({
+    public changeState({
         body,
         path,
         headers,
@@ -327,10 +456,28 @@ export class MambuLoanAccounts {
     }: {
         body: LoanAccountAction
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanAccountAction, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'200', LoanAccount>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(LoanAccountAction, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:changeState`, {
@@ -339,50 +486,63 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
                 200: LoanAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['changeState']>
     }
 
     /**
      * Create loan account
      */
-    public async create({
+    public create({
         body,
         headers,
         auth = [['apiKey'], ['basic']],
-    }: {
-        body: LoanAccount
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanAccount, body)
+    }: { body: LoanAccount; headers?: { 'Idempotency-Key'?: string }; auth?: string[][] | string[] }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'201', LoanAccount>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(LoanAccount, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans`, {
+            this.buildClient(auth).post('loans', {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
                 201: LoanAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['create']>
     }
 
     /**
      * Represents the information needed to create and associate a new card to an account.
      */
-    public async createCard({
+    public createCard({
         body,
         path,
         headers,
@@ -390,32 +550,50 @@ export class MambuLoanAccounts {
     }: {
         body: Card
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(Card, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'201', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(Card, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/cards`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+                headers: headers ?? {},
+                responseType: 'text',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                201: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                201: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['createCard']>
     }
 
     /**
      * Create funding sources for a loan account
      */
-    public async createLoanAccountFundingSources({
+    public createLoanAccountFundingSources({
         body,
         path,
         headers,
@@ -423,10 +601,28 @@ export class MambuLoanAccounts {
     }: {
         body: CreateLoanAccountFundingSourcesRequest
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(CreateLoanAccountFundingSourcesRequest, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'201', CreateLoanAccountFundingSourcesResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(CreateLoanAccountFundingSourcesRequest, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/funding`, {
@@ -435,20 +631,20 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
                 201: CreateLoanAccountFundingSourcesResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['createLoanAccountFundingSources']>
     }
 
     /**
      * Create planned fees
      */
-    public async createPlannedFees({
+    public createPlannedFees({
         body,
         path,
         headers,
@@ -456,10 +652,28 @@ export class MambuLoanAccounts {
     }: {
         body: CreatePlannedFeesRequest
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(CreatePlannedFeesRequest, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'201', CreatePlannedFeesResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(CreatePlannedFeesRequest, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/plannedfees`, {
@@ -468,145 +682,190 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
                 201: CreatePlannedFeesResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['createPlannedFees']>
     }
 
     /**
      * Delete loan account
      */
-    public async delete({
+    public delete({
         path,
         auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { path: { loanAccountId: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).delete(`loans/${path.loanAccountId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
+                responseType: 'text',
             }),
             {
-                204: { is: (_x: unknown): _x is unknown => true },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['delete']>
     }
 
     /**
      * Represents the information needed to delete a card associated to an account using its reference token.
      */
-    public async deleteCard({
+    public deleteCard({
         path,
         auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string; cardReferenceToken: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { path: { loanAccountId: string; cardReferenceToken: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).delete(`loans/${path.loanAccountId}/cards/${path.cardReferenceToken}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
+                responseType: 'text',
             }),
             {
-                204: { is: (_x: unknown): _x is unknown => true },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['deleteCard']>
     }
 
     /**
      * Delete loan account funding sources
      */
-    public async deleteFundingSources({
+    public deleteFundingSources({
         path,
         auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { path: { loanAccountId: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).delete(`loans/${path.loanAccountId}/funding`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
+                responseType: 'text',
             }),
             {
-                204: { is: (_x: unknown): _x is unknown => true },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['deleteFundingSources']>
     }
 
     /**
      * Delete planned fee
      */
-    public async deletePlannedFees({
+    public deletePlannedFees({
         path,
         auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string; plannedInstallmentFeeKey: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { path: { loanAccountId: string; plannedInstallmentFeeKey: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).delete(`loans/${path.loanAccountId}/plannedfees/${path.plannedInstallmentFeeKey}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
+                responseType: 'text',
             }),
             {
-                204: { is: (_x: unknown): _x is unknown => true },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['deletePlannedFees']>
     }
 
     /**
      * Delete loan account funding source
      */
-    public async deleteSingleFundingSource({
+    public deleteSingleFundingSource({
         path,
         auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string; fundEncodedKey: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { path: { loanAccountId: string; fundEncodedKey: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).delete(`loans/${path.loanAccountId}/funding/${path.fundEncodedKey}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
+                responseType: 'text',
             }),
             {
-                204: { is: (_x: unknown): _x is unknown => true },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['deleteSingleFundingSource']>
     }
 
     /**
      * Get loan accounts
      */
-    public async getAll({
+    public getAll({
         query,
         auth = [['apiKey'], ['basic']],
     }: {
@@ -624,9 +883,21 @@ export class MambuLoanAccounts {
             sortBy?: string
         }
         auth?: string[][] | string[]
-    } = {}) {
+    } = {}): Promise<
+        | SuccessResponse<'200', GetAllResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
-            this.buildClient(auth).get(`loans`, {
+            this.buildClient(auth).get('loans', {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
@@ -636,14 +907,14 @@ export class MambuLoanAccounts {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['getAll']>
     }
 
     /**
      * Get authorization holds related to a loan account, ordered from newest to oldest by creation date
      */
-    public async getAllAuthorizationHolds({
+    public getAllAuthorizationHolds({
         path,
         query,
         auth = [['apiKey'], ['basic']],
@@ -651,7 +922,20 @@ export class MambuLoanAccounts {
         path: { loanAccountId: string }
         query?: { offset?: string; limit?: string; paginationDetails?: string; status?: string }
         auth?: string[][] | string[]
-    }) {
+    }): Promise<
+        | SuccessResponse<'200', GetAllAuthorizationHoldsResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans/${path.loanAccountId}/authorizationholds`, {
                 searchParams: query ?? {},
@@ -664,20 +948,30 @@ export class MambuLoanAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['getAllAuthorizationHolds']>
     }
 
     /**
      * Get cards associated with an account
      */
-    public async getAllCards({
+    public getAllCards({
         path,
         auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { path: { loanAccountId: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'200', GetAllCardsResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans/${path.loanAccountId}/cards`, {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
@@ -689,20 +983,29 @@ export class MambuLoanAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['getAllCards']>
     }
 
     /**
      * Get planned fees
      */
-    public async getAllPlannedFees({
+    public getAllPlannedFees({
         path,
         auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { path: { loanAccountId: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'200', GetAllPlannedFeesResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans/${path.loanAccountId}/plannedfees`, {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
@@ -713,22 +1016,31 @@ export class MambuLoanAccounts {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['getAllPlannedFees']>
     }
 
     /**
      * Get loan account
      */
-    public async getById({
+    public getById({
         path,
         query,
         auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string }
-        query?: { detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { path: { loanAccountId: string }; query?: { detailsLevel?: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'200', LoanAccount>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans/${path.loanAccountId}`, {
                 searchParams: query ?? {},
@@ -741,14 +1053,14 @@ export class MambuLoanAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['getById']>
     }
 
     /**
      * Get loan account document
      */
-    public async getLoanAccountDocument({
+    public getLoanAccountDocument({
         path,
         query,
         auth = [['apiKey'], ['basic']],
@@ -756,7 +1068,20 @@ export class MambuLoanAccounts {
         path: { loanAccountId: string; templateId: string }
         query?: { startDate?: string; endDate?: string }
         auth?: string[][] | string[]
-    }) {
+    }): Promise<
+        | SuccessResponse<'200', GetLoanAccountDocumentResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans/${path.loanAccountId}/templates/${path.templateId}`, {
                 searchParams: query ?? {},
@@ -769,14 +1094,14 @@ export class MambuLoanAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['getLoanAccountDocument']>
     }
 
     /**
      * Download loan account document PDF
      */
-    public async getPdfDocument({
+    public getPdfDocument({
         path,
         query,
         auth = [['apiKey'], ['basic']],
@@ -784,35 +1109,62 @@ export class MambuLoanAccounts {
         path: { loanAccountId: string; templateId: string }
         query?: { startDate?: string; endDate?: string }
         auth?: string[][] | string[]
-    }) {
+    }): Promise<
+        | SuccessResponse<'200', unknown>
+        | FailureResponse<'400', unknown, 'response:statuscode'>
+        | FailureResponse<'401', unknown, 'response:statuscode'>
+        | FailureResponse<'403', unknown, 'response:statuscode'>
+        | FailureResponse<'404', unknown, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans/${path.loanAccountId}/templates/${path.templateId}/pdf`, {
                 searchParams: query ?? {},
+                responseType: 'text',
             }),
             {
-                200: { is: (_x: unknown): _x is string => true },
-                400: { is: (_x: unknown): _x is string => true },
-                401: { is: (_x: unknown): _x is string => true },
-                403: { is: (_x: unknown): _x is string => true },
-                404: { is: (_x: unknown): _x is string => true },
-            }
-        )
+                200: { parse: (x: unknown) => ({ right: x }) },
+                400: { parse: (x: unknown) => ({ right: x }) },
+                401: { parse: (x: unknown) => ({ right: x }) },
+                403: { parse: (x: unknown) => ({ right: x }) },
+                404: { parse: (x: unknown) => ({ right: x }) },
+            },
+        ) as ReturnType<this['getPdfDocument']>
     }
 
     /**
      * Preview loan account schedule for non-existent loan account
      */
-    public async getPreviewLoanAccountSchedule({
+    public getPreviewLoanAccountSchedule({
         body,
         auth = [['apiKey'], ['basic']],
-    }: {
-        body: PreviewLoanAccountSchedule
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PreviewLoanAccountSchedule, body)
+    }: { body: PreviewLoanAccountSchedule; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'200', LoanAccountSchedule>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(PreviewLoanAccountSchedule, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans:previewSchedule`, {
+            this.buildClient(auth).post('loans:previewSchedule', {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
@@ -822,22 +1174,31 @@ export class MambuLoanAccounts {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['getPreviewLoanAccountSchedule']>
     }
 
     /**
      * Get all versions of loan account
      */
-    public async getVersionsById({
+    public getVersionsById({
         path,
         query,
         auth = [['apiKey'], ['basic']],
-    }: {
-        path: { loanAccountId: string }
-        query?: { detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { path: { loanAccountId: string }; query?: { detailsLevel?: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'200', GetVersionsByIdResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).get(`loans/${path.loanAccountId}:versions`, {
                 searchParams: query ?? {},
@@ -850,44 +1211,56 @@ export class MambuLoanAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['getVersionsById']>
     }
 
     /**
      * Partially update loan account
      */
-    public async patch({
+    public patch({
         body,
         path,
         auth = [['apiKey'], ['basic']],
-    }: {
-        body: PatchRequest
-        path: { loanAccountId: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PatchRequest, body)
+    }: { body: PatchRequest; path: { loanAccountId: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(PatchRequest, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).patch(`loans/${path.loanAccountId}`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
+                responseType: 'text',
             }),
             {
-                204: { is: (_x: unknown): _x is unknown => true },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['patch']>
     }
 
     /**
      * Update loan account funding source
      */
-    public async patchFundingSource({
+    public patchFundingSource({
         body,
         path,
         auth = [['apiKey'], ['basic']],
@@ -895,29 +1268,45 @@ export class MambuLoanAccounts {
         body: PatchFundingSourceRequest
         path: { loanAccountId: string; fundEncodedKey: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PatchFundingSourceRequest, body)
+    }): Promise<
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(PatchFundingSourceRequest, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).patch(`loans/${path.loanAccountId}/funding/${path.fundEncodedKey}`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
+                responseType: 'text',
             }),
             {
-                204: { is: (_x: unknown): _x is unknown => true },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['patchFundingSource']>
     }
 
     /**
      * Pay off loan account
      */
-    public async payOff({
+    public payOff({
         body,
         path,
         headers,
@@ -925,32 +1314,50 @@ export class MambuLoanAccounts {
     }: {
         body: LoanAccountPayOffInput
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanAccountPayOffInput, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(LoanAccountPayOffInput, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:payOff`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+                headers: headers ?? {},
+                responseType: 'text',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['payOff']>
     }
 
     /**
      * Preview pay off due amounts in a future date
      */
-    public async previewPayOffAmounts({
+    public previewPayOffAmounts({
         body,
         path,
         headers,
@@ -958,10 +1365,28 @@ export class MambuLoanAccounts {
     }: {
         body: PreviewPayOffDueAmountsInAFutureDateInput
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PreviewPayOffDueAmountsInAFutureDateInput, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'200', PreviewPayOffDueAmountsInAFutureDateWrapper>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(PreviewPayOffDueAmountsInAFutureDateInput, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:previewPayOffAmounts`, {
@@ -970,50 +1395,63 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
                 200: PreviewPayOffDueAmountsInAFutureDateWrapper,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['previewPayOffAmounts']>
     }
 
     /**
      * Update collateral asset amounts
      */
-    public async reevaluateCollateralAssets({
+    public reevaluateCollateralAssets({
         body,
         headers,
         auth = [['apiKey'], ['basic']],
-    }: {
-        body: CollateralAssetFilter
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(CollateralAssetFilter, body)
+    }: { body: CollateralAssetFilter; headers?: { 'Idempotency-Key'?: string }; auth?: string[][] | string[] }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'202', CollateralAssetsReevaluationResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(CollateralAssetFilter, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans:reevaluateCollateral`, {
+            this.buildClient(auth).post('loans:reevaluateCollateral', {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
                 202: CollateralAssetsReevaluationResponse,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['reevaluateCollateralAssets']>
     }
 
     /**
      * Refinance loan account
      */
-    public async refinance({
+    public refinance({
         body,
         path,
         headers,
@@ -1021,10 +1459,28 @@ export class MambuLoanAccounts {
     }: {
         body: RefinanceLoanAccountAction
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(RefinanceLoanAccountAction, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'200', LoanAccount>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(RefinanceLoanAccountAction, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:refinance`, {
@@ -1033,20 +1489,20 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
                 200: LoanAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['refinance']>
     }
 
     /**
      * Reschedule loan account
      */
-    public async reschedule({
+    public reschedule({
         body,
         path,
         headers,
@@ -1054,10 +1510,28 @@ export class MambuLoanAccounts {
     }: {
         body: RescheduleLoanAccountAction
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(RescheduleLoanAccountAction, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'200', LoanAccount>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(RescheduleLoanAccountAction, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:reschedule`, {
@@ -1066,20 +1540,20 @@ export class MambuLoanAccounts {
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
                 200: LoanAccount,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['reschedule']>
     }
 
     /**
      * Search loan accounts
      */
-    public async search({
+    public search({
         body,
         query,
         auth = [['apiKey'], ['basic']],
@@ -1087,11 +1561,28 @@ export class MambuLoanAccounts {
         body: LoanAccountSearchCriteria
         query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanAccountSearchCriteria, body)
+    }): Promise<
+        | SuccessResponse<'200', SearchResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(LoanAccountSearchCriteria, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`loans:search`, {
+            this.buildClient(auth).post('loans:search', {
                 json: body,
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
@@ -1103,14 +1594,14 @@ export class MambuLoanAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['search']>
     }
 
     /**
      * Terminate loan account
      */
-    public async terminateLoanAccount({
+    public terminateLoanAccount({
         body,
         path,
         headers,
@@ -1118,32 +1609,50 @@ export class MambuLoanAccounts {
     }: {
         body: TerminateLoanAccountInput
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(TerminateLoanAccountInput, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(TerminateLoanAccountInput, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:terminate`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+                headers: headers ?? {},
+                responseType: 'text',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['terminateLoanAccount']>
     }
 
     /**
      * Undo loan account refinance action
      */
-    public async undoRefinance({
+    public undoRefinance({
         body,
         path,
         headers,
@@ -1151,32 +1660,50 @@ export class MambuLoanAccounts {
     }: {
         body: LoanActionDetails
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanActionDetails, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(LoanActionDetails, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:undoRefinance`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+                headers: headers ?? {},
+                responseType: 'text',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['undoRefinance']>
     }
 
     /**
      * Undo loan account reschedule action
      */
-    public async undoReschedule({
+    public undoReschedule({
         body,
         path,
         headers,
@@ -1184,32 +1711,50 @@ export class MambuLoanAccounts {
     }: {
         body: LoanActionDetails
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanActionDetails, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(LoanActionDetails, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:undoReschedule`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+                headers: headers ?? {},
+                responseType: 'text',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['undoReschedule']>
     }
 
     /**
      * Undo write off for loan account
      */
-    public async undoWriteOff({
+    public undoWriteOff({
         body,
         path,
         headers,
@@ -1217,41 +1762,72 @@ export class MambuLoanAccounts {
     }: {
         body: LoanActionDetails
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanActionDetails, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(LoanActionDetails, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:undoWriteOff`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+                headers: headers ?? {},
+                responseType: 'text',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['undoWriteOff']>
     }
 
     /**
      * Update loan account
      */
-    public async update({
+    public update({
         body,
         path,
         auth = [['apiKey'], ['basic']],
-    }: {
-        body: LoanAccount
-        path: { loanAccountId: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanAccount, body)
+    }: { body: LoanAccount; path: { loanAccountId: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'200', LoanAccount>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(LoanAccount, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).put(`loans/${path.loanAccountId}`, {
@@ -1265,23 +1841,36 @@ export class MambuLoanAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['update']>
     }
 
     /**
      * Update loan account funding sources
      */
-    public async updateLoanAccountFundingSources({
+    public updateLoanAccountFundingSources({
         body,
         path,
         auth = [['apiKey'], ['basic']],
-    }: {
-        body: UpdateLoanAccountFundingSourcesRequest
-        path: { loanAccountId: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(UpdateLoanAccountFundingSourcesRequest, body)
+    }: { body: UpdateLoanAccountFundingSourcesRequest; path: { loanAccountId: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'200', UpdateLoanAccountFundingSourcesResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(UpdateLoanAccountFundingSourcesRequest, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).put(`loans/${path.loanAccountId}/funding`, {
@@ -1295,23 +1884,36 @@ export class MambuLoanAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['updateLoanAccountFundingSources']>
     }
 
     /**
      * Update planned fees
      */
-    public async updatePlannedFees({
+    public updatePlannedFees({
         body,
         path,
         auth = [['apiKey'], ['basic']],
-    }: {
-        body: UpdatePlannedFeesRequest
-        path: { loanAccountId: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(UpdatePlannedFeesRequest, body)
+    }: { body: UpdatePlannedFeesRequest; path: { loanAccountId: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'200', UpdatePlannedFeesResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(UpdatePlannedFeesRequest, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).put(`loans/${path.loanAccountId}/plannedfees`, {
@@ -1325,14 +1927,14 @@ export class MambuLoanAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['updatePlannedFees']>
     }
 
     /**
      * Write off loan account
      */
-    public async writeOff({
+    public writeOff({
         body,
         path,
         headers,
@@ -1340,63 +1942,102 @@ export class MambuLoanAccounts {
     }: {
         body: LoanActionDetails
         path: { loanAccountId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(LoanActionDetails, body)
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(LoanActionDetails, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}:writeOff`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+                headers: headers ?? {},
+                responseType: 'text',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
-                204: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['writeOff']>
     }
 
-    public validateRequestBody<T>(schema: { is: (o: unknown) => o is T; assert: (o: unknown) => void }, body: T) {
-        schema.assert(body)
-        return body
+    public validateRequestBody<Parser extends { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } }, Body>(
+        parser: Parser,
+        body: unknown,
+    ) {
+        const _body = parser.parse(body)
+        if ('left' in _body) {
+            return {
+                statusCode: undefined,
+                status: undefined,
+                headers: undefined,
+                left: body,
+                validationErrors: _body.left,
+                where: 'request:body',
+            } satisfies FailureResponse<undefined, unknown, 'request:body', undefined>
+        }
+        return _body
     }
 
     public async awaitResponse<
-        T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
-    >(response: CancelableRequest<Response<unknown>>, schemas: S) {
-        type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
-            ? `${S}` extends `${T}${infer _X}`
-                ? S
-                : never
-            : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
+        I,
+        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } } | undefined>,
+    >(response: CancelableRequest<Response<I>>, schemas: S) {
         const result = await response
+        const status =
+            result.statusCode < 200
+                ? 'informational'
+                : result.statusCode < 300
+                  ? 'success'
+                  : result.statusCode < 400
+                    ? 'redirection'
+                    : result.statusCode < 500
+                      ? 'client-error'
+                      : 'server-error'
         const validator = schemas[result.statusCode] ?? schemas.default
-        if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {
+        const body = validator?.parse?.(result.body)
+        if (result.statusCode < 200 || result.statusCode >= 300) {
             return {
-                statusCode: result.statusCode,
+                statusCode: result.statusCode.toString(),
+                status,
                 headers: result.headers,
-                left: result.body,
-                validationErrors: validator?.validate?.errors ?? undefined,
-            } as {
-                statusCode: number
-                headers: IncomingHttpHeaders
-                left: InferSchemaType<S[keyof S]>
-                validationErrors?: ErrorObject[]
+                left: body !== undefined && 'right' in body ? body.right : result.body,
+                validationErrors: body !== undefined && 'left' in body ? body.left : undefined,
+                where: 'response:statuscode',
             }
         }
-        return { statusCode: result.statusCode, headers: result.headers, right: result.body } as {
-            statusCode: number
-            headers: IncomingHttpHeaders
-            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2' | 'default'>>]>
+        if (body === undefined || 'left' in body) {
+            return {
+                statusCode: result.statusCode.toString(),
+                status,
+                headers: result.headers,
+                left: result.body,
+                validationErrors: body?.left,
+                where: 'response:body',
+            }
         }
+        return { statusCode: result.statusCode.toString(), status, headers: result.headers, right: result.body }
     }
 
     protected buildBasicClient(client: Got) {
@@ -1423,24 +2064,52 @@ export class MambuLoanAccounts {
                     async (options) => {
                         const apiKey = this.auth.apiKey
                         const key = typeof apiKey === 'function' ? await apiKey() : apiKey
-                        options.headers['apiKey'] = key
+                        options.headers.apiKey = key
                     },
                 ],
             },
         })
     }
 
-    protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
+    protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client?: Got): Got {
         const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
+        let chosenClient = client ?? this.client
         for (const chosen of auth[0] ?? []) {
             if (chosen === 'basic') {
-                client = this.buildBasicClient(client)
+                chosenClient = this.buildBasicClient(chosenClient)
             } else if (chosen === 'apiKey') {
-                client = this.buildApiKeyClient(client)
+                chosenClient = this.buildApiKeyClient(chosenClient)
             }
         }
-        return client
+        return chosenClient
     }
 }
+
+export type Status<Major> = Major extends string
+    ? Major extends `1${number}`
+        ? 'informational'
+        : Major extends `2${number}`
+          ? 'success'
+          : Major extends `3${number}`
+            ? 'redirection'
+            : Major extends `4${number}`
+              ? 'client-error'
+              : 'server-error'
+    : undefined
+export interface SuccessResponse<StatusCode extends string, T> {
+    statusCode: StatusCode
+    status: Status<StatusCode>
+    headers: IncomingHttpHeaders
+    right: T
+}
+export interface FailureResponse<StatusCode = string, T = unknown, Where = never, Headers = IncomingHttpHeaders> {
+    statusCode: StatusCode
+    status: Status<StatusCode>
+    headers: Headers
+    validationErrors: DefinedError[] | undefined
+    left: T
+    where: Where
+}
+export type StatusCode<Major extends number = 1 | 2 | 3 | 4 | 5> = `${Major}${number}`

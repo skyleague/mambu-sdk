@@ -3,15 +3,20 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
+import { validate as PatchRequestValidator } from './schemas/patch-request.schema.js'
+import { validate as TaskValidator } from './schemas/task.schema.js'
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -19,17 +24,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetAllResponse = Task[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -37,6 +43,12 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -46,7 +58,7 @@ export interface PatchOperation {
     /**
      * The field from where a value should be moved, when using move
      */
-    from?: string
+    from?: string | undefined
     /**
      * The change to perform
      */
@@ -58,15 +70,13 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: {
-        [k: string]: unknown | undefined
-    }
+    value?: unknown
 }
 
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
+    validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -74,17 +84,18 @@ export const PatchRequest = {
         return PatchRequest.validate.errors ?? undefined
     },
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
+    parse: (o: unknown): { right: PatchRequest } | { left: DefinedError[] } => {
+        if (PatchRequest.is(o)) {
+            return { right: o }
         }
+        return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
 
 /**
@@ -94,23 +105,23 @@ export interface Task {
     /**
      * The key of the user this task is assigned to.
      */
-    assignedUserKey?: string
+    assignedUserKey?: string | undefined
     /**
      * The name of the user who created the task.
      */
-    createdByFullName?: string
+    createdByFullName?: string | undefined
     /**
      * The key of the user that created this task. The value is not editable and it is populated at task creation with the current user key.
      */
-    createdByUserKey?: string
+    createdByUserKey?: string | undefined
     /**
      * The date when the task was created.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The description of the task.
      */
-    description?: string
+    description?: string | undefined
     /**
      * The due date when the task has to be completed.
      */
@@ -118,23 +129,23 @@ export interface Task {
     /**
      * The encoded key of the task, which is auto generated, and must be unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The ID of the task, which is uniquely generated for the task.
      */
-    id?: number
+    id?: number | undefined
     /**
      * The last date when the task was modified.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The status of this task, a new task always has an `OPEN` status.
      */
-    status?: 'OPEN' | 'COMPLETED'
+    status?: 'OPEN' | 'COMPLETED' | undefined
     /**
      * The individual linked to this task. If null, it means nobody is linked to this task.
      */
-    taskLinkKey?: string
+    taskLinkKey?: string | undefined
     /**
      * The type of the owner represented by the task link key.
      */
@@ -151,18 +162,19 @@ export interface Task {
         | 'ID_DOCUMENT'
         | 'LINE_OF_CREDIT'
         | 'GL_JOURNAL_ENTRY'
+        | undefined
     /**
      * The template key used to create the task.
      */
-    templateKey?: string
+    templateKey?: string | undefined
     /**
      * The title of the task.
      */
-    title?: string
+    title?: string | undefined
 }
 
 export const Task = {
-    validate: (await import('./schemas/task.schema.js')).validate as ValidateFunction<Task>,
+    validate: TaskValidator as ValidateFunction<Task>,
     get schema() {
         return Task.validate.schema
     },
@@ -170,9 +182,10 @@ export const Task = {
         return Task.validate.errors ?? undefined
     },
     is: (o: unknown): o is Task => Task.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Task.validate(o)) {
-            throw new ValidationError(Task.errors ?? [])
+    parse: (o: unknown): { right: Task } | { left: DefinedError[] } => {
+        if (Task.is(o)) {
+            return { right: o }
         }
+        return { left: (Task.errors ?? []) as DefinedError[] }
     },
 } as const

@@ -1,1 +1,1 @@
-export * from './rest.client.js'
+export { MambuInternalControlsConfiguration } from './rest.client.js'

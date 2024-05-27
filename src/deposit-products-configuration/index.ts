@@ -1,1 +1,1 @@
-export * from './rest.client.js'
+export { MambuDepositProductsConfiguration } from './rest.client.js'

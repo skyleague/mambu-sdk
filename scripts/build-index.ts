@@ -3,7 +3,6 @@ import camelcase from 'camelcase'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-
 ;(() => {
     const __dirname = path.dirname(fileURLToPath(import.meta.url))
     const directories = fs.readdirSync(`${__dirname}/../src`)
@@ -21,7 +20,9 @@ import { fileURLToPath } from 'node:url'
                 if (file.endsWith('.type.ts')) {
                     exports.push(`export * as ${camelcase(dir)} from './${file.replace('.ts', '.js')}'`)
                 } else if (file.endsWith('.client.ts')) {
-                    exports.push(`export * from './${file.replace('.ts', '.js')}'`)
+                    const contents = fs.readFileSync(`${__dirname}/../src/${dir}/${file}`, 'utf-8')
+                    const className = contents.match(/export class (.+) {/)?.[1]
+                    exports.push(`export { ${className} } from './${file.replace('.ts', '.js')}'`)
                 }
             }
 

@@ -1,1 +1,1 @@
-export * from './rest.client.js'
+export { MambuIdentificationDocumentTemplatesConfiguration } from './rest.client.js'

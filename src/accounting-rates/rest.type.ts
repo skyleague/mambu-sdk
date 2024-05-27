@@ -3,8 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as AccountingRateValidator } from './schemas/accounting-rate.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
+import { validate as PostAccountingRateDTOValidator } from './schemas/post-accounting-rate-dto.schema.js'
 
 /**
  * Represents the conversion rate used in accounting to convert amounts from one currency to organisation currency
@@ -13,31 +18,31 @@ export interface AccountingRate {
     /**
      * The encoded key of the accounting rate, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * Rate validity end date (as Organization Time)
      */
-    endDate?: string
+    endDate?: string | undefined
     /**
      * Organisation currency code
      */
-    fromCurrencyCode?: string
+    fromCurrencyCode?: string | undefined
     /**
      * Value of rate to be used for accounting conversions
      */
-    rate?: number
+    rate?: number | undefined
     /**
      * Rate validity start date (as Organization Time)
      */
-    startDate?: string
+    startDate?: string | undefined
     /**
      * Foreign currency code
      */
-    toCurrencyCode?: string
+    toCurrencyCode?: string | undefined
 }
 
 export const AccountingRate = {
-    validate: (await import('./schemas/accounting-rate.schema.js')).validate as ValidateFunction<AccountingRate>,
+    validate: AccountingRateValidator as ValidateFunction<AccountingRate>,
     get schema() {
         return AccountingRate.validate.schema
     },
@@ -45,14 +50,20 @@ export const AccountingRate = {
         return AccountingRate.validate.errors ?? undefined
     },
     is: (o: unknown): o is AccountingRate => AccountingRate.validate(o) === true,
+    parse: (o: unknown): { right: AccountingRate } | { left: DefinedError[] } => {
+        if (AccountingRate.is(o)) {
+            return { right: o }
+        }
+        return { left: (AccountingRate.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -60,17 +71,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetAllResponse = AccountingRate[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -78,6 +90,12 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -91,11 +109,11 @@ export interface PostAccountingRateDTO {
     /**
      * The start date from which the accounting rate will be applied (as Organization time)
      */
-    startDate?: string
+    startDate?: string | undefined
 }
 
 export const PostAccountingRateDTO = {
-    validate: (await import('./schemas/post-accounting-rate-dto.schema.js')).validate as ValidateFunction<PostAccountingRateDTO>,
+    validate: PostAccountingRateDTOValidator as ValidateFunction<PostAccountingRateDTO>,
     get schema() {
         return PostAccountingRateDTO.validate.schema
     },
@@ -103,15 +121,16 @@ export const PostAccountingRateDTO = {
         return PostAccountingRateDTO.validate.errors ?? undefined
     },
     is: (o: unknown): o is PostAccountingRateDTO => PostAccountingRateDTO.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PostAccountingRateDTO.validate(o)) {
-            throw new ValidationError(PostAccountingRateDTO.errors ?? [])
+    parse: (o: unknown): { right: PostAccountingRateDTO } | { left: DefinedError[] } => {
+        if (PostAccountingRateDTO.is(o)) {
+            return { right: o }
         }
+        return { left: (PostAccountingRateDTO.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

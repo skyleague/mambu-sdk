@@ -3,8 +3,23 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as BulkDepositTransactionsInputValidator } from './schemas/bulk-deposit-transactions-input.schema.js'
+import { validate as DepositTransactionAdjustmentDetailsValidator } from './schemas/deposit-transaction-adjustment-details.schema.js'
+import { validate as DepositTransactionInputValidator } from './schemas/deposit-transaction-input.schema.js'
+import { validate as DepositTransactionSearchCriteriaValidator } from './schemas/deposit-transaction-search-criteria.schema.js'
+import { validate as DepositTransactionValidator } from './schemas/deposit-transaction.schema.js'
+import { validate as EditTransactionDetailsRequestValidator } from './schemas/edit-transaction-details-request.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as FeeAppliedDepositTransactionInputValidator } from './schemas/fee-applied-deposit-transaction-input.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
+import { validate as GetDepositTransactionDocumentResponseValidator } from './schemas/get-deposit-transaction-document-response.schema.js'
+import { validate as SearchResponseValidator } from './schemas/search-response.schema.js'
+import { validate as SeizeBlockAmountValidator } from './schemas/seize-block-amount.schema.js'
+import { validate as TransferDepositTransactionInputValidator } from './schemas/transfer-deposit-transaction-input.schema.js'
+import { validate as WithdrawalDepositTransactionInputValidator } from './schemas/withdrawal-deposit-transaction-input.schema.js'
 
 /**
  * The account currency and identification
@@ -13,8 +28,8 @@ export interface AccountDetails {
     /**
      * The currency of the account
      */
-    currency?: string
-    identification?: AccountIdentification
+    currency?: string | undefined
+    identification?: AccountIdentification | undefined
 }
 
 /**
@@ -24,15 +39,15 @@ export interface AccountIdentification {
     /**
      * The account unique identifier
      */
-    iban?: string
-    other?: OtherAccountIdentification
+    iban?: string | undefined
+    other?: OtherAccountIdentification | undefined
 }
 
 /**
  * The agent details for a party
  */
 export interface Agent {
-    financialInstitutionIdentification?: FinancialInstitutionIdentification
+    financialInstitutionIdentification?: FinancialInstitutionIdentification | undefined
 }
 
 /**
@@ -42,12 +57,11 @@ export interface BulkDepositTransactionsInput {
     /**
      * The list of transactions
      */
-    transactions?: DepositTransactionBulkableInputDTO[]
+    transactions?: DepositTransactionBulkableInputDTO[] | undefined
 }
 
 export const BulkDepositTransactionsInput = {
-    validate: (await import('./schemas/bulk-deposit-transactions-input.schema.js'))
-        .validate as ValidateFunction<BulkDepositTransactionsInput>,
+    validate: BulkDepositTransactionsInputValidator as ValidateFunction<BulkDepositTransactionsInput>,
     get schema() {
         return BulkDepositTransactionsInput.validate.schema
     },
@@ -55,10 +69,11 @@ export const BulkDepositTransactionsInput = {
         return BulkDepositTransactionsInput.validate.errors ?? undefined
     },
     is: (o: unknown): o is BulkDepositTransactionsInput => BulkDepositTransactionsInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!BulkDepositTransactionsInput.validate(o)) {
-            throw new ValidationError(BulkDepositTransactionsInput.errors ?? [])
+    parse: (o: unknown): { right: BulkDepositTransactionsInput } | { left: DefinedError[] } => {
+        if (BulkDepositTransactionsInput.is(o)) {
+            return { right: o }
         }
+        return { left: (BulkDepositTransactionsInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -69,31 +84,31 @@ export interface CardAcceptor {
     /**
      * The city in which the card acceptor has the business.
      */
-    city?: string
+    city?: string | undefined
     /**
      * The country in which the card acceptor has the business.
      */
-    country?: string
+    country?: string | undefined
     /**
      * The Merchant Category Code of the card acceptor.
      */
-    mcc?: number
+    mcc?: number | undefined
     /**
      * The name of the card acceptor.
      */
-    name?: string
+    name?: string | undefined
     /**
      * The state in which the card acceptor has the business.
      */
-    state?: string
+    state?: string | undefined
     /**
      * The street in which the card acceptor has the business.
      */
-    street?: string
+    street?: string | undefined
     /**
      * The ZIP code of the location in which the card acceptor has the business.
      */
-    zip?: string
+    zip?: string | undefined
 }
 
 /**
@@ -108,23 +123,23 @@ export interface CardTransaction {
      * The amount of money to be withdrawn in the financial transaction.
      */
     amount: number
-    cardAcceptor?: CardAcceptor
+    cardAcceptor?: CardAcceptor | undefined
     /**
      * The reference token of the card.
      */
-    cardToken?: string
+    cardToken?: string | undefined
     /**
      * The ISO currency code in which the card reversal transaction is posted. The amounts are stored in the base currency, but the transaction can be created with a foreign currency.
      */
-    currencyCode?: string
+    currencyCode?: string | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The external authorization hold reference ID, which relates this card transaction to a previous authorization hold.
      */
-    externalAuthorizationReferenceId?: string
+    externalAuthorizationReferenceId?: string | undefined
     /**
      * The external reference ID to be used to reference the card transaction in subsequent requests.
      */
@@ -132,7 +147,7 @@ export interface CardTransaction {
     /**
      * The formatted time at which the user made this card transaction.
      */
-    userTransactionTime?: string
+    userTransactionTime?: string | undefined
 }
 
 /**
@@ -142,15 +157,15 @@ export interface CreditorReferenceInformation {
     /**
      * The reference information of the creditor's underlying documents
      */
-    reference?: string
+    reference?: string | undefined
     /**
      * The entity that assigns the reference type
      */
-    referenceIssuer?: string
+    referenceIssuer?: string | undefined
     /**
      * The type of creditor reference
      */
-    referenceType?: string
+    referenceType?: string | undefined
 }
 
 /**
@@ -160,39 +175,39 @@ export interface DepositAffectedAmounts {
     /**
      * Amount of fees involved in a transaction that affects an account with positive balance
      */
-    feesAmount?: number
+    feesAmount?: number | undefined
     /**
      * In the case of an LOAN_FRACTION_BOUGHT this represent the fraction amount which was bought from another investor
      */
-    fractionAmount?: number
+    fractionAmount?: number | undefined
     /**
      * Balance change amount involved in a transaction that affects an account with positive balance
      */
-    fundsAmount?: number
+    fundsAmount?: number | undefined
     /**
      * Amount of interest involved in a transaction that affects an account with positive balance
      */
-    interestAmount?: number
+    interestAmount?: number | undefined
     /**
      * The amount of money that was added/subtracted from the account by this transaction as overdraft
      */
-    overdraftAmount?: number
+    overdraftAmount?: number | undefined
     /**
      * Fees amount involved in a transaction that affects an overdraft
      */
-    overdraftFeesAmount?: number
+    overdraftFeesAmount?: number | undefined
     /**
      * Interest amount involved in a transaction that affects an overdraft
      */
-    overdraftInterestAmount?: number
+    overdraftInterestAmount?: number | undefined
     /**
      * The amount of money that was added/subtracted from the account by this transaction as technical overdraft
      */
-    technicalOverdraftAmount?: number
+    technicalOverdraftAmount?: number | undefined
     /**
      * The amount of money that was added/subtracted from the account by this transaction as technical overdraft interest
      */
-    technicalOverdraftInterestAmount?: number
+    technicalOverdraftInterestAmount?: number | undefined
 }
 
 /**
@@ -202,11 +217,11 @@ export interface DepositFee {
     /**
      * The amount of the fee that was applied/paid in the transaction for the given predefined fee.
      */
-    amount?: number
+    amount?: number | undefined
     /**
      * The name of the predefined fee
      */
-    name?: string
+    name?: string | undefined
     /**
      * The encoded key of the predefined fee, auto generated, unique
      */
@@ -214,11 +229,11 @@ export interface DepositFee {
     /**
      * The amount of the taxes on fee that was applied/paid in the transaction.
      */
-    taxAmount?: number
+    taxAmount?: number | undefined
     /**
      * Shows the event that will trigger a fee
      */
-    trigger?: 'MANUAL' | 'MONTHLY_FEE' | 'ARBITRARY'
+    trigger?: 'MANUAL' | 'MONTHLY_FEE' | 'ARBITRARY' | undefined
 }
 
 /**
@@ -228,19 +243,19 @@ export interface DepositInterestAccruedAmounts {
     /**
      * The amount of positive interest accrued since last interest application/activation date and applied within Interest Applied transaction
      */
-    interestAccrued?: number
+    interestAccrued?: number | undefined
     /**
      * The amount of negative interest accrued since last interest application/activation date and applied within Interest Applied transaction
      */
-    negativeInterestAccrued?: number
+    negativeInterestAccrued?: number | undefined
     /**
      * The amount of overdraft interest accrued since last interest application/activation date and applied within Interest Applied transaction
      */
-    overdraftInterestAccrued?: number
+    overdraftInterestAccrued?: number | undefined
     /**
      * The amount of technical overdraft interest accrued since last interest application/activation date and applied within Interest Applied transaction
      */
-    technicalOverdraftInterestAccrued?: number
+    technicalOverdraftInterestAccrued?: number | undefined
 }
 
 /**
@@ -250,11 +265,11 @@ export interface DepositOverdraftInterestSettings {
     /**
      * The value of the index interest rate set or changed in this transaction
      */
-    indexInterestRate?: number
+    indexInterestRate?: number | undefined
     /**
      * The interest rate that was set or changed in this transaction. Used on product interest rate changes or interest tier switches
      */
-    interestRate?: number
+    interestRate?: number | undefined
 }
 
 /**
@@ -264,7 +279,7 @@ export interface DepositOverdraftSettings {
     /**
      * The overdraft limit that was set or changed in this transaction
      */
-    overdraftLimit?: number
+    overdraftLimit?: number | undefined
 }
 
 /**
@@ -274,107 +289,107 @@ export interface DepositTaxes {
     /**
      * The tax rate that was set or changed in this transaction
      */
-    taxRate?: number
+    taxRate?: number | undefined
 }
 
 /**
  * The deposit transaction terms
  */
 export interface DepositTerms {
-    interestSettings?: DepositTransactionInterestSettings
-    overdraftInterestSettings?: DepositOverdraftInterestSettings
-    overdraftSettings?: DepositOverdraftSettings
+    interestSettings?: DepositTransactionInterestSettings | undefined
+    overdraftInterestSettings?: DepositOverdraftInterestSettings | undefined
+    overdraftSettings?: DepositOverdraftSettings | undefined
 }
 
 /**
  * Represents the action performed on an Deposit Account after which the account's amount changes its value.
  */
 export interface DepositTransaction {
-    accountBalances?: DepositTransactionBalances
+    accountBalances?: DepositTransactionBalances | undefined
     /**
      * The key of the deposit transaction where the adjustment for this transaction was made (if any adjustment was involved)
      */
-    adjustmentTransactionKey?: string
-    affectedAmounts?: DepositAffectedAmounts
+    adjustmentTransactionKey?: string | undefined
+    affectedAmounts?: DepositAffectedAmounts | undefined
     /**
      * How much was added/removed in account
      */
-    amount?: number
+    amount?: number | undefined
     /**
      * The block fund id associated with the transaction
      */
-    blockId?: string
+    blockId?: string | undefined
     /**
      * The date when corresponding JE is booked (as Organization Time)
      */
-    bookingDate?: string
+    bookingDate?: string | undefined
     /**
      * The branch where the transaction was performed
      */
-    branchKey?: string
-    cardTransaction?: CardTransaction
+    branchKey?: string | undefined
+    cardTransaction?: CardTransaction | undefined
     /**
      * The center where the transaction was performed
      */
-    centreKey?: string
+    centreKey?: string | undefined
     /**
      * The date when this deposit transaction was created
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The currency in which this transaction was posted
      */
-    currencyCode?: string
+    currencyCode?: string | undefined
     /**
      * The encoded key of the deposit transaction, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The external id of the deposit transaction, customizable, unique
      */
-    externalId?: string
+    externalId?: string | undefined
     /**
      * All the amounts that have been applied or paid within this transaction and involved predefined fees
      */
-    fees?: DepositFee[]
+    fees?: DepositFee[] | undefined
     /**
      * The external id of an account authorization hold
      */
-    holdExternalReferenceId?: string
+    holdExternalReferenceId?: string | undefined
     /**
      * The id of the deposit transaction, auto generated, unique
      */
-    id?: string
-    interestAccruedAmounts?: DepositInterestAccruedAmounts
+    id?: string | undefined
+    interestAccruedAmounts?: DepositInterestAccruedAmounts | undefined
     /**
      * The migration event encoded key associated with this deposit account. If this account was imported, track which 'migration event' they came from
      */
-    migrationEventKey?: string
+    migrationEventKey?: string | undefined
     /**
      * Extra notes about this deposit transaction
      */
-    notes?: string
+    notes?: string | undefined
     /**
      * The encodedKey of the transaction that was adjusted as part of this one. Available only for adjustment transactions
      */
-    originalTransactionKey?: string
+    originalTransactionKey?: string | undefined
     /**
      * The key of the parent deposit account
      */
-    parentAccountKey?: string
-    paymentDetails?: PaymentDetails
+    parentAccountKey?: string | undefined
+    paymentDetails?: PaymentDetails | undefined
     /**
      * The payment order id of the deposit transaction, customizable
      */
-    paymentOrderId?: string
-    taxes?: DepositTaxes
-    terms?: DepositTerms
+    paymentOrderId?: string | undefined
+    taxes?: DepositTaxes | undefined
+    terms?: DepositTerms | undefined
     /**
      * The till key associated with this transaction
      */
-    tillKey?: string
-    transactionDetails?: TransactionDetails
-    transferDetails?: TransferDetails
+    tillKey?: string | undefined
+    transactionDetails?: TransactionDetails | undefined
+    transferDetails?: TransferDetails | undefined
     /**
      * The type of the deposit transaction
      */
@@ -412,18 +427,19 @@ export interface DepositTransaction {
         | 'LOAN_FRACTION_SOLD'
         | 'LOAN_FRACTION_SOLD_ADJUSTMENT'
         | 'SEIZED_AMOUNT'
+        | undefined
     /**
      * The person that performed the transaction
      */
-    userKey?: string
+    userKey?: string | undefined
     /**
      * Date of the entry (eg date of repayment or disbursal, etc.) (as Organization Time)
      */
-    valueDate?: string
+    valueDate?: string | undefined
 }
 
 export const DepositTransaction = {
-    validate: (await import('./schemas/deposit-transaction.schema.js')).validate as ValidateFunction<DepositTransaction>,
+    validate: DepositTransactionValidator as ValidateFunction<DepositTransaction>,
     get schema() {
         return DepositTransaction.validate.schema
     },
@@ -431,10 +447,11 @@ export const DepositTransaction = {
         return DepositTransaction.validate.errors ?? undefined
     },
     is: (o: unknown): o is DepositTransaction => DepositTransaction.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!DepositTransaction.validate(o)) {
-            throw new ValidationError(DepositTransaction.errors ?? [])
+    parse: (o: unknown): { right: DepositTransaction } | { left: DefinedError[] } => {
+        if (DepositTransaction.is(o)) {
+            return { right: o }
         }
+        return { left: (DepositTransaction.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -445,16 +462,15 @@ export interface DepositTransactionAdjustmentDetails {
     /**
      * Date when the adjustment transaction is logged into accounting. Can be null. Available only for DEPOSIT and WITHDRAWAL
      */
-    bookingDate?: string
+    bookingDate?: string | undefined
     /**
      * Notes detailing why the transaction is adjusted
      */
-    notes?: string
+    notes?: string | undefined
 }
 
 export const DepositTransactionAdjustmentDetails = {
-    validate: (await import('./schemas/deposit-transaction-adjustment-details.schema.js'))
-        .validate as ValidateFunction<DepositTransactionAdjustmentDetails>,
+    validate: DepositTransactionAdjustmentDetailsValidator as ValidateFunction<DepositTransactionAdjustmentDetails>,
     get schema() {
         return DepositTransactionAdjustmentDetails.validate.schema
     },
@@ -462,10 +478,11 @@ export const DepositTransactionAdjustmentDetails = {
         return DepositTransactionAdjustmentDetails.validate.errors ?? undefined
     },
     is: (o: unknown): o is DepositTransactionAdjustmentDetails => DepositTransactionAdjustmentDetails.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!DepositTransactionAdjustmentDetails.validate(o)) {
-            throw new ValidationError(DepositTransactionAdjustmentDetails.errors ?? [])
+    parse: (o: unknown): { right: DepositTransactionAdjustmentDetails } | { left: DefinedError[] } => {
+        if (DepositTransactionAdjustmentDetails.is(o)) {
+            return { right: o }
         }
+        return { left: (DepositTransactionAdjustmentDetails.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -476,7 +493,7 @@ export interface DepositTransactionBalances {
     /**
      * The running balance owed by deposit
      */
-    totalBalance?: number
+    totalBalance?: number | undefined
 }
 
 /**
@@ -494,25 +511,25 @@ export interface DepositTransactionBulkableInputDTO {
     /**
      * The external id of the deposit transaction, customizable, unique
      */
-    externalId?: string
+    externalId?: string | undefined
     /**
      * The external id of an account authorization hold
      */
-    holdExternalReferenceId?: string
+    holdExternalReferenceId?: string | undefined
     /**
      * Extra notes about this deposit transaction
      */
-    notes?: string
-    paymentDetails?: PaymentDetails
+    notes?: string | undefined
+    paymentDetails?: PaymentDetails | undefined
     /**
      * The payment order id of the deposit transaction, customizable
      */
-    paymentOrderId?: string
+    paymentOrderId?: string | undefined
     /**
      * Flag indicating that a maximum balance validation should be skipped
      */
-    skipMaximumBalanceValidation?: boolean
-    transactionDetails?: TransactionDetailsInput
+    skipMaximumBalanceValidation?: boolean | undefined
+    transactionDetails?: TransactionDetailsInput | undefined
 }
 
 /**
@@ -614,15 +631,15 @@ export interface DepositTransactionFilterCriteria {
     /**
      * The second value to match the searching criteria, when the `BETWEEN` operator is used.
      */
-    secondValue?: string
+    secondValue?: string | undefined
     /**
      * The value to match the searching criteria.
      */
-    value?: string
+    value?: string | undefined
     /**
      * List of values when the `IN` operator is used.
      */
-    values?: string[]
+    values?: string[] | undefined
 }
 
 /**
@@ -636,38 +653,37 @@ export interface DepositTransactionInput {
     /**
      * The date of Journal Entry (as Organization Time)
      */
-    bookingDate?: string
+    bookingDate?: string | undefined
     /**
      * The external id of the deposit transaction, customizable, unique
      */
-    externalId?: string
+    externalId?: string | undefined
     /**
      * The external id of an account authorization hold
      */
-    holdExternalReferenceId?: string
+    holdExternalReferenceId?: string | undefined
     /**
      * Extra notes about this deposit transaction
      */
-    notes?: string
-    paymentDetails?: PaymentDetails
+    notes?: string | undefined
+    paymentDetails?: PaymentDetails | undefined
     /**
      * The payment order id of the deposit transaction, customizable
      */
-    paymentOrderId?: string
+    paymentOrderId?: string | undefined
     /**
      * Flag indicating that a maximum balance validation should be skipped
      */
-    skipMaximumBalanceValidation?: boolean
-    transactionDetails?: TransactionDetailsInput
+    skipMaximumBalanceValidation?: boolean | undefined
+    transactionDetails?: TransactionDetailsInput | undefined
     /**
      * The entry date of the deposit (as Organization Time)
      */
-    valueDate?: string
+    valueDate?: string | undefined
 }
 
 export const DepositTransactionInput = {
-    validate: (await import('./schemas/deposit-transaction-input.schema.js'))
-        .validate as ValidateFunction<DepositTransactionInput>,
+    validate: DepositTransactionInputValidator as ValidateFunction<DepositTransactionInput>,
     get schema() {
         return DepositTransactionInput.validate.schema
     },
@@ -675,10 +691,11 @@ export const DepositTransactionInput = {
         return DepositTransactionInput.validate.errors ?? undefined
     },
     is: (o: unknown): o is DepositTransactionInput => DepositTransactionInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!DepositTransactionInput.validate(o)) {
-            throw new ValidationError(DepositTransactionInput.errors ?? [])
+    parse: (o: unknown): { right: DepositTransactionInput } | { left: DefinedError[] } => {
+        if (DepositTransactionInput.is(o)) {
+            return { right: o }
         }
+        return { left: (DepositTransactionInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -689,11 +706,11 @@ export interface DepositTransactionInterestSettings {
     /**
      * The value of the index interest rate set or changed in this transaction
      */
-    indexInterestRate?: number
+    indexInterestRate?: number | undefined
     /**
      * The interest rate for the deposit account
      */
-    interestRate?: number
+    interestRate?: number | undefined
 }
 
 /**
@@ -704,12 +721,11 @@ export interface DepositTransactionSearchCriteria {
      * The list of filtering criteria
      */
     filterCriteria: DepositTransactionFilterCriteria[]
-    sortingCriteria?: DepositTransactionSortingCriteria
+    sortingCriteria?: DepositTransactionSortingCriteria | undefined
 }
 
 export const DepositTransactionSearchCriteria = {
-    validate: (await import('./schemas/deposit-transaction-search-criteria.schema.js'))
-        .validate as ValidateFunction<DepositTransactionSearchCriteria>,
+    validate: DepositTransactionSearchCriteriaValidator as ValidateFunction<DepositTransactionSearchCriteria>,
     get schema() {
         return DepositTransactionSearchCriteria.validate.schema
     },
@@ -717,10 +733,11 @@ export const DepositTransactionSearchCriteria = {
         return DepositTransactionSearchCriteria.validate.errors ?? undefined
     },
     is: (o: unknown): o is DepositTransactionSearchCriteria => DepositTransactionSearchCriteria.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!DepositTransactionSearchCriteria.validate(o)) {
-            throw new ValidationError(DepositTransactionSearchCriteria.errors ?? [])
+    parse: (o: unknown): { right: DepositTransactionSearchCriteria } | { left: DefinedError[] } => {
+        if (DepositTransactionSearchCriteria.is(o)) {
+            return { right: o }
         }
+        return { left: (DepositTransactionSearchCriteria.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -754,14 +771,13 @@ export interface DepositTransactionSortingCriteria {
     /**
      * The sorting order: `ASC` or `DESC`. The default order is `DESC`.
      */
-    order?: 'ASC' | 'DESC'
+    order?: 'ASC' | 'DESC' | undefined
 }
 
 export type EditTransactionDetailsRequest = PatchOperation[]
 
 export const EditTransactionDetailsRequest = {
-    validate: (await import('./schemas/edit-transaction-details-request.schema.js'))
-        .validate as ValidateFunction<EditTransactionDetailsRequest>,
+    validate: EditTransactionDetailsRequestValidator as ValidateFunction<EditTransactionDetailsRequest>,
     get schema() {
         return EditTransactionDetailsRequest.validate.schema
     },
@@ -769,19 +785,20 @@ export const EditTransactionDetailsRequest = {
         return EditTransactionDetailsRequest.validate.errors ?? undefined
     },
     is: (o: unknown): o is EditTransactionDetailsRequest => EditTransactionDetailsRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!EditTransactionDetailsRequest.validate(o)) {
-            throw new ValidationError(EditTransactionDetailsRequest.errors ?? [])
+    parse: (o: unknown): { right: EditTransactionDetailsRequest } | { left: DefinedError[] } => {
+        if (EditTransactionDetailsRequest.is(o)) {
+            return { right: o }
         }
+        return { left: (EditTransactionDetailsRequest.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -789,10 +806,11 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -803,24 +821,23 @@ export interface FeeAppliedDepositTransactionInput {
     /**
      * The value of the fee applied on the account
      */
-    amount?: number
+    amount?: number | undefined
     /**
      * The external id of the current transaction, customizable, unique
      */
-    externalId?: string
+    externalId?: string | undefined
     /**
      * Extra notes about the current transaction
      */
-    notes?: string
+    notes?: string | undefined
     /**
      * The encodedKey of the predefined fee that defines the current fee
      */
-    predefinedFeeKey?: string
+    predefinedFeeKey?: string | undefined
 }
 
 export const FeeAppliedDepositTransactionInput = {
-    validate: (await import('./schemas/fee-applied-deposit-transaction-input.schema.js'))
-        .validate as ValidateFunction<FeeAppliedDepositTransactionInput>,
+    validate: FeeAppliedDepositTransactionInputValidator as ValidateFunction<FeeAppliedDepositTransactionInput>,
     get schema() {
         return FeeAppliedDepositTransactionInput.validate.schema
     },
@@ -828,10 +845,11 @@ export const FeeAppliedDepositTransactionInput = {
         return FeeAppliedDepositTransactionInput.validate.errors ?? undefined
     },
     is: (o: unknown): o is FeeAppliedDepositTransactionInput => FeeAppliedDepositTransactionInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!FeeAppliedDepositTransactionInput.validate(o)) {
-            throw new ValidationError(FeeAppliedDepositTransactionInput.errors ?? [])
+    parse: (o: unknown): { right: FeeAppliedDepositTransactionInput } | { left: DefinedError[] } => {
+        if (FeeAppliedDepositTransactionInput.is(o)) {
+            return { right: o }
         }
+        return { left: (FeeAppliedDepositTransactionInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -842,13 +860,13 @@ export interface FinancialInstitutionIdentification {
     /**
      * Business identifier code
      */
-    bic?: string
+    bic?: string | undefined
 }
 
 export type GetAllResponse = DepositTransaction[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -856,13 +874,18 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export type GetDepositTransactionDocumentResponse = string
 
 export const GetDepositTransactionDocumentResponse = {
-    validate: (await import('./schemas/get-deposit-transaction-document-response.schema.js'))
-        .validate as ValidateFunction<GetDepositTransactionDocumentResponse>,
+    validate: GetDepositTransactionDocumentResponseValidator as ValidateFunction<GetDepositTransactionDocumentResponse>,
     get schema() {
         return GetDepositTransactionDocumentResponse.validate.schema
     },
@@ -870,6 +893,12 @@ export const GetDepositTransactionDocumentResponse = {
         return GetDepositTransactionDocumentResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetDepositTransactionDocumentResponse => GetDepositTransactionDocumentResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetDepositTransactionDocumentResponse } | { left: DefinedError[] } => {
+        if (GetDepositTransactionDocumentResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetDepositTransactionDocumentResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -879,11 +908,11 @@ export interface OtherAccountIdentification {
     /**
      * The identification of the payer/payee
      */
-    identification?: string
+    identification?: string | undefined
     /**
      * The identification scheme
      */
-    scheme?: string
+    scheme?: string | undefined
 }
 
 /**
@@ -893,7 +922,7 @@ export interface Party {
     /**
      * The name of the party
      */
-    name?: string
+    name?: string | undefined
 }
 
 /**
@@ -903,7 +932,7 @@ export interface PatchOperation {
     /**
      * The field from where a value should be moved, when using move
      */
-    from?: string
+    from?: string | undefined
     /**
      * The change to perform
      */
@@ -915,24 +944,22 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: {
-        [k: string]: unknown | undefined
-    }
+    value?: unknown
 }
 
 /**
  * The payment information including account identification details
  */
 export interface PaymentDetails {
-    creditor?: Party
-    creditorAccount?: AccountDetails
-    creditorAgent?: Agent
-    debtor?: Party
-    debtorAccount?: AccountDetails
-    debtorAgent?: Agent
-    paymentIdentification?: PaymentIdentification
-    paymentTypeInformation?: PaymentTypeInformation
-    remittanceInformation?: RemittanceInformation
+    creditor?: Party | undefined
+    creditorAccount?: AccountDetails | undefined
+    creditorAgent?: Agent | undefined
+    debtor?: Party | undefined
+    debtorAccount?: AccountDetails | undefined
+    debtorAgent?: Agent | undefined
+    paymentIdentification?: PaymentIdentification | undefined
+    paymentTypeInformation?: PaymentTypeInformation | undefined
+    remittanceInformation?: RemittanceInformation | undefined
 }
 
 /**
@@ -942,45 +969,45 @@ export interface PaymentIdentification {
     /**
      * Identifier assigned by the initiating party to the transaction
      */
-    endToEndIdentification?: string
+    endToEndIdentification?: string | undefined
     /**
      * Identifier of a payment instruction
      */
-    instructionIdentification?: string
+    instructionIdentification?: string | undefined
     /**
      * Identifier unique for a period assigned by the first initiating party to the transaction
      */
-    transactionIdentification?: string
+    transactionIdentification?: string | undefined
 }
 
 /**
  * The information specifying the type of transaction
  */
 export interface PaymentTypeInformation {
-    serviceLevel?: ServiceLevel
+    serviceLevel?: ServiceLevel | undefined
 }
 
 /**
  * The information specifying the payment items that are intended to settle
  */
 export interface RemittanceInformation {
-    structured?: Structured
+    structured?: Structured | undefined
     /**
      * Information supplied to match the items of the payment in an unstructured form
      */
-    unstructured?: string
+    unstructured?: string | undefined
 }
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
 
 export type SearchResponse = DepositTransaction[]
 
 export const SearchResponse = {
-    validate: (await import('./schemas/search-response.schema.js')).validate as ValidateFunction<SearchResponse>,
+    validate: SearchResponseValidator as ValidateFunction<SearchResponse>,
     get schema() {
         return SearchResponse.validate.schema
     },
@@ -988,6 +1015,12 @@ export const SearchResponse = {
         return SearchResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is SearchResponse => SearchResponse.validate(o) === true,
+    parse: (o: unknown): { right: SearchResponse } | { left: DefinedError[] } => {
+        if (SearchResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (SearchResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -997,7 +1030,7 @@ export interface SeizeBlockAmount {
     /**
      * The amount of the block fund
      */
-    amount?: number
+    amount?: number | undefined
     /**
      * The id of the block fund
      */
@@ -1005,11 +1038,11 @@ export interface SeizeBlockAmount {
     /**
      * The external id of the current transaction, customizable, unique
      */
-    externalId?: string
+    externalId?: string | undefined
     /**
      * Extra notes about the current transaction
      */
-    notes?: string
+    notes?: string | undefined
     /**
      * The id of the channel through which the transaction is done.
      */
@@ -1017,7 +1050,7 @@ export interface SeizeBlockAmount {
 }
 
 export const SeizeBlockAmount = {
-    validate: (await import('./schemas/seize-block-amount.schema.js')).validate as ValidateFunction<SeizeBlockAmount>,
+    validate: SeizeBlockAmountValidator as ValidateFunction<SeizeBlockAmount>,
     get schema() {
         return SeizeBlockAmount.validate.schema
     },
@@ -1025,10 +1058,11 @@ export const SeizeBlockAmount = {
         return SeizeBlockAmount.validate.errors ?? undefined
     },
     is: (o: unknown): o is SeizeBlockAmount => SeizeBlockAmount.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!SeizeBlockAmount.validate(o)) {
-            throw new ValidationError(SeizeBlockAmount.errors ?? [])
+    parse: (o: unknown): { right: SeizeBlockAmount } | { left: DefinedError[] } => {
+        if (SeizeBlockAmount.is(o)) {
+            return { right: o }
         }
+        return { left: (SeizeBlockAmount.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -1039,14 +1073,14 @@ export interface ServiceLevel {
     /**
      * The code for a pre-agreed service or level of service between the parties
      */
-    code?: string
+    code?: string | undefined
 }
 
 /**
  * The information specifying the payment items that are intended to settle
  */
 export interface Structured {
-    creditorReferenceInformation?: CreditorReferenceInformation
+    creditorReferenceInformation?: CreditorReferenceInformation | undefined
 }
 
 /**
@@ -1056,11 +1090,11 @@ export interface TransactionDetails {
     /**
      * The id of the transaction channel associated with the transaction details.
      */
-    transactionChannelId?: string
+    transactionChannelId?: string | undefined
     /**
      * The encoded key of the transaction channel associated with the transaction details.
      */
-    transactionChannelKey?: string
+    transactionChannelKey?: string | undefined
 }
 
 /**
@@ -1070,11 +1104,11 @@ export interface TransactionDetailsInput {
     /**
      * The id of the transaction channel associated with the transaction details.
      */
-    transactionChannelId?: string
+    transactionChannelId?: string | undefined
     /**
      * The encoded key of the transaction channel associated with the transaction details.
      */
-    transactionChannelKey?: string
+    transactionChannelKey?: string | undefined
 }
 
 /**
@@ -1088,30 +1122,29 @@ export interface TransferDepositTransactionInput {
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The external id of the transfer transaction, customizable, unique
      */
-    externalId?: string
+    externalId?: string | undefined
     /**
      * Extra notes about this deposit transaction
      */
-    notes?: string
-    paymentDetails?: PaymentDetails
+    notes?: string | undefined
+    paymentDetails?: PaymentDetails | undefined
     /**
      * The payment order id of the transfer transaction, customizable
      */
-    paymentOrderId?: string
+    paymentOrderId?: string | undefined
     transferDetails: TransferDetailsInput
     /**
      * The entry date of the transfer. If not specified it is considered the current date (as Organization Time)
      */
-    valueDate?: string
+    valueDate?: string | undefined
 }
 
 export const TransferDepositTransactionInput = {
-    validate: (await import('./schemas/transfer-deposit-transaction-input.schema.js'))
-        .validate as ValidateFunction<TransferDepositTransactionInput>,
+    validate: TransferDepositTransactionInputValidator as ValidateFunction<TransferDepositTransactionInput>,
     get schema() {
         return TransferDepositTransactionInput.validate.schema
     },
@@ -1119,10 +1152,11 @@ export const TransferDepositTransactionInput = {
         return TransferDepositTransactionInput.validate.errors ?? undefined
     },
     is: (o: unknown): o is TransferDepositTransactionInput => TransferDepositTransactionInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!TransferDepositTransactionInput.validate(o)) {
-            throw new ValidationError(TransferDepositTransactionInput.errors ?? [])
+    parse: (o: unknown): { right: TransferDepositTransactionInput } | { left: DefinedError[] } => {
+        if (TransferDepositTransactionInput.is(o)) {
+            return { right: o }
         }
+        return { left: (TransferDepositTransactionInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -1133,11 +1167,11 @@ export interface TransferDetails {
     /**
      * The key of the related deposit transaction
      */
-    linkedDepositTransactionKey?: string
+    linkedDepositTransactionKey?: string | undefined
     /**
      * The key of the related loan transaction
      */
-    linkedLoanTransactionKey?: string
+    linkedLoanTransactionKey?: string | undefined
 }
 
 /**
@@ -1147,11 +1181,11 @@ export interface TransferDetailsInput {
     /**
      * The id of the linked account
      */
-    linkedAccountId?: string
+    linkedAccountId?: string | undefined
     /**
      * The encoded key of the linked account
      */
-    linkedAccountKey?: string
+    linkedAccountKey?: string | undefined
     /**
      * The type of the linked account. Can be LOAN or DEPOSIT
      */
@@ -1169,34 +1203,33 @@ export interface WithdrawalDepositTransactionInput {
     /**
      * The date of the withdrawal when the transaction is logged into accounting. If not specified it is considered the value date
      */
-    bookingDate?: string
+    bookingDate?: string | undefined
     /**
      * The external id of the withdrawal transaction, customizable, unique
      */
-    externalId?: string
+    externalId?: string | undefined
     /**
      * The external id of an account authorization hold
      */
-    holdExternalReferenceId?: string
+    holdExternalReferenceId?: string | undefined
     /**
      * Extra notes about this deposit transaction
      */
-    notes?: string
-    paymentDetails?: PaymentDetails
+    notes?: string | undefined
+    paymentDetails?: PaymentDetails | undefined
     /**
      * The payment order id of the withdrawal transaction, customizable
      */
-    paymentOrderId?: string
-    transactionDetails?: TransactionDetailsInput
+    paymentOrderId?: string | undefined
+    transactionDetails?: TransactionDetailsInput | undefined
     /**
      * The entry date of the withdrawal. If not specified it is considered the current date (as Organization Time)
      */
-    valueDate?: string
+    valueDate?: string | undefined
 }
 
 export const WithdrawalDepositTransactionInput = {
-    validate: (await import('./schemas/withdrawal-deposit-transaction-input.schema.js'))
-        .validate as ValidateFunction<WithdrawalDepositTransactionInput>,
+    validate: WithdrawalDepositTransactionInputValidator as ValidateFunction<WithdrawalDepositTransactionInput>,
     get schema() {
         return WithdrawalDepositTransactionInput.validate.schema
     },
@@ -1204,9 +1237,10 @@ export const WithdrawalDepositTransactionInput = {
         return WithdrawalDepositTransactionInput.validate.errors ?? undefined
     },
     is: (o: unknown): o is WithdrawalDepositTransactionInput => WithdrawalDepositTransactionInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!WithdrawalDepositTransactionInput.validate(o)) {
-            throw new ValidationError(WithdrawalDepositTransactionInput.errors ?? [])
+    parse: (o: unknown): { right: WithdrawalDepositTransactionInput } | { left: DefinedError[] } => {
+        if (WithdrawalDepositTransactionInput.is(o)) {
+            return { right: o }
         }
+        return { left: (WithdrawalDepositTransactionInput.errors ?? []) as DefinedError[] }
     },
 } as const

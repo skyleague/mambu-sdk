@@ -3,49 +3,60 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ApiConsumerValidator } from './schemas/api-consumer.schema.js'
+import { validate as ApiKeyInputValidator } from './schemas/api-key-input.schema.js'
+import { validate as ApiKeyValidator } from './schemas/api-key.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
+import { validate as GetKeysByConsumerIdResponseValidator } from './schemas/get-keys-by-consumer-id-response.schema.js'
+import { validate as PatchRequestValidator } from './schemas/patch-request.schema.js'
+import { validate as SecretKeyValidator } from './schemas/secret-key.schema.js'
 
 /**
  * Represents an API consumer.
  */
 export interface ApiConsumer {
-    access?: ApiConsumerAccess
+    access?: ApiConsumerAccess | undefined
     /**
      * The encoded key of the branch this API consumer is assigned to.
      */
-    assignedBranchKey?: string
+    assignedBranchKey?: string | undefined
     /**
      * The date when the API consumer was created in UTC.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The ID of the API consumer.
      */
-    id?: string
+    id?: string | undefined
     /**
      * The last time the API consumer was modified in UTC.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The API consumer name.
      */
     name: string
-    role?: RoleIdentifier
+    role?: RoleIdentifier | undefined
     /**
      * The API consumer transaction limits.
      */
-    transactionLimits?: {
-        [k: string]: number
-    }
+    transactionLimits?:
+        | {
+              [k: string]: number | undefined
+          }
+        | undefined
 }
 
 export const ApiConsumer = {
-    validate: (await import('./schemas/api-consumer.schema.js')).validate as ValidateFunction<ApiConsumer>,
+    validate: ApiConsumerValidator as ValidateFunction<ApiConsumer>,
     get schema() {
         return ApiConsumer.validate.schema
     },
@@ -53,10 +64,11 @@ export const ApiConsumer = {
         return ApiConsumer.validate.errors ?? undefined
     },
     is: (o: unknown): o is ApiConsumer => ApiConsumer.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ApiConsumer.validate(o)) {
-            throw new ValidationError(ApiConsumer.errors ?? [])
+    parse: (o: unknown): { right: ApiConsumer } | { left: DefinedError[] } => {
+        if (ApiConsumer.is(o)) {
+            return { right: o }
         }
+        return { left: (ApiConsumer.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -67,31 +79,31 @@ export interface ApiConsumerAccess {
     /**
      * `TRUE` if the API consumer has the administrator user type, `FALSE` otherwise. Administrators (admins) have all permissions and can perform any action in Mambu.
      */
-    administratorAccess?: boolean
+    administratorAccess?: boolean | undefined
     /**
      * `TRUE` if the API consumer can authenticate and interact with Mambu APIs, `FALSE` otherwise. The API consumer may still require additional permissions for specific API requests.
      */
-    apiAccess?: boolean
+    apiAccess?: boolean | undefined
     /**
      * `TRUE` if the API consumer permissions apply to all branches, `FALSE` if they only apply to specific branches.
      */
-    canManageAllBranches?: boolean
+    canManageAllBranches?: boolean | undefined
     /**
      * `TRUE` if the API consumer (that has the credit officer access) can access entities (for example, clients or accounts) assigned to other credit officers, `FALSE` otherwise.
      */
-    canManageEntitiesAssignedToOtherOfficers?: boolean
+    canManageEntitiesAssignedToOtherOfficers?: boolean | undefined
     /**
      * `TRUE` if the API consumer has the credit officer user type, `FALSE` otherwise. Credit officers have the option of having clients and groups assigned to them.
      */
-    creditOfficerAccess?: boolean
+    creditOfficerAccess?: boolean | undefined
     /**
      * The list of branches that can be managed by the API consumer. If the API consumer has the `canManageAllBranches` property set to `TRUE`, this list does not apply.
      */
-    managedBranches?: UserManagedBranch[]
+    managedBranches?: UserManagedBranch[] | undefined
     /**
      * Permissions for the API consumer. The non-admin API consumers and users are authorized to do actions based a set of permissions in order to access Mambu features. Permissions may be relevant for the API and/or the Mambu UI.
      */
-    permissions?: Local0[]
+    permissions?: Permissions[] | undefined
 }
 
 /**
@@ -101,19 +113,19 @@ export interface ApiKey {
     /**
      * A six character cleartext prefix of the API key. The prefix is not guaranteed to be unique. You must base any identification process on the API key ID, not the prefix.
      */
-    apiKey?: string
+    apiKey?: string | undefined
     /**
      * The time to live (TTL) for the API key in seconds.
      */
-    expirationTime?: number
+    expirationTime?: number | undefined
     /**
      * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
      */
-    id?: string
+    id?: string | undefined
 }
 
 export const ApiKey = {
-    validate: (await import('./schemas/api-key.schema.js')).validate as ValidateFunction<ApiKey>,
+    validate: ApiKeyValidator as ValidateFunction<ApiKey>,
     get schema() {
         return ApiKey.validate.schema
     },
@@ -121,6 +133,12 @@ export const ApiKey = {
         return ApiKey.validate.errors ?? undefined
     },
     is: (o: unknown): o is ApiKey => ApiKey.validate(o) === true,
+    parse: (o: unknown): { right: ApiKey } | { left: DefinedError[] } => {
+        if (ApiKey.is(o)) {
+            return { right: o }
+        }
+        return { left: (ApiKey.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -130,11 +148,11 @@ export interface ApiKeyInput {
     /**
      * The time to live (TTL) for the API key in seconds.
      */
-    expirationTime?: number
+    expirationTime?: number | undefined
 }
 
 export const ApiKeyInput = {
-    validate: (await import('./schemas/api-key-input.schema.js')).validate as ValidateFunction<ApiKeyInput>,
+    validate: ApiKeyInputValidator as ValidateFunction<ApiKeyInput>,
     get schema() {
         return ApiKeyInput.validate.schema
     },
@@ -142,19 +160,20 @@ export const ApiKeyInput = {
         return ApiKeyInput.validate.errors ?? undefined
     },
     is: (o: unknown): o is ApiKeyInput => ApiKeyInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ApiKeyInput.validate(o)) {
-            throw new ValidationError(ApiKeyInput.errors ?? [])
+    parse: (o: unknown): { right: ApiKeyInput } | { left: DefinedError[] } => {
+        if (ApiKeyInput.is(o)) {
+            return { right: o }
         }
+        return { left: (ApiKeyInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -162,17 +181,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetAllResponse = ApiConsumer[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -180,13 +200,18 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export type GetKeysByConsumerIdResponse = ApiKey[]
 
 export const GetKeysByConsumerIdResponse = {
-    validate: (await import('./schemas/get-keys-by-consumer-id-response.schema.js'))
-        .validate as ValidateFunction<GetKeysByConsumerIdResponse>,
+    validate: GetKeysByConsumerIdResponseValidator as ValidateFunction<GetKeysByConsumerIdResponse>,
     get schema() {
         return GetKeysByConsumerIdResponse.validate.schema
     },
@@ -194,9 +219,56 @@ export const GetKeysByConsumerIdResponse = {
         return GetKeysByConsumerIdResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetKeysByConsumerIdResponse => GetKeysByConsumerIdResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetKeysByConsumerIdResponse } | { left: DefinedError[] } => {
+        if (GetKeysByConsumerIdResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetKeysByConsumerIdResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
-type Local0 =
+/**
+ * A single change that needs to be made to a resource
+ */
+export interface PatchOperation {
+    /**
+     * The field from where a value should be moved, when using move
+     */
+    from?: string | undefined
+    /**
+     * The change to perform
+     */
+    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
+    /**
+     * The field to perform the operation on
+     */
+    path: string
+    /**
+     * The value of the field, can be null
+     */
+    value?: unknown
+}
+
+export type PatchRequest = PatchOperation[]
+
+export const PatchRequest = {
+    validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
+    get schema() {
+        return PatchRequest.validate.schema
+    },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
+    parse: (o: unknown): { right: PatchRequest } | { left: DefinedError[] } => {
+        if (PatchRequest.is(o)) {
+            return { right: o }
+        }
+        return { left: (PatchRequest.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+type Permissions =
     | 'AUDIT_TRANSACTIONS'
     | 'VIEW_EXCHANGE_RATES'
     | 'CREATE_EXCHANGE_RATE'
@@ -442,52 +514,10 @@ type Local0 =
     | 'VIEW_PROFIT_SHARING_GL_ACCOUNTS'
     | 'VIEW_PROFIT_SHARING_BRANCHES'
 
-/**
- * A single change that needs to be made to a resource
- */
-export interface PatchOperation {
-    /**
-     * The field from where a value should be moved, when using move
-     */
-    from?: string
-    /**
-     * The change to perform
-     */
-    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
-    /**
-     * The field to perform the operation on
-     */
-    path: string
-    /**
-     * The value of the field, can be null
-     */
-    value?: {
-        [k: string]: unknown | undefined
-    }
-}
-
-export type PatchRequest = PatchOperation[]
-
-export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
-    get schema() {
-        return PatchRequest.validate.schema
-    },
-    get errors() {
-        return PatchRequest.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
-        }
-    },
-} as const
-
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
 
 /**
@@ -497,11 +527,11 @@ export interface RoleIdentifier {
     /**
      * The encoded key of the entity, generated automatically, globally unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The ID of the role, which can be generated and customized, but must be unique.
      */
-    id?: string
+    id?: string | undefined
 }
 
 /**
@@ -511,11 +541,11 @@ export interface SecretKey {
     /**
      * The secret key
      */
-    secretKey?: string
+    secretKey?: string | undefined
 }
 
 export const SecretKey = {
-    validate: (await import('./schemas/secret-key.schema.js')).validate as ValidateFunction<SecretKey>,
+    validate: SecretKeyValidator as ValidateFunction<SecretKey>,
     get schema() {
         return SecretKey.validate.schema
     },
@@ -523,6 +553,12 @@ export const SecretKey = {
         return SecretKey.validate.errors ?? undefined
     },
     is: (o: unknown): o is SecretKey => SecretKey.validate(o) === true,
+    parse: (o: unknown): { right: SecretKey } | { left: DefinedError[] } => {
+        if (SecretKey.is(o)) {
+            return { right: o }
+        }
+        return { left: (SecretKey.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -532,5 +568,5 @@ export interface UserManagedBranch {
     /**
      * The encoded key of the branch, it is automatically generated.
      */
-    branchKey?: string
+    branchKey?: string | undefined
 }

@@ -1,12 +1,7 @@
 import { cloneDeep, omitUndefined, pick } from '@skyleague/axioms'
 import { $restclient } from '@skyleague/therefore'
 import type { OpenapiV3 } from '@skyleague/therefore'
-import type {
-    APIKeySecurityScheme,
-    Operation,
-    PathItem,
-    Schema,
-} from '@skyleague/therefore/src/lib/primitives/restclient/openapi.type.js'
+import type { APIKeySecurityScheme, Operation, PathItem, Schema } from '@skyleague/therefore/src/types/openapi.type.js'
 import got from 'got'
 
 export const baseMambuStreaming = got
@@ -20,15 +15,15 @@ export const baseMambuStreaming = got
 
         for (const path of Object.values(data.paths)) {
             for (const [method, op] of Object.entries(
-                pick(path as PathItem, ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace'])
+                pick(path as PathItem, ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace']),
             )) {
                 const operation = op as Operation
                 if (operation.operationId === '"get-subscriptions-subscription_id-events') {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-dynamic-delete
                     delete path[method]
                 } else if (operation.operationId === 'post-subscriptions-subscription_id-cursors') {
                     operation.operationId = 'commitSubscriptionCursors'
                 } else {
+                    // biome-ignore lint/performance/noDelete: This is necessary to remove the operationId
                     delete operation.operationId
                 }
             }
@@ -36,6 +31,7 @@ export const baseMambuStreaming = got
 
         const schemas = data.components?.schemas
         if (schemas !== undefined) {
+            // biome-ignore lint/performance/noDelete: This is necessary
             delete ((schemas.Subscription as Schema).properties?.initial_cursors as Schema).minItems
 
             const eventProperties = (schemas.Event as Schema).properties
@@ -63,7 +59,7 @@ export const baseMambuStreaming = got
                         description: 'An opaque value defined by the server.',
                     },
                 },
-                required: [...(cursor.required ?? []), 'event_type', 'cursor_token'] as [string, ...string[]],
+                required: [...(cursor.required ?? []), 'event_type', 'cursor_token'] as unknown as [string, ...string[]],
             }) as Schema
             schemas['Subscription-Cursor-Without-Token'] = omitUndefined({
                 ...cloneDeep(cursor),
@@ -77,7 +73,7 @@ export const baseMambuStreaming = got
                         description: "The name of the event type this partition's events belong to.",
                     },
                 },
-                required: [...(cursor.required ?? []), 'cursor_token'] as [string, ...string[]],
+                required: [...(cursor.required ?? []), 'cursor_token'] as unknown as [string, ...string[]],
             }) as Schema
         }
 

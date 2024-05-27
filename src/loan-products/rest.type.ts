@@ -3,8 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
+import { validate as LoanProductValidator } from './schemas/loan-product.schema.js'
+import { validate as PatchRequestValidator } from './schemas/patch-request.schema.js'
 
 /**
  * Accounting settings, defines the accounting settings for the product.
@@ -17,15 +22,15 @@ export interface AccountingSettings {
     /**
      * A list of accounting rules for the product.
      */
-    accountingRules?: GLAccountingRule[]
+    accountingRules?: GLAccountingRule[] | undefined
     /**
      * The accounting interest calculation option selected for the product.
      */
-    interestAccrualCalculation?: 'NONE' | 'AGGREGATED_AMOUNT' | 'BREAKDOWN_PER_ACCOUNT'
+    interestAccrualCalculation?: 'NONE' | 'AGGREGATED_AMOUNT' | 'BREAKDOWN_PER_ACCOUNT' | undefined
     /**
      * A list of accounting rules for a product.
      */
-    interestAccruedAccountingMethod?: 'NONE' | 'DAILY' | 'END_OF_MONTH'
+    interestAccruedAccountingMethod?: 'NONE' | 'DAILY' | 'END_OF_MONTH' | undefined
 }
 
 /**
@@ -39,15 +44,15 @@ export interface AccountLinkSettings {
     /**
      * Loan accounts created for this product can only be linked the the savings accounts that use the savings product with this key. If null, the loan accounts for this product can be linked to any savings account.
      */
-    linkableDepositProductKey?: string
+    linkableDepositProductKey?: string | undefined
     /**
      * A set of linked account options.
      */
-    linkedAccountOptions?: ('AUTO_LINK_ACCOUNTS' | 'AUTO_CREATE_LINKED_ACCOUNTS')[]
+    linkedAccountOptions?: ('AUTO_LINK_ACCOUNTS' | 'AUTO_CREATE_LINKED_ACCOUNTS')[] | undefined
     /**
      * Set the option of automated transfer that should be made from linked deposit accounts into loan accounts create from this product.
      */
-    settlementMethod?: 'FULL_DUE_AMOUNTS' | 'PARTIAL_DUE_AMOUNTS' | 'NO_AUTOMATED_TRANSFERS'
+    settlementMethod?: 'FULL_DUE_AMOUNTS' | 'PARTIAL_DUE_AMOUNTS' | 'NO_AUTOMATED_TRANSFERS' | undefined
 }
 
 /**
@@ -57,19 +62,19 @@ export interface AmountDecimalConstraints {
     /**
      * The default value, will be used in case no other value was filled in by the user.
      */
-    defaultValue?: number
+    defaultValue?: number | undefined
     /**
      * The encoded key of the decimal constraint, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The maximum value.
      */
-    maxValue?: number
+    maxValue?: number | undefined
     /**
      * The minimum value.
      */
-    minValue?: number
+    minValue?: number | undefined
 }
 
 /**
@@ -79,11 +84,11 @@ export interface BillingCyclesProductSettings {
     /**
      * The billing cycle status if it is enabled or disabled
      */
-    enabled?: boolean
+    enabled?: boolean | undefined
     /**
      * The billing cycle start days in case it is enabled
      */
-    startDays?: number[]
+    startDays?: number[] | undefined
 }
 
 /**
@@ -93,11 +98,11 @@ export interface BranchSettings {
     /**
      * Holds the encoded keys of the branches this product should be available for.
      */
-    availableProductBranches?: string[]
+    availableProductBranches?: string[] | undefined
     /**
      * Indicates if this product should be available for all branches
      */
-    forAllBranches?: boolean
+    forAllBranches?: boolean | undefined
 }
 
 /**
@@ -107,7 +112,7 @@ export interface CreditArrangementSettings {
     /**
      * Shows whether accounts created after this product can/should be part of a line of credit.
      */
-    creditArrangementRequirement?: 'OPTIONAL' | 'REQUIRED' | 'NOT_REQUIRED'
+    creditArrangementRequirement?: 'OPTIONAL' | 'REQUIRED' | 'NOT_REQUIRED' | undefined
 }
 
 /**
@@ -301,15 +306,17 @@ export interface Currency {
         | 'XXX'
         | 'YER'
         | 'ZAR'
+        | 'ZIG'
         | 'ZMK'
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+        | undefined
     /**
      * Currency code for NON_FIAT currency.
      */
-    currencyCode?: string
+    currencyCode?: string | undefined
 }
 
 /**
@@ -319,11 +326,11 @@ export interface DaysInMonth {
     /**
      * Specifies the day(s) of the month when the interest application dates should be. Only available if the Interest Application Method is InterestApplicationMethodDTO#FIXED_DAYS_OF_MONTH. Currently only 1 value can be specified.
      */
-    daysInMonth?: number[]
+    daysInMonth?: number[] | undefined
     /**
      * Determines how to handle the short months, if they select a fixed day of month > 28. Will be null if no such date is selected. Only available if the Interest Application Method is InterestApplicationMethodDTO#FIXED_DAYS_OF_MONTH.
      */
-    shortMonthHandlingMethod?: 'LAST_DAY_IN_MONTH' | 'FIRST_DAY_OF_NEXT_MONTH'
+    shortMonthHandlingMethod?: 'LAST_DAY_IN_MONTH' | 'FIRST_DAY_OF_NEXT_MONTH' | undefined
 }
 
 /**
@@ -333,19 +340,19 @@ export interface DecimalConstraints {
     /**
      * The default value, will be used in case no other value was filled in by the user.
      */
-    defaultValue?: number
+    defaultValue?: number | undefined
     /**
      * The encoded key of the decimal constraint, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The maximum value.
      */
-    maxValue?: number
+    maxValue?: number | undefined
     /**
      * The minimum value.
      */
-    minValue?: number
+    minValue?: number | undefined
 }
 
 /**
@@ -355,15 +362,15 @@ export interface DecimalInterval {
     /**
      * The default value, will be used in case no other value was filled in by the user.
      */
-    defaultValue?: number
+    defaultValue?: number | undefined
     /**
      * The maximum value.
      */
-    maxValue?: number
+    maxValue?: number | undefined
     /**
      * The minimum value.
      */
-    minValue?: number
+    minValue?: number | undefined
 }
 
 /**
@@ -373,31 +380,31 @@ export interface DocumentTemplate {
     /**
      * The creation date of the document
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The document encodedKey
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The last modified date of the document
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The name the document
      */
-    name?: string
+    name?: string | undefined
     /**
      * The type of the template
      */
-    type?: 'ACCOUNT' | 'TRANSACTION' | 'ACCOUNT_WITH_TRANSACTIONS'
+    type?: 'ACCOUNT' | 'TRANSACTION' | 'ACCOUNT_WITH_TRANSACTIONS' | undefined
 }
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -405,10 +412,11 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -419,11 +427,11 @@ export interface FeesSettings {
     /**
      * Only if true users will be able to apply fees, for current object, of type 'Other'; these fees can have any amount.
      */
-    allowArbitraryFees?: boolean
+    allowArbitraryFees?: boolean | undefined
     /**
      * List of all fees that can be applied for accounts of this loan product.
      */
-    fees?: PredefinedFee[]
+    fees?: PredefinedFee[] | undefined
 }
 
 /**
@@ -433,7 +441,7 @@ export interface FeeTaxSettings {
     /**
      * Marks a specific fee as non-taxable (taxes are not calculated for it).Feature is in the Early Stage. To be enabled by request.
      */
-    taxableCalculationMethod?: 'DEFAULT' | 'NON_TAXABLE' | 'CUSTOM_TAX'
+    taxableCalculationMethod?: 'DEFAULT' | 'NON_TAXABLE' | 'CUSTOM_TAX' | undefined
 }
 
 /**
@@ -443,7 +451,7 @@ export interface FourEyesPrinciple {
     /**
      * Requires separate users to create and approve loan accounts
      */
-    activeForLoanApproval?: boolean
+    activeForLoanApproval?: boolean | undefined
 }
 
 /**
@@ -453,27 +461,27 @@ export interface FundingSettings {
     /**
      * Indicates whether the product has the investor funds enabled or not.
      */
-    enabled?: boolean
-    funderInterestCommission?: DecimalConstraints
+    enabled?: boolean | undefined
+    funderInterestCommission?: DecimalConstraints | undefined
     /**
      * Define how the Interest is allocated to the investors(if the investors can define their own percentages for their own contribution to the loan, or if all of them are using the same percentage).
      */
-    funderInterestCommissionAllocationType?: 'PERCENTAGE_OF_LOAN_FUNDING' | 'FIXED_INTEREST_COMMISSIONS'
+    funderInterestCommissionAllocationType?: 'PERCENTAGE_OF_LOAN_FUNDING' | 'FIXED_INTEREST_COMMISSIONS' | undefined
     /**
      * Shows whether investor funds are locked or not at the loan account's approval.
      */
-    lockFundsAtApproval?: boolean
-    organizationInterestCommission?: DecimalConstraints
+    lockFundsAtApproval?: boolean | undefined
+    organizationInterestCommission?: DecimalConstraints | undefined
     /**
      * The required investor funds percentage, for opening an account with external funding. If null, the investor funds are not enabled.
      */
-    requiredFunds?: number
+    requiredFunds?: number | undefined
 }
 
 export type GetAllResponse = LoanProduct[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -481,6 +489,12 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -490,7 +504,7 @@ export interface GLAccountingRule {
     /**
      * The encoded key of the accounting rule, auto generated, unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * General Ledger Financial Resources used to setup the product accounting rules and determine the credit and debit accounts when logging journal entries
      */
@@ -529,18 +543,18 @@ export interface GLAccountingRule {
     /**
      * The key of the transaction rule that uses this rule
      */
-    transactionChannelKey?: string
+    transactionChannelKey?: string | undefined
 }
 
 /**
  * The funding settings, holds the settings regarding the funding for the loan product.
  */
 export interface GracePeriodSettings {
-    gracePeriod?: IntegerIntervalConstraints
+    gracePeriod?: IntegerIntervalConstraints | undefined
     /**
      * The grace period type. Representing the type of grace period which is possible for a loan account.
      */
-    gracePeriodType?: 'NONE' | 'PAY_INTEREST_ONLY' | 'INTEREST_FORGIVENESS'
+    gracePeriodType?: 'NONE' | 'PAY_INTEREST_ONLY' | 'INTEREST_FORGIVENESS' | undefined
 }
 
 /**
@@ -550,19 +564,19 @@ export interface IntegerIntervalConstraints {
     /**
      * The default value, will be used in case no other value was filled in by the user.
      */
-    defaultValue?: number
+    defaultValue?: number | undefined
     /**
      * The encoded key of the integer constraint, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The maximum value.
      */
-    maxValue?: number
+    maxValue?: number | undefined
     /**
      * The minimum value.
      */
-    minValue?: number
+    minValue?: number | undefined
 }
 
 /**
@@ -572,70 +586,63 @@ export interface InterestProductSettings {
     /**
      * If the product supports this option, specify if the interest should be accrued after the account maturity date
      */
-    accrueInterestAfterMaturity?: boolean
+    accrueInterestAfterMaturity?: boolean | undefined
     /**
      * Indicator whether the loan product allows negative values for interest rate or interest spread
      */
-    allowNegativeInterestRate?: boolean
+    allowNegativeInterestRate?: boolean | undefined
     /**
      * The encoded key of the interest rate tier, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * Index rate source key.
      */
-    indexSourceKey?: string
+    indexSourceKey?: string | undefined
     /**
      * The interval used for determining how often is interest charged
      */
-    interestChargeFrequency?: 'ANNUALIZED' | 'EVERY_MONTH' | 'EVERY_FOUR_WEEKS' | 'EVERY_WEEK' | 'EVERY_DAY' | 'EVERY_X_DAYS'
+    interestChargeFrequency?:
+        | 'ANNUALIZED'
+        | 'EVERY_MONTH'
+        | 'EVERY_FOUR_WEEKS'
+        | 'EVERY_WEEK'
+        | 'EVERY_DAY'
+        | 'EVERY_X_DAYS'
+        | undefined
     /**
      * the count of units to apply over the interval
      */
-    interestChargeFrequencyCount?: number
-    interestRate?: DecimalInterval
+    interestChargeFrequencyCount?: number | undefined
+    interestRate?: DecimalInterval | undefined
     /**
      * Interest spread + index interest rate can't be more than this amount (valid only for index interest rate products).
      */
-    interestRateCeilingValue?: number
+    interestRateCeilingValue?: number | undefined
     /**
      * Interest spread + index interest rate can't be less than this amount (valid only for index interest rate products).
      */
-    interestRateFloorValue?: number
+    interestRateFloorValue?: number | undefined
     /**
      * Interest rate review frequency unit count
      */
-    interestRateReviewCount?: number
+    interestRateReviewCount?: number | undefined
     /**
      * Interest rate review frequency measurement unit
      */
-    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
+    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | undefined
     /**
      * Interest calculation method: fixed or (interest spread + active organization index interest rate)
      */
-    interestRateSource?: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE'
+    interestRateSource?: 'FIXED_INTEREST_RATE' | 'INDEX_INTEREST_RATE' | undefined
     /**
      * The option for how is the interest rate determined when being accrued for an account
      */
-    interestRateTerms?: 'FIXED' | 'TIERED' | 'TIERED_PERIOD' | 'TIERED_BAND'
+    interestRateTerms?: 'FIXED' | 'TIERED' | 'TIERED_PERIOD' | 'TIERED_BAND' | undefined
     /**
      * The list of interest rate tiers available for the current settings instance
      */
-    interestRateTiers?: InterestRateTier[]
-}
-
-/**
- * Represents interest rate change threshold settings for loan accounts and loan products.
- */
-export interface InterestRateChangePMTAdjustmentThreshold {
-    /**
-     * The method used to calculate the interest rate change threshold. Supported value is CALENDAR_DAYS
-     */
-    method?: 'WORKING_DAYS' | 'CALENDAR_DAYS'
-    /**
-     * The number of days that trigger an interest rate change.
-     */
-    numberOfDays?: number
+    interestRateTiers?: InterestRateTier[] | undefined
 }
 
 /**
@@ -645,11 +652,11 @@ export interface InterestRateTier {
     /**
      * The encoded key of the interest rate tier, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The top-limit value for the account balance in order to determine if this tier is used or not
      */
-    endingBalance?: number
+    endingBalance?: number | undefined
     /**
      * The rate used for computing the interest for an account which has the balance less than the ending balance
      */
@@ -663,87 +670,94 @@ export interface InternalControls {
     /**
      * Specifies the number of days for an account to be fully paid in order to auto close it.
      */
-    dormancyPeriodDays?: number
-    fourEyesPrinciple?: FourEyesPrinciple
-    lockSettings?: LockSettings
+    dormancyPeriodDays?: number | undefined
+    fourEyesPrinciple?: FourEyesPrinciple | undefined
+    lockSettings?: LockSettings | undefined
 }
 
 /**
  * The amount settings, holds all amount properties.
  */
 export interface LoanAmountSettings {
-    loanAmount?: AmountDecimalConstraints
-    trancheSettings?: TrancheSettings
+    loanAmount?: AmountDecimalConstraints | undefined
+    trancheSettings?: TrancheSettings | undefined
 }
 
 /**
  * Represents a loan product.
  */
 export interface LoanProduct {
-    accountingSettings?: AccountingSettings
-    accountLinkSettings?: AccountLinkSettings
+    accountingSettings?: AccountingSettings | undefined
+    accountLinkSettings?: AccountLinkSettings | undefined
     /**
      * `TRUE` if it is possible to adjust the interest for the first repayment when the first repayment period is different than the repayment frequency, `FALSE` otherwise.
      */
-    adjustInterestForFirstInstallment?: boolean
+    adjustInterestForFirstInstallment?: boolean | undefined
     /**
      * `TRUE` if an additional payment may be allocated on the account, ignoring the default repayment allocation order, `FALSE` otherwise.
      */
-    allowCustomRepaymentAllocation?: boolean
-    arrearsSettings?: ProductArrearsSettings
-    availabilitySettings?: ProductAvailabilitySettings
+    allowCustomRepaymentAllocation?: boolean | undefined
+    arrearsSettings?: ProductArrearsSettings | undefined
+    availabilitySettings?: ProductAvailabilitySettings | undefined
     /**
      * The category of the loan product.
      */
-    category?: 'PERSONAL_LENDING' | 'PURCHASE_FINANCING' | 'RETAIL_MORTGAGES' | 'SME_LENDING' | 'COMMERCIAL' | 'UNCATEGORIZED'
+    category?:
+        | 'PERSONAL_LENDING'
+        | 'PURCHASE_FINANCING'
+        | 'RETAIL_MORTGAGES'
+        | 'SME_LENDING'
+        | 'COMMERCIAL'
+        | 'UNCATEGORIZED'
+        | undefined
     /**
      * The date the loan product was created.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     creditArrangementSettings: CreditArrangementSettings
-    currency?: Currency
+    currency?: Currency | undefined
     /**
      * The encoded key of the loan product, it is auto generated, and unique.
      */
-    encodedKey?: string
-    feesSettings?: FeesSettings
-    fundingSettings?: FundingSettings
-    gracePeriodSettings?: GracePeriodSettings
+    encodedKey?: string | undefined
+    feesSettings?: FeesSettings | undefined
+    fundingSettings?: FundingSettings | undefined
+    gracePeriodSettings?: GracePeriodSettings | undefined
     /**
      * The ID of the loan product, can be generated and customized, and must be unique.
      */
     id: string
-    interestSettings?: ProductInterestSettings
-    internalControls?: InternalControls
+    interestSettings?: ProductInterestSettings | undefined
+    internalControls?: InternalControls | undefined
     /**
      * The last date the loan product was updated.
      */
-    lastModifiedDate?: string
-    loanAmountSettings?: LoanAmountSettings
+    lastModifiedDate?: string | undefined
+    loanAmountSettings?: LoanAmountSettings | undefined
     /**
      * The name of the loan product.
      */
     name: string
-    newAccountSettings?: NewAccountSettings
+    newAccountSettings?: NewAccountSettings | undefined
     /**
      * The notes or description of the loan product.
      */
-    notes?: string
-    offsetSettings?: OffsetSettings
-    paymentSettings?: PaymentSettings
-    penaltySettings?: ProductPenaltySettings
-    redrawSettings?: ProductRedrawSettings
-    scheduleSettings?: LoanProductScheduleSettings
-    securitySettings?: SecuritySettings
+    notes?: string | undefined
+    offsetSettings?: OffsetSettings | undefined
+    paymentSettings?: PaymentSettings | undefined
+    penaltySettings?: ProductPenaltySettings | undefined
+    redrawSettings?: ProductRedrawSettings | undefined
+    scheduleSettings?: LoanProductScheduleSettings | undefined
+    securitySettings?: SecuritySettings | undefined
     /**
      * The current state of the loan product.
      */
-    state?: 'ACTIVE' | 'INACTIVE'
-    taxSettings?: TaxSettings
+    state?: 'ACTIVE' | 'INACTIVE' | undefined
+    taxSettings?: TaxSettings | undefined
     /**
      * The template documents of the loan product.
      */
-    templates?: DocumentTemplate[]
+    templates?: DocumentTemplate[] | undefined
     /**
      * The type of the loan product.
      */
@@ -757,7 +771,7 @@ export interface LoanProduct {
 }
 
 export const LoanProduct = {
-    validate: (await import('./schemas/loan-product.schema.js')).validate as ValidateFunction<LoanProduct>,
+    validate: LoanProductValidator as ValidateFunction<LoanProduct>,
     get schema() {
         return LoanProduct.validate.schema
     },
@@ -765,10 +779,11 @@ export const LoanProduct = {
         return LoanProduct.validate.errors ?? undefined
     },
     is: (o: unknown): o is LoanProduct => LoanProduct.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!LoanProduct.validate(o)) {
-            throw new ValidationError(LoanProduct.errors ?? [])
+    parse: (o: unknown): { right: LoanProduct } | { left: DefinedError[] } => {
+        if (LoanProduct.is(o)) {
+            return { right: o }
         }
+        return { left: (LoanProduct.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -776,31 +791,31 @@ export const LoanProduct = {
  * Defines the settings and constraints for schedule for the loans that are created based on this product.
  */
 export interface LoanProductScheduleSettings {
-    amortizationPeriod?: ProductAmortizationPeriod
-    billingCycles?: BillingCyclesProductSettings
+    amortizationPeriod?: ProductAmortizationPeriod | undefined
+    billingCycles?: BillingCyclesProductSettings | undefined
     /**
      * Interval Repayment Methodology Settings.
      */
-    defaultRepaymentPeriodCount?: number
-    firstRepaymentDueDateOffset?: IntegerIntervalConstraints
+    defaultRepaymentPeriodCount?: number | undefined
+    firstRepaymentDueDateOffset?: IntegerIntervalConstraints | undefined
     /**
      * Specifies the days of the month when the repayment due dates should be. Only available if the Repayment Methodology is ScheduleDueDatesMethodDTO#FIXED_DAYS_OF_MONTH.
      */
-    fixedDaysOfMonth?: number[]
+    fixedDaysOfMonth?: number[] | undefined
     /**
      * Represents the moment the interest will start getting accrued.
      */
-    interestAccrualSince?: 'DISBURSEMENT' | 'DUE_DATE'
-    numInstallments?: IntegerIntervalConstraints
-    previewSchedule?: PreviewScheduleSettings
+    interestAccrualSince?: 'DISBURSEMENT' | 'DUE_DATE' | undefined
+    numInstallments?: IntegerIntervalConstraints | undefined
+    previewSchedule?: PreviewScheduleSettings | undefined
     /**
      * The repayment method value
      */
-    repaymentMethod?: 'AMOUNT' | 'INSTALLMENTS'
+    repaymentMethod?: 'AMOUNT' | 'INSTALLMENTS' | undefined
     /**
      * The frequency of the loan repayment.
      */
-    repaymentPeriodUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS'
+    repaymentPeriodUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS' | undefined
     /**
      * The repayment rescheduling method used in calculations.
      */
@@ -808,32 +823,22 @@ export interface LoanProductScheduleSettings {
     /**
      * Shows the properties from the repayment schedule can be edited.
      */
-    repaymentScheduleEditOptions?: Local1[]
+    repaymentScheduleEditOptions?: RepaymentScheduleEditOptions[] | undefined
     /**
      * The repayment schedule method. Represents the method that determines whether the schedule will be fixed all over the loan account's life cycle or will be dynamically recomputed when required.
      */
     repaymentScheduleMethod: 'NONE' | 'FIXED' | 'DYNAMIC'
-    roundingSettings?: RoundingSettings
+    roundingSettings?: RoundingSettings | undefined
     /**
      * The methodology used by this product to compute the due dates of the repayments.
      */
     scheduleDueDatesMethod: 'INTERVAL' | 'FIXED_DAYS_OF_MONTH'
+    scheduleEditOptionDetails?: RepaymentScheduleEditOptionDetails | undefined
     /**
      * Determines how to handle the short months, if they select a fixed day of month > 28. Will be null if no such date is selected and also for the Interval methodology. Only available if the Schedule Due Dates Method is ScheduleDueDatesMethodDTO#FIXED_DAYS_OF_MONTHs.
      */
-    shortMonthHandlingMethod?: 'LAST_DAY_IN_MONTH' | 'FIRST_DAY_OF_NEXT_MONTH'
+    shortMonthHandlingMethod?: 'LAST_DAY_IN_MONTH' | 'FIRST_DAY_OF_NEXT_MONTH' | undefined
 }
-
-type Local0 = 'PRINCIPAL' | 'INTEREST' | 'FEE' | 'PENALTY'
-
-type Local1 =
-    | 'ADJUST_PAYMENT_DATES'
-    | 'ADJUST_PRINCIPAL_PAYMENT_SCHEDULE'
-    | 'ADJUST_INTEREST_PAYMENT_SCHEDULE'
-    | 'ADJUST_FEE_PAYMENT_SCHEDULE'
-    | 'ADJUST_PENALTY_PAYMENT_SCHEDULE'
-    | 'ADJUST_NUMBER_OF_INSTALLMENTS'
-    | 'ADJUST_PAYMENT_HOLIDAYS'
 
 /**
  * Settings applied when transitioning accounts to Locked state
@@ -842,19 +847,19 @@ export interface LockSettings {
     /**
      * Specifies constraint types for capping charges.
      */
-    cappingConstraintType?: 'SOFT_CAP' | 'HARD_CAP'
+    cappingConstraintType?: 'SOFT_CAP' | 'HARD_CAP' | undefined
     /**
      * Specifies how principal will be used when calculating capping charges.
      */
-    cappingMethod?: 'OUTSTANDING_PRINCIPAL_PERCENTAGE' | 'ORIGINAL_PRINCIPAL_PERCENTAGE'
+    cappingMethod?: 'OUTSTANDING_PRINCIPAL_PERCENTAGE' | 'ORIGINAL_PRINCIPAL_PERCENTAGE' | undefined
     /**
      * Specifies the percentage of principal that cannot be exceeded by the sum of interest, fees and penalty balances.
      */
-    cappingPercentage?: number
+    cappingPercentage?: number | undefined
     /**
      * Specifies the number of days for in which the account will be locked if it stays in arrears.
      */
-    lockPeriodDays?: number
+    lockPeriodDays?: number | undefined
 }
 
 /**
@@ -882,7 +887,7 @@ export interface OffsetSettings {
     /**
      * Indicates whether the product supports offset
      */
-    allowOffset?: boolean
+    allowOffset?: boolean | undefined
 }
 
 /**
@@ -892,7 +897,7 @@ export interface PatchOperation {
     /**
      * The field from where a value should be moved, when using move
      */
-    from?: string
+    from?: string | undefined
     /**
      * The change to perform
      */
@@ -904,15 +909,13 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: {
-        [k: string]: unknown | undefined
-    }
+    value?: unknown
 }
 
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
+    validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -920,12 +923,23 @@ export const PatchRequest = {
         return PatchRequest.validate.errors ?? undefined
     },
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
+    parse: (o: unknown): { right: PatchRequest } | { left: DefinedError[] } => {
+        if (PatchRequest.is(o)) {
+            return { right: o }
         }
+        return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
+
+/**
+ * Holds Payment Holidays Settings
+ */
+export interface PaymentHolidaysSettings {
+    /**
+     * payment holiday option
+     */
+    paymentHolidaysLoanTermOption?: 'EXTEND_LOAN_TERM' | 'KEEP_THE_SAME_LOAN_TERM' | undefined
+}
 
 /**
  * Defines the payment settings for the loan product and for loans crated based on this product.
@@ -934,21 +948,21 @@ export interface PaymentSettings {
     /**
      * Payments Method used by loan accounts for repayments schedule generation.
      */
-    amortizationMethod?: 'STANDARD_PAYMENTS' | 'BALLOON_PAYMENTS' | 'OPTIMIZED_PAYMENTS' | 'PAYMENT_PLAN'
+    amortizationMethod?: 'STANDARD_PAYMENTS' | 'BALLOON_PAYMENTS' | 'OPTIMIZED_PAYMENTS' | 'PAYMENT_PLAN' | undefined
     /**
      * Recalculate the schedule when late payments are posted on dynamic Equal Installments loans.
      */
-    latePaymentsRecalculationMethod: 'OVERDUE_INSTALLMENTS_INCREASE' | 'LAST_INSTALLMENT_INCREASE'
+    latePaymentsRecalculationMethod: 'OVERDUE_INSTALLMENTS_INCREASE' | 'LAST_INSTALLMENT_INCREASE' | 'NO_RECALCULATION'
     /**
      * The payment method. Represents the interest payment method that determines whether the payments are made Horizontally (on the Repayments) or Vertically (on the Loan Account)
      */
     paymentMethod: 'HORIZONTAL' | 'VERTICAL'
-    prepaymentSettings?: ProductPrepaymentSettings
-    principalPaymentSettings?: PrincipalPaymentProductSettings
+    prepaymentSettings?: ProductPrepaymentSettings | undefined
+    principalPaymentSettings?: PrincipalPaymentProductSettings | undefined
     /**
      * A list of basic repayment allocation elements such as the principal, interest & fees.
      */
-    repaymentAllocationOrder: Local0[]
+    repaymentAllocationOrder: ('PRINCIPAL' | 'INTEREST' | 'FEE' | 'PENALTY')[]
 }
 
 /**
@@ -958,37 +972,52 @@ export interface PeriodIntervalSettings {
     /**
      * Type of amortization profile used for fee
      */
-    amortizationProfile?: 'NONE' | 'SUM_OF_YEARS_DIGITS' | 'STRAIGHT_LINE' | 'EFFECTIVE_INTEREST_RATE'
+    amortizationProfile?: 'NONE' | 'SUM_OF_YEARS_DIGITS' | 'STRAIGHT_LINE' | 'EFFECTIVE_INTEREST_RATE' | undefined
     /**
      * The encoded key of the period interval settings, auto generated, unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * Flag for signaling if fee amortization should be continued or finished at account reschedule/refinance
      */
     feeAmortizationUponRescheduleRefinanceOption?:
         | 'END_AMORTIZATION_ON_THE_ORIGINAL_ACCOUNT'
         | 'CONTINUE_AMORTIZATION_ON_THE_RESCHEDULED_REFINANCED_ACCOUNT'
+        | undefined
     /**
      * Frequency settings of the fee amortization
      */
-    frequency?: 'ACCOUNT_INSTALLMENTS_DUE_DATES' | 'ACCOUNT_INSTALLMENTS_DUE_DATES_DAILY_BOOKING' | 'CUSTOM_INTERVAL'
+    frequency?: 'ACCOUNT_INSTALLMENTS_DUE_DATES' | 'ACCOUNT_INSTALLMENTS_DUE_DATES_DAILY_BOOKING' | 'CUSTOM_INTERVAL' | undefined
     /**
      * Total number of intervals
      */
-    intervalCount?: number
+    intervalCount?: number | undefined
     /**
      * Defines the options for an interval
      */
-    intervalType?: 'PREDEFINED_INTERVALS' | 'FULL_TERM'
+    intervalType?: 'PREDEFINED_INTERVALS' | 'FULL_TERM' | undefined
     /**
      * Period count used in conjunction with periodUnit to determine the next date of the interval
      */
-    periodCount?: number
+    periodCount?: number | undefined
     /**
      * Amortization unit to determine the interval between amortizations
      */
-    periodUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS'
+    periodUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS' | undefined
+}
+
+/**
+ * Represents PMT Adjustment threshold settings for loan accounts and loan products.
+ */
+export interface PMTAdjustmentThreshold {
+    /**
+     * The method used to calculate the PMT Adjustment threshold. Supported value is CALENDAR_DAYS
+     */
+    method?: 'WORKING_DAYS' | 'CALENDAR_DAYS' | undefined
+    /**
+     * The number of days that trigger a PMT Adjustment.
+     */
+    numberOfDays?: number | undefined
 }
 
 /**
@@ -998,16 +1027,16 @@ export interface PredefinedFee {
     /**
      * A list of accounting rules defined for this fee. If null, product default rules are selected.
      */
-    accountingRules?: GLAccountingRule[]
-    amortizationSettings?: PeriodIntervalSettings
+    accountingRules?: GLAccountingRule[] | undefined
+    amortizationSettings?: PeriodIntervalSettings | undefined
     /**
      * The amount of the fee
      */
-    amount?: number
+    amount?: number | undefined
     /**
      * Mambu Function name used for the fee calculation
      */
-    amountCalculationFunctionName?: string
+    amountCalculationFunctionName?: string | undefined
     /**
      * The amount from which the fee is calculated using percentageAmount
      */
@@ -1021,18 +1050,19 @@ export interface PredefinedFee {
         | 'IOF_PERCENTAGE_OF_INSTALLMENT_PRINCIPAL'
         | 'IOF_PERCENTAGE_OF_LATE_INSTALLMENT_PRINCIPAL'
         | 'MAMBU_FUNCTION'
+        | undefined
     /**
      * Shows when a fee should be applied; to be used with monthly deposit fees
      */
-    applyDateMethod?: 'MONTHLY_FROM_ACTIVATION' | 'FIRST_OF_EVERY_MONTH'
+    applyDateMethod?: 'MONTHLY_FROM_ACTIVATION' | 'FIRST_OF_EVERY_MONTH' | undefined
     /**
      * Shows the creation date of the fee
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The encoded key of the predefined fee, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The type of fee application when disbursement is applied
      */
@@ -1040,24 +1070,24 @@ export interface PredefinedFee {
     /**
      * The id of the fee
      */
-    id?: string
+    id?: string | undefined
     /**
      * Shows the last modified date of the fee
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The name of the fee
      */
-    name?: string
+    name?: string | undefined
     /**
      * The amount of the fee in percents applied to percentSource
      */
-    percentageAmount?: number
+    percentageAmount?: number | undefined
     /**
      * Indicates the state of the fee
      */
     state: 'ACTIVE' | 'INACTIVE'
-    taxSettings?: FeeTaxSettings
+    taxSettings?: FeeTaxSettings | undefined
     /**
      * Shows the event that will trigger a fee
      */
@@ -1082,43 +1112,43 @@ export interface PreviewScheduleSettings {
     /**
      * Number of Previewed Instalments.
      */
-    numberOfPreviewedInstalments?: number
+    numberOfPreviewedInstalments?: number | undefined
     /**
      * Preview Schedule status.
      */
-    previewScheduleEnabled?: boolean
+    previewScheduleEnabled?: boolean | undefined
 }
 
 /**
  * Defines the principal payment settings constraints for the loans that will be created based on this product.
  */
 export interface PrincipalPaymentProductSettings {
-    amount?: AmountDecimalConstraints
+    amount?: AmountDecimalConstraints | undefined
     /**
      * How many repayments the principal has to be paid
      */
-    defaultPrincipalRepaymentInterval?: number
+    defaultPrincipalRepaymentInterval?: number | undefined
     /**
      * The encoded key of the settings, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * If true, the fees will be included along with the principal in the repayment floor amount, for a revolving credit account
      */
-    includeFeesInFloorAmount?: boolean
+    includeFeesInFloorAmount?: boolean | undefined
     /**
      * If true, the interest will be included along with the principal in the repayment floor amount, for a revolving credit account
      */
-    includeInterestInFloorAmount?: boolean
-    percentage?: DecimalConstraints
+    includeInterestInFloorAmount?: boolean | undefined
+    percentage?: DecimalConstraints | undefined
     /**
      * The maximum principal due amount a repayment made with this settings can have
      */
-    principalCeilingValue?: number
+    principalCeilingValue?: number | undefined
     /**
      * The minimum principal due amount a repayment made with this settings can have
      */
-    principalFloorValue?: number
+    principalFloorValue?: number | undefined
     /**
      * The method of principal payment for revolving credit
      */
@@ -1129,10 +1159,11 @@ export interface PrincipalPaymentProductSettings {
         | 'TOTAL_BALANCE_PERCENTAGE'
         | 'TOTAL_BALANCE_FLAT'
         | 'TOTAL_PRINCIPAL_PERCENTAGE'
+        | undefined
     /**
      * The minimum total due amount a repayment made with this settings can have
      */
-    totalDueAmountFloor?: number
+    totalDueAmountFloor?: number | undefined
     /**
      * The method of total due payment for revolving credit
      */
@@ -1143,6 +1174,7 @@ export interface PrincipalPaymentProductSettings {
         | 'TOTAL_BALANCE_PERCENTAGE'
         | 'TOTAL_BALANCE_FLAT'
         | 'TOTAL_PRINCIPAL_PERCENTAGE'
+        | undefined
 }
 
 /**
@@ -1152,15 +1184,15 @@ export interface ProductAmortizationPeriod {
     /**
      * default value
      */
-    defaultValue?: number
+    defaultValue?: number | undefined
     /**
      * max value
      */
-    maxValue?: number
+    maxValue?: number | undefined
     /**
      * min value
      */
-    minValue?: number
+    minValue?: number | undefined
 }
 
 /**
@@ -1174,28 +1206,29 @@ export interface ProductArrearsSettings {
         | 'ACCOUNT_FIRST_WENT_TO_ARREARS'
         | 'LAST_LATE_REPAYMENT'
         | 'ACCOUNT_FIRST_BREACHED_MATERIALITY_THRESHOLD'
+        | undefined
     /**
      * The encoded key of the arrears base settings, auto generated, unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * Defines the tolerance monthly date
      */
-    monthlyToleranceDay?: number
+    monthlyToleranceDay?: number | undefined
     /**
      * Shows whether the non working days are taken in consideration or not when applying penaltees/late fees or when setting an account into arrears
      */
-    nonWorkingDaysMethod?: 'INCLUDED' | 'EXCLUDED'
+    nonWorkingDaysMethod?: 'INCLUDED' | 'EXCLUDED' | undefined
     /**
      * Defines the tolerance calculation method
      */
-    toleranceCalculationMethod?: 'ARREARS_TOLERANCE_PERIOD' | 'MONTHLY_ARREARS_TOLERANCE_DAY'
+    toleranceCalculationMethod?: 'ARREARS_TOLERANCE_PERIOD' | 'MONTHLY_ARREARS_TOLERANCE_DAY' | undefined
     /**
      * The tolerance floor amount.
      */
-    toleranceFloorAmount?: number
-    tolerancePercentageOfOutstandingPrincipal?: DecimalInterval
-    tolerancePeriod?: IntegerIntervalConstraints
+    toleranceFloorAmount?: number | undefined
+    tolerancePercentageOfOutstandingPrincipal?: DecimalInterval | undefined
+    tolerancePeriod?: IntegerIntervalConstraints | undefined
 }
 
 /**
@@ -1205,8 +1238,8 @@ export interface ProductAvailabilitySettings {
     /**
      * Holds the entities this product is available for. i.e Individuals
      */
-    availableFor?: ('INDIVIDUALS' | 'PURE_GROUPS' | 'SOLIDARITY_GROUPS')[]
-    branchSettings?: BranchSettings
+    availableFor?: ('INDIVIDUALS' | 'PURE_GROUPS' | 'SOLIDARITY_GROUPS')[] | undefined
+    branchSettings?: BranchSettings | undefined
 }
 
 /**
@@ -1216,28 +1249,28 @@ export interface ProductInterestRateSettings {
     /**
      * The encoded key of the interest rate settings, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * Index rate source key.
      */
-    indexSourceKey?: string
-    interestRate?: DecimalInterval
+    indexSourceKey?: string | undefined
+    interestRate?: DecimalInterval | undefined
     /**
      * Maximum value allowed for index based interest rate. Valid only for index interest rate.
      */
-    interestRateCeilingValue?: number
+    interestRateCeilingValue?: number | undefined
     /**
      * Minimum value allowed for index based interest rate. Valid only for index interest rate.
      */
-    interestRateFloorValue?: number
+    interestRateFloorValue?: number | undefined
     /**
      * Interest rate review frequency unit count. Valid only for index interest rate.
      */
-    interestRateReviewCount?: number
+    interestRateReviewCount?: number | undefined
     /**
      * Interest rate review frequency measurement unit. Valid only for index interest rate.
      */
-    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
+    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | undefined
     /**
      * Interest calculation method: fixed or indexed(interest spread + active organization index interest rate)
      */
@@ -1251,38 +1284,38 @@ export interface ProductInterestSettings {
     /**
      * Whether late interest should be accrued, applied and paid
      */
-    accrueLateInterest?: boolean
+    accrueLateInterest?: boolean | undefined
     /**
      * The frequency on which the accrued interest will be added to the principal for interest calculation. It is used only for InterestType.COMPOUNDING_INTEREST
      */
-    compoundingFrequency?: 'DAILY'
+    compoundingFrequency?: 'DAILY' | undefined
     /**
      * The days in year that should be used for loan calculations.
      */
     daysInYear: 'ACTUAL_365_FIXED' | 'ACTUAL_364' | 'ACTUAL_360' | 'ACTUAL_ACTUAL_ISDA' | 'E30_360' | 'BUS_252' | 'E30_42_365'
-    indexRateSettings?: InterestProductSettings
-    interestApplicationDays?: DaysInMonth
+    indexRateSettings?: InterestProductSettings | undefined
+    interestApplicationDays?: DaysInMonth | undefined
     /**
      * The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.
      */
-    interestApplicationMethod?: 'AFTER_DISBURSEMENT' | 'REPAYMENT_DUE_DATE' | 'FIXED_DAYS_OF_MONTH'
+    interestApplicationMethod?: 'AFTER_DISBURSEMENT' | 'REPAYMENT_DUE_DATE' | 'FIXED_DAYS_OF_MONTH' | undefined
     /**
      * The interest balance calculation method. Represents the option which determines the way the balance for the account's interest is computed.
      */
-    interestBalanceCalculationMethod?: 'ONLY_PRINCIPAL' | 'PRINCIPAL_AND_INTEREST'
+    interestBalanceCalculationMethod?: 'ONLY_PRINCIPAL' | 'PRINCIPAL_AND_INTEREST' | undefined
     /**
      * The interest calculation method. Holds the type of interest calculation method.
      */
     interestCalculationMethod: 'FLAT' | 'DECLINING_BALANCE' | 'DECLINING_BALANCE_DISCOUNTED' | 'EQUAL_INSTALLMENTS'
-    interestRateChangePMTAdjustmentThreshold?: InterestRateChangePMTAdjustmentThreshold
     /**
      * Adjustable interest rates settings
      */
-    interestRateSettings?: ProductInterestRateSettings[]
+    interestRateSettings?: ProductInterestRateSettings[] | undefined
     /**
      * The possible values for how we compute and apply the interest
      */
-    interestType?: 'SIMPLE_INTEREST' | 'CAPITALIZED_INTEREST' | 'COMPOUNDING_INTEREST'
+    interestType?: 'SIMPLE_INTEREST' | 'CAPITALIZED_INTEREST' | 'COMPOUNDING_INTEREST' | undefined
+    pmtAdjustmentThreshold?: PMTAdjustmentThreshold | undefined
     /**
      * Shows  whether all the installments should compute the interest based on the actual number of days or based on the defined repayment periodicity.
      */
@@ -1300,8 +1333,8 @@ export interface ProductPenaltySettings {
     /**
      * Number of days to wait before applying the loan penalty amounts
      */
-    loanPenaltyGracePeriod?: number
-    penaltyRate?: DecimalConstraints
+    loanPenaltyGracePeriod?: number | undefined
+    penaltyRate?: DecimalConstraints | undefined
 }
 
 /**
@@ -1311,15 +1344,15 @@ export interface ProductPrepaymentSettings {
     /**
      * Whether the interest on prepayment is applied manual or automatic.
      */
-    applyInterestOnPrepaymentMethod?: 'AUTOMATIC' | 'MANUAL'
+    applyInterestOnPrepaymentMethod?: 'AUTOMATIC' | 'MANUAL' | undefined
     /**
      * The elements recalculation method, indicates how the declining balance with equal installments repayments are recalculated
      */
-    elementsRecalculationMethod?: 'PRINCIPAL_EXPECTED_FIXED' | 'TOTAL_EXPECTED_FIXED'
+    elementsRecalculationMethod?: 'PRINCIPAL_EXPECTED_FIXED' | 'TOTAL_EXPECTED_FIXED' | undefined
     /**
      * ERC free allowance in percentage
      */
-    ercFreeAllowance?: number
+    ercFreeAllowance?: number | undefined
     /**
      * Shows whether the future payments are allowed or not for this product (repayment transactions with entry date set in the future)
      */
@@ -1327,7 +1360,7 @@ export interface ProductPrepaymentSettings {
     /**
      * Shows whether the pre-payments are allowed or not for this product.
      */
-    prepaymentAcceptance?: 'ACCEPT_PREPAYMENTS' | 'NO_PREPAYMENTS'
+    prepaymentAcceptance?: 'ACCEPT_PREPAYMENTS' | 'NO_PREPAYMENTS' | undefined
     /**
      * Prepayment recalculation method copied from the loan product on which this account is based
      */
@@ -1340,10 +1373,11 @@ export interface ProductPrepaymentSettings {
         | 'REDUCE_AMOUNT_PER_INSTALLMENT'
         | 'REDUCE_NUMBER_OF_INSTALLMENTS'
         | 'REDUCE_NUMBER_OF_INSTALLMENTS_NEW'
+        | undefined
     /**
      * Installment status for the case when principal is paid off (copied from loan product)
      */
-    principalPaidInstallmentStatus?: 'PARTIALLY_PAID' | 'PAID' | 'ORIGINAL_TOTAL_EXPECTED_PAID'
+    principalPaidInstallmentStatus?: 'PARTIALLY_PAID' | 'PAID' | 'ORIGINAL_TOTAL_EXPECTED_PAID' | undefined
 }
 
 /**
@@ -1356,10 +1390,26 @@ export interface ProductRedrawSettings {
     allowRedraw: boolean
 }
 
+/**
+ * Holds Repayments Schedule Editing options
+ */
+export interface RepaymentScheduleEditOptionDetails {
+    paymentHolidaysSettings?: PaymentHolidaysSettings | undefined
+}
+
+type RepaymentScheduleEditOptions =
+    | 'ADJUST_PAYMENT_DATES'
+    | 'ADJUST_PRINCIPAL_PAYMENT_SCHEDULE'
+    | 'ADJUST_INTEREST_PAYMENT_SCHEDULE'
+    | 'ADJUST_FEE_PAYMENT_SCHEDULE'
+    | 'ADJUST_PENALTY_PAYMENT_SCHEDULE'
+    | 'ADJUST_NUMBER_OF_INSTALLMENTS'
+    | 'ADJUST_PAYMENT_HOLIDAYS'
+
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
 
 /**
@@ -1390,15 +1440,15 @@ export interface SecuritySettings {
     /**
      * Shows whether collateral (assets or other goods) are accepted in order to reach required securities percentage from loan amount, as defined in this product.
      */
-    isCollateralEnabled?: boolean
+    isCollateralEnabled?: boolean | undefined
     /**
      * Shows whether guarantors (other clients) are accepted in order to reach the required securities percentage from loan amount, as defined in this product.
      */
-    isGuarantorsEnabled?: boolean
+    isGuarantorsEnabled?: boolean | undefined
     /**
      * The securities percentage from loan amount that is needed in order for this account to be approved. Null if the securities are not required.
      */
-    requiredGuaranties?: number
+    requiredGuaranties?: number | undefined
 }
 
 /**
@@ -1408,23 +1458,23 @@ export interface TaxSettings {
     /**
      * Shows whether the tax is added on top of the target amount or not.
      */
-    taxCalculationMethod?: 'INCLUSIVE' | 'EXCLUSIVE'
+    taxCalculationMethod?: 'INCLUSIVE' | 'EXCLUSIVE' | undefined
     /**
      * Shows whether taxes on fees are enabled for this product or not.
      */
-    taxesOnFeesEnabled?: boolean
+    taxesOnFeesEnabled?: boolean | undefined
     /**
      * Shows whether taxes on interest are enabled for this product or not.
      */
-    taxesOnInterestEnabled?: boolean
+    taxesOnInterestEnabled?: boolean | undefined
     /**
      * Shows whether taxes on penalties are enabled for this product or not.
      */
-    taxesOnPenaltyEnabled?: boolean
+    taxesOnPenaltyEnabled?: boolean | undefined
     /**
      * The tax source from where the loan account taxes will be updated.
      */
-    taxSourceKey?: string
+    taxSourceKey?: string | undefined
 }
 
 /**
@@ -1434,5 +1484,5 @@ export interface TrancheSettings {
     /**
      * The number of tranches supported by the loan product
      */
-    maxNumberOfTranches?: number
+    maxNumberOfTranches?: number | undefined
 }

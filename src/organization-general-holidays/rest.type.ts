@@ -3,13 +3,18 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as CreateRequestValidator } from './schemas/create-request.schema.js'
+import { validate as CreateResponseValidator } from './schemas/create-response.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as HolidayValidator } from './schemas/holiday.schema.js'
 
 export type CreateRequest = Holiday[]
 
 export const CreateRequest = {
-    validate: (await import('./schemas/create-request.schema.js')).validate as ValidateFunction<CreateRequest>,
+    validate: CreateRequestValidator as ValidateFunction<CreateRequest>,
     get schema() {
         return CreateRequest.validate.schema
     },
@@ -17,17 +22,18 @@ export const CreateRequest = {
         return CreateRequest.validate.errors ?? undefined
     },
     is: (o: unknown): o is CreateRequest => CreateRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!CreateRequest.validate(o)) {
-            throw new ValidationError(CreateRequest.errors ?? [])
+    parse: (o: unknown): { right: CreateRequest } | { left: DefinedError[] } => {
+        if (CreateRequest.is(o)) {
+            return { right: o }
         }
+        return { left: (CreateRequest.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type CreateResponse = Holiday[]
 
 export const CreateResponse = {
-    validate: (await import('./schemas/create-response.schema.js')).validate as ValidateFunction<CreateResponse>,
+    validate: CreateResponseValidator as ValidateFunction<CreateResponse>,
     get schema() {
         return CreateResponse.validate.schema
     },
@@ -35,14 +41,20 @@ export const CreateResponse = {
         return CreateResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is CreateResponse => CreateResponse.validate(o) === true,
+    parse: (o: unknown): { right: CreateResponse } | { left: DefinedError[] } => {
+        if (CreateResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (CreateResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -50,10 +62,11 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -64,31 +77,31 @@ export interface Holiday {
     /**
      * The date when the holiday was created.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The date the holiday takes place.
      */
-    date?: string
+    date?: string | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The ID of the holiday.
      */
-    id?: number
+    id?: number | undefined
     /**
      * `TRUE` if a holiday is annually recurring, `FALSE` otherwise.
      */
-    isAnnuallyRecurring?: boolean
+    isAnnuallyRecurring?: boolean | undefined
     /**
      * The name of the holiday.
      */
-    name?: string
+    name?: string | undefined
 }
 
 export const Holiday = {
-    validate: (await import('./schemas/holiday.schema.js')).validate as ValidateFunction<Holiday>,
+    validate: HolidayValidator as ValidateFunction<Holiday>,
     get schema() {
         return Holiday.validate.schema
     },
@@ -96,10 +109,16 @@ export const Holiday = {
         return Holiday.validate.errors ?? undefined
     },
     is: (o: unknown): o is Holiday => Holiday.validate(o) === true,
+    parse: (o: unknown): { right: Holiday } | { left: DefinedError[] } => {
+        if (Holiday.is(o)) {
+            return { right: o }
+        }
+        return { left: (Holiday.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

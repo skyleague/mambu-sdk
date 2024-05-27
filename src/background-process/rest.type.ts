@@ -3,8 +3,11 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as BackgroundProcessValidator } from './schemas/background-process.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
 
 /**
  * Represents details of the Background Process
@@ -13,19 +16,19 @@ export interface BackgroundProcess {
     /**
      * When this process was created. Stored as Organization Time
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * When this process was ended. Stored as Organization Time
      */
-    endDate?: string
+    endDate?: string | undefined
     /**
      * When this process was started. Stored as Organization Time
      */
-    startDate?: string
+    startDate?: string | undefined
     /**
      * The current status of this process
      */
@@ -41,14 +44,15 @@ export interface BackgroundProcess {
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
         | 'RECOVERABLE_ERROR'
+        | undefined
     /**
      * The type of the background process
      */
-    type?: 'CRON_JOBS' | 'MANUAL_CRON_JOBS_TRIGGER'
+    type?: 'CRON_JOBS' | 'MANUAL_CRON_JOBS_TRIGGER' | undefined
 }
 
 export const BackgroundProcess = {
-    validate: (await import('./schemas/background-process.schema.js')).validate as ValidateFunction<BackgroundProcess>,
+    validate: BackgroundProcessValidator as ValidateFunction<BackgroundProcess>,
     get schema() {
         return BackgroundProcess.validate.schema
     },
@@ -56,19 +60,20 @@ export const BackgroundProcess = {
         return BackgroundProcess.validate.errors ?? undefined
     },
     is: (o: unknown): o is BackgroundProcess => BackgroundProcess.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!BackgroundProcess.validate(o)) {
-            throw new ValidationError(BackgroundProcess.errors ?? [])
+    parse: (o: unknown): { right: BackgroundProcess } | { left: DefinedError[] } => {
+        if (BackgroundProcess.is(o)) {
+            return { right: o }
         }
+        return { left: (BackgroundProcess.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -76,15 +81,16 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

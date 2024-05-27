@@ -3,13 +3,20 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as CreateRequestValidator } from './schemas/create-request.schema.js'
+import { validate as CreateResponseValidator } from './schemas/create-response.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
+import { validate as GLAccountValidator } from './schemas/gl-account.schema.js'
+import { validate as PatchRequestValidator } from './schemas/patch-request.schema.js'
 
 export type CreateRequest = GLAccountInput[]
 
 export const CreateRequest = {
-    validate: (await import('./schemas/create-request.schema.js')).validate as ValidateFunction<CreateRequest>,
+    validate: CreateRequestValidator as ValidateFunction<CreateRequest>,
     get schema() {
         return CreateRequest.validate.schema
     },
@@ -17,17 +24,18 @@ export const CreateRequest = {
         return CreateRequest.validate.errors ?? undefined
     },
     is: (o: unknown): o is CreateRequest => CreateRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!CreateRequest.validate(o)) {
-            throw new ValidationError(CreateRequest.errors ?? [])
+    parse: (o: unknown): { right: CreateRequest } | { left: DefinedError[] } => {
+        if (CreateRequest.is(o)) {
+            return { right: o }
         }
+        return { left: (CreateRequest.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type CreateResponse = GLAccount[]
 
 export const CreateResponse = {
-    validate: (await import('./schemas/create-response.schema.js')).validate as ValidateFunction<CreateResponse>,
+    validate: CreateResponseValidator as ValidateFunction<CreateResponse>,
     get schema() {
         return CreateResponse.validate.schema
     },
@@ -35,6 +43,12 @@ export const CreateResponse = {
         return CreateResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is CreateResponse => CreateResponse.validate(o) === true,
+    parse: (o: unknown): { right: CreateResponse } | { left: DefinedError[] } => {
+        if (CreateResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (CreateResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -228,23 +242,25 @@ export interface Currency {
         | 'XXX'
         | 'YER'
         | 'ZAR'
+        | 'ZIG'
         | 'ZMK'
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+        | undefined
     /**
      * Currency code for NON_FIAT currency.
      */
-    currencyCode?: string
+    currencyCode?: string | undefined
 }
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -252,17 +268,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetAllResponse = GLAccount[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -270,6 +287,12 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -279,60 +302,60 @@ export interface GLAccount {
     /**
      * `TRUE` if the account is activated and may be used, `FALSE` otherwise.
      */
-    activated?: boolean
+    activated?: boolean | undefined
     /**
      * `TRUE` if manual journal entries are allowed, `FALSE` otherwise.
      */
-    allowManualJournalEntries?: boolean
+    allowManualJournalEntries?: boolean | undefined
     /**
      * The balance of the general ledger account, which is only populated for the GET /glaccounts endpoint.
      */
-    balance?: number
+    balance?: number | undefined
     /**
      * The creation date for this account, which is stored as UTC.
      */
-    creationDate?: string
-    currency?: Currency
+    creationDate?: string | undefined
+    currency?: Currency | undefined
     /**
      * A description of the general ledger account.
      */
-    description?: string
+    description?: string | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The general ledger code used to identify different account types. Also used for grouping and categorizing accounts. For example: an account code of '3201' is considered a subtype of '3200'.
      */
-    glCode?: string
+    glCode?: string | undefined
     /**
      * The last modification date and time, which is stored as UTC.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The data migration event key if the general ledger account was created as a part of a data migration event.
      */
-    migrationEventKey?: string
+    migrationEventKey?: string | undefined
     /**
      * The name of the general ledger account.
      */
-    name?: string
+    name?: string | undefined
     /**
      * `TRUE` if trailing zeros are stripped, `FALSE` otherwise.
      */
-    stripTrailingZeros?: boolean
+    stripTrailingZeros?: boolean | undefined
     /**
      * The general ledger account type.
      */
-    type?: 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE'
+    type?: 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE' | undefined
     /**
      * The usage type of the general ledger account. `DETAIL` accounts are used to stores transaction balances. `HEADER` accounts are used to organise and group detail accounts for reporting purposes.
      */
-    usage?: 'DETAIL' | 'HEADER'
+    usage?: 'DETAIL' | 'HEADER' | undefined
 }
 
 export const GLAccount = {
-    validate: (await import('./schemas/gl-account.schema.js')).validate as ValidateFunction<GLAccount>,
+    validate: GLAccountValidator as ValidateFunction<GLAccount>,
     get schema() {
         return GLAccount.validate.schema
     },
@@ -340,6 +363,12 @@ export const GLAccount = {
         return GLAccount.validate.errors ?? undefined
     },
     is: (o: unknown): o is GLAccount => GLAccount.validate(o) === true,
+    parse: (o: unknown): { right: GLAccount } | { left: DefinedError[] } => {
+        if (GLAccount.is(o)) {
+            return { right: o }
+        }
+        return { left: (GLAccount.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -349,12 +378,12 @@ export interface GLAccountInput {
     /**
      * `TRUE` if manual journal entries are allowed, `FALSE` otherwise. This is only available for Detail Accounts.
      */
-    allowManualJournalEntries?: boolean
-    currency?: Currency
+    allowManualJournalEntries?: boolean | undefined
+    currency?: Currency | undefined
     /**
      * The description of the general ledger account.
      */
-    description?: string
+    description?: string | undefined
     /**
      * The general ledger code used to identify different account types. Also used for grouping and categorizing accounts. For example: an account code of '3201' is considered a subtype of '3200'.
      */
@@ -366,7 +395,7 @@ export interface GLAccountInput {
     /**
      * `TRUE` to strip trailing zeros, `FALSE` otherwise. Only available for Header Accounts.
      */
-    stripTrailingZeros?: boolean
+    stripTrailingZeros?: boolean | undefined
     /**
      * The general ledger account type.
      */
@@ -384,7 +413,7 @@ export interface PatchOperation {
     /**
      * The field from where a value should be moved, when using move
      */
-    from?: string
+    from?: string | undefined
     /**
      * The change to perform
      */
@@ -396,15 +425,13 @@ export interface PatchOperation {
     /**
      * The value of the field, can be null
      */
-    value?: {
-        [k: string]: unknown | undefined
-    }
+    value?: unknown
 }
 
 export type PatchRequest = PatchOperation[]
 
 export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
+    validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
         return PatchRequest.validate.schema
     },
@@ -412,15 +439,16 @@ export const PatchRequest = {
         return PatchRequest.validate.errors ?? undefined
     },
     is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
+    parse: (o: unknown): { right: PatchRequest } | { left: DefinedError[] } => {
+        if (PatchRequest.is(o)) {
+            return { right: o }
         }
+        return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

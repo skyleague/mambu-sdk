@@ -1,1 +1,1 @@
-export * from './rest.client.js'
+export { MambuEndOfDayProcessingConfiguration } from './rest.client.js'

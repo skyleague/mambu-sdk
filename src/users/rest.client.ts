@@ -3,10 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import got from 'got'
+
+import type { IncomingHttpHeaders } from 'node:http'
+
+import type { DefinedError } from 'ajv'
+import { got } from 'got'
 import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
-import type { ValidateFunction, ErrorObject } from 'ajv'
-import type { IncomingHttpHeaders } from 'http'
+
 import { ErrorResponse, GetAllResponse, PatchRequest, User, UserRequest } from './rest.type.js'
 
 /**
@@ -46,56 +49,84 @@ export class MambuUsers {
     /**
      * Create user
      */
-    public async create({
+    public create({
         body,
         headers,
         auth = [['apiKey'], ['basic']],
-    }: {
-        body: UserRequest
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(UserRequest, body)
+    }: { body: UserRequest; headers?: { 'Idempotency-Key'?: string }; auth?: string[][] | string[] }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'201', User>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(UserRequest, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
-            this.buildClient(auth).post(`users`, {
+            this.buildClient(auth).post('users', {
                 json: body,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
                 201: User,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['create']>
     }
 
     /**
      * Delete user
      */
-    public async delete({ path, auth = [['apiKey'], ['basic']] }: { path: { userId: string }; auth?: string[][] | string[] }) {
+    public delete({
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: { path: { userId: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).delete(`users/${path.userId}`, {
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
+                responseType: 'text',
             }),
             {
-                204: { is: (_x: unknown): _x is unknown => true },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['delete']>
     }
 
     /**
      * Get users
      */
-    public async getAll({
+    public getAll({
         query,
         auth = [['apiKey'], ['basic']],
     }: {
@@ -108,9 +139,21 @@ export class MambuUsers {
             branchIdType?: string
         }
         auth?: string[][] | string[]
-    } = {}) {
+    } = {}): Promise<
+        | SuccessResponse<'200', GetAllResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
-            this.buildClient(auth).get(`users`, {
+            this.buildClient(auth).get('users', {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
@@ -120,22 +163,31 @@ export class MambuUsers {
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['getAll']>
     }
 
     /**
      * Get user
      */
-    public async getById({
+    public getById({
         path,
         query,
         auth = [['apiKey'], ['basic']],
-    }: {
-        path: { userId: string }
-        query?: { detailsLevel?: string }
-        auth?: string[][] | string[]
-    }) {
+    }: { path: { userId: string }; query?: { detailsLevel?: string }; auth?: string[][] | string[] }): Promise<
+        | SuccessResponse<'200', User>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
         return this.awaitResponse(
             this.buildClient(auth).get(`users/${path.userId}`, {
                 searchParams: query ?? {},
@@ -148,14 +200,14 @@ export class MambuUsers {
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['getById']>
     }
 
     /**
      * Partially update user
      */
-    public async patch({
+    public patch({
         body,
         path,
         headers,
@@ -163,42 +215,72 @@ export class MambuUsers {
     }: {
         body: PatchRequest
         path: { userId: string }
-        headers?: { ['Idempotency-Key']?: string }
+        headers?: { 'Idempotency-Key'?: string }
         auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(PatchRequest, body)
+    }): Promise<
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(PatchRequest, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).patch(`users/${path.userId}`, {
                 json: body,
-                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
+                headers: headers ?? {},
+                responseType: 'text',
             }),
             {
-                204: { is: (_x: unknown): _x is unknown => true },
+                204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['patch']>
     }
 
     /**
      * Update user
      */
-    public async update({
+    public update({
         body,
         path,
         headers,
         auth = [['apiKey'], ['basic']],
-    }: {
-        body: User
-        path: { userId: string }
-        headers?: { ['Idempotency-Key']?: string }
-        auth?: string[][] | string[]
-    }) {
-        this.validateRequestBody(User, body)
+    }: { body: User; path: { userId: string }; headers?: { 'Idempotency-Key'?: string }; auth?: string[][] | string[] }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'200', User>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              string,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(User, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
 
         return this.awaitResponse(
             this.buildClient(auth).put(`users/${path.userId}`, {
@@ -207,51 +289,72 @@ export class MambuUsers {
                 responseType: 'json',
             }),
             {
-                102: { is: (_x: unknown): _x is unknown => true },
+                102: { parse: (x: unknown) => ({ right: x }) },
                 200: User,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
-            }
-        )
+            },
+        ) as ReturnType<this['update']>
     }
 
-    public validateRequestBody<T>(schema: { is: (o: unknown) => o is T; assert: (o: unknown) => void }, body: T) {
-        schema.assert(body)
-        return body
+    public validateRequestBody<Parser extends { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } }, Body>(
+        parser: Parser,
+        body: unknown,
+    ) {
+        const _body = parser.parse(body)
+        if ('left' in _body) {
+            return {
+                statusCode: undefined,
+                status: undefined,
+                headers: undefined,
+                left: body,
+                validationErrors: _body.left,
+                where: 'request:body',
+            } satisfies FailureResponse<undefined, unknown, 'request:body', undefined>
+        }
+        return _body
     }
 
     public async awaitResponse<
-        T,
-        S extends Record<PropertyKey, undefined | { is: (o: unknown) => o is T; validate?: ValidateFunction<T> }>,
-    >(response: CancelableRequest<Response<unknown>>, schemas: S) {
-        type FilterStartingWith<S extends PropertyKey, T extends string> = S extends number | string
-            ? `${S}` extends `${T}${infer _X}`
-                ? S
-                : never
-            : never
-        type InferSchemaType<T> = T extends { is: (o: unknown) => o is infer S } ? S : never
+        I,
+        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } } | undefined>,
+    >(response: CancelableRequest<Response<I>>, schemas: S) {
         const result = await response
+        const status =
+            result.statusCode < 200
+                ? 'informational'
+                : result.statusCode < 300
+                  ? 'success'
+                  : result.statusCode < 400
+                    ? 'redirection'
+                    : result.statusCode < 500
+                      ? 'client-error'
+                      : 'server-error'
         const validator = schemas[result.statusCode] ?? schemas.default
-        if (validator?.is(result.body) === false || result.statusCode < 200 || result.statusCode >= 300) {
+        const body = validator?.parse?.(result.body)
+        if (result.statusCode < 200 || result.statusCode >= 300) {
             return {
-                statusCode: result.statusCode,
+                statusCode: result.statusCode.toString(),
+                status,
                 headers: result.headers,
-                left: result.body,
-                validationErrors: validator?.validate?.errors ?? undefined,
-            } as {
-                statusCode: number
-                headers: IncomingHttpHeaders
-                left: InferSchemaType<S[keyof S]>
-                validationErrors?: ErrorObject[]
+                left: body !== undefined && 'right' in body ? body.right : result.body,
+                validationErrors: body !== undefined && 'left' in body ? body.left : undefined,
+                where: 'response:statuscode',
             }
         }
-        return { statusCode: result.statusCode, headers: result.headers, right: result.body } as {
-            statusCode: number
-            headers: IncomingHttpHeaders
-            right: InferSchemaType<S[keyof Pick<S, FilterStartingWith<keyof S, '2' | 'default'>>]>
+        if (body === undefined || 'left' in body) {
+            return {
+                statusCode: result.statusCode.toString(),
+                status,
+                headers: result.headers,
+                left: result.body,
+                validationErrors: body?.left,
+                where: 'response:body',
+            }
         }
+        return { statusCode: result.statusCode.toString(), status, headers: result.headers, right: result.body }
     }
 
     protected buildBasicClient(client: Got) {
@@ -278,24 +381,52 @@ export class MambuUsers {
                     async (options) => {
                         const apiKey = this.auth.apiKey
                         const key = typeof apiKey === 'function' ? await apiKey() : apiKey
-                        options.headers['apiKey'] = key
+                        options.headers.apiKey = key
                     },
                 ],
             },
         })
     }
 
-    protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client: Got = this.client): Got {
+    protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client?: Got): Got {
         const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
+        let chosenClient = client ?? this.client
         for (const chosen of auth[0] ?? []) {
             if (chosen === 'basic') {
-                client = this.buildBasicClient(client)
+                chosenClient = this.buildBasicClient(chosenClient)
             } else if (chosen === 'apiKey') {
-                client = this.buildApiKeyClient(client)
+                chosenClient = this.buildApiKeyClient(chosenClient)
             }
         }
-        return client
+        return chosenClient
     }
 }
+
+export type Status<Major> = Major extends string
+    ? Major extends `1${number}`
+        ? 'informational'
+        : Major extends `2${number}`
+          ? 'success'
+          : Major extends `3${number}`
+            ? 'redirection'
+            : Major extends `4${number}`
+              ? 'client-error'
+              : 'server-error'
+    : undefined
+export interface SuccessResponse<StatusCode extends string, T> {
+    statusCode: StatusCode
+    status: Status<StatusCode>
+    headers: IncomingHttpHeaders
+    right: T
+}
+export interface FailureResponse<StatusCode = string, T = unknown, Where = never, Headers = IncomingHttpHeaders> {
+    statusCode: StatusCode
+    status: Status<StatusCode>
+    headers: Headers
+    validationErrors: DefinedError[] | undefined
+    left: T
+    where: Where
+}
+export type StatusCode<Major extends number = 1 | 2 | 3 | 4 | 5> = `${Major}${number}`

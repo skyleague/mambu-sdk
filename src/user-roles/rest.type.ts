@@ -3,8 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
+import { validate as PatchRequestValidator } from './schemas/patch-request.schema.js'
+import { validate as RoleValidator } from './schemas/role.schema.js'
 
 /**
  * Represents the user permissions and access rights.
@@ -13,43 +18,43 @@ export interface BaseUserAccess {
     /**
      * `TRUE` if the user has the administrator user type, `FALSE` otherwise. Administrators (admins) have all permissions and can perform any action in Mambu.
      */
-    administratorAccess?: boolean
+    administratorAccess?: boolean | undefined
     /**
      * `TRUE` if the user can authenticate and interact with Mambu APIs, `FALSE` otherwise. The user may still require additional permissions for specific API requests.
      */
-    apiAccess?: boolean
+    apiAccess?: boolean | undefined
     /**
      * `TRUE` if the user has the credit officer user type, `FALSE` otherwise. Credit officers have the option of having clients and groups assigned to them.
      */
-    creditOfficerAccess?: boolean
+    creditOfficerAccess?: boolean | undefined
     /**
      * `TRUE` if the user is part of the Mambu delivery team, `FALSE` otherwise.
      */
-    deliveryAccess?: boolean
+    deliveryAccess?: boolean | undefined
     /**
      * TRUE` if the user can log in to the Mambu UI using their login credentials, `FALSE` otherwise.
      */
-    mambuAccess?: boolean
+    mambuAccess?: boolean | undefined
     /**
      * Permissions for the user. The non-admin users are authorized to do actions based a set of permissions in order to access Mambu features. Permissions may be relevant for the API and/or the Mambu UI.
      */
-    permissions?: Local0[]
+    permissions?: Permissions[] | undefined
     /**
      * `TRUE` if the user can provide Mambu technical support, `FALSE` otherwise.
      */
-    supportAccess?: boolean
+    supportAccess?: boolean | undefined
     /**
      * `TRUE` if the user has the teller user type, `FALSE` otherwise. Tellers have access to the teller module and specific tellering permissions, which allow them to take actions such as opening or closing tills, posting transactions on a till, and adding and removing cash from a till.
      */
-    tellerAccess?: boolean
+    tellerAccess?: boolean | undefined
 }
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -57,17 +62,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type GetAllResponse = Role[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -75,9 +81,56 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
-type Local0 =
+/**
+ * A single change that needs to be made to a resource
+ */
+export interface PatchOperation {
+    /**
+     * The field from where a value should be moved, when using move
+     */
+    from?: string | undefined
+    /**
+     * The change to perform
+     */
+    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
+    /**
+     * The field to perform the operation on
+     */
+    path: string
+    /**
+     * The value of the field, can be null
+     */
+    value?: unknown
+}
+
+export type PatchRequest = PatchOperation[]
+
+export const PatchRequest = {
+    validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
+    get schema() {
+        return PatchRequest.validate.schema
+    },
+    get errors() {
+        return PatchRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
+    parse: (o: unknown): { right: PatchRequest } | { left: DefinedError[] } => {
+        if (PatchRequest.is(o)) {
+            return { right: o }
+        }
+        return { left: (PatchRequest.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+type Permissions =
     | 'AUDIT_TRANSACTIONS'
     | 'VIEW_COMMENTS'
     | 'CREATE_COMMENTS'
@@ -366,75 +419,33 @@ type Local0 =
     | 'VIEW_PROFIT_SHARING_BRANCHES'
     | 'MAKE_BULK_CHANGE_INTEREST_AVAILABILITY'
 
-/**
- * A single change that needs to be made to a resource
- */
-export interface PatchOperation {
-    /**
-     * The field from where a value should be moved, when using move
-     */
-    from?: string
-    /**
-     * The change to perform
-     */
-    op: 'ADD' | 'REPLACE' | 'REMOVE' | 'MOVE'
-    /**
-     * The field to perform the operation on
-     */
-    path: string
-    /**
-     * The value of the field, can be null
-     */
-    value?: {
-        [k: string]: unknown | undefined
-    }
-}
-
-export type PatchRequest = PatchOperation[]
-
-export const PatchRequest = {
-    validate: (await import('./schemas/patch-request.schema.js')).validate as ValidateFunction<PatchRequest>,
-    get schema() {
-        return PatchRequest.validate.schema
-    },
-    get errors() {
-        return PatchRequest.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PatchRequest => PatchRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PatchRequest.validate(o)) {
-            throw new ValidationError(PatchRequest.errors ?? [])
-        }
-    },
-} as const
-
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
 
 /**
  * Represents a user role.
  */
 export interface Role {
-    access?: BaseUserAccess
+    access?: BaseUserAccess | undefined
     /**
      * The date when the role was created in UTC.
      */
-    creationDate?: string
+    creationDate?: string | undefined
     /**
      * The encoded key of the entity, generated automatically, globally unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The ID of the role, which can be generated and customized, but must be unique.
      */
-    id?: string
+    id?: string | undefined
     /**
      * The last time the role was modified in UTC.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The unique name of the role.
      */
@@ -442,11 +453,11 @@ export interface Role {
     /**
      * The notes about the role.
      */
-    notes?: string
+    notes?: string | undefined
 }
 
 export const Role = {
-    validate: (await import('./schemas/role.schema.js')).validate as ValidateFunction<Role>,
+    validate: RoleValidator as ValidateFunction<Role>,
     get schema() {
         return Role.validate.schema
     },
@@ -454,9 +465,10 @@ export const Role = {
         return Role.validate.errors ?? undefined
     },
     is: (o: unknown): o is Role => Role.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Role.validate(o)) {
-            throw new ValidationError(Role.errors ?? [])
+    parse: (o: unknown): { right: Role } | { left: DefinedError[] } => {
+        if (Role.is(o)) {
+            return { right: o }
         }
+        return { left: (Role.errors ?? []) as DefinedError[] }
     },
 } as const

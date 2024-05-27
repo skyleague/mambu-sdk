@@ -1,1 +1,1 @@
-export * from './rest.client.js'
+export { MambuTransactionChannelsConfiguration } from './rest.client.js'

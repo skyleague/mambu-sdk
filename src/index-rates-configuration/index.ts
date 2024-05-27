@@ -1,1 +1,1 @@
-export * from './rest.client.js'
+export { MambuIndexRatesConfiguration } from './rest.client.js'

@@ -3,8 +3,15 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as EditScheduleRequestValidator } from './schemas/edit-schedule-request.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as LoanAccountPreviewProcessPMTTransactionallyValidator } from './schemas/loan-account-preview-process-pmt-transactionally.schema.js'
+import { validate as LoanAccountScheduleValidator } from './schemas/loan-account-schedule.schema.js'
+import { validate as PreviewLoanAccountScheduleValidator } from './schemas/preview-loan-account-schedule.schema.js'
+import { validate as PreviewTranchesOnScheduleRequestValidator } from './schemas/preview-tranches-on-schedule-request.schema.js'
 
 /**
  * Adjustable interest rates settings for loan account
@@ -13,31 +20,31 @@ export interface AccountInterestRateSettings {
     /**
      * The encoded key of the interest rate settings, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * Index rate source key.
      */
-    indexSourceKey?: string
+    indexSourceKey?: string | undefined
     /**
      * Interest rate value.
      */
-    interestRate?: number
+    interestRate?: number | undefined
     /**
      * Maximum value allowed for index based interest rate. Valid only for index interest rate.
      */
-    interestRateCeilingValue?: number
+    interestRateCeilingValue?: number | undefined
     /**
      * Minimum value allowed for index based interest rate. Valid only for index interest rate.
      */
-    interestRateFloorValue?: number
+    interestRateFloorValue?: number | undefined
     /**
      * Interest rate review frequency unit count. Valid only for index interest rate.
      */
-    interestRateReviewCount?: number
+    interestRateReviewCount?: number | undefined
     /**
      * Interest rate review frequency measurement unit. Valid only for index interest rate.
      */
-    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS'
+    interestRateReviewUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | undefined
     /**
      * Interest calculation method: fixed or indexed(interest spread + active organization index interest rate)
      */
@@ -45,7 +52,7 @@ export interface AccountInterestRateSettings {
     /**
      * Interest spread value.
      */
-    interestSpread?: number
+    interestSpread?: number | undefined
     /**
      * Date since an interest rate is valid
      */
@@ -59,15 +66,15 @@ export interface Amount {
     /**
      * The due amount.
      */
-    due?: number
+    due?: number | undefined
     /**
      * The expected amount, which is sum of paid and due amounts.
      */
-    expected?: number
+    expected?: number | undefined
     /**
      * The paid amount.
      */
-    paid?: number
+    paid?: number | undefined
 }
 
 /**
@@ -77,19 +84,19 @@ export interface AmountWithReduced {
     /**
      * The due amount.
      */
-    due?: number
+    due?: number | undefined
     /**
      * The expected amount, which is sum of paid and due amounts.
      */
-    expected?: number
+    expected?: number | undefined
     /**
      * The paid amount.
      */
-    paid?: number
+    paid?: number | undefined
     /**
      * The reduced amount.
      */
-    reduced?: number
+    reduced?: number | undefined
 }
 
 /**
@@ -283,15 +290,17 @@ export interface Currency {
         | 'XXX'
         | 'YER'
         | 'ZAR'
+        | 'ZIG'
         | 'ZMK'
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+        | undefined
     /**
      * Currency code for NON_FIAT currency.
      */
-    currencyCode?: string
+    currencyCode?: string | undefined
 }
 
 /**
@@ -301,19 +310,19 @@ export interface CustomPredefinedFee {
     /**
      * The amount of the custom fee.
      */
-    amount?: number
+    amount?: number | undefined
     /**
      * The encoded key of the custom predefined fee, auto generated, unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The percentage of the custom fee.
      */
-    percentage?: number
+    percentage?: number | undefined
     /**
      * The encoded key of the predefined fee
      */
-    predefinedFeeEncodedKey?: string
+    predefinedFeeEncodedKey?: string | undefined
 }
 
 /**
@@ -323,21 +332,21 @@ export interface DisbursementDetailsForSchedulePreview {
     /**
      * The date of the expected disbursement.Stored as Organization Time.
      */
-    expectedDisbursementDate?: string
+    expectedDisbursementDate?: string | undefined
     /**
      * List of fees that should be applied at the disbursement time.
      */
-    fees?: CustomPredefinedFee[]
+    fees?: CustomPredefinedFee[] | undefined
     /**
      * The date of the expected first repayment. Stored as Organization Time.
      */
-    firstRepaymentDate?: string
+    firstRepaymentDate?: string | undefined
 }
 
 export type EditScheduleRequest = Installment[]
 
 export const EditScheduleRequest = {
-    validate: (await import('./schemas/edit-schedule-request.schema.js')).validate as ValidateFunction<EditScheduleRequest>,
+    validate: EditScheduleRequestValidator as ValidateFunction<EditScheduleRequest>,
     get schema() {
         return EditScheduleRequest.validate.schema
     },
@@ -345,19 +354,20 @@ export const EditScheduleRequest = {
         return EditScheduleRequest.validate.errors ?? undefined
     },
     is: (o: unknown): o is EditScheduleRequest => EditScheduleRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!EditScheduleRequest.validate(o)) {
-            throw new ValidationError(EditScheduleRequest.errors ?? [])
+    parse: (o: unknown): { right: EditScheduleRequest } | { left: DefinedError[] } => {
+        if (EditScheduleRequest.is(o)) {
+            return { right: o }
         }
+        return { left: (EditScheduleRequest.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -365,10 +375,11 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -379,19 +390,19 @@ export interface FeeAmount {
     /**
      * The due amount.
      */
-    due?: number
+    due?: number | undefined
     /**
      * The expected amount, which is sum of paid and due amounts.
      */
-    expected?: number
+    expected?: number | undefined
     /**
      * The expected amount, which is the sum of unapplied fee and planned fee due amounts.
      */
-    expectedUnapplied?: number
+    expectedUnapplied?: number | undefined
     /**
      * The paid amount.
      */
-    paid?: number
+    paid?: number | undefined
 }
 
 /**
@@ -401,94 +412,94 @@ export interface Installment {
     /**
      * The installment due date.
      */
-    dueDate?: string
+    dueDate?: string | undefined
     /**
      * The encoded key of the installment, which is auto generated, and unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The expected closing balance is the remaining amount per installment only applicable for interest only equal installment products.
      */
-    expectedClosingBalance?: number
-    fee?: InstallmentFee
+    expectedClosingBalance?: number | undefined
+    fee?: InstallmentFee | undefined
     /**
      * The breakdown of the fee amounts that have been applied to the loan account.
      */
-    feeDetails?: InstallmentFeeDetails[]
-    interest?: InstallmentAllocationElementTaxableAmount
+    feeDetails?: InstallmentFeeDetails[] | undefined
+    interest?: InstallmentAllocationElementTaxableAmount | undefined
     /**
      * The interest accrued calculated on previous repayment closing balance only applicable interest only equal installment products.
      */
-    interestAccrued?: number
+    interestAccrued?: number | undefined
     /**
      * `TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.
      */
-    isPaymentHoliday?: boolean
+    isPaymentHoliday?: boolean | undefined
     /**
      * The installment last paid date.
      */
-    lastPaidDate?: string
+    lastPaidDate?: string | undefined
     /**
      * The order number of an installment among all the installments generated for a loan. Loan installments are put in ascending order by due date. The order number only applies to the content of a particular JSON response therefore it is not unique.
      */
-    number?: string
+    number?: string | undefined
     /**
      * The parent account key of the installment.
      */
-    parentAccountKey?: string
-    penalty?: InstallmentAllocationElementTaxableAmount
-    principal?: InstallmentAllocationElementAmount
+    parentAccountKey?: string | undefined
+    penalty?: InstallmentAllocationElementTaxableAmount | undefined
+    principal?: InstallmentAllocationElementAmount | undefined
     /**
      * The installment repaid date.
      */
-    repaidDate?: string
+    repaidDate?: string | undefined
     /**
      * The installment state.
      */
-    state?: 'PENDING' | 'LATE' | 'PAID' | 'PARTIALLY_PAID' | 'GRACE'
+    state?: 'PENDING' | 'LATE' | 'PAID' | 'PARTIALLY_PAID' | 'GRACE' | undefined
 }
 
 /**
  * Represents an installment allocation element amount structure.
  */
 export interface InstallmentAllocationElementAmount {
-    amount?: Amount
+    amount?: Amount | undefined
 }
 
 /**
  * Represents an installment allocation element taxable amount structure.
  */
 export interface InstallmentAllocationElementTaxableAmount {
-    amount?: Amount
-    tax?: Amount
+    amount?: Amount | undefined
+    tax?: Amount | undefined
 }
 
 /**
  * Represents an installment fee structure.
  */
 export interface InstallmentFee {
-    amount?: FeeAmount
-    tax?: Amount
+    amount?: FeeAmount | undefined
+    tax?: Amount | undefined
 }
 
 /**
  * Represents fee details for an installment.
  */
 export interface InstallmentFeeDetails {
-    amount?: AmountWithReduced
+    amount?: AmountWithReduced | undefined
     /**
      * The encoded key of the predefined fee, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The id of the fee, provided by the client
      */
-    id?: string
+    id?: string | undefined
     /**
      * The name of the fee
      */
-    name?: string
-    tax?: AmountWithReduced
+    name?: string | undefined
+    tax?: AmountWithReduced | undefined
 }
 
 /**
@@ -498,15 +509,15 @@ export interface InterestSettingsForSchedulePreview {
     /**
      * The interest settings details for schedule preview.
      */
-    accountInterestRateSettings?: AccountInterestRateSettings[]
+    accountInterestRateSettings?: AccountInterestRateSettings[] | undefined
     /**
      * The interest rate. Represents the interest rate for the loan account. The interest on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.
      */
-    interestRate?: number
+    interestRate?: number | undefined
     /**
      * Interest to be added to active organization index interest rate in order to find out actual interest rate
      */
-    interestSpread?: number
+    interestSpread?: number | undefined
 }
 
 /**
@@ -516,21 +527,21 @@ export interface LoanAccountPreviewProcessPMTTransactionally {
     /**
      * The error code of the request.
      */
-    error?: string
+    error?: string | undefined
     /**
      * Additional information about the request.
      */
-    info?: string
-    result?: LoanAccountSchedulesPreviewProcessPMTTransactionally
+    info?: string | undefined
+    result?: LoanAccountSchedulesPreviewProcessPMTTransactionally | undefined
     /**
      * The status of the request.
      */
-    status?: string
+    status?: string | undefined
 }
 
 export const LoanAccountPreviewProcessPMTTransactionally = {
-    validate: (await import('./schemas/loan-account-preview-process-pmt-transactionally.schema.js'))
-        .validate as ValidateFunction<LoanAccountPreviewProcessPMTTransactionally>,
+    validate:
+        LoanAccountPreviewProcessPMTTransactionallyValidator as ValidateFunction<LoanAccountPreviewProcessPMTTransactionally>,
     get schema() {
         return LoanAccountPreviewProcessPMTTransactionally.validate.schema
     },
@@ -539,21 +550,27 @@ export const LoanAccountPreviewProcessPMTTransactionally = {
     },
     is: (o: unknown): o is LoanAccountPreviewProcessPMTTransactionally =>
         LoanAccountPreviewProcessPMTTransactionally.validate(o) === true,
+    parse: (o: unknown): { right: LoanAccountPreviewProcessPMTTransactionally } | { left: DefinedError[] } => {
+        if (LoanAccountPreviewProcessPMTTransactionally.is(o)) {
+            return { right: o }
+        }
+        return { left: (LoanAccountPreviewProcessPMTTransactionally.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
  * Represents a single loan account schedule structure.
  */
 export interface LoanAccountSchedule {
-    currency?: Currency
+    currency?: Currency | undefined
     /**
      * The loan account schedule installments list.
      */
-    installments?: Installment[]
+    installments?: Installment[] | undefined
 }
 
 export const LoanAccountSchedule = {
-    validate: (await import('./schemas/loan-account-schedule.schema.js')).validate as ValidateFunction<LoanAccountSchedule>,
+    validate: LoanAccountScheduleValidator as ValidateFunction<LoanAccountSchedule>,
     get schema() {
         return LoanAccountSchedule.validate.schema
     },
@@ -561,10 +578,11 @@ export const LoanAccountSchedule = {
         return LoanAccountSchedule.validate.errors ?? undefined
     },
     is: (o: unknown): o is LoanAccountSchedule => LoanAccountSchedule.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!LoanAccountSchedule.validate(o)) {
-            throw new ValidationError(LoanAccountSchedule.errors ?? [])
+    parse: (o: unknown): { right: LoanAccountSchedule } | { left: DefinedError[] } => {
+        if (LoanAccountSchedule.is(o)) {
+            return { right: o }
         }
+        return { left: (LoanAccountSchedule.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -575,15 +593,15 @@ export interface LoanAccountSchedulesPreviewProcessPMTTransactionally {
     /**
      * Whether there differences on schedule or not.
      */
-    differences?: boolean
+    differences?: boolean | undefined
     /**
      * The loan account existing schedule installments list.
      */
-    existingSchedule?: Installment[]
+    existingSchedule?: Installment[] | undefined
     /**
      * The loan account new schedule installments list.
      */
-    schedule?: Installment[]
+    schedule?: Installment[] | undefined
 }
 
 /**
@@ -594,19 +612,19 @@ export interface LoanTranche {
      * The amount this tranche has available for disburse
      */
     amount: number
-    disbursementDetails?: TrancheDisbursementDetails
+    disbursementDetails?: TrancheDisbursementDetails | undefined
     /**
      * The encoded key of the transaction details , auto generated, unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * Fees that are associated with this tranche
      */
-    fees?: CustomPredefinedFee[]
+    fees?: CustomPredefinedFee[] | undefined
     /**
      * Index indicating the tranche number
      */
-    trancheNumber?: number
+    trancheNumber?: number | undefined
 }
 
 /**
@@ -630,23 +648,23 @@ export interface PlannedInstallmentFee {
     /**
      * The amount of the planned fee.
      */
-    amount?: number
+    amount?: number | undefined
     /**
      * The date when a planned fee should be applied, overriding installment's due date. It should match the interval of the installment. If it belong to first installment, it should be between disbursement date and installment due date.
      */
-    applyOnDate?: string
+    applyOnDate?: string | undefined
     /**
      * The encoded key of the planned installment fee, auto generated, unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The encoded key of the installment on which the predefined fee is planned.
      */
-    installmentKey?: string
+    installmentKey?: string | undefined
     /**
      * The number of the installment on which the predefined fee is planned. It is used only in the case when fees are created at the same time with the loan account creation or during preview schedule, before account creation, otherwise this should be empty and installmentKey will be used to identify an installment.
      */
-    installmentNumber?: number
+    installmentNumber?: number | undefined
     /**
      * The encoded key of the predefined fee which is planned.
      */
@@ -657,12 +675,12 @@ export interface PlannedInstallmentFee {
  * Payload structure to preview loan account schedule.
  */
 export interface PreviewLoanAccountSchedule {
-    disbursementDetails?: DisbursementDetailsForSchedulePreview
+    disbursementDetails?: DisbursementDetailsForSchedulePreview | undefined
     /**
      * The value of the interest booked by the organization from the accounts funded by investors. Null if the funds are not enable
      */
-    interestCommission?: number
-    interestSettings?: InterestSettingsForSchedulePreview
+    interestCommission?: number | undefined
+    interestSettings?: InterestSettingsForSchedulePreview | undefined
     /**
      * The loan amount
      */
@@ -670,25 +688,24 @@ export interface PreviewLoanAccountSchedule {
     /**
      * A list with planned manual fees to be applied on the installments for schedule preview.
      */
-    plannedInstallmentFees?: PlannedInstallmentFee[]
+    plannedInstallmentFees?: PlannedInstallmentFee[] | undefined
     /**
      * The key to the type of product that this account is based on.
      */
     productTypeKey: string
-    scheduleSettings?: ScheduleSettingsForSchedulePreview
+    scheduleSettings?: ScheduleSettingsForSchedulePreview | undefined
     /**
      * The top up amount in case of a refinanced account
      */
-    topUpAmount?: number
+    topUpAmount?: number | undefined
     /**
      * List of tranches to be considered for schedule preview.
      */
-    tranches?: LoanTranche[]
+    tranches?: LoanTranche[] | undefined
 }
 
 export const PreviewLoanAccountSchedule = {
-    validate: (await import('./schemas/preview-loan-account-schedule.schema.js'))
-        .validate as ValidateFunction<PreviewLoanAccountSchedule>,
+    validate: PreviewLoanAccountScheduleValidator as ValidateFunction<PreviewLoanAccountSchedule>,
     get schema() {
         return PreviewLoanAccountSchedule.validate.schema
     },
@@ -696,18 +713,18 @@ export const PreviewLoanAccountSchedule = {
         return PreviewLoanAccountSchedule.validate.errors ?? undefined
     },
     is: (o: unknown): o is PreviewLoanAccountSchedule => PreviewLoanAccountSchedule.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PreviewLoanAccountSchedule.validate(o)) {
-            throw new ValidationError(PreviewLoanAccountSchedule.errors ?? [])
+    parse: (o: unknown): { right: PreviewLoanAccountSchedule } | { left: DefinedError[] } => {
+        if (PreviewLoanAccountSchedule.is(o)) {
+            return { right: o }
         }
+        return { left: (PreviewLoanAccountSchedule.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export type PreviewTranchesOnScheduleRequest = LoanTranche[]
 
 export const PreviewTranchesOnScheduleRequest = {
-    validate: (await import('./schemas/preview-tranches-on-schedule-request.schema.js'))
-        .validate as ValidateFunction<PreviewTranchesOnScheduleRequest>,
+    validate: PreviewTranchesOnScheduleRequestValidator as ValidateFunction<PreviewTranchesOnScheduleRequest>,
     get schema() {
         return PreviewTranchesOnScheduleRequest.validate.schema
     },
@@ -715,17 +732,18 @@ export const PreviewTranchesOnScheduleRequest = {
         return PreviewTranchesOnScheduleRequest.validate.errors ?? undefined
     },
     is: (o: unknown): o is PreviewTranchesOnScheduleRequest => PreviewTranchesOnScheduleRequest.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!PreviewTranchesOnScheduleRequest.validate(o)) {
-            throw new ValidationError(PreviewTranchesOnScheduleRequest.errors ?? [])
+    parse: (o: unknown): { right: PreviewTranchesOnScheduleRequest } | { left: DefinedError[] } => {
+        if (PreviewTranchesOnScheduleRequest.is(o)) {
+            return { right: o }
         }
+        return { left: (PreviewTranchesOnScheduleRequest.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
 
 /**
@@ -735,35 +753,35 @@ export interface ScheduleSettingsForSchedulePreview {
     /**
      * Specifies the days of the month when the repayment due dates should be. Only available if the Repayment Methodology is FIXED_DAYS_OF_MONTH.
      */
-    fixedDaysOfMonth?: number[]
+    fixedDaysOfMonth?: number[] | undefined
     /**
      * The grace period. Represents the grace period for loan repayment - in number of installments.
      */
-    gracePeriod?: number
+    gracePeriod?: number | undefined
     /**
      * A list of periodic payments for the current loan account.
      */
-    paymentPlan?: PeriodicPaymentForSchedulePreview[]
+    paymentPlan?: PeriodicPaymentForSchedulePreview[] | undefined
     /**
      * The periodic payment amount for the accounts which have balloon payments or Reduce Number of Installments and Optimized Payments
      */
-    periodicPayment?: number
+    periodicPayment?: number | undefined
     /**
      * The principal repayment interval. Indicates the interval of repayments that the principal has to be paid.
      */
-    principalRepaymentInterval?: number
+    principalRepaymentInterval?: number | undefined
     /**
      * The repayment installments. Represents how many installments are required to pay back the loan.
      */
-    repaymentInstallments?: number
+    repaymentInstallments?: number | undefined
     /**
      * The repayment period count. Represents how often the loan is to be repaid: stored based on the type repayment option.
      */
-    repaymentPeriodCount?: number
+    repaymentPeriodCount?: number | undefined
     /**
      * The repayment period unit. Represents the frequency of loan repayment.
      */
-    repaymentPeriodUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS'
+    repaymentPeriodUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS' | undefined
 }
 
 /**
@@ -773,9 +791,9 @@ export interface TrancheDisbursementDetails {
     /**
      * The key of the disbursement transaction logged when this tranche was disbursed. This field will be null until the tranche disbursement
      */
-    disbursementTransactionKey?: string
+    disbursementTransactionKey?: string | undefined
     /**
      * The date when this tranche is supposed to be disbursed (as Organization Time)
      */
-    expectedDisbursementDate?: string
+    expectedDisbursementDate?: string | undefined
 }

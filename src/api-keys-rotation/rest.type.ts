@@ -3,8 +3,12 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ApiKeyRotationResultValidator } from './schemas/api-key-rotation-result.schema.js'
+import { validate as ApiKeyValidator } from './schemas/api-key.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
 
 /**
  * Represents an API key of an API consumer.
@@ -13,19 +17,19 @@ export interface ApiKey {
     /**
      * A six character cleartext prefix of the API key. The prefix is not guaranteed to be unique. You must base any identification process on the API key ID, not the prefix.
      */
-    apiKey?: string
+    apiKey?: string | undefined
     /**
      * The time to live (TTL) for the API key in seconds.
      */
-    expirationTime?: number
+    expirationTime?: number | undefined
     /**
      * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
      */
-    id?: string
+    id?: string | undefined
 }
 
 export const ApiKey = {
-    validate: (await import('./schemas/api-key.schema.js')).validate as ValidateFunction<ApiKey>,
+    validate: ApiKeyValidator as ValidateFunction<ApiKey>,
     get schema() {
         return ApiKey.validate.schema
     },
@@ -33,10 +37,11 @@ export const ApiKey = {
         return ApiKey.validate.errors ?? undefined
     },
     is: (o: unknown): o is ApiKey => ApiKey.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ApiKey.validate(o)) {
-            throw new ValidationError(ApiKey.errors ?? [])
+    parse: (o: unknown): { right: ApiKey } | { left: DefinedError[] } => {
+        if (ApiKey.is(o)) {
+            return { right: o }
         }
+        return { left: (ApiKey.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -47,19 +52,19 @@ export interface ApiKeyRotationResult {
     /**
      * The new API key created after rotating an existing API key.
      */
-    apiKey?: string
+    apiKey?: string | undefined
     /**
      * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
      */
-    id?: string
+    id?: string | undefined
     /**
      * The new secret key created after rotating an existing API key.
      */
-    secretKey?: string
+    secretKey?: string | undefined
 }
 
 export const ApiKeyRotationResult = {
-    validate: (await import('./schemas/api-key-rotation-result.schema.js')).validate as ValidateFunction<ApiKeyRotationResult>,
+    validate: ApiKeyRotationResultValidator as ValidateFunction<ApiKeyRotationResult>,
     get schema() {
         return ApiKeyRotationResult.validate.schema
     },
@@ -67,14 +72,20 @@ export const ApiKeyRotationResult = {
         return ApiKeyRotationResult.validate.errors ?? undefined
     },
     is: (o: unknown): o is ApiKeyRotationResult => ApiKeyRotationResult.validate(o) === true,
+    parse: (o: unknown): { right: ApiKeyRotationResult } | { left: DefinedError[] } => {
+        if (ApiKeyRotationResult.is(o)) {
+            return { right: o }
+        }
+        return { left: (ApiKeyRotationResult.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -82,15 +93,16 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

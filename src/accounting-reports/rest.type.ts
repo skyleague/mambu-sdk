@@ -3,8 +3,13 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as AccountingReportGenerationInputValidator } from './schemas/accounting-report-generation-input.schema.js'
+import { validate as AccountingReportGenerationResponseValidator } from './schemas/accounting-report-generation-response.schema.js'
+import { validate as AccountingReportValidator } from './schemas/accounting-report.schema.js'
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
 
 /**
  * Represents information about the accounting report.
@@ -13,11 +18,11 @@ export interface AccountingReport {
     /**
      * The list of the accounting report items.
      */
-    items?: AccountingReportItem[]
+    items?: AccountingReportItem[] | undefined
     /**
      * The encoded key of the generated accounting report.
      */
-    reportKey?: string
+    reportKey?: string | undefined
     /**
      * The accounting report generation status.
      */
@@ -33,10 +38,11 @@ export interface AccountingReport {
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
         | 'RECOVERABLE_ERROR'
+        | undefined
 }
 
 export const AccountingReport = {
-    validate: (await import('./schemas/accounting-report.schema.js')).validate as ValidateFunction<AccountingReport>,
+    validate: AccountingReportValidator as ValidateFunction<AccountingReport>,
     get schema() {
         return AccountingReport.validate.schema
     },
@@ -44,6 +50,12 @@ export const AccountingReport = {
         return AccountingReport.validate.errors ?? undefined
     },
     is: (o: unknown): o is AccountingReport => AccountingReport.validate(o) === true,
+    parse: (o: unknown): { right: AccountingReport } | { left: DefinedError[] } => {
+        if (AccountingReport.is(o)) {
+            return { right: o }
+        }
+        return { left: (AccountingReport.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -53,23 +65,23 @@ export interface AccountingReportAmounts {
     /**
      * The closing balance amount of the general ledger account.
      */
-    closingBalance?: number
+    closingBalance?: number | undefined
     /**
      * The credit amount of the general ledger account.
      */
-    credits?: number
+    credits?: number | undefined
     /**
      * The debit amount of the general ledger account.
      */
-    debits?: number
+    debits?: number | undefined
     /**
      * The net change amount of the general ledger account.
      */
-    netChange?: number
+    netChange?: number | undefined
     /**
      * The opening balance amount of the general ledger account.
      */
-    openingBalance?: number
+    openingBalance?: number | undefined
 }
 
 /**
@@ -79,15 +91,15 @@ export interface AccountingReportGenerationInput {
     /**
      * The balance types to include in the generated report.
      */
-    balanceTypes?: ('OPENING_BALANCE' | 'NET_CHANGE' | 'CLOSING_BALANCE')[]
+    balanceTypes?: ('OPENING_BALANCE' | 'NET_CHANGE' | 'CLOSING_BALANCE')[] | undefined
     /**
      * The branch ID  or encoded key to filter general ledger journal entries by.
      */
-    branchId?: string
+    branchId?: string | undefined
     /**
      * The ISO currency code to filter general ledger accounts by.
      */
-    currencyCode?: string
+    currencyCode?: string | undefined
     /**
      * The inclusive end date in the organization time format and timezone that the general ledger journal entries' entry date is filtered to.
      */
@@ -95,7 +107,7 @@ export interface AccountingReportGenerationInput {
     /**
      * The account types to filter general ledger accounts by. For header general ledger accounts the report will reflect the sum of the detail general ledger accounts that match the given filters used.
      */
-    glTypes?: AccountingReportGenerationInputGlTypesArray[]
+    glTypes?: GlTypes[] | undefined
     /**
      * The inclusive start date in the organization time format and timezone that the general ledger journal entries' entry date is filtered from.
      */
@@ -103,8 +115,7 @@ export interface AccountingReportGenerationInput {
 }
 
 export const AccountingReportGenerationInput = {
-    validate: (await import('./schemas/accounting-report-generation-input.schema.js'))
-        .validate as ValidateFunction<AccountingReportGenerationInput>,
+    validate: AccountingReportGenerationInputValidator as ValidateFunction<AccountingReportGenerationInput>,
     get schema() {
         return AccountingReportGenerationInput.validate.schema
     },
@@ -112,14 +123,13 @@ export const AccountingReportGenerationInput = {
         return AccountingReportGenerationInput.validate.errors ?? undefined
     },
     is: (o: unknown): o is AccountingReportGenerationInput => AccountingReportGenerationInput.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!AccountingReportGenerationInput.validate(o)) {
-            throw new ValidationError(AccountingReportGenerationInput.errors ?? [])
+    parse: (o: unknown): { right: AccountingReportGenerationInput } | { left: DefinedError[] } => {
+        if (AccountingReportGenerationInput.is(o)) {
+            return { right: o }
         }
+        return { left: (AccountingReportGenerationInput.errors ?? []) as DefinedError[] }
     },
 } as const
-
-type AccountingReportGenerationInputGlTypesArray = 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE'
 
 /**
  * Represents the information about the accounting report generation status.
@@ -128,7 +138,7 @@ export interface AccountingReportGenerationResponse {
     /**
      * The encoded key of the generated report.
      */
-    reportKey?: string
+    reportKey?: string | undefined
     /**
      * The accounting report generation status.
      */
@@ -144,11 +154,11 @@ export interface AccountingReportGenerationResponse {
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
         | 'RECOVERABLE_ERROR'
+        | undefined
 }
 
 export const AccountingReportGenerationResponse = {
-    validate: (await import('./schemas/accounting-report-generation-response.schema.js'))
-        .validate as ValidateFunction<AccountingReportGenerationResponse>,
+    validate: AccountingReportGenerationResponseValidator as ValidateFunction<AccountingReportGenerationResponse>,
     get schema() {
         return AccountingReportGenerationResponse.validate.schema
     },
@@ -156,15 +166,21 @@ export const AccountingReportGenerationResponse = {
         return AccountingReportGenerationResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is AccountingReportGenerationResponse => AccountingReportGenerationResponse.validate(o) === true,
+    parse: (o: unknown): { right: AccountingReportGenerationResponse } | { left: DefinedError[] } => {
+        if (AccountingReportGenerationResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (AccountingReportGenerationResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
  * Represents the accounting report information about general ledger accounts and their amounts in both the organization's currency and foreign currencies.
  */
 export interface AccountingReportItem {
-    amounts?: AccountingReportAmounts
-    foreignAmounts?: AccountingReportAmounts
-    glAccount?: GLAccount
+    amounts?: AccountingReportAmounts | undefined
+    foreignAmounts?: AccountingReportAmounts | undefined
+    glAccount?: GLAccount | undefined
 }
 
 /**
@@ -358,23 +374,25 @@ export interface Currency {
         | 'XXX'
         | 'YER'
         | 'ZAR'
+        | 'ZIG'
         | 'ZMK'
         | 'ZWL'
         | 'ZMW'
         | 'SSP'
         | 'NON_FIAT'
+        | undefined
     /**
      * Currency code for NON_FIAT currency.
      */
-    currencyCode?: string
+    currencyCode?: string | undefined
 }
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -382,10 +400,11 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -396,60 +415,62 @@ export interface GLAccount {
     /**
      * `TRUE` if the account is activated and may be used, `FALSE` otherwise.
      */
-    activated?: boolean
+    activated?: boolean | undefined
     /**
      * `TRUE` if manual journal entries are allowed, `FALSE` otherwise.
      */
-    allowManualJournalEntries?: boolean
+    allowManualJournalEntries?: boolean | undefined
     /**
      * The balance of the general ledger account, which is only populated for the GET /glaccounts endpoint.
      */
-    balance?: number
+    balance?: number | undefined
     /**
      * The creation date for this account, which is stored as UTC.
      */
-    creationDate?: string
-    currency?: Currency
+    creationDate?: string | undefined
+    currency?: Currency | undefined
     /**
      * A description of the general ledger account.
      */
-    description?: string
+    description?: string | undefined
     /**
      * The encoded key of the entity, generated, globally unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The general ledger code used to identify different account types. Also used for grouping and categorizing accounts. For example: an account code of '3201' is considered a subtype of '3200'.
      */
-    glCode?: string
+    glCode?: string | undefined
     /**
      * The last modification date and time, which is stored as UTC.
      */
-    lastModifiedDate?: string
+    lastModifiedDate?: string | undefined
     /**
      * The data migration event key if the general ledger account was created as a part of a data migration event.
      */
-    migrationEventKey?: string
+    migrationEventKey?: string | undefined
     /**
      * The name of the general ledger account.
      */
-    name?: string
+    name?: string | undefined
     /**
      * `TRUE` if trailing zeros are stripped, `FALSE` otherwise.
      */
-    stripTrailingZeros?: boolean
+    stripTrailingZeros?: boolean | undefined
     /**
      * The general ledger account type.
      */
-    type?: 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE'
+    type?: 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE' | undefined
     /**
      * The usage type of the general ledger account. `DETAIL` accounts are used to stores transaction balances. `HEADER` accounts are used to organise and group detail accounts for reporting purposes.
      */
-    usage?: 'DETAIL' | 'HEADER'
+    usage?: 'DETAIL' | 'HEADER' | undefined
 }
 
+type GlTypes = 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE'
+
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }

@@ -3,15 +3,18 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as TriggerHourlyAndEndOfDayProcessingResponseValidator } from './schemas/trigger-hourly-and-end-of-day-processing-response.schema.js'
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -19,17 +22,18 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
 
 /**
@@ -51,11 +55,11 @@ export interface TriggerHourlyAndEndOfDayProcessingResponse {
         | 'TRANSIENT_ERROR'
         | 'OVERRIDDEN'
         | 'RECOVERABLE_ERROR'
+        | undefined
 }
 
 export const TriggerHourlyAndEndOfDayProcessingResponse = {
-    validate: (await import('./schemas/trigger-hourly-and-end-of-day-processing-response.schema.js'))
-        .validate as ValidateFunction<TriggerHourlyAndEndOfDayProcessingResponse>,
+    validate: TriggerHourlyAndEndOfDayProcessingResponseValidator as ValidateFunction<TriggerHourlyAndEndOfDayProcessingResponse>,
     get schema() {
         return TriggerHourlyAndEndOfDayProcessingResponse.validate.schema
     },
@@ -64,4 +68,10 @@ export const TriggerHourlyAndEndOfDayProcessingResponse = {
     },
     is: (o: unknown): o is TriggerHourlyAndEndOfDayProcessingResponse =>
         TriggerHourlyAndEndOfDayProcessingResponse.validate(o) === true,
+    parse: (o: unknown): { right: TriggerHourlyAndEndOfDayProcessingResponse } | { left: DefinedError[] } => {
+        if (TriggerHourlyAndEndOfDayProcessingResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (TriggerHourlyAndEndOfDayProcessingResponse.errors ?? []) as DefinedError[] }
+    },
 } as const

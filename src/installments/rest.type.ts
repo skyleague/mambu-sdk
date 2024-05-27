@@ -3,8 +3,11 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
+import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
 
 /**
  * Represents a simple installment amount structure.
@@ -13,15 +16,15 @@ export interface Amount {
     /**
      * The due amount.
      */
-    due?: number
+    due?: number | undefined
     /**
      * The expected amount, which is sum of paid and due amounts.
      */
-    expected?: number
+    expected?: number | undefined
     /**
      * The paid amount.
      */
-    paid?: number
+    paid?: number | undefined
 }
 
 /**
@@ -31,27 +34,27 @@ export interface AmountWithReduced {
     /**
      * The due amount.
      */
-    due?: number
+    due?: number | undefined
     /**
      * The expected amount, which is sum of paid and due amounts.
      */
-    expected?: number
+    expected?: number | undefined
     /**
      * The paid amount.
      */
-    paid?: number
+    paid?: number | undefined
     /**
      * The reduced amount.
      */
-    reduced?: number
+    reduced?: number | undefined
 }
 
 export interface ErrorResponse {
-    errors?: RestError[]
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
-    validate: (await import('./schemas/error-response.schema.js')).validate as ValidateFunction<ErrorResponse>,
+    validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
         return ErrorResponse.validate.schema
     },
@@ -59,10 +62,11 @@ export const ErrorResponse = {
         return ErrorResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is ErrorResponse => ErrorResponse.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!ErrorResponse.validate(o)) {
-            throw new ValidationError(ErrorResponse.errors ?? [])
+    parse: (o: unknown): { right: ErrorResponse } | { left: DefinedError[] } => {
+        if (ErrorResponse.is(o)) {
+            return { right: o }
         }
+        return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -73,25 +77,25 @@ export interface FeeAmount {
     /**
      * The due amount.
      */
-    due?: number
+    due?: number | undefined
     /**
      * The expected amount, which is sum of paid and due amounts.
      */
-    expected?: number
+    expected?: number | undefined
     /**
      * The expected amount, which is the sum of unapplied fee and planned fee due amounts.
      */
-    expectedUnapplied?: number
+    expectedUnapplied?: number | undefined
     /**
      * The paid amount.
      */
-    paid?: number
+    paid?: number | undefined
 }
 
 export type GetAllResponse = Installment[]
 
 export const GetAllResponse = {
-    validate: (await import('./schemas/get-all-response.schema.js')).validate as ValidateFunction<GetAllResponse>,
+    validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
         return GetAllResponse.validate.schema
     },
@@ -99,6 +103,12 @@ export const GetAllResponse = {
         return GetAllResponse.validate.errors ?? undefined
     },
     is: (o: unknown): o is GetAllResponse => GetAllResponse.validate(o) === true,
+    parse: (o: unknown): { right: GetAllResponse } | { left: DefinedError[] } => {
+        if (GetAllResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
+    },
 } as const
 
 /**
@@ -108,98 +118,98 @@ export interface Installment {
     /**
      * The installment due date.
      */
-    dueDate?: string
+    dueDate?: string | undefined
     /**
      * The encoded key of the installment, which is auto generated, and unique.
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The expected closing balance is the remaining amount per installment only applicable for interest only equal installment products.
      */
-    expectedClosingBalance?: number
-    fee?: InstallmentFee
+    expectedClosingBalance?: number | undefined
+    fee?: InstallmentFee | undefined
     /**
      * The breakdown of the fee amounts that have been applied to the loan account.
      */
-    feeDetails?: InstallmentFeeDetails[]
-    interest?: InstallmentAllocationElementTaxableAmount
+    feeDetails?: InstallmentFeeDetails[] | undefined
+    interest?: InstallmentAllocationElementTaxableAmount | undefined
     /**
      * The interest accrued calculated on previous repayment closing balance only applicable interest only equal installment products.
      */
-    interestAccrued?: number
+    interestAccrued?: number | undefined
     /**
      * `TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.
      */
-    isPaymentHoliday?: boolean
+    isPaymentHoliday?: boolean | undefined
     /**
      * The installment last paid date.
      */
-    lastPaidDate?: string
+    lastPaidDate?: string | undefined
     /**
      * The order number of an installment among all the installments generated for a loan. Loan installments are put in ascending order by due date. The order number only applies to the content of a particular JSON response therefore it is not unique.
      */
-    number?: string
+    number?: string | undefined
     /**
      * The parent account key of the installment.
      */
-    parentAccountKey?: string
-    penalty?: InstallmentAllocationElementTaxableAmount
-    principal?: InstallmentAllocationElementAmount
+    parentAccountKey?: string | undefined
+    penalty?: InstallmentAllocationElementTaxableAmount | undefined
+    principal?: InstallmentAllocationElementAmount | undefined
     /**
      * The installment repaid date.
      */
-    repaidDate?: string
+    repaidDate?: string | undefined
     /**
      * The installment state.
      */
-    state?: 'PENDING' | 'LATE' | 'PAID' | 'PARTIALLY_PAID' | 'GRACE'
+    state?: 'PENDING' | 'LATE' | 'PAID' | 'PARTIALLY_PAID' | 'GRACE' | undefined
 }
 
 /**
  * Represents an installment allocation element amount structure.
  */
 export interface InstallmentAllocationElementAmount {
-    amount?: Amount
+    amount?: Amount | undefined
 }
 
 /**
  * Represents an installment allocation element taxable amount structure.
  */
 export interface InstallmentAllocationElementTaxableAmount {
-    amount?: Amount
-    tax?: Amount
+    amount?: Amount | undefined
+    tax?: Amount | undefined
 }
 
 /**
  * Represents an installment fee structure.
  */
 export interface InstallmentFee {
-    amount?: FeeAmount
-    tax?: Amount
+    amount?: FeeAmount | undefined
+    tax?: Amount | undefined
 }
 
 /**
  * Represents fee details for an installment.
  */
 export interface InstallmentFeeDetails {
-    amount?: AmountWithReduced
+    amount?: AmountWithReduced | undefined
     /**
      * The encoded key of the predefined fee, auto generated, unique
      */
-    encodedKey?: string
+    encodedKey?: string | undefined
     /**
      * The id of the fee, provided by the client
      */
-    id?: string
+    id?: string | undefined
     /**
      * The name of the fee
      */
-    name?: string
-    tax?: AmountWithReduced
+    name?: string | undefined
+    tax?: AmountWithReduced | undefined
 }
 
 export interface RestError {
-    errorCode?: number
-    errorReason?: string
-    errorSource?: string
+    errorCode?: number | undefined
+    errorReason?: string | undefined
+    errorSource?: string | undefined
 }
