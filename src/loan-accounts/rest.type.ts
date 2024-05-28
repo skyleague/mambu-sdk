@@ -558,7 +558,7 @@ export const ChangeDueDatesSettingsInput = {
 } as const
 
 /**
- * Represents the request payload for performing an interest rate change action
+ * Represents the request payload for performing an PMT Adjustment action
  */
 export interface ChangeInterestRateLoanAccountInput {
     /**
