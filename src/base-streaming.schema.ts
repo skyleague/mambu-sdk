@@ -80,6 +80,7 @@ export const baseMambuStreaming = got
         data.security ??= [{ ApiKeyAuth: [] }]
 
         return $restclient(data, {
+            formats: false,
             strict: false,
         })
     })

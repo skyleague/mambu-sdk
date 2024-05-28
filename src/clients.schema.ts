@@ -53,6 +53,7 @@ for (const item of clientList) {
     exports[camelCase(`mambu_${clientName}`)] = $restclient(openapi, {
         filename: `${clientName}/rest.client.ts`,
         strict: false,
+        formats: false,
         transformOpenapi: (api: OpenapiV3) => {
             const securitySchemes = api.components?.securitySchemes
             const injectApiKey =
