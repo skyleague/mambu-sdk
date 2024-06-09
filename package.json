@@ -24,8 +24,8 @@
     "check:coverage": "vitest run --coverage=true",
     "check:project": "node-standards lint",
     "check:types": "tsc -p tsconfig.json",
-    "lint": "biome check src test examples",
-    "lint:fix": "npm run lint -- --apply-unsafe",
+    "lint": "biome check",
+    "lint:fix": "npm run lint -- --write --unsafe",
     "package": "rm -rf .dist && npm run build",
     "prepare": "husky || true",
     "test": "vitest run"
@@ -36,8 +36,8 @@
   },
   "devDependencies": {
     "@skyleague/axioms": "^4.3.4",
-    "@skyleague/node-standards": "^7.0.2",
-    "@skyleague/therefore": "^5.8.2",
+    "@skyleague/node-standards": "^7.1.0",
+    "@skyleague/therefore": "^5.8.8",
     "@types/split2": "^4.2.3",
     "camelcase": "^8.0.0",
     "got": "^14.3.0",
