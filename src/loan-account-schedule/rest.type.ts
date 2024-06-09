@@ -751,6 +751,10 @@ export interface RestError {
  */
 export interface ScheduleSettingsForSchedulePreview {
     /**
+     * The PMT is calculated as the loan would have [amortizationPeriod] installments.
+     */
+    amortizationPeriod?: number | undefined
+    /**
      * Specifies the days of the month when the repayment due dates should be. Only available if the Repayment Methodology is FIXED_DAYS_OF_MONTH.
      */
     fixedDaysOfMonth?: number[] | undefined
