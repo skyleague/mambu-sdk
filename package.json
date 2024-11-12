@@ -21,6 +21,7 @@
     "build": "tsc -p tsconfig.dist.json",
     "build:docs": "npx typedoc",
     "build:index": "node --import tsx/esm scripts/build-index.ts",
+    "build:types": "npx therefore -f src",
     "check:coverage": "vitest run --coverage=true",
     "check:project": "node-standards lint",
     "check:types": "tsc -p tsconfig.json",
@@ -35,17 +36,17 @@
     "split2": "^4.2.0"
   },
   "devDependencies": {
-    "@skyleague/axioms": "^4.3.4",
-    "@skyleague/node-standards": "^7.1.0",
-    "@skyleague/therefore": "^5.8.8",
+    "@skyleague/axioms": "^4.5.2",
+    "@skyleague/node-standards": "^8.2.4",
+    "@skyleague/therefore": "^5.18.0",
     "@types/split2": "^4.2.3",
     "camelcase": "^8.0.0",
-    "got": "^14.3.0",
-    "nock": "^13.5.4",
+    "ky": "^1.7.2",
+    "nock": "^14.0.0-beta.15",
     "typescript": "^5.4.5"
   },
   "peerDependencies": {
-    "got": "^14.3.0"
+    "ky": "^1.7.2"
   },
   "engines": {
     "node": ">=20"

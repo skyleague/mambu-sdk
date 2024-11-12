@@ -6,8 +6,25 @@ import split2 from 'split2'
 
 import https from 'node:https'
 import { PassThrough } from 'node:stream'
+import type { KyInstance, Options } from 'ky'
 
 export class MambuStreaming extends BaseMambuStreaming {
+    public prefixUrl: string | undefined
+
+    public constructor(params: {
+        prefixUrl?: string | 'http://MYTENANT.mambu.com/api/v1'
+        options?: Options
+        auth: {
+            apiKeyAuth?: string | (() => Promise<string>)
+        }
+        defaultAuth?: string[][] | string[]
+        client?: KyInstance
+    }) {
+        super(params)
+
+        this.prefixUrl = params.prefixUrl
+    }
+
     public async *getSubscriptionEventBatches({
         path,
         query,
@@ -27,7 +44,7 @@ export class MambuStreaming extends BaseMambuStreaming {
     }) {
         const apiKey = typeof this.auth.apiKeyAuth === 'string' ? this.auth.apiKeyAuth : await this.auth.apiKeyAuth?.()
         const stream = new PassThrough()
-        const url = new URL(`${this.client.defaults.options.prefixUrl.toString()}subscriptions/${path.subscriptionId}/events`)
+        const url = new URL(`${this.prefixUrl}subscriptions/${path.subscriptionId}/events`)
         for (const [k, v] of Object.entries(query ?? {})) {
             url.searchParams.set(k, v)
         }

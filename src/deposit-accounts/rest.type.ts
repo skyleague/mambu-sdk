@@ -34,6 +34,7 @@ import { validate as PatchRequestValidator } from './schemas/patch-request.schem
 import { validate as ReopenDepositActionValidator } from './schemas/reopen-deposit-action.schema.js'
 import { validate as SearchResponseValidator } from './schemas/search-response.schema.js'
 import { validate as StartMaturityActionValidator } from './schemas/start-maturity-action.schema.js'
+import { validate as TransferOwnershipActionValidator } from './schemas/transfer-ownership-action.schema.js'
 import { validate as UndoMaturityActionValidator } from './schemas/undo-maturity-action.schema.js'
 
 /**
@@ -314,6 +315,10 @@ export interface ApplyInterestInput {
      * The date up to which interest is to be posted
      */
     interestApplicationDate: string
+    /**
+     * Whether the interest amount to apply should be the regular one or interest from arrears. If nothing specified it will be the regular one.
+     */
+    isInterestFromArrears?: boolean | undefined
     /**
      * Whether the interest amount to apply should be the regular one or the one accrued during the Payment Holidays. If nothing specified it will be the regular one.
      */
@@ -1058,6 +1063,10 @@ export interface DepositAccount {
     overdraftInterestSettings?: DepositAccountOverdraftInterestSettings | undefined
     overdraftSettings?: DepositAccountOverdraftSettings | undefined
     /**
+     * The history of deposit account ownership
+     */
+    ownershipHistory?: DepositAccountOwnershipHistory[] | undefined
+    /**
      * The key to the product type that this account is based on.
      */
     productTypeKey: string
@@ -1536,6 +1545,20 @@ export interface DepositAccountOverdraftSettings {
      * The limit amount that may be taken out as overdraft, where null means 0.
      */
     overdraftLimit?: number | undefined
+}
+
+/**
+ * The history of deposit account ownership
+ */
+export interface DepositAccountOwnershipHistory {
+    /**
+     * They key of the previous account holder
+     */
+    previousOwnerKey?: string | undefined
+    /**
+     * The transfer date of the account ownership
+     */
+    transferDate?: string | undefined
 }
 
 /**
@@ -2181,6 +2204,10 @@ export interface InterestSettings {
      * Indicates whether late interest is accrued for this loan account
      */
     accrueLateInterest?: boolean | undefined
+    /**
+     * The effective interest rate. Represents the interest rate for the loan accounts with semi-annually compounding product.
+     */
+    effectiveInterestRate?: number | undefined
     interestApplicationDays?: DaysInMonth | undefined
     /**
      * The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.
@@ -3025,6 +3052,33 @@ export interface TrancheDisbursementDetails {
      */
     expectedDisbursementDate?: string | undefined
 }
+
+/**
+ * Transfer the account ownership from current account holder to a new one (client/group).
+ */
+export interface TransferOwnershipAction {
+    /**
+     * The ID or encoded key of the new account holder.
+     */
+    targetHolderKey: string
+}
+
+export const TransferOwnershipAction = {
+    validate: TransferOwnershipActionValidator as ValidateFunction<TransferOwnershipAction>,
+    get schema() {
+        return TransferOwnershipAction.validate.schema
+    },
+    get errors() {
+        return TransferOwnershipAction.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is TransferOwnershipAction => TransferOwnershipAction.validate(o) === true,
+    parse: (o: unknown): { right: TransferOwnershipAction } | { left: DefinedError[] } => {
+        if (TransferOwnershipAction.is(o)) {
+            return { right: o }
+        }
+        return { left: (TransferOwnershipAction.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * The action to undo the maturity period for a deposit account

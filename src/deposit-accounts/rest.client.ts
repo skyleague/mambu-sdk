@@ -7,8 +7,8 @@
 import type { IncomingHttpHeaders } from 'node:http'
 
 import type { DefinedError } from 'ajv'
-import { got } from 'got'
-import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
+import ky from 'ky'
+import type { KyInstance, Options, ResponsePromise } from 'ky'
 
 import {
     AccountAuthorizationHold,
@@ -39,6 +39,7 @@ import {
     ReopenDepositAction,
     SearchResponse,
     StartMaturityAction,
+    TransferOwnershipAction,
     UndoMaturityAction,
 } from './rest.type.js'
 
@@ -46,7 +47,7 @@ import {
  * deposits
  */
 export class MambuDepositAccounts {
-    public client: Got
+    public client: KyInstance
 
     public auth: {
         basic?: [username: string, password: string] | (() => Promise<[username: string, password: string]>)
@@ -61,22 +62,26 @@ export class MambuDepositAccounts {
         options,
         auth = {},
         defaultAuth,
+        client = ky,
     }: {
         prefixUrl: string | 'http://localhost:8889/api' | 'https://localhost:8889/api'
-        options?: Options | OptionsInit
+        options?: Options
         auth: {
             basic?: [username: string, password: string] | (() => Promise<[username: string, password: string]>)
             apiKey?: string | (() => Promise<string>)
         }
         defaultAuth?: string[][] | string[]
+        client?: KyInstance
     }) {
-        this.client = got.extend(...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined))
+        this.client = client.extend({ prefixUrl, throwHttpErrors: false, ...options })
         this.auth = auth
         this.availableAuth = new Set(Object.keys(auth))
         this.defaultAuth = defaultAuth
     }
 
     /**
+     * POST /deposits/{depositAccountId}:applyInterest
+     *
      * Represents information to apply accrued interest.
      */
     public applyInterest({
@@ -97,11 +102,12 @@ export class MambuDepositAccounts {
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'409', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'429', ErrorResponse, 'response:statuscode'>
         | FailureResponse<undefined, unknown, 'request:body', undefined>
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
-              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
-              string,
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409' | '429'>,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -113,9 +119,8 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:applyInterest`, {
-                json: body,
+                json: _body.right as ApplyInterestInput,
                 headers: headers ?? {},
-                responseType: 'text',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -125,11 +130,15 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
                 409: ErrorResponse,
+                429: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['applyInterest']>
     }
 
     /**
+     * POST /deposits/{depositAccountId}:changeInterestRate
+     *
      * Change deposit account interest rate
      */
     public changeInterestRate({
@@ -154,7 +163,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -166,9 +175,8 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:changeInterestRate`, {
-                json: body,
+                json: _body.right as ChangeInterestRateAction,
                 headers: headers ?? {},
-                responseType: 'text',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -179,10 +187,13 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['changeInterestRate']>
     }
 
     /**
+     * POST /deposits/{depositAccountId}:changeState
+     *
      * Represents the information to post an action, such as approving a deposit account.
      */
     public changeState({
@@ -207,7 +218,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -219,9 +230,8 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:changeState`, {
-                json: body,
+                json: _body.right as DepositAccountAction,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -232,10 +242,13 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['changeState']>
     }
 
     /**
+     * POST /deposits/{depositAccountId}:changeWithholdingTax
+     *
      * Change deposit account withholding tax rate
      */
     public changeWithholdingTax({
@@ -259,7 +272,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -271,9 +284,8 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:changeWithholdingTax`, {
-                json: body,
+                json: _body.right as ChangeWithholdingTaxAction,
                 headers: headers ?? {},
-                responseType: 'text',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -283,10 +295,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['changeWithholdingTax']>
     }
 
     /**
+     * POST /deposits
+     *
      * Create deposit account
      */
     public create({
@@ -304,7 +319,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -316,9 +331,8 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).post('deposits', {
-                json: body,
+                json: _body.right as DepositAccount,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -328,10 +342,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 409: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['create']>
     }
 
     /**
+     * POST /deposits/{depositAccountId}/authorizationholds
+     *
      * Create an authorization hold corresponding to a given account
      */
     public createAuthorizationHold({
@@ -356,7 +373,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -368,9 +385,8 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}/authorizationholds`, {
-                json: body,
+                json: _body.right as AccountAuthorizationHold,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -381,10 +397,13 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['createAuthorizationHold']>
     }
 
     /**
+     * POST /deposits/{depositAccountId}/blocks
+     *
      * Create a block fund for the account
      */
     public createBlockFund({
@@ -409,7 +428,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -421,9 +440,8 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}/blocks`, {
-                json: body,
+                json: _body.right as BlockFund,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -434,10 +452,13 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['createBlockFund']>
     }
 
     /**
+     * POST /deposits/{depositAccountId}/cards
+     *
      * Represents the information needed to create and associate a new card to an account.
      */
     public createCard({
@@ -462,7 +483,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -474,9 +495,8 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}/cards`, {
-                json: body,
+                json: _body.right as Card,
                 headers: headers ?? {},
-                responseType: 'text',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -487,10 +507,13 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['createCard']>
     }
 
     /**
+     * POST /deposits/{depositAccountId}/interest-availabilities
+     *
      * Create Interest Availability
      */
     public createInterestAvailability({
@@ -514,7 +537,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -526,9 +549,8 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}/interest-availabilities`, {
-                json: body,
+                json: _body.right as InterestAccountSettingsAvailability,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -538,10 +560,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 409: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['createInterestAvailability']>
     }
 
     /**
+     * DELETE /deposits/{depositAccountId}
+     *
      * Delete inactive deposit account
      */
     public delete({
@@ -557,15 +582,13 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
     > {
         return this.awaitResponse(
-            this.buildClient(auth).delete(`deposits/${path.depositAccountId}`, {
-                responseType: 'text',
-            }),
+            this.buildClient(auth).delete(`deposits/${path.depositAccountId}`, {}),
             {
                 204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
@@ -574,10 +597,13 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['delete']>
     }
 
     /**
+     * DELETE /deposits/{depositAccountId}/cards/{cardReferenceToken}
+     *
      * Represents the information needed to delete a card associated to an account using its reference token.
      */
     public deleteCard({
@@ -592,15 +618,13 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
     > {
         return this.awaitResponse(
-            this.buildClient(auth).delete(`deposits/${path.depositAccountId}/cards/${path.cardReferenceToken}`, {
-                responseType: 'text',
-            }),
+            this.buildClient(auth).delete(`deposits/${path.depositAccountId}/cards/${path.cardReferenceToken}`, {}),
             {
                 204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
@@ -608,10 +632,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['deleteCard']>
     }
 
     /**
+     * DELETE /deposits/{depositAccountId}/interest-availabilities/{interestAvailabilityKey}
+     *
      * Delete Interest Availability
      */
     public deleteInterestAvailability({
@@ -627,7 +654,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -635,9 +662,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).delete(
                 `deposits/${path.depositAccountId}/interest-availabilities/${path.interestAvailabilityKey}`,
-                {
-                    responseType: 'text',
-                },
+                {},
             ),
             {
                 204: { parse: (x: unknown) => ({ right: x }) },
@@ -647,10 +672,13 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['deleteInterestAvailability']>
     }
 
     /**
+     * GET /deposits
+     *
      * Get deposit accounts
      */
     public getAll({
@@ -679,7 +707,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -688,7 +716,6 @@ export class MambuDepositAccounts {
             this.buildClient(auth).get('deposits', {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: GetAllResponse,
@@ -697,10 +724,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getAll']>
     }
 
     /**
+     * GET /deposits/{depositAccountId}/authorizationholds
+     *
      * Get authorization holds related to a deposit account, ordered from newest to oldest by creation date
      */
     public getAllAuthorizationHolds({
@@ -720,7 +750,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -729,7 +759,6 @@ export class MambuDepositAccounts {
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/authorizationholds`, {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: GetAllAuthorizationHoldsResponse,
@@ -738,10 +767,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getAllAuthorizationHolds']>
     }
 
     /**
+     * GET /deposits/{depositAccountId}/blocks
+     *
      * Get all block funds for a deposit account
      */
     public getAllBlocks({
@@ -761,7 +793,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -770,7 +802,6 @@ export class MambuDepositAccounts {
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/blocks`, {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: GetAllBlocksResponse,
@@ -779,10 +810,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getAllBlocks']>
     }
 
     /**
+     * GET /deposits/{depositAccountId}/cards
+     *
      * Get cards associated with an account
      */
     public getAllCards({
@@ -797,7 +831,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -805,7 +839,6 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/cards`, {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: GetAllCardsResponse,
@@ -814,10 +847,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getAllCards']>
     }
 
     /**
+     * GET /deposits/{depositAccountId}/authorizationholds/{authorizationHoldExternalReferenceId}
+     *
      * Get account authorization hold
      */
     public getAuthorizationHoldById({
@@ -835,7 +871,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -845,7 +881,6 @@ export class MambuDepositAccounts {
                 `deposits/${path.depositAccountId}/authorizationholds/${path.authorizationHoldExternalReferenceId}`,
                 {
                     headers: { Accept: 'application/vnd.mambu.v2+json' },
-                    responseType: 'json',
                 },
             ),
             {
@@ -855,10 +890,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getAuthorizationHoldById']>
     }
 
     /**
+     * GET /deposits/{depositAccountId}
+     *
      * Get deposit account
      */
     public getById({
@@ -874,7 +912,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -883,7 +921,6 @@ export class MambuDepositAccounts {
             this.buildClient(auth).get(`deposits/${path.depositAccountId}`, {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: DepositAccount,
@@ -892,10 +929,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getById']>
     }
 
     /**
+     * GET /deposits/{depositAccountId}/templates/{templateId}
+     *
      * Get deposit account document
      */
     public getDepositAccountDocument({
@@ -915,7 +955,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -924,7 +964,6 @@ export class MambuDepositAccounts {
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/templates/${path.templateId}`, {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: GetDepositAccountDocumentResponse,
@@ -933,10 +972,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getDepositAccountDocument']>
     }
 
     /**
+     * GET /deposits/{depositAccountId}/funding
+     *
      * Get all loan accounts funded by the deposit account with the given ID or encoded key
      */
     public getFundedLoans({
@@ -951,7 +993,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -959,7 +1001,6 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/funding`, {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: GetFundedLoansResponse,
@@ -968,10 +1009,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getFundedLoans']>
     }
 
     /**
+     * GET /deposits/{depositAccountId}/interest-availabilities
+     *
      * Get Interest Availabilities
      */
     public getInterestAvailabilitiesList({
@@ -991,7 +1035,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1000,7 +1044,6 @@ export class MambuDepositAccounts {
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/interest-availabilities`, {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: GetInterestAvailabilitiesListResponse,
@@ -1009,10 +1052,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getInterestAvailabilitiesList']>
     }
 
     /**
+     * GET /deposits/{depositAccountId}/interest-availabilities/{interestAvailabilityKey}
+     *
      * Get Interest Availability
      */
     public getInterestAvailabilityById({
@@ -1027,7 +1073,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1037,7 +1083,6 @@ export class MambuDepositAccounts {
                 `deposits/${path.depositAccountId}/interest-availabilities/${path.interestAvailabilityKey}`,
                 {
                     headers: { Accept: 'application/vnd.mambu.v2+json' },
-                    responseType: 'json',
                 },
             ),
             {
@@ -1047,10 +1092,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getInterestAvailabilityById']>
     }
 
     /**
+     * GET /deposits/{depositAccountId}/templates/{templateId}/pdf
+     *
      * Download deposit account document PDF
      */
     public getPdfDocument({
@@ -1070,7 +1118,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1078,7 +1126,6 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/templates/${path.templateId}/pdf`, {
                 searchParams: query ?? {},
-                responseType: 'text',
             }),
             {
                 200: { parse: (x: unknown) => ({ right: x }) },
@@ -1087,10 +1134,13 @@ export class MambuDepositAccounts {
                 403: { parse: (x: unknown) => ({ right: x }) },
                 404: { parse: (x: unknown) => ({ right: x }) },
             },
+            'text',
         ) as ReturnType<this['getPdfDocument']>
     }
 
     /**
+     * GET /deposits/{depositAccountId}/funding/{loanAccountId}/schedule
+     *
      * Allows retrieval of the loan account schedule for a loan account with the given id or encodedKey and funded by the deposit account with the given id or encodedKey.
      */
     public getScheduleForFundedAccount({
@@ -1105,7 +1155,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1113,7 +1163,6 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/funding/${path.loanAccountId}/schedule`, {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: LoanAccountSchedule,
@@ -1122,10 +1171,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getScheduleForFundedAccount']>
     }
 
     /**
+     * GET /deposits/{depositAccountId}/withholdingtaxes
+     *
      * Get deposit account withholding tax history
      */
     public getWithholdingTaxHistory({
@@ -1141,7 +1193,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1150,7 +1202,6 @@ export class MambuDepositAccounts {
             this.buildClient(auth).get(`deposits/${path.depositAccountId}/withholdingtaxes`, {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: GetWithholdingTaxHistoryResponse,
@@ -1159,10 +1210,13 @@ export class MambuDepositAccounts {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getWithholdingTaxHistory']>
     }
 
     /**
+     * POST /deposits/interest-availabilities:bulk
+     *
      * Create Interest Availabilities for a group of accounts
      */
     public makeBulkInterestAccountSettingsAvailabilities({
@@ -1183,7 +1237,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1195,9 +1249,8 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).post('deposits/interest-availabilities:bulk', {
-                json: body,
+                json: _body.right as BulkInterestAccountSettingsAvailabilityInput,
                 headers: headers ?? {},
-                responseType: 'text',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -1206,10 +1259,13 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['makeBulkInterestAccountSettingsAvailabilities']>
     }
 
     /**
+     * PATCH /deposits/{depositAccountId}
+     *
      * Partially update deposit account
      */
     public patch({
@@ -1227,7 +1283,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1239,8 +1295,7 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).patch(`deposits/${path.depositAccountId}`, {
-                json: body,
-                responseType: 'text',
+                json: _body.right as PatchRequest,
             }),
             {
                 204: { parse: (x: unknown) => ({ right: x }) },
@@ -1250,10 +1305,13 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['patch']>
     }
 
     /**
+     * PATCH /deposits/{depositAccountId}/blocks/{externalReferenceId}
+     *
      * Updates the amount of an existing blocked fund on a deposit account. If the new amount equals the seized amount the block fund will transition to a seized state.
      */
     public patchBlockFund({
@@ -1275,7 +1333,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1287,8 +1345,7 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).patch(`deposits/${path.depositAccountId}/blocks/${path.externalReferenceId}`, {
-                json: body,
-                responseType: 'text',
+                json: _body.right as PatchBlockFundRequest,
             }),
             {
                 204: { parse: (x: unknown) => ({ right: x }) },
@@ -1298,10 +1355,13 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['patchBlockFund']>
     }
 
     /**
+     * POST /deposits/{depositAccountId}:reopen
+     *
      * Reopen a deposit account
      */
     public reopen({
@@ -1326,7 +1386,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1338,9 +1398,8 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:reopen`, {
-                json: body,
+                json: _body.right as ReopenDepositAction,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -1351,10 +1410,13 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['reopen']>
     }
 
     /**
+     * DELETE /deposits/{depositAccountId}/authorizationholds/{authorizationHoldExternalReferenceId}
+     *
      * Reverse account authorization hold
      */
     public reverseAuthorizationHold({
@@ -1373,7 +1435,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1381,9 +1443,7 @@ export class MambuDepositAccounts {
         return this.awaitResponse(
             this.buildClient(auth).delete(
                 `deposits/${path.depositAccountId}/authorizationholds/${path.authorizationHoldExternalReferenceId}`,
-                {
-                    responseType: 'text',
-                },
+                {},
             ),
             {
                 204: { parse: (x: unknown) => ({ right: x }) },
@@ -1393,10 +1453,13 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['reverseAuthorizationHold']>
     }
 
     /**
+     * POST /deposits:search
+     *
      * Search deposit accounts
      */
     public search({
@@ -1405,7 +1468,7 @@ export class MambuDepositAccounts {
         auth = [['apiKey'], ['basic']],
     }: {
         body: DepositAccountSearchCriteria
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string; cursor?: string; detailsLevel?: string }
         auth?: string[][] | string[]
     }): Promise<
         | SuccessResponse<'200', SearchResponse>
@@ -1416,7 +1479,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1428,10 +1491,9 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).post('deposits:search', {
-                json: body,
+                json: _body.right as DepositAccountSearchCriteria,
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: SearchResponse,
@@ -1439,10 +1501,13 @@ export class MambuDepositAccounts {
                 401: ErrorResponse,
                 403: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['search']>
     }
 
     /**
+     * POST /deposits/{depositAccountId}:startMaturity
+     *
      * Represents information to start the maturity period for the specified deposit account.
      */
     public startMaturity({
@@ -1467,7 +1532,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1479,9 +1544,8 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:startMaturity`, {
-                json: body,
+                json: _body.right as StartMaturityAction,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -1492,10 +1556,68 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['startMaturity']>
     }
 
     /**
+     * POST /deposits/{depositAccountId}:transferOwnership
+     *
+     * Transfer the account ownership from current account holder to a new one (client/group).
+     */
+    public transferOwnership({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: TransferOwnershipAction
+        path: { depositAccountId: string }
+        headers?: { 'Idempotency-Key'?: string }
+        auth?: string[][] | string[]
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'204', unknown>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'409', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
+              unknown,
+              'response:statuscode',
+              IncomingHttpHeaders
+          >
+    > {
+        const _body = this.validateRequestBody(TransferOwnershipAction, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`deposits/${path.depositAccountId}:transferOwnership`, {
+                json: _body.right as TransferOwnershipAction,
+                headers: headers ?? {},
+            }),
+            {
+                102: { parse: (x: unknown) => ({ right: x }) },
+                204: { parse: (x: unknown) => ({ right: x }) },
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+                409: ErrorResponse,
+            },
+            'text',
+        ) as ReturnType<this['transferOwnership']>
+    }
+
+    /**
+     * DELETE /deposits/{depositAccountId}/blocks/{externalReferenceId}
+     *
      * Unblock a previously blocked fund for a deposit account
      */
     public unblockFund({
@@ -1511,15 +1633,13 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
     > {
         return this.awaitResponse(
-            this.buildClient(auth).delete(`deposits/${path.depositAccountId}/blocks/${path.externalReferenceId}`, {
-                responseType: 'text',
-            }),
+            this.buildClient(auth).delete(`deposits/${path.depositAccountId}/blocks/${path.externalReferenceId}`, {}),
             {
                 204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
@@ -1528,10 +1648,13 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['unblockFund']>
     }
 
     /**
+     * POST /deposits/{depositAccountId}:undoMaturity
+     *
      * Represents the action to undo the maturity period for the specified deposit account.
      */
     public undoMaturity({
@@ -1556,7 +1679,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1568,9 +1691,8 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`deposits/${path.depositAccountId}:undoMaturity`, {
-                json: body,
+                json: _body.right as UndoMaturityAction,
                 headers: headers ?? {},
-                responseType: 'text',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -1581,10 +1703,13 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['undoMaturity']>
     }
 
     /**
+     * PUT /deposits/{depositAccountId}
+     *
      * Update deposit account
      */
     public update({
@@ -1602,7 +1727,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1614,9 +1739,8 @@ export class MambuDepositAccounts {
 
         return this.awaitResponse(
             this.buildClient(auth).put(`deposits/${path.depositAccountId}`, {
-                json: body,
+                json: _body.right as DepositAccount,
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: DepositAccount,
@@ -1626,10 +1750,13 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['update']>
     }
 
     /**
+     * PUT /deposits/{depositAccountId}/interest-availabilities/{interestAvailabilityKey}
+     *
      * Update Interest Availability
      */
     public updateInterestAvailability({
@@ -1651,7 +1778,7 @@ export class MambuDepositAccounts {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -1665,9 +1792,8 @@ export class MambuDepositAccounts {
             this.buildClient(auth).put(
                 `deposits/${path.depositAccountId}/interest-availabilities/${path.interestAvailabilityKey}`,
                 {
-                    json: body,
+                    json: _body.right as InterestAccountSettingsAvailabilityUpdate,
                     headers: { Accept: 'application/vnd.mambu.v2+json' },
-                    responseType: 'json',
                 },
             ),
             {
@@ -1678,6 +1804,7 @@ export class MambuDepositAccounts {
                 404: ErrorResponse,
                 409: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['updateInterestAvailability']>
     }
 
@@ -1702,44 +1829,45 @@ export class MambuDepositAccounts {
     public async awaitResponse<
         I,
         S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } } | undefined>,
-    >(response: CancelableRequest<Response<I>>, schemas: S) {
+    >(response: ResponsePromise<I>, schemas: S, responseType?: 'json' | 'text') {
         const result = await response
+        const _body = (await (responseType !== undefined ? result[responseType]() : result.text())) as I
         const status =
-            result.statusCode < 200
+            result.status < 200
                 ? 'informational'
-                : result.statusCode < 300
+                : result.status < 300
                   ? 'success'
-                  : result.statusCode < 400
+                  : result.status < 400
                     ? 'redirection'
-                    : result.statusCode < 500
+                    : result.status < 500
                       ? 'client-error'
                       : 'server-error'
-        const validator = schemas[result.statusCode] ?? schemas.default
-        const body = validator?.parse?.(result.body)
-        if (result.statusCode < 200 || result.statusCode >= 300) {
+        const validator = schemas[result.status] ?? schemas.default
+        const body = validator?.parse?.(_body)
+        if (result.status < 200 || result.status >= 300) {
             return {
-                statusCode: result.statusCode.toString(),
+                statusCode: result.status.toString(),
                 status,
                 headers: result.headers,
-                left: body !== undefined && 'right' in body ? body.right : result.body,
+                left: body !== undefined && 'right' in body ? body.right : _body,
                 validationErrors: body !== undefined && 'left' in body ? body.left : undefined,
                 where: 'response:statuscode',
             }
         }
         if (body === undefined || 'left' in body) {
             return {
-                statusCode: result.statusCode.toString(),
+                statusCode: result.status.toString(),
                 status,
                 headers: result.headers,
-                left: result.body,
+                left: _body,
                 validationErrors: body?.left,
                 where: 'response:body',
             }
         }
-        return { statusCode: result.statusCode.toString(), status, headers: result.headers, right: result.body }
+        return { statusCode: result.status.toString(), status, headers: result.headers, right: _body }
     }
 
-    protected buildBasicClient(client: Got) {
+    protected buildBasicClient(client: KyInstance) {
         return client.extend({
             hooks: {
                 beforeRequest: [
@@ -1747,8 +1875,7 @@ export class MambuDepositAccounts {
                         const basic = this.auth.basic
                         if (basic !== undefined) {
                             const [username, password] = typeof basic === 'function' ? await basic() : basic
-                            options.username = username
-                            options.password = password
+                            options.headers.set('Authorization', `Basic ${btoa(`${username}:${password}`)}`)
                         }
                     },
                 ],
@@ -1756,21 +1883,21 @@ export class MambuDepositAccounts {
         })
     }
 
-    protected buildApiKeyClient(client: Got) {
+    protected buildApiKeyClient(client: KyInstance) {
         return client.extend({
             hooks: {
                 beforeRequest: [
                     async (options) => {
                         const apiKey = this.auth.apiKey
                         const key = typeof apiKey === 'function' ? await apiKey() : apiKey
-                        options.headers.apiKey = key
+                        options.headers.set('apiKey', `${key}`)
                     },
                 ],
             },
         })
     }
 
-    protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client?: Got): Got {
+    protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client?: KyInstance): KyInstance {
         const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))

@@ -13,6 +13,9 @@ import { validate as ErrorResponseValidator } from './schemas/error-response.sch
  * Describes the application status regarding the data access
  */
 export interface ApplicationStatus {
+    /**
+     * Data access state
+     */
     dataAccessState?: 'READ_ONLY_STATE' | 'WRITE_READ_STATE' | undefined
 }
 

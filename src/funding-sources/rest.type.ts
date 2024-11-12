@@ -303,6 +303,10 @@ export interface DepositTransaction {
      */
     currencyCode?: string | undefined
     /**
+     * Whether the custom fields of the transaction are archived
+     */
+    customFieldsArchived?: boolean | undefined
+    /**
      * The encoded key of the deposit transaction, auto generated, unique
      */
     encodedKey?: string | undefined
@@ -380,6 +384,7 @@ export interface DepositTransaction {
         | 'OVERDRAFT_INTEREST_RATE_CHANGED'
         | 'OVERDRAFT_LIMIT_CHANGED'
         | 'BRANCH_CHANGED'
+        | 'ACCOUNT_HOLDER_CHANGED'
         | 'LOAN_FUNDED'
         | 'LOAN_FUNDED_ADJUSTMENT'
         | 'LOAN_REPAID'

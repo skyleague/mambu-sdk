@@ -293,12 +293,14 @@ export interface DepositGLAccountingRule {
         | 'FUND_SOURCE'
         | 'WRITE_OFF_EXPENSE'
         | 'INTEREST_INCOME'
+        | 'PAYMENT_HOLIDAY_INTEREST_INCOME'
         | 'TAXES_PAYABLE'
         | 'FEE_INCOME'
         | 'PENALTY_INCOME'
         | 'NEGATIVE_INTEREST_PAYABLE_RECEIVABLE'
         | 'NEGATIVE_INTEREST_PAYABLE'
         | 'INTEREST_RECEIVABLE'
+        | 'PAYMENT_HOLIDAY_INTEREST_RECEIVABLE'
         | 'FEE_RECEIVABLE'
         | 'PENALTY_RECEIVABLE'
         | 'TAXES_RECEIVABLE'
@@ -316,6 +318,9 @@ export interface DepositGLAccountingRule {
         | 'OVERDRAFT_WRITE_OFF_EXPENSE'
         | 'OVERDRAFT_INTEREST_RECEIVABLE'
         | 'INTER_BRANCH_TRANSFER'
+        | 'INTEREST_FROM_ARREARS_INCOME'
+        | 'INTEREST_FROM_ARREARS_RECEIVABLE'
+        | 'INTEREST_FROM_ARREARS_WRITE_OFF_EXPENSE'
     /**
      * The encoded key of the account that is mapped to the financialResource
      */
@@ -435,7 +440,7 @@ export const DepositProduct = {
  */
 export interface DepositProductAccountingSettings {
     /**
-     * A list of accounting rules for a product.
+     * The calculation method used for accounting.
      */
     accountingMethod: 'NONE' | 'CASH' | 'ACCRUAL'
     /**
@@ -443,7 +448,11 @@ export interface DepositProductAccountingSettings {
      */
     accountingRules?: DepositGLAccountingRule[] | undefined
     /**
-     * A list of accounting rules for a product.
+     * The accounting interest calculation option selected for the product.
+     */
+    interestAccrualCalculation?: 'NONE' | 'AGGREGATED_AMOUNT' | 'BREAKDOWN_PER_ACCOUNT' | undefined
+    /**
+     * The interval defined for a product when the interest accrues should be maintained.
      */
     interestAccruedAccountingMethod?: 'NONE' | 'DAILY' | 'END_OF_MONTH' | undefined
 }
