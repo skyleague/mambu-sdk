@@ -10,7 +10,7 @@ import type { DefinedError } from 'ajv'
 import { got } from 'got'
 import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
 
-import { DataImportAction, DataImportResponse, DataImportStatus, ErrorResponse } from './rest.type.js'
+import { DataImportAction, DataImportRequest, DataImportResponse, DataImportStatus, ErrorResponse } from './rest.type.js'
 
 /**
  * data/import
@@ -31,6 +31,7 @@ export class MambuDataImport {
         options,
         auth = {},
         defaultAuth,
+        client = got,
     }: {
         prefixUrl: string | 'http://localhost:8889/api' | 'https://localhost:8889/api'
         options?: Options | OptionsInit
@@ -39,14 +40,19 @@ export class MambuDataImport {
             apiKey?: string | (() => Promise<string>)
         }
         defaultAuth?: string[][] | string[]
+        client?: Got
     }) {
-        this.client = got.extend(...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined))
+        this.client = client.extend(
+            ...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined),
+        )
         this.auth = auth
         this.availableAuth = new Set(Object.keys(auth))
         this.defaultAuth = defaultAuth
     }
 
     /**
+     * POST /data/import/events/{eventKey}:action
+     *
      * Allows you to approve or reject a data import event
      */
     public action({
@@ -70,7 +76,7 @@ export class MambuDataImport {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -82,7 +88,7 @@ export class MambuDataImport {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`data/import/events/${path.eventKey}:action`, {
-                json: body,
+                json: _body.right,
                 headers: headers ?? {},
                 responseType: 'text',
             }),
@@ -98,25 +104,35 @@ export class MambuDataImport {
     }
 
     /**
+     * POST /data/import
+     *
      * Allows you to import data
      */
     public dataImport({
+        body,
         auth = [['apiKey'], ['basic']],
-    }: { auth?: string[][] | string[] } = {}): Promise<
+    }: { body: DataImportRequest; auth?: string[][] | string[] }): Promise<
         | SuccessResponse<'202', DataImportResponse>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
     > {
+        const _body = this.validateRequestBody(DataImportRequest, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
+
         return this.awaitResponse(
             this.buildClient(auth).post('data/import', {
+                form: _body.right,
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
@@ -130,6 +146,8 @@ export class MambuDataImport {
     }
 
     /**
+     * GET /data/import/{importKey}
+     *
      * Allows you to retrieve a data import response
      */
     public getImport({
@@ -144,7 +162,7 @@ export class MambuDataImport {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -164,13 +182,14 @@ export class MambuDataImport {
         ) as ReturnType<this['getImport']>
     }
 
-    public validateRequestBody<Parser extends { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } }, Body>(
-        parser: Parser,
+    public validateRequestBody<Body>(
+        parser: { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } },
         body: unknown,
     ) {
         const _body = parser.parse(body)
         if ('left' in _body) {
             return {
+                success: false as const,
                 statusCode: undefined,
                 status: undefined,
                 headers: undefined,
@@ -184,8 +203,8 @@ export class MambuDataImport {
 
     public async awaitResponse<
         I,
-        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } } | undefined>,
-    >(response: CancelableRequest<Response<I>>, schemas: S) {
+        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } }>,
+    >(response: CancelableRequest<NoInfer<Response<I>>>, schemas: S) {
         const result = await response
         const status =
             result.statusCode < 200
@@ -201,6 +220,7 @@ export class MambuDataImport {
         const body = validator?.parse?.(result.body)
         if (result.statusCode < 200 || result.statusCode >= 300) {
             return {
+                success: false as const,
                 statusCode: result.statusCode.toString(),
                 status,
                 headers: result.headers,
@@ -211,6 +231,7 @@ export class MambuDataImport {
         }
         if (body === undefined || 'left' in body) {
             return {
+                success: false as const,
                 statusCode: result.statusCode.toString(),
                 status,
                 headers: result.headers,
@@ -219,7 +240,13 @@ export class MambuDataImport {
                 where: 'response:body',
             }
         }
-        return { statusCode: result.statusCode.toString(), status, headers: result.headers, right: result.body }
+        return {
+            success: true as const,
+            statusCode: result.statusCode.toString(),
+            status,
+            headers: result.headers,
+            right: result.body,
+        }
     }
 
     protected buildBasicClient(client: Got) {
@@ -281,12 +308,14 @@ export type Status<Major> = Major extends string
               : 'server-error'
     : undefined
 export interface SuccessResponse<StatusCode extends string, T> {
+    success: true
     statusCode: StatusCode
     status: Status<StatusCode>
     headers: IncomingHttpHeaders
     right: T
 }
 export interface FailureResponse<StatusCode = string, T = unknown, Where = never, Headers = IncomingHttpHeaders> {
+    success: false
     statusCode: StatusCode
     status: Status<StatusCode>
     headers: Headers

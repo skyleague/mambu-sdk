@@ -109,6 +109,7 @@ export interface DuplicateFieldConstraint {
         | 'ACCOUNT_INTEREST_RATE_SETTINGS'
         | 'LENDING_ACCOUNT_CONTRACT'
         | 'REVOLVING_ACCOUNT'
+        | 'LENDING_PRODUCT_CONTRACT'
         | undefined
     /**
      * The encoded key of the duplicate field constraint, auto generated, unique

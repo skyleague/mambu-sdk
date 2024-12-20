@@ -7,6 +7,7 @@
 import type { DefinedError, ValidateFunction } from 'ajv'
 
 import { validate as DataImportActionValidator } from './schemas/data-import-action.schema.js'
+import { validate as DataImportRequestValidator } from './schemas/data-import-request.schema.js'
 import { validate as DataImportResponseValidator } from './schemas/data-import-response.schema.js'
 import { validate as DataImportStatusValidator } from './schemas/data-import-status.schema.js'
 import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
@@ -70,6 +71,30 @@ export interface DataImportErrorColumn {
      */
     name?: string | undefined
 }
+
+export interface DataImportRequest {
+    /**
+     * The file to import
+     */
+    file: string
+}
+
+export const DataImportRequest = {
+    validate: DataImportRequestValidator as ValidateFunction<DataImportRequest>,
+    get schema() {
+        return DataImportRequest.validate.schema
+    },
+    get errors() {
+        return DataImportRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is DataImportRequest => DataImportRequest.validate(o) === true,
+    parse: (o: unknown): { right: DataImportRequest } | { left: DefinedError[] } => {
+        if (DataImportRequest.is(o)) {
+            return { right: o }
+        }
+        return { left: (DataImportRequest.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Holds information about the response of the data import action

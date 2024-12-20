@@ -29,6 +29,7 @@ export class MambuLoanProductsConfiguration {
         options,
         auth = {},
         defaultAuth,
+        client = got,
     }: {
         prefixUrl: string | 'http://localhost:8889/api' | 'https://localhost:8889/api'
         options?: Options | OptionsInit
@@ -37,14 +38,19 @@ export class MambuLoanProductsConfiguration {
             apiKey?: string | (() => Promise<string>)
         }
         defaultAuth?: string[][] | string[]
+        client?: Got
     }) {
-        this.client = got.extend(...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined))
+        this.client = client.extend(
+            ...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined),
+        )
         this.auth = auth
         this.availableAuth = new Set(Object.keys(auth))
         this.defaultAuth = defaultAuth
     }
 
     /**
+     * GET /configuration/loanproducts.yaml
+     *
      * Allows you to get or update the loan products configuration.
      */
     public get({
@@ -58,7 +64,7 @@ export class MambuLoanProductsConfiguration {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -79,6 +85,8 @@ export class MambuLoanProductsConfiguration {
     }
 
     /**
+     * PUT /configuration/loanproducts.yaml
+     *
      * Update loan products configuration
      */
     public update({
@@ -94,7 +102,7 @@ export class MambuLoanProductsConfiguration {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -117,8 +125,8 @@ export class MambuLoanProductsConfiguration {
 
     public async awaitResponse<
         I,
-        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } } | undefined>,
-    >(response: CancelableRequest<Response<I>>, schemas: S) {
+        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } }>,
+    >(response: CancelableRequest<NoInfer<Response<I>>>, schemas: S) {
         const result = await response
         const status =
             result.statusCode < 200
@@ -134,6 +142,7 @@ export class MambuLoanProductsConfiguration {
         const body = validator?.parse?.(result.body)
         if (result.statusCode < 200 || result.statusCode >= 300) {
             return {
+                success: false as const,
                 statusCode: result.statusCode.toString(),
                 status,
                 headers: result.headers,
@@ -144,6 +153,7 @@ export class MambuLoanProductsConfiguration {
         }
         if (body === undefined || 'left' in body) {
             return {
+                success: false as const,
                 statusCode: result.statusCode.toString(),
                 status,
                 headers: result.headers,
@@ -152,7 +162,13 @@ export class MambuLoanProductsConfiguration {
                 where: 'response:body',
             }
         }
-        return { statusCode: result.statusCode.toString(), status, headers: result.headers, right: result.body }
+        return {
+            success: true as const,
+            statusCode: result.statusCode.toString(),
+            status,
+            headers: result.headers,
+            right: result.body,
+        }
     }
 
     protected buildBasicClient(client: Got) {
@@ -214,12 +230,14 @@ export type Status<Major> = Major extends string
               : 'server-error'
     : undefined
 export interface SuccessResponse<StatusCode extends string, T> {
+    success: true
     statusCode: StatusCode
     status: Status<StatusCode>
     headers: IncomingHttpHeaders
     right: T
 }
 export interface FailureResponse<StatusCode = string, T = unknown, Where = never, Headers = IncomingHttpHeaders> {
+    success: false
     statusCode: StatusCode
     status: Status<StatusCode>
     headers: Headers

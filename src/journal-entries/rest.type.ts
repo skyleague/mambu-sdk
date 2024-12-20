@@ -538,17 +538,6 @@ export interface GLJournalEntryForeignAmount {
     currency?: Currency | undefined
 }
 
-/**
- * Represents the list of filtering criteria and the sorting criteria when searching general ledger journal entries.
- */
-export interface GLJournalEntrySearchCriteria {
-    /**
-     * The list of filtering criteria.
-     */
-    filterCriteria?: GLJournalEntryFilterCriteria[] | undefined
-    sortingCriteria?: GLJournalEntrySortingCriteria | undefined
-}
-
 export const GLJournalEntrySearchCriteria = {
     validate: GLJournalEntrySearchCriteriaValidator as ValidateFunction<GLJournalEntrySearchCriteria>,
     get schema() {
@@ -565,6 +554,17 @@ export const GLJournalEntrySearchCriteria = {
         return { left: (GLJournalEntrySearchCriteria.errors ?? []) as DefinedError[] }
     },
 } as const
+
+/**
+ * Represents the list of filtering criteria and the sorting criteria when searching general ledger journal entries.
+ */
+export interface GLJournalEntrySearchCriteria {
+    /**
+     * The list of filtering criteria.
+     */
+    filterCriteria?: GLJournalEntryFilterCriteria[] | undefined
+    sortingCriteria?: GLJournalEntrySortingCriteria | undefined
+}
 
 /**
  * Represents the sorting criteria used for general ledger journal entries.
@@ -650,8 +650,6 @@ export interface RestError {
     errorSource?: string | undefined
 }
 
-export type SearchResponse = GLJournalEntry[]
-
 export const SearchResponse = {
     validate: SearchResponseValidator as ValidateFunction<SearchResponse>,
     get schema() {
@@ -668,3 +666,5 @@ export const SearchResponse = {
         return { left: (SearchResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type SearchResponse = GLJournalEntry[]

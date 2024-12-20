@@ -39,6 +39,7 @@ export class MambuGroups {
         options,
         auth = {},
         defaultAuth,
+        client = got,
     }: {
         prefixUrl: string | 'http://localhost:8889/api' | 'https://localhost:8889/api'
         options?: Options | OptionsInit
@@ -47,14 +48,19 @@ export class MambuGroups {
             apiKey?: string | (() => Promise<string>)
         }
         defaultAuth?: string[][] | string[]
+        client?: Got
     }) {
-        this.client = got.extend(...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined))
+        this.client = client.extend(
+            ...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined),
+        )
         this.auth = auth
         this.availableAuth = new Set(Object.keys(auth))
         this.defaultAuth = defaultAuth
     }
 
     /**
+     * POST /groups
+     *
      * Create group
      */
     public create({
@@ -71,7 +77,7 @@ export class MambuGroups {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -83,7 +89,7 @@ export class MambuGroups {
 
         return this.awaitResponse(
             this.buildClient(auth).post('groups', {
-                json: body,
+                json: _body.right,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
@@ -98,6 +104,8 @@ export class MambuGroups {
     }
 
     /**
+     * DELETE /groups/{groupId}
+     *
      * Delete group
      */
     public delete({
@@ -112,7 +120,7 @@ export class MambuGroups {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -132,6 +140,8 @@ export class MambuGroups {
     }
 
     /**
+     * GET /groups
+     *
      * Get groups
      */
     public getAll({
@@ -157,7 +167,7 @@ export class MambuGroups {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -178,6 +188,8 @@ export class MambuGroups {
     }
 
     /**
+     * GET /groups/{groupId}
+     *
      * Get group
      */
     public getById({
@@ -193,7 +205,7 @@ export class MambuGroups {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -215,6 +227,8 @@ export class MambuGroups {
     }
 
     /**
+     * GET /groups/{groupId}/creditarrangements
+     *
      * Credit arrangements list returned.
      */
     public getCreditArrangementsByGroupIdOrKey({
@@ -234,7 +248,7 @@ export class MambuGroups {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -256,6 +270,8 @@ export class MambuGroups {
     }
 
     /**
+     * PATCH /groups/{groupId}
+     *
      * Partially update group
      */
     public patch({
@@ -272,7 +288,7 @@ export class MambuGroups {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -284,7 +300,7 @@ export class MambuGroups {
 
         return this.awaitResponse(
             this.buildClient(auth).patch(`groups/${path.groupId}`, {
-                json: body,
+                json: _body.right,
                 responseType: 'text',
             }),
             {
@@ -298,6 +314,8 @@ export class MambuGroups {
     }
 
     /**
+     * POST /groups:search
+     *
      * Search groups
      */
     public search({
@@ -317,7 +335,7 @@ export class MambuGroups {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -329,7 +347,7 @@ export class MambuGroups {
 
         return this.awaitResponse(
             this.buildClient(auth).post('groups:search', {
-                json: body,
+                json: _body.right,
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
@@ -344,6 +362,8 @@ export class MambuGroups {
     }
 
     /**
+     * PUT /groups/{groupId}
+     *
      * Update group
      */
     public update({
@@ -360,7 +380,7 @@ export class MambuGroups {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -372,7 +392,7 @@ export class MambuGroups {
 
         return this.awaitResponse(
             this.buildClient(auth).put(`groups/${path.groupId}`, {
-                json: body,
+                json: _body.right,
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
@@ -386,13 +406,14 @@ export class MambuGroups {
         ) as ReturnType<this['update']>
     }
 
-    public validateRequestBody<Parser extends { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } }, Body>(
-        parser: Parser,
+    public validateRequestBody<Body>(
+        parser: { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } },
         body: unknown,
     ) {
         const _body = parser.parse(body)
         if ('left' in _body) {
             return {
+                success: false as const,
                 statusCode: undefined,
                 status: undefined,
                 headers: undefined,
@@ -406,8 +427,8 @@ export class MambuGroups {
 
     public async awaitResponse<
         I,
-        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } } | undefined>,
-    >(response: CancelableRequest<Response<I>>, schemas: S) {
+        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } }>,
+    >(response: CancelableRequest<NoInfer<Response<I>>>, schemas: S) {
         const result = await response
         const status =
             result.statusCode < 200
@@ -423,6 +444,7 @@ export class MambuGroups {
         const body = validator?.parse?.(result.body)
         if (result.statusCode < 200 || result.statusCode >= 300) {
             return {
+                success: false as const,
                 statusCode: result.statusCode.toString(),
                 status,
                 headers: result.headers,
@@ -433,6 +455,7 @@ export class MambuGroups {
         }
         if (body === undefined || 'left' in body) {
             return {
+                success: false as const,
                 statusCode: result.statusCode.toString(),
                 status,
                 headers: result.headers,
@@ -441,7 +464,13 @@ export class MambuGroups {
                 where: 'response:body',
             }
         }
-        return { statusCode: result.statusCode.toString(), status, headers: result.headers, right: result.body }
+        return {
+            success: true as const,
+            statusCode: result.statusCode.toString(),
+            status,
+            headers: result.headers,
+            right: result.body,
+        }
     }
 
     protected buildBasicClient(client: Got) {
@@ -503,12 +532,14 @@ export type Status<Major> = Major extends string
               : 'server-error'
     : undefined
 export interface SuccessResponse<StatusCode extends string, T> {
+    success: true
     statusCode: StatusCode
     status: Status<StatusCode>
     headers: IncomingHttpHeaders
     right: T
 }
 export interface FailureResponse<StatusCode = string, T = unknown, Where = never, Headers = IncomingHttpHeaders> {
+    success: false
     statusCode: StatusCode
     status: Status<StatusCode>
     headers: Headers

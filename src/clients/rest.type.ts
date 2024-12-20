@@ -65,6 +65,23 @@ export interface Address {
     region?: string | undefined
 }
 
+export const Client = {
+    validate: ClientValidator as ValidateFunction<Client>,
+    get schema() {
+        return Client.validate.schema
+    },
+    get errors() {
+        return Client.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Client => Client.validate(o) === true,
+    parse: (o: unknown): { right: Client } | { left: DefinedError[] } => {
+        if (Client.is(o)) {
+            return { right: o }
+        }
+        return { left: (Client.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Represents a client.
  */
@@ -214,23 +231,6 @@ export interface Client {
     state?: 'PENDING_APPROVAL' | 'INACTIVE' | 'ACTIVE' | 'EXITED' | 'BLACKLISTED' | 'REJECTED' | undefined
 }
 
-export const Client = {
-    validate: ClientValidator as ValidateFunction<Client>,
-    get schema() {
-        return Client.validate.schema
-    },
-    get errors() {
-        return Client.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Client => Client.validate(o) === true,
-    parse: (o: unknown): { right: Client } | { left: DefinedError[] } => {
-        if (Client.is(o)) {
-            return { right: o }
-        }
-        return { left: (Client.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * The unit that composes the list used for Clients searching
  */
@@ -328,6 +328,23 @@ export interface ClientFilterCriteria {
     values?: string[] | undefined
 }
 
+export const ClientRole = {
+    validate: ClientRoleValidator as ValidateFunction<ClientRole>,
+    get schema() {
+        return ClientRole.validate.schema
+    },
+    get errors() {
+        return ClientRole.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ClientRole => ClientRole.validate(o) === true,
+    parse: (o: unknown): { right: ClientRole } | { left: DefinedError[] } => {
+        if (ClientRole.is(o)) {
+            return { right: o }
+        }
+        return { left: (ClientRole.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Represents a client or group role.
  */
@@ -378,34 +395,6 @@ export interface ClientRole {
     useDefaultAddress?: boolean | undefined
 }
 
-export const ClientRole = {
-    validate: ClientRoleValidator as ValidateFunction<ClientRole>,
-    get schema() {
-        return ClientRole.validate.schema
-    },
-    get errors() {
-        return ClientRole.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ClientRole => ClientRole.validate(o) === true,
-    parse: (o: unknown): { right: ClientRole } | { left: DefinedError[] } => {
-        if (ClientRole.is(o)) {
-            return { right: o }
-        }
-        return { left: (ClientRole.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-/**
- * Wrapper that holds a list of filtering criteria and a sorting criteria for clients
- */
-export interface ClientSearchCriteria {
-    /**
-     * The list of filtering criteria
-     */
-    filterCriteria: ClientFilterCriteria[]
-    sortingCriteria?: ClientSortingCriteria | undefined
-}
-
 export const ClientSearchCriteria = {
     validate: ClientSearchCriteriaValidator as ValidateFunction<ClientSearchCriteria>,
     get schema() {
@@ -422,6 +411,17 @@ export const ClientSearchCriteria = {
         return { left: (ClientSearchCriteria.errors ?? []) as DefinedError[] }
     },
 } as const
+
+/**
+ * Wrapper that holds a list of filtering criteria and a sorting criteria for clients
+ */
+export interface ClientSearchCriteria {
+    /**
+     * The list of filtering criteria
+     */
+    filterCriteria: ClientFilterCriteria[]
+    sortingCriteria?: ClientSortingCriteria | undefined
+}
 
 /**
  * The sorting criteria used for Clients
@@ -805,10 +805,6 @@ export interface Document {
     type: string
 }
 
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
-
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -826,7 +822,9 @@ export const ErrorResponse = {
     },
 } as const
 
-export type GetAllResponse = Client[]
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
 
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
@@ -845,7 +843,7 @@ export const GetAllResponse = {
     },
 } as const
 
-export type GetCreditArrangementsByClientIdOrKeyResponse = CreditArrangement[]
+export type GetAllResponse = Client[]
 
 export const GetCreditArrangementsByClientIdOrKeyResponse = {
     validate:
@@ -865,6 +863,8 @@ export const GetCreditArrangementsByClientIdOrKeyResponse = {
         return { left: (GetCreditArrangementsByClientIdOrKeyResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type GetCreditArrangementsByClientIdOrKeyResponse = CreditArrangement[]
 
 /**
  * An Id document represents a document that can be used to identify a person like a passport, a drivers license an id card etc.
@@ -930,8 +930,6 @@ export interface PatchOperation {
     value?: unknown
 }
 
-export type PatchRequest = PatchOperation[]
-
 export const PatchRequest = {
     validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
@@ -948,6 +946,8 @@ export const PatchRequest = {
         return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type PatchRequest = PatchOperation[]
 
 /**
  * Represents portal settings for an individual client.
@@ -973,8 +973,6 @@ export interface RestError {
     errorSource?: string | undefined
 }
 
-export type SearchResponse = Client[]
-
 export const SearchResponse = {
     validate: SearchResponseValidator as ValidateFunction<SearchResponse>,
     get schema() {
@@ -991,3 +989,5 @@ export const SearchResponse = {
         return { left: (SearchResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type SearchResponse = Client[]

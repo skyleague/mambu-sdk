@@ -215,6 +215,10 @@ export interface ApplyInterestInput {
      */
     interestApplicationDate: string
     /**
+     * Whether the interest amount to apply should be the regular one or interest from arrears. If nothing specified it will be the regular one.
+     */
+    isInterestFromArrears?: boolean | undefined
+    /**
      * Whether the interest amount to apply should be the regular one or the one accrued during the Payment Holidays. If nothing specified it will be the regular one.
      */
     isPaymentHolidaysInterest?: boolean | undefined
@@ -1048,6 +1052,7 @@ export interface CustomPaymentAmount {
         | 'LATE_REPAYMENT_FEE'
         | 'PAYMENT_DUE_FEE'
         | 'PENALTY'
+        | 'INTEREST_FROM_ARREARS'
     /**
      * The encodedKey of the predefined fee to be paid.
      */
@@ -1557,6 +1562,10 @@ export interface InterestSettings {
      * Indicates whether late interest is accrued for this loan account
      */
     accrueLateInterest?: boolean | undefined
+    /**
+     * The effective interest rate. Represents the interest rate for the loan accounts with semi-annually compounding product.
+     */
+    effectiveInterestRate?: number | undefined
     interestApplicationDays?: DaysInMonth | undefined
     /**
      * The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.
@@ -2504,12 +2513,17 @@ export interface LoanTransaction {
         | 'WITHDRAWAL_REDRAW_ADJUSTMENT'
         | 'FEE_APPLIED'
         | 'FEE_CHARGED'
+        | 'FEE_CAPITALISED'
+        | 'SCHEDULE_FIX_APPLIED'
         | 'FEES_DUE_REDUCED'
+        | 'FEE_REFUND'
+        | 'FEE_REFUND_ADJUSTMENT'
         | 'FEE_ADJUSTMENT'
         | 'PENALTY_APPLIED'
         | 'PENALTY_ADJUSTMENT'
         | 'PENALTIES_DUE_REDUCED'
         | 'REPAYMENT_ADJUSTMENT'
+        | 'FEE_CAPITALISED_ADJUSTMENT'
         | 'PAYMENT_MADE_ADJUSTMENT'
         | 'INTEREST_RATE_CHANGED'
         | 'TAX_RATE_CHANGED'
@@ -2544,6 +2558,8 @@ export interface LoanTransaction {
         | 'DUE_DATE_CHANGED_ADJUSTMENT'
         | 'ACCOUNT_TERMINATED'
         | 'ACCOUNT_TERMINATED_ADJUSTMENT'
+        | 'REFUND'
+        | 'REFUND_ADJUSTMENT'
         | undefined
     /**
      * The user that performed the transaction.
@@ -2649,6 +2665,10 @@ export interface PayOffAdjustableAmounts {
      * The fee amount to be paid for Pay Off action
      */
     feesPaid?: number | undefined
+    /**
+     * The interest from arrears amount to be paid for Pay Off action
+     */
+    interestFromArrearsPaid?: number | undefined
     /**
      * The interest amount to be paid for Pay Off action
      */
@@ -2912,6 +2932,10 @@ export interface PreviewPayOffDueAmountsInAFutureDateWrapper {
      */
     interestBalance?: number | undefined
     /**
+     * The interest from arrears balance due when pay off the account in a future date
+     */
+    interestFromArrearsBalance?: number | undefined
+    /**
      * The penalty balance due when pay off the account in a future date
      */
     penaltyBalance?: number | undefined
@@ -3063,7 +3087,7 @@ export interface RefinanceLoanAccount {
  */
 export interface RefinanceLoanAccountAction {
     /**
-     * Keep same account ID option
+     * Choose whether to keep the same account ID as the originating account. If true, the 'id' field in the 'loanAccount' object should not be provided.
      */
     keepSameAccountId?: boolean | undefined
     loanAccount: RefinanceLoanAccount
@@ -3103,6 +3127,7 @@ export interface RefinanceWriteOffAmounts {
      * Interest write-off amount
      */
     interest?: number | undefined
+    interestFromArrears?: number | undefined
     /**
      * Penalty write-off amount
      */
@@ -3164,7 +3189,7 @@ export interface RescheduleLoanAccount {
  */
 export interface RescheduleLoanAccountAction {
     /**
-     * Keep same account ID option
+     * Choose whether to keep the same account ID as the originating account. If true, the 'id' field in the 'loanAccount' object should not be provided.
      */
     keepSameAccountId?: boolean | undefined
     loanAccount: RescheduleLoanAccount
@@ -3200,6 +3225,10 @@ export interface RescheduleWriteOffAmounts {
      * Interest write-off amount
      */
     interest?: number | undefined
+    /**
+     * Interest from Arrears write-off amount
+     */
+    interestFromArrears?: number | undefined
     /**
      * Penalty write-off amount
      */

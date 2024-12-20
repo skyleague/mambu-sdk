@@ -38,6 +38,7 @@ export class MambuJournalEntries {
         options,
         auth = {},
         defaultAuth,
+        client = got,
     }: {
         prefixUrl: string | 'http://localhost:8889/api' | 'https://localhost:8889/api'
         options?: Options | OptionsInit
@@ -46,14 +47,19 @@ export class MambuJournalEntries {
             apiKey?: string | (() => Promise<string>)
         }
         defaultAuth?: string[][] | string[]
+        client?: Got
     }) {
-        this.client = got.extend(...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined))
+        this.client = client.extend(
+            ...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined),
+        )
         this.auth = auth
         this.availableAuth = new Set(Object.keys(auth))
         this.defaultAuth = defaultAuth
     }
 
     /**
+     * POST /gljournalentries
+     *
      * Create general ledger journal entries.
      */
     public create({
@@ -70,7 +76,7 @@ export class MambuJournalEntries {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -82,7 +88,7 @@ export class MambuJournalEntries {
 
         return this.awaitResponse(
             this.buildClient(auth).post('gljournalentries', {
-                json: body,
+                json: _body.right,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
@@ -97,6 +103,8 @@ export class MambuJournalEntries {
     }
 
     /**
+     * GET /gljournalentries
+     *
      * Get general ledger journal entries
      */
     public getAll({
@@ -121,7 +129,7 @@ export class MambuJournalEntries {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -142,6 +150,8 @@ export class MambuJournalEntries {
     }
 
     /**
+     * POST /gljournalentries:search
+     *
      * Search for general ledger journal entries
      */
     public search({
@@ -150,7 +160,7 @@ export class MambuJournalEntries {
         auth = [['apiKey'], ['basic']],
     }: {
         body: GLJournalEntrySearchCriteria
-        query?: { offset?: string; limit?: string; paginationDetails?: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string; cursor?: string }
         auth?: string[][] | string[]
     }): Promise<
         | SuccessResponse<'200', SearchResponse>
@@ -161,7 +171,7 @@ export class MambuJournalEntries {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -173,7 +183,7 @@ export class MambuJournalEntries {
 
         return this.awaitResponse(
             this.buildClient(auth).post('gljournalentries:search', {
-                json: body,
+                json: _body.right,
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
@@ -187,13 +197,14 @@ export class MambuJournalEntries {
         ) as ReturnType<this['search']>
     }
 
-    public validateRequestBody<Parser extends { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } }, Body>(
-        parser: Parser,
+    public validateRequestBody<Body>(
+        parser: { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } },
         body: unknown,
     ) {
         const _body = parser.parse(body)
         if ('left' in _body) {
             return {
+                success: false as const,
                 statusCode: undefined,
                 status: undefined,
                 headers: undefined,
@@ -207,8 +218,8 @@ export class MambuJournalEntries {
 
     public async awaitResponse<
         I,
-        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } } | undefined>,
-    >(response: CancelableRequest<Response<I>>, schemas: S) {
+        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } }>,
+    >(response: CancelableRequest<NoInfer<Response<I>>>, schemas: S) {
         const result = await response
         const status =
             result.statusCode < 200
@@ -224,6 +235,7 @@ export class MambuJournalEntries {
         const body = validator?.parse?.(result.body)
         if (result.statusCode < 200 || result.statusCode >= 300) {
             return {
+                success: false as const,
                 statusCode: result.statusCode.toString(),
                 status,
                 headers: result.headers,
@@ -234,6 +246,7 @@ export class MambuJournalEntries {
         }
         if (body === undefined || 'left' in body) {
             return {
+                success: false as const,
                 statusCode: result.statusCode.toString(),
                 status,
                 headers: result.headers,
@@ -242,7 +255,13 @@ export class MambuJournalEntries {
                 where: 'response:body',
             }
         }
-        return { statusCode: result.statusCode.toString(), status, headers: result.headers, right: result.body }
+        return {
+            success: true as const,
+            statusCode: result.statusCode.toString(),
+            status,
+            headers: result.headers,
+            right: result.body,
+        }
     }
 
     protected buildBasicClient(client: Got) {
@@ -304,12 +323,14 @@ export type Status<Major> = Major extends string
               : 'server-error'
     : undefined
 export interface SuccessResponse<StatusCode extends string, T> {
+    success: true
     statusCode: StatusCode
     status: Status<StatusCode>
     headers: IncomingHttpHeaders
     right: T
 }
 export interface FailureResponse<StatusCode = string, T = unknown, Where = never, Headers = IncomingHttpHeaders> {
+    success: false
     statusCode: StatusCode
     status: Status<StatusCode>
     headers: Headers

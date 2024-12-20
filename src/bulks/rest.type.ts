@@ -53,6 +53,23 @@ export interface BulkProcessingSuccess {
     indexInRequest?: number | undefined
 }
 
+export const BulkProcessStatus = {
+    validate: BulkProcessStatusValidator as ValidateFunction<BulkProcessStatus>,
+    get schema() {
+        return BulkProcessStatus.validate.schema
+    },
+    get errors() {
+        return BulkProcessStatus.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is BulkProcessStatus => BulkProcessStatus.validate(o) === true,
+    parse: (o: unknown): { right: BulkProcessStatus } | { left: DefinedError[] } => {
+        if (BulkProcessStatus.is(o)) {
+            return { right: o }
+        }
+        return { left: (BulkProcessStatus.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Holds information about the status of a bulk process
  */
@@ -83,27 +100,6 @@ export interface BulkProcessStatus {
         | undefined
 }
 
-export const BulkProcessStatus = {
-    validate: BulkProcessStatusValidator as ValidateFunction<BulkProcessStatus>,
-    get schema() {
-        return BulkProcessStatus.validate.schema
-    },
-    get errors() {
-        return BulkProcessStatus.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is BulkProcessStatus => BulkProcessStatus.validate(o) === true,
-    parse: (o: unknown): { right: BulkProcessStatus } | { left: DefinedError[] } => {
-        if (BulkProcessStatus.is(o)) {
-            return { right: o }
-        }
-        return { left: (BulkProcessStatus.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
-
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -120,6 +116,10 @@ export const ErrorResponse = {
         return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
 
 export interface RestError {
     errorCode?: number | undefined

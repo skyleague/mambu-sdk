@@ -293,12 +293,14 @@ export interface DepositGLAccountingRule {
         | 'FUND_SOURCE'
         | 'WRITE_OFF_EXPENSE'
         | 'INTEREST_INCOME'
+        | 'PAYMENT_HOLIDAY_INTEREST_INCOME'
         | 'TAXES_PAYABLE'
         | 'FEE_INCOME'
         | 'PENALTY_INCOME'
         | 'NEGATIVE_INTEREST_PAYABLE_RECEIVABLE'
         | 'NEGATIVE_INTEREST_PAYABLE'
         | 'INTEREST_RECEIVABLE'
+        | 'PAYMENT_HOLIDAY_INTEREST_RECEIVABLE'
         | 'FEE_RECEIVABLE'
         | 'PENALTY_RECEIVABLE'
         | 'TAXES_RECEIVABLE'
@@ -316,6 +318,9 @@ export interface DepositGLAccountingRule {
         | 'OVERDRAFT_WRITE_OFF_EXPENSE'
         | 'OVERDRAFT_INTEREST_RECEIVABLE'
         | 'INTER_BRANCH_TRANSFER'
+        | 'INTEREST_FROM_ARREARS_INCOME'
+        | 'INTEREST_FROM_ARREARS_RECEIVABLE'
+        | 'INTEREST_FROM_ARREARS_WRITE_OFF_EXPENSE'
     /**
      * The encoded key of the account that is mapped to the financialResource
      */
@@ -346,6 +351,23 @@ export interface DepositNewAccountSettings {
      */
     idPattern: string
 }
+
+export const DepositProduct = {
+    validate: DepositProductValidator as ValidateFunction<DepositProduct>,
+    get schema() {
+        return DepositProduct.validate.schema
+    },
+    get errors() {
+        return DepositProduct.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is DepositProduct => DepositProduct.validate(o) === true,
+    parse: (o: unknown): { right: DepositProduct } | { left: DefinedError[] } => {
+        if (DepositProduct.is(o)) {
+            return { right: o }
+        }
+        return { left: (DepositProduct.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * A deposit product defines the terms and constraints on deposit accounts
@@ -413,29 +435,12 @@ export interface DepositProduct {
     type: 'CURRENT_ACCOUNT' | 'REGULAR_SAVINGS' | 'FIXED_DEPOSIT' | 'SAVINGS_PLAN' | 'INVESTOR_ACCOUNT'
 }
 
-export const DepositProduct = {
-    validate: DepositProductValidator as ValidateFunction<DepositProduct>,
-    get schema() {
-        return DepositProduct.validate.schema
-    },
-    get errors() {
-        return DepositProduct.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is DepositProduct => DepositProduct.validate(o) === true,
-    parse: (o: unknown): { right: DepositProduct } | { left: DefinedError[] } => {
-        if (DepositProduct.is(o)) {
-            return { right: o }
-        }
-        return { left: (DepositProduct.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Accounting settings, defines the accounting settings for the product.
  */
 export interface DepositProductAccountingSettings {
     /**
-     * A list of accounting rules for a product.
+     * The calculation method used for accounting.
      */
     accountingMethod: 'NONE' | 'CASH' | 'ACCRUAL'
     /**
@@ -443,19 +448,13 @@ export interface DepositProductAccountingSettings {
      */
     accountingRules?: DepositGLAccountingRule[] | undefined
     /**
-     * A list of accounting rules for a product.
+     * The accounting interest calculation option selected for the product.
+     */
+    interestAccrualCalculation?: 'NONE' | 'AGGREGATED_AMOUNT' | 'BREAKDOWN_PER_ACCOUNT' | undefined
+    /**
+     * The interval defined for a product when the interest accrues should be maintained.
      */
     interestAccruedAccountingMethod?: 'NONE' | 'DAILY' | 'END_OF_MONTH' | undefined
-}
-
-/**
- * Specify the batch update action details for a deposit product.
- */
-export interface DepositProductAction {
-    /**
-     * The action type to be applied. When UPDATE_INTEREST_SETTINGS action type is used, all the existing deposit accounts will be updated with the latest interest-related fields at the end of day job execution
-     */
-    action: 'UPDATE_INTEREST_SETTINGS'
 }
 
 export const DepositProductAction = {
@@ -476,13 +475,13 @@ export const DepositProductAction = {
 } as const
 
 /**
- * Represents the response returned after a batch update action for a deposit product.
+ * Specify the batch update action details for a deposit product.
  */
-export interface DepositProductActionResponse {
+export interface DepositProductAction {
     /**
-     * The state of the deposit product action
+     * The action type to be applied. When UPDATE_INTEREST_SETTINGS action type is used, all the existing deposit accounts will be updated with the latest interest-related fields at the end of day job execution
      */
-    state?: 'QUEUED' | undefined
+    action: 'UPDATE_INTEREST_SETTINGS'
 }
 
 export const DepositProductActionResponse = {
@@ -501,6 +500,16 @@ export const DepositProductActionResponse = {
         return { left: (DepositProductActionResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+/**
+ * Represents the response returned after a batch update action for a deposit product.
+ */
+export interface DepositProductActionResponse {
+    /**
+     * The state of the deposit product action
+     */
+    state?: 'QUEUED' | undefined
+}
 
 /**
  * Holds information about product availability.
@@ -864,10 +873,6 @@ export interface DocumentTemplate {
     type?: 'ACCOUNT' | 'TRANSACTION' | 'ACCOUNT_WITH_TRANSACTIONS' | undefined
 }
 
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
-
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -885,7 +890,9 @@ export const ErrorResponse = {
     },
 } as const
 
-export type GetAllResponse = DepositProduct[]
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
 
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
@@ -903,6 +910,8 @@ export const GetAllResponse = {
         return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type GetAllResponse = DepositProduct[]
 
 /**
  * Decimal integer, like min/max/default.
@@ -1004,8 +1013,6 @@ export interface PatchOperation {
     value?: unknown
 }
 
-export type PatchRequest = PatchOperation[]
-
 export const PatchRequest = {
     validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
@@ -1022,6 +1029,8 @@ export const PatchRequest = {
         return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type PatchRequest = PatchOperation[]
 
 export interface RestError {
     errorCode?: number | undefined

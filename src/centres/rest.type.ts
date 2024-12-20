@@ -60,6 +60,23 @@ export interface Address {
     region?: string | undefined
 }
 
+export const Centre = {
+    validate: CentreValidator as ValidateFunction<Centre>,
+    get schema() {
+        return Centre.validate.schema
+    },
+    get errors() {
+        return Centre.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Centre => Centre.validate(o) === true,
+    parse: (o: unknown): { right: Centre } | { left: DefinedError[] } => {
+        if (Centre.is(o)) {
+            return { right: o }
+        }
+        return { left: (Centre.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Represents a centre. A centre is a common meeting area that credit officers and the individual and group clients go to. Each centre is assigned to a branch (a branch can have multiple centres) and might have a specific meeting day and location.
  */
@@ -106,27 +123,6 @@ export interface Centre {
     state?: 'ACTIVE' | 'INACTIVE' | undefined
 }
 
-export const Centre = {
-    validate: CentreValidator as ValidateFunction<Centre>,
-    get schema() {
-        return Centre.validate.schema
-    },
-    get errors() {
-        return Centre.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Centre => Centre.validate(o) === true,
-    parse: (o: unknown): { right: Centre } | { left: DefinedError[] } => {
-        if (Centre.is(o)) {
-            return { right: o }
-        }
-        return { left: (Centre.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
-
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -144,7 +140,9 @@ export const ErrorResponse = {
     },
 } as const
 
-export type GetAllResponse = Centre[]
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
 
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
@@ -162,6 +160,8 @@ export const GetAllResponse = {
         return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type GetAllResponse = Centre[]
 
 export interface RestError {
     errorCode?: number | undefined

@@ -16,7 +16,7 @@ import { validate as PatchRequestValidator } from './schemas/patch-request.schem
  */
 export interface AccountingSettings {
     /**
-     * A list of accounting rules for a product.
+     * The calculation method used for accounting.
      */
     accountingMethod: 'NONE' | 'CASH' | 'ACCRUAL'
     /**
@@ -28,7 +28,7 @@ export interface AccountingSettings {
      */
     interestAccrualCalculation?: 'NONE' | 'AGGREGATED_AMOUNT' | 'BREAKDOWN_PER_ACCOUNT' | undefined
     /**
-     * A list of accounting rules for a product.
+     * The interval defined for a product when the interest accrues should be maintained.
      */
     interestAccruedAccountingMethod?: 'NONE' | 'DAILY' | 'END_OF_MONTH' | undefined
 }
@@ -399,10 +399,6 @@ export interface DocumentTemplate {
     type?: 'ACCOUNT' | 'TRANSACTION' | 'ACCOUNT_WITH_TRANSACTIONS' | undefined
 }
 
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
-
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -419,6 +415,10 @@ export const ErrorResponse = {
         return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
 
 /**
  * Defines fees settings for the product.
@@ -478,8 +478,6 @@ export interface FundingSettings {
     requiredFunds?: number | undefined
 }
 
-export type GetAllResponse = LoanProduct[]
-
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
@@ -497,6 +495,8 @@ export const GetAllResponse = {
     },
 } as const
 
+export type GetAllResponse = LoanProduct[]
+
 /**
  * The GL accounting rule, it maps a financial resource with a GL account for a specific product (i.e loan or saving).
  */
@@ -513,12 +513,14 @@ export interface GLAccountingRule {
         | 'FUND_SOURCE'
         | 'WRITE_OFF_EXPENSE'
         | 'INTEREST_INCOME'
+        | 'PAYMENT_HOLIDAY_INTEREST_INCOME'
         | 'TAXES_PAYABLE'
         | 'FEE_INCOME'
         | 'PENALTY_INCOME'
         | 'NEGATIVE_INTEREST_PAYABLE_RECEIVABLE'
         | 'NEGATIVE_INTEREST_PAYABLE'
         | 'INTEREST_RECEIVABLE'
+        | 'PAYMENT_HOLIDAY_INTEREST_RECEIVABLE'
         | 'FEE_RECEIVABLE'
         | 'PENALTY_RECEIVABLE'
         | 'TAXES_RECEIVABLE'
@@ -536,6 +538,9 @@ export interface GLAccountingRule {
         | 'OVERDRAFT_WRITE_OFF_EXPENSE'
         | 'OVERDRAFT_INTEREST_RECEIVABLE'
         | 'INTER_BRANCH_TRANSFER'
+        | 'INTEREST_FROM_ARREARS_INCOME'
+        | 'INTEREST_FROM_ARREARS_RECEIVABLE'
+        | 'INTEREST_FROM_ARREARS_WRITE_OFF_EXPENSE'
     /**
      * The encoded key of the account that is mapped to the financialResource
      */
@@ -683,6 +688,23 @@ export interface LoanAmountSettings {
     trancheSettings?: TrancheSettings | undefined
 }
 
+export const LoanProduct = {
+    validate: LoanProductValidator as ValidateFunction<LoanProduct>,
+    get schema() {
+        return LoanProduct.validate.schema
+    },
+    get errors() {
+        return LoanProduct.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is LoanProduct => LoanProduct.validate(o) === true,
+    parse: (o: unknown): { right: LoanProduct } | { left: DefinedError[] } => {
+        if (LoanProduct.is(o)) {
+            return { right: o }
+        }
+        return { left: (LoanProduct.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Represents a loan product.
  */
@@ -770,23 +792,6 @@ export interface LoanProduct {
         | 'INTEREST_ONLY_EQUAL_INSTALLMENTS'
 }
 
-export const LoanProduct = {
-    validate: LoanProductValidator as ValidateFunction<LoanProduct>,
-    get schema() {
-        return LoanProduct.validate.schema
-    },
-    get errors() {
-        return LoanProduct.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanProduct => LoanProduct.validate(o) === true,
-    parse: (o: unknown): { right: LoanProduct } | { left: DefinedError[] } => {
-        if (LoanProduct.is(o)) {
-            return { right: o }
-        }
-        return { left: (LoanProduct.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Defines the settings and constraints for schedule for the loans that are created based on this product.
  */
@@ -806,6 +811,10 @@ export interface LoanProductScheduleSettings {
      * Represents the moment the interest will start getting accrued.
      */
     interestAccrualSince?: 'DISBURSEMENT' | 'DUE_DATE' | undefined
+    /**
+     * For optimized payments only, indicates whether the installments should remain equal when the first period is long
+     */
+    keepInstallmentsEqualIfLongFirstPeriod?: boolean | undefined
     numInstallments?: IntegerIntervalConstraints | undefined
     previewSchedule?: PreviewScheduleSettings | undefined
     /**
@@ -912,8 +921,6 @@ export interface PatchOperation {
     value?: unknown
 }
 
-export type PatchRequest = PatchOperation[]
-
 export const PatchRequest = {
     validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
@@ -930,6 +937,8 @@ export const PatchRequest = {
         return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type PatchRequest = PatchOperation[]
 
 /**
  * Holds Payment Holidays Settings
@@ -1288,11 +1297,15 @@ export interface ProductInterestSettings {
     /**
      * The frequency on which the accrued interest will be added to the principal for interest calculation. It is used only for InterestType.COMPOUNDING_INTEREST
      */
-    compoundingFrequency?: 'DAILY' | undefined
+    compoundingFrequency?: 'DAILY' | 'SEMI_ANNUALLY' | undefined
     /**
      * The days in year that should be used for loan calculations.
      */
     daysInYear: 'ACTUAL_365_FIXED' | 'ACTUAL_364' | 'ACTUAL_360' | 'ACTUAL_ACTUAL_ISDA' | 'E30_360' | 'BUS_252' | 'E30_42_365'
+    /**
+     * Whether interest from arrears is decoupled from regular interest. (Only accepted or returned if the feature is enabled.)
+     */
+    decoupleInterestFromArrears?: boolean | undefined
     indexRateSettings?: InterestProductSettings | undefined
     interestApplicationDays?: DaysInMonth | undefined
     /**

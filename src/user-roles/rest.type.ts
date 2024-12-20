@@ -49,10 +49,6 @@ export interface BaseUserAccess {
     tellerAccess?: boolean | undefined
 }
 
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
-
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -70,7 +66,9 @@ export const ErrorResponse = {
     },
 } as const
 
-export type GetAllResponse = Role[]
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
 
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
@@ -88,6 +86,8 @@ export const GetAllResponse = {
         return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type GetAllResponse = Role[]
 
 /**
  * A single change that needs to be made to a resource
@@ -111,8 +111,6 @@ export interface PatchOperation {
     value?: unknown
 }
 
-export type PatchRequest = PatchOperation[]
-
 export const PatchRequest = {
     validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
@@ -129,6 +127,8 @@ export const PatchRequest = {
         return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type PatchRequest = PatchOperation[]
 
 type Permissions =
     | 'AUDIT_TRANSACTIONS'
@@ -257,6 +257,7 @@ type Permissions =
     | 'EDIT_PERIODIC_PAYMENT_FOR_ACTIVE_ACCOUNT'
     | 'MANAGE_LOAN_ASSOCIATION'
     | 'MAKE_WITHDRAWAL_REDRAW'
+    | 'ENTER_REFUND'
     | 'VIEW_SAVINGS_ACCOUNT_DETAILS'
     | 'CREATE_SAVINGS_ACCOUNT'
     | 'EDIT_SAVINGS_ACCOUNT'
@@ -286,6 +287,7 @@ type Permissions =
     | 'WITHDRAW_BLOCKED_FUNDS'
     | 'MANAGE_DEPOSIT_ACCOUNT_RECIPIENT'
     | 'MANAGE_DEPOSIT_ASSOCIATION'
+    | 'BYPASS_ACCOUNT_OWNERSHIP_TRANSFER_VIEW_RESTRICTION'
     | 'CREATE_CARDS'
     | 'VIEW_CARDS'
     | 'DELETE_CARDS'
@@ -379,44 +381,19 @@ type Permissions =
     | 'CREATE_MAMBU_FUNCTIONS_SECRETS'
     | 'EDIT_MAMBU_FUNCTIONS_SECRETS'
     | 'DELETE_MAMBU_FUNCTIONS_SECRETS'
-    | 'VIEW_CURRENT_USER_DETAILS'
-    | 'VIEW_PROFIT_SHARING_CLASSES'
-    | 'CREATE_PROFIT_SHARING_CLASSES'
-    | 'EDIT_PROFIT_SHARING_CLASSES'
-    | 'DELETE_PROFIT_SHARING_CLASSES'
-    | 'VIEW_PROFIT_SHARING_POOLS'
+    | 'VIEW_PROFIT_SHARING_PROPOSALS'
+    | 'CREATE_PROFIT_SHARING_CASH_FLOWS'
+    | 'VIEW_PROFIT_SHARING_CASH_FLOWS'
+    | 'EDIT_PROFIT_SHARING_CASH_FLOWS'
+    | 'DELETE_PROFIT_SHARING_CASH_FLOWS'
     | 'CREATE_PROFIT_SHARING_POOLS'
+    | 'VIEW_PROFIT_SHARING_POOLS'
     | 'EDIT_PROFIT_SHARING_POOLS'
     | 'DELETE_PROFIT_SHARING_POOLS'
-    | 'VIEW_PROFIT_SHARING_INCOME_CATEGORIES'
-    | 'CREATE_PROFIT_SHARING_INCOME_CATEGORIES'
-    | 'EDIT_PROFIT_SHARING_INCOME_CATEGORIES'
-    | 'DELETE_PROFIT_SHARING_INCOME_CATEGORIES'
-    | 'VIEW_PROFIT_SHARING_EXPENSES'
-    | 'CREATE_PROFIT_SHARING_EXPENSES'
-    | 'EDIT_PROFIT_SHARING_EXPENSES'
-    | 'DELETE_PROFIT_SHARING_EXPENSES'
-    | 'VIEW_PROFIT_SHARING_DEDUCTIONS'
-    | 'CREATE_PROFIT_SHARING_DEDUCTIONS'
-    | 'EDIT_PROFIT_SHARING_DEDUCTIONS'
-    | 'DELETE_PROFIT_SHARING_DEDUCTIONS'
-    | 'VIEW_PROFIT_SHARING_PROPOSALS'
-    | 'EDIT_PROFIT_SHARING_PROPOSALS'
-    | 'CREATE_PROFIT_SHARING_PROPOSALS'
-    | 'APPROVE_PROFIT_SHARING_PROPOSALS'
-    | 'ADJUST_PROFIT_SHARING_PROPOSALS'
-    | 'TRIGGER_COMPUTATION'
-    | 'VIEW_PROFIT_SHARING_SYSTEM_OPTIONS'
-    | 'CREATE_PROFIT_SHARING_SYSTEM_OPTIONS'
-    | 'EDIT_PROFIT_SHARING_SYSTEM_OPTIONS'
-    | 'DELETE_PROFIT_SHARING_SYSTEM_OPTIONS'
-    | 'VIEW_PROFIT_SHARING_DEPOSIT_PRODUCTS'
-    | 'EDIT_PROFIT_SHARING_DEPOSIT_PRODUCT_LINK'
-    | 'VIEW_PROFIT_SHARING_ACCOUNTS_SETTINGS'
-    | 'CREATE_PROFIT_SHARING_ACCOUNT_SETTINGS'
-    | 'EDIT_PROFIT_SHARING_ACCOUNT_SETTINGS'
-    | 'VIEW_PROFIT_SHARING_GL_ACCOUNTS'
-    | 'VIEW_PROFIT_SHARING_BRANCHES'
+    | 'CREATE_PROFIT_SHARING_PRODUCT_SETTINGS'
+    | 'VIEW_PROFIT_SHARING_PRODUCT_SETTINGS'
+    | 'EDIT_PROFIT_SHARING_PRODUCT_SETTINGS'
+    | 'DELETE_PROFIT_SHARING_PRODUCT_SETTINGS'
     | 'MAKE_BULK_CHANGE_INTEREST_AVAILABILITY'
 
 export interface RestError {
@@ -424,6 +401,23 @@ export interface RestError {
     errorReason?: string | undefined
     errorSource?: string | undefined
 }
+
+export const Role = {
+    validate: RoleValidator as ValidateFunction<Role>,
+    get schema() {
+        return Role.validate.schema
+    },
+    get errors() {
+        return Role.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Role => Role.validate(o) === true,
+    parse: (o: unknown): { right: Role } | { left: DefinedError[] } => {
+        if (Role.is(o)) {
+            return { right: o }
+        }
+        return { left: (Role.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Represents a user role.
@@ -455,20 +449,3 @@ export interface Role {
      */
     notes?: string | undefined
 }
-
-export const Role = {
-    validate: RoleValidator as ValidateFunction<Role>,
-    get schema() {
-        return Role.validate.schema
-    },
-    get errors() {
-        return Role.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Role => Role.validate(o) === true,
-    parse: (o: unknown): { right: Role } | { left: DefinedError[] } => {
-        if (Role.is(o)) {
-            return { right: o }
-        }
-        return { left: (Role.errors ?? []) as DefinedError[] }
-    },
-} as const

@@ -928,6 +928,7 @@ export interface GetCardTransaction {
         | 'OVERDRAFT_INTEREST_RATE_CHANGED'
         | 'OVERDRAFT_LIMIT_CHANGED'
         | 'BRANCH_CHANGED'
+        | 'ACCOUNT_HOLDER_CHANGED'
         | 'LOAN_FUNDED'
         | 'LOAN_FUNDED_ADJUSTMENT'
         | 'LOAN_REPAID'

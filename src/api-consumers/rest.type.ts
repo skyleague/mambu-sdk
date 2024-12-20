@@ -15,6 +15,23 @@ import { validate as GetKeysByConsumerIdResponseValidator } from './schemas/get-
 import { validate as PatchRequestValidator } from './schemas/patch-request.schema.js'
 import { validate as SecretKeyValidator } from './schemas/secret-key.schema.js'
 
+export const ApiConsumer = {
+    validate: ApiConsumerValidator as ValidateFunction<ApiConsumer>,
+    get schema() {
+        return ApiConsumer.validate.schema
+    },
+    get errors() {
+        return ApiConsumer.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ApiConsumer => ApiConsumer.validate(o) === true,
+    parse: (o: unknown): { right: ApiConsumer } | { left: DefinedError[] } => {
+        if (ApiConsumer.is(o)) {
+            return { right: o }
+        }
+        return { left: (ApiConsumer.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Represents an API consumer.
  */
@@ -55,23 +72,6 @@ export interface ApiConsumer {
         | undefined
 }
 
-export const ApiConsumer = {
-    validate: ApiConsumerValidator as ValidateFunction<ApiConsumer>,
-    get schema() {
-        return ApiConsumer.validate.schema
-    },
-    get errors() {
-        return ApiConsumer.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ApiConsumer => ApiConsumer.validate(o) === true,
-    parse: (o: unknown): { right: ApiConsumer } | { left: DefinedError[] } => {
-        if (ApiConsumer.is(o)) {
-            return { right: o }
-        }
-        return { left: (ApiConsumer.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents the API consumer permissions and access rights.
  */
@@ -106,24 +106,6 @@ export interface ApiConsumerAccess {
     permissions?: Permissions[] | undefined
 }
 
-/**
- * Represents an API key of an API consumer.
- */
-export interface ApiKey {
-    /**
-     * A six character cleartext prefix of the API key. The prefix is not guaranteed to be unique. You must base any identification process on the API key ID, not the prefix.
-     */
-    apiKey?: string | undefined
-    /**
-     * The time to live (TTL) for the API key in seconds.
-     */
-    expirationTime?: number | undefined
-    /**
-     * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
-     */
-    id?: string | undefined
-}
-
 export const ApiKey = {
     validate: ApiKeyValidator as ValidateFunction<ApiKey>,
     get schema() {
@@ -142,13 +124,21 @@ export const ApiKey = {
 } as const
 
 /**
- * Represents an API key expiration time.
+ * Represents an API key of an API consumer.
  */
-export interface ApiKeyInput {
+export interface ApiKey {
+    /**
+     * A six character cleartext prefix of the API key. The prefix is not guaranteed to be unique. You must base any identification process on the API key ID, not the prefix.
+     */
+    apiKey?: string | undefined
     /**
      * The time to live (TTL) for the API key in seconds.
      */
     expirationTime?: number | undefined
+    /**
+     * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
+     */
+    id?: string | undefined
 }
 
 export const ApiKeyInput = {
@@ -168,8 +158,14 @@ export const ApiKeyInput = {
     },
 } as const
 
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
+/**
+ * Represents an API key expiration time.
+ */
+export interface ApiKeyInput {
+    /**
+     * The time to live (TTL) for the API key in seconds.
+     */
+    expirationTime?: number | undefined
 }
 
 export const ErrorResponse = {
@@ -189,7 +185,9 @@ export const ErrorResponse = {
     },
 } as const
 
-export type GetAllResponse = ApiConsumer[]
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
 
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
@@ -208,7 +206,7 @@ export const GetAllResponse = {
     },
 } as const
 
-export type GetKeysByConsumerIdResponse = ApiKey[]
+export type GetAllResponse = ApiConsumer[]
 
 export const GetKeysByConsumerIdResponse = {
     validate: GetKeysByConsumerIdResponseValidator as ValidateFunction<GetKeysByConsumerIdResponse>,
@@ -226,6 +224,8 @@ export const GetKeysByConsumerIdResponse = {
         return { left: (GetKeysByConsumerIdResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type GetKeysByConsumerIdResponse = ApiKey[]
 
 /**
  * A single change that needs to be made to a resource
@@ -249,8 +249,6 @@ export interface PatchOperation {
     value?: unknown
 }
 
-export type PatchRequest = PatchOperation[]
-
 export const PatchRequest = {
     validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
@@ -267,6 +265,8 @@ export const PatchRequest = {
         return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type PatchRequest = PatchOperation[]
 
 type Permissions =
     | 'AUDIT_TRANSACTIONS'
@@ -317,6 +317,7 @@ type Permissions =
     | 'PERFORM_REPAYMENTS_WITH_CUSTOM_AMOUNTS_ALLOCATION'
     | 'MANAGE_LOAN_ASSOCIATION'
     | 'MAKE_WITHDRAWAL_REDRAW'
+    | 'ENTER_REFUND'
     | 'VIEW_SAVINGS_ACCOUNT_DETAILS'
     | 'CREATE_SAVINGS_ACCOUNT'
     | 'EDIT_SAVINGS_ACCOUNT'
@@ -346,6 +347,7 @@ type Permissions =
     | 'MAKE_BULK_CHANGE_INTEREST_AVAILABILITY'
     | 'MANAGE_DEPOSIT_ACCOUNT_RECIPIENT'
     | 'MANAGE_DEPOSIT_ASSOCIATION'
+    | 'BYPASS_ACCOUNT_OWNERSHIP_TRANSFER_VIEW_RESTRICTION'
     | 'CREATE_CARDS'
     | 'VIEW_CARDS'
     | 'DELETE_CARDS'
@@ -475,44 +477,19 @@ type Permissions =
     | 'CREATE_MAMBU_FUNCTIONS_SECRETS'
     | 'EDIT_MAMBU_FUNCTIONS_SECRETS'
     | 'DELETE_MAMBU_FUNCTIONS_SECRETS'
-    | 'VIEW_CURRENT_USER_DETAILS'
-    | 'VIEW_PROFIT_SHARING_CLASSES'
-    | 'CREATE_PROFIT_SHARING_CLASSES'
-    | 'EDIT_PROFIT_SHARING_CLASSES'
-    | 'DELETE_PROFIT_SHARING_CLASSES'
-    | 'VIEW_PROFIT_SHARING_POOLS'
+    | 'VIEW_PROFIT_SHARING_PROPOSALS'
+    | 'CREATE_PROFIT_SHARING_CASH_FLOWS'
+    | 'VIEW_PROFIT_SHARING_CASH_FLOWS'
+    | 'EDIT_PROFIT_SHARING_CASH_FLOWS'
+    | 'DELETE_PROFIT_SHARING_CASH_FLOWS'
     | 'CREATE_PROFIT_SHARING_POOLS'
+    | 'VIEW_PROFIT_SHARING_POOLS'
     | 'EDIT_PROFIT_SHARING_POOLS'
     | 'DELETE_PROFIT_SHARING_POOLS'
-    | 'VIEW_PROFIT_SHARING_INCOME_CATEGORIES'
-    | 'CREATE_PROFIT_SHARING_INCOME_CATEGORIES'
-    | 'EDIT_PROFIT_SHARING_INCOME_CATEGORIES'
-    | 'DELETE_PROFIT_SHARING_INCOME_CATEGORIES'
-    | 'VIEW_PROFIT_SHARING_PROPOSALS'
-    | 'EDIT_PROFIT_SHARING_PROPOSALS'
-    | 'CREATE_PROFIT_SHARING_PROPOSALS'
-    | 'APPROVE_PROFIT_SHARING_PROPOSALS'
-    | 'ADJUST_PROFIT_SHARING_PROPOSALS'
-    | 'TRIGGER_COMPUTATION'
-    | 'VIEW_PROFIT_SHARING_SYSTEM_OPTIONS'
-    | 'CREATE_PROFIT_SHARING_SYSTEM_OPTIONS'
-    | 'EDIT_PROFIT_SHARING_SYSTEM_OPTIONS'
-    | 'DELETE_PROFIT_SHARING_SYSTEM_OPTIONS'
-    | 'VIEW_PROFIT_SHARING_EXPENSES'
-    | 'CREATE_PROFIT_SHARING_EXPENSES'
-    | 'EDIT_PROFIT_SHARING_EXPENSES'
-    | 'DELETE_PROFIT_SHARING_EXPENSES'
-    | 'VIEW_PROFIT_SHARING_DEDUCTIONS'
-    | 'CREATE_PROFIT_SHARING_DEDUCTIONS'
-    | 'EDIT_PROFIT_SHARING_DEDUCTIONS'
-    | 'DELETE_PROFIT_SHARING_DEDUCTIONS'
-    | 'VIEW_PROFIT_SHARING_DEPOSIT_PRODUCTS'
-    | 'EDIT_PROFIT_SHARING_DEPOSIT_PRODUCT_LINK'
-    | 'VIEW_PROFIT_SHARING_ACCOUNTS_SETTINGS'
-    | 'CREATE_PROFIT_SHARING_ACCOUNT_SETTINGS'
-    | 'EDIT_PROFIT_SHARING_ACCOUNT_SETTINGS'
-    | 'VIEW_PROFIT_SHARING_GL_ACCOUNTS'
-    | 'VIEW_PROFIT_SHARING_BRANCHES'
+    | 'CREATE_PROFIT_SHARING_PRODUCT_SETTINGS'
+    | 'VIEW_PROFIT_SHARING_PRODUCT_SETTINGS'
+    | 'EDIT_PROFIT_SHARING_PRODUCT_SETTINGS'
+    | 'DELETE_PROFIT_SHARING_PRODUCT_SETTINGS'
 
 export interface RestError {
     errorCode?: number | undefined
@@ -534,16 +511,6 @@ export interface RoleIdentifier {
     id?: string | undefined
 }
 
-/**
- * Representation of an API Consumer's Secret Key
- */
-export interface SecretKey {
-    /**
-     * The secret key
-     */
-    secretKey?: string | undefined
-}
-
 export const SecretKey = {
     validate: SecretKeyValidator as ValidateFunction<SecretKey>,
     get schema() {
@@ -560,6 +527,16 @@ export const SecretKey = {
         return { left: (SecretKey.errors ?? []) as DefinedError[] }
     },
 } as const
+
+/**
+ * Representation of an API Consumer's Secret Key
+ */
+export interface SecretKey {
+    /**
+     * The secret key
+     */
+    secretKey?: string | undefined
+}
 
 /**
  * Represents a branch that can be managed by the user or API consumer.

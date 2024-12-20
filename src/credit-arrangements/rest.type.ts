@@ -106,20 +106,6 @@ export interface AccountInterestRateSettings {
     validFrom: string
 }
 
-/**
- * Represents the account to add to the credit arrangement.
- */
-export interface AddCreditArrangementAccountInput {
-    /**
-     * The encoded key of the account.
-     */
-    accountId: string
-    /**
-     * The type of the account.
-     */
-    accountType: 'LOAN' | 'DEPOSIT'
-}
-
 export const AddCreditArrangementAccountInput = {
     validate: AddCreditArrangementAccountInputValidator as ValidateFunction<AddCreditArrangementAccountInput>,
     get schema() {
@@ -136,6 +122,20 @@ export const AddCreditArrangementAccountInput = {
         return { left: (AddCreditArrangementAccountInput.errors ?? []) as DefinedError[] }
     },
 } as const
+
+/**
+ * Represents the account to add to the credit arrangement.
+ */
+export interface AddCreditArrangementAccountInput {
+    /**
+     * The encoded key of the account.
+     */
+    accountId: string
+    /**
+     * The type of the account.
+     */
+    accountType: 'LOAN' | 'DEPOSIT'
+}
 
 /**
  * Represents a simple installment amount structure.
@@ -296,6 +296,23 @@ export interface BillingCycleDays {
     days?: number[] | undefined
 }
 
+export const CreditArrangement = {
+    validate: CreditArrangementValidator as ValidateFunction<CreditArrangement>,
+    get schema() {
+        return CreditArrangement.validate.schema
+    },
+    get errors() {
+        return CreditArrangement.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CreditArrangement => CreditArrangement.validate(o) === true,
+    parse: (o: unknown): { right: CreditArrangement } | { left: DefinedError[] } => {
+        if (CreditArrangement.is(o)) {
+            return { right: o }
+        }
+        return { left: (CreditArrangement.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Represents a credit arrangement.
  */
@@ -371,37 +388,6 @@ export interface CreditArrangement {
     subState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED' | undefined
 }
 
-export const CreditArrangement = {
-    validate: CreditArrangementValidator as ValidateFunction<CreditArrangement>,
-    get schema() {
-        return CreditArrangement.validate.schema
-    },
-    get errors() {
-        return CreditArrangement.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CreditArrangement => CreditArrangement.validate(o) === true,
-    parse: (o: unknown): { right: CreditArrangement } | { left: DefinedError[] } => {
-        if (CreditArrangement.is(o)) {
-            return { right: o }
-        }
-        return { left: (CreditArrangement.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-/**
- * Represents loan and deposit accounts linked to a credit arrangement.
- */
-export interface CreditArrangementAccounts {
-    /**
-     * List of the deposit accounts linked to the credit arrangement.
-     */
-    depositAccounts?: DepositAccount[] | undefined
-    /**
-     * List of loan accounts linked to the credit arrangement.
-     */
-    loanAccounts?: LoanAccount[] | undefined
-}
-
 export const CreditArrangementAccounts = {
     validate: CreditArrangementAccountsValidator as ValidateFunction<CreditArrangementAccounts>,
     get schema() {
@@ -420,17 +406,17 @@ export const CreditArrangementAccounts = {
 } as const
 
 /**
- * The state change to perform on the credit arrangement.
+ * Represents loan and deposit accounts linked to a credit arrangement.
  */
-export interface CreditArrangementAction {
+export interface CreditArrangementAccounts {
     /**
-     * The action type to be applied.
+     * List of the deposit accounts linked to the credit arrangement.
      */
-    action: 'APPROVE' | 'UNDO_APPROVE' | 'REJECT' | 'UNDO_REJECT' | 'WITHDRAW' | 'UNDO_WITHDRAW' | 'CLOSE' | 'UNDO_CLOSE'
+    depositAccounts?: DepositAccount[] | undefined
     /**
-     * The notes related to the action performed.
+     * List of loan accounts linked to the credit arrangement.
      */
-    notes?: string | undefined
+    loanAccounts?: LoanAccount[] | undefined
 }
 
 export const CreditArrangementAction = {
@@ -449,6 +435,20 @@ export const CreditArrangementAction = {
         return { left: (CreditArrangementAction.errors ?? []) as DefinedError[] }
     },
 } as const
+
+/**
+ * The state change to perform on the credit arrangement.
+ */
+export interface CreditArrangementAction {
+    /**
+     * The action type to be applied.
+     */
+    action: 'APPROVE' | 'UNDO_APPROVE' | 'REJECT' | 'UNDO_REJECT' | 'WITHDRAW' | 'UNDO_WITHDRAW' | 'CLOSE' | 'UNDO_CLOSE'
+    /**
+     * The notes related to the action performed.
+     */
+    notes?: string | undefined
+}
 
 /**
  * Represents credit arrangment filter and search criteria.
@@ -514,16 +514,6 @@ export interface CreditArrangementFilterCriteria {
     values?: string[] | undefined
 }
 
-/**
- * Represents the credit arrangement schedule.
- */
-export interface CreditArrangementSchedule {
-    /**
-     * The list of installments for the credit arrangement.
-     */
-    installments?: Installment[] | undefined
-}
-
 export const CreditArrangementSchedule = {
     validate: CreditArrangementScheduleValidator as ValidateFunction<CreditArrangementSchedule>,
     get schema() {
@@ -542,14 +532,13 @@ export const CreditArrangementSchedule = {
 } as const
 
 /**
- * Represents the filtering and sorting criteria when searching credit arrangements.
+ * Represents the credit arrangement schedule.
  */
-export interface CreditArrangementSearchCriteria {
+export interface CreditArrangementSchedule {
     /**
-     * The list of filtering criteria.
+     * The list of installments for the credit arrangement.
      */
-    filterCriteria?: CreditArrangementFilterCriteria[] | undefined
-    sortingCriteria?: CreditArrangementSortingCriteria | undefined
+    installments?: Installment[] | undefined
 }
 
 export const CreditArrangementSearchCriteria = {
@@ -568,6 +557,17 @@ export const CreditArrangementSearchCriteria = {
         return { left: (CreditArrangementSearchCriteria.errors ?? []) as DefinedError[] }
     },
 } as const
+
+/**
+ * Represents the filtering and sorting criteria when searching credit arrangements.
+ */
+export interface CreditArrangementSearchCriteria {
+    /**
+     * The list of filtering criteria.
+     */
+    filterCriteria?: CreditArrangementFilterCriteria[] | undefined
+    sortingCriteria?: CreditArrangementSortingCriteria | undefined
+}
 
 /**
  * The sorting criteria used for credit arrangement client directed query
@@ -958,6 +958,10 @@ export interface DepositAccount {
     overdraftInterestSettings?: DepositAccountOverdraftInterestSettings | undefined
     overdraftSettings?: DepositAccountOverdraftSettings | undefined
     /**
+     * The history of deposit account ownership
+     */
+    ownershipHistory?: DepositAccountOwnershipHistory[] | undefined
+    /**
      * The key to the product type that this account is based on.
      */
     productTypeKey: string
@@ -1248,6 +1252,20 @@ export interface DepositAccountOverdraftSettings {
 }
 
 /**
+ * The history of deposit account ownership
+ */
+export interface DepositAccountOwnershipHistory {
+    /**
+     * They key of the previous account holder
+     */
+    previousOwnerKey?: string | undefined
+    /**
+     * The transfer date of the account ownership
+     */
+    transferDate?: string | undefined
+}
+
+/**
  * The the disbursement details it holds the information related to the disbursement details as disbursement date, first repayment date, disbursement fees.
  */
 export interface DisbursementDetails {
@@ -1274,10 +1292,6 @@ export interface DisbursementDetails {
     transactionDetails?: LoanTransactionDetails | undefined
 }
 
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
-
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -1294,6 +1308,10 @@ export const ErrorResponse = {
         return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
 
 /**
  * Represents a fee amount.
@@ -1317,8 +1335,6 @@ export interface FeeAmount {
     paid?: number | undefined
 }
 
-export type GetAllResponse = CreditArrangement[]
-
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
@@ -1335,6 +1351,8 @@ export const GetAllResponse = {
         return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type GetAllResponse = CreditArrangement[]
 
 /**
  * Guarantor, holds information about a client guaranty entry. It can be defined based on another client which guarantees (including or not a savings account whether it is a client of the organization using Mambu or not) or based on a value the client holds (an asset)
@@ -1479,6 +1497,10 @@ export interface InterestSettings {
      * Indicates whether late interest is accrued for this loan account
      */
     accrueLateInterest?: boolean | undefined
+    /**
+     * The effective interest rate. Represents the interest rate for the loan accounts with semi-annually compounding product.
+     */
+    effectiveInterestRate?: number | undefined
     interestApplicationDays?: DaysInMonth | undefined
     /**
      * The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.
@@ -1906,8 +1928,6 @@ export interface PatchOperation {
     value?: unknown
 }
 
-export type PatchRequest = PatchOperation[]
-
 export const PatchRequest = {
     validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
@@ -1924,6 +1944,8 @@ export const PatchRequest = {
         return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type PatchRequest = PatchOperation[]
 
 /**
  * The penalty settings, holds all the fields regarding penalties
@@ -2102,20 +2124,6 @@ export interface PrincipalPaymentAccountSettings {
         | undefined
 }
 
-/**
- * Represents the account to remove from the credit arrangement.
- */
-export interface RemoveCreditArrangementAccountInput {
-    /**
-     * The encoded key of the account.
-     */
-    accountId: string
-    /**
-     * The type of the account.
-     */
-    accountType: 'LOAN' | 'DEPOSIT'
-}
-
 export const RemoveCreditArrangementAccountInput = {
     validate: RemoveCreditArrangementAccountInputValidator as ValidateFunction<RemoveCreditArrangementAccountInput>,
     get schema() {
@@ -2132,6 +2140,20 @@ export const RemoveCreditArrangementAccountInput = {
         return { left: (RemoveCreditArrangementAccountInput.errors ?? []) as DefinedError[] }
     },
 } as const
+
+/**
+ * Represents the account to remove from the credit arrangement.
+ */
+export interface RemoveCreditArrangementAccountInput {
+    /**
+     * The encoded key of the account.
+     */
+    accountId: string
+    /**
+     * The type of the account.
+     */
+    accountType: 'LOAN' | 'DEPOSIT'
+}
 
 export interface RestError {
     errorCode?: number | undefined
@@ -2217,8 +2239,6 @@ export interface ScheduleSettings {
     shortMonthHandlingMethod?: 'LAST_DAY_IN_MONTH' | 'FIRST_DAY_OF_NEXT_MONTH' | undefined
 }
 
-export type SearchResponse = CreditArrangement[]
-
 export const SearchResponse = {
     validate: SearchResponseValidator as ValidateFunction<SearchResponse>,
     get schema() {
@@ -2235,6 +2255,8 @@ export const SearchResponse = {
         return { left: (SearchResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type SearchResponse = CreditArrangement[]
 
 /**
  * The disbursement details regarding a loan tranche.

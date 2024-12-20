@@ -38,6 +38,7 @@ export class MambuLoanAccountSchedule {
         options,
         auth = {},
         defaultAuth,
+        client = got,
     }: {
         prefixUrl: string | 'http://localhost:8889/api' | 'https://localhost:8889/api'
         options?: Options | OptionsInit
@@ -46,14 +47,19 @@ export class MambuLoanAccountSchedule {
             apiKey?: string | (() => Promise<string>)
         }
         defaultAuth?: string[][] | string[]
+        client?: Got
     }) {
-        this.client = got.extend(...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined))
+        this.client = client.extend(
+            ...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined),
+        )
         this.auth = auth
         this.availableAuth = new Set(Object.keys(auth))
         this.defaultAuth = defaultAuth
     }
 
     /**
+     * PUT /loans/{loanAccountId}/schedule
+     *
      * Update loan account schedule
      */
     public editSchedule({
@@ -70,7 +76,7 @@ export class MambuLoanAccountSchedule {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -82,7 +88,7 @@ export class MambuLoanAccountSchedule {
 
         return this.awaitResponse(
             this.buildClient(auth).put(`loans/${path.loanAccountId}/schedule`, {
-                json: body,
+                json: _body.right,
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
                 responseType: 'json',
             }),
@@ -97,6 +103,8 @@ export class MambuLoanAccountSchedule {
     }
 
     /**
+     * GET /loans/{loanAccountId}/schedule
+     *
      * Get loan account schedule
      */
     public getScheduleForLoanAccount({
@@ -112,7 +120,7 @@ export class MambuLoanAccountSchedule {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -134,6 +142,8 @@ export class MambuLoanAccountSchedule {
     }
 
     /**
+     * POST /loans/{loanAccountId}/schedule/previewProcessPMTTransactionally
+     *
      * Preview loan account schedule using transactional processing for PMT.
      */
     public previewProcessPmtTransactionally({
@@ -149,7 +159,7 @@ export class MambuLoanAccountSchedule {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -170,6 +180,8 @@ export class MambuLoanAccountSchedule {
     }
 
     /**
+     * POST /loans/schedule:preview
+     *
      * Preview loan account schedule for non-existent loan account
      */
     public previewSchedule({
@@ -185,7 +197,7 @@ export class MambuLoanAccountSchedule {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -197,7 +209,7 @@ export class MambuLoanAccountSchedule {
 
         return this.awaitResponse(
             this.buildClient(auth).post('loans/schedule:preview', {
-                json: body,
+                json: _body.right,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
@@ -211,6 +223,8 @@ export class MambuLoanAccountSchedule {
     }
 
     /**
+     * POST /loans/{loanAccountId}/schedule:previewTranches
+     *
      * Preview loan account schedule for non-existent loan account
      */
     public previewTranchesOnSchedule({
@@ -232,7 +246,7 @@ export class MambuLoanAccountSchedule {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -244,7 +258,7 @@ export class MambuLoanAccountSchedule {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`loans/${path.loanAccountId}/schedule:previewTranches`, {
-                json: body,
+                json: _body.right,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
                 responseType: 'json',
             }),
@@ -257,13 +271,14 @@ export class MambuLoanAccountSchedule {
         ) as ReturnType<this['previewTranchesOnSchedule']>
     }
 
-    public validateRequestBody<Parser extends { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } }, Body>(
-        parser: Parser,
+    public validateRequestBody<Body>(
+        parser: { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } },
         body: unknown,
     ) {
         const _body = parser.parse(body)
         if ('left' in _body) {
             return {
+                success: false as const,
                 statusCode: undefined,
                 status: undefined,
                 headers: undefined,
@@ -277,8 +292,8 @@ export class MambuLoanAccountSchedule {
 
     public async awaitResponse<
         I,
-        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } } | undefined>,
-    >(response: CancelableRequest<Response<I>>, schemas: S) {
+        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } }>,
+    >(response: CancelableRequest<NoInfer<Response<I>>>, schemas: S) {
         const result = await response
         const status =
             result.statusCode < 200
@@ -294,6 +309,7 @@ export class MambuLoanAccountSchedule {
         const body = validator?.parse?.(result.body)
         if (result.statusCode < 200 || result.statusCode >= 300) {
             return {
+                success: false as const,
                 statusCode: result.statusCode.toString(),
                 status,
                 headers: result.headers,
@@ -304,6 +320,7 @@ export class MambuLoanAccountSchedule {
         }
         if (body === undefined || 'left' in body) {
             return {
+                success: false as const,
                 statusCode: result.statusCode.toString(),
                 status,
                 headers: result.headers,
@@ -312,7 +329,13 @@ export class MambuLoanAccountSchedule {
                 where: 'response:body',
             }
         }
-        return { statusCode: result.statusCode.toString(), status, headers: result.headers, right: result.body }
+        return {
+            success: true as const,
+            statusCode: result.statusCode.toString(),
+            status,
+            headers: result.headers,
+            right: result.body,
+        }
     }
 
     protected buildBasicClient(client: Got) {
@@ -374,12 +397,14 @@ export type Status<Major> = Major extends string
               : 'server-error'
     : undefined
 export interface SuccessResponse<StatusCode extends string, T> {
+    success: true
     statusCode: StatusCode
     status: Status<StatusCode>
     headers: IncomingHttpHeaders
     right: T
 }
 export interface FailureResponse<StatusCode = string, T = unknown, Where = never, Headers = IncomingHttpHeaders> {
+    success: false
     statusCode: StatusCode
     status: Status<StatusCode>
     headers: Headers

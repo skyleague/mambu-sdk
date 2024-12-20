@@ -6,9 +6,59 @@
 
 import type { DefinedError, ValidateFunction } from 'ajv'
 
+import { validate as CreateDocumentRequestValidator } from './schemas/create-document-request.schema.js'
 import { validate as DocumentValidator } from './schemas/document.schema.js'
 import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
 import { validate as GetDocumentsByClientIdResponseValidator } from './schemas/get-documents-by-client-id-response.schema.js'
+
+export const CreateDocumentRequest = {
+    validate: CreateDocumentRequestValidator as ValidateFunction<CreateDocumentRequest>,
+    get schema() {
+        return CreateDocumentRequest.validate.schema
+    },
+    get errors() {
+        return CreateDocumentRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CreateDocumentRequest => CreateDocumentRequest.validate(o) === true,
+    parse: (o: unknown): { right: CreateDocumentRequest } | { left: DefinedError[] } => {
+        if (CreateDocumentRequest.is(o)) {
+            return { right: o }
+        }
+        return { left: (CreateDocumentRequest.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+export interface CreateDocumentRequest {
+    /**
+     * The file to be attached for a client.
+     */
+    file: string
+    /**
+     * The name (title) of the attached file.
+     */
+    name?: string | undefined
+    /**
+     * The description of the attached file.
+     */
+    notes?: string | undefined
+}
+
+export const Document = {
+    validate: DocumentValidator as ValidateFunction<Document>,
+    get schema() {
+        return Document.validate.schema
+    },
+    get errors() {
+        return Document.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Document => Document.validate(o) === true,
+    parse: (o: unknown): { right: Document } | { left: DefinedError[] } => {
+        if (Document.is(o)) {
+            return { right: o }
+        }
+        return { left: (Document.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Holds information regarding the documents uploaded as attachments
@@ -77,27 +127,6 @@ export interface Document {
     type: string
 }
 
-export const Document = {
-    validate: DocumentValidator as ValidateFunction<Document>,
-    get schema() {
-        return Document.validate.schema
-    },
-    get errors() {
-        return Document.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Document => Document.validate(o) === true,
-    parse: (o: unknown): { right: Document } | { left: DefinedError[] } => {
-        if (Document.is(o)) {
-            return { right: o }
-        }
-        return { left: (Document.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
-
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -115,7 +144,9 @@ export const ErrorResponse = {
     },
 } as const
 
-export type GetDocumentsByClientIdResponse = Document[]
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
 
 export const GetDocumentsByClientIdResponse = {
     validate: GetDocumentsByClientIdResponseValidator as ValidateFunction<GetDocumentsByClientIdResponse>,
@@ -133,6 +164,8 @@ export const GetDocumentsByClientIdResponse = {
         return { left: (GetDocumentsByClientIdResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type GetDocumentsByClientIdResponse = Document[]
 
 export interface RestError {
     errorCode?: number | undefined

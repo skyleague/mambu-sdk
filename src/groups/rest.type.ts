@@ -343,10 +343,6 @@ export interface Currency {
     currencyCode?: string | undefined
 }
 
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
-
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -364,7 +360,9 @@ export const ErrorResponse = {
     },
 } as const
 
-export type GetAllResponse = Group[]
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
 
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
@@ -383,7 +381,7 @@ export const GetAllResponse = {
     },
 } as const
 
-export type GetCreditArrangementsByGroupIdOrKeyResponse = CreditArrangement[]
+export type GetAllResponse = Group[]
 
 export const GetCreditArrangementsByGroupIdOrKeyResponse = {
     validate:
@@ -401,6 +399,25 @@ export const GetCreditArrangementsByGroupIdOrKeyResponse = {
             return { right: o }
         }
         return { left: (GetCreditArrangementsByGroupIdOrKeyResponse.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+export type GetCreditArrangementsByGroupIdOrKeyResponse = CreditArrangement[]
+
+export const Group = {
+    validate: GroupValidator as ValidateFunction<Group>,
+    get schema() {
+        return Group.validate.schema
+    },
+    get errors() {
+        return Group.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Group => Group.validate(o) === true,
+    parse: (o: unknown): { right: Group } | { left: DefinedError[] } => {
+        if (Group.is(o)) {
+            return { right: o }
+        }
+        return { left: (Group.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -499,23 +516,6 @@ export interface Group {
         | 'PHRASE'
         | undefined
 }
-
-export const Group = {
-    validate: GroupValidator as ValidateFunction<Group>,
-    get schema() {
-        return Group.validate.schema
-    },
-    get errors() {
-        return Group.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Group => Group.validate(o) === true,
-    parse: (o: unknown): { right: Group } | { left: DefinedError[] } => {
-        if (Group.is(o)) {
-            return { right: o }
-        }
-        return { left: (Group.errors ?? []) as DefinedError[] }
-    },
-} as const
 
 /**
  * The unit that composes the list used for Groups searching
@@ -633,17 +633,6 @@ export interface GroupRole {
     roleNameId?: string | undefined
 }
 
-/**
- * Wrapper that holds a list of filtering criteria and a sorting criteria for Groups client directed query
- */
-export interface GroupSearchCriteria {
-    /**
-     * The list of filtering criteria
-     */
-    filterCriteria: GroupFilterCriteria[]
-    sortingCriteria?: GroupSortingCriteria | undefined
-}
-
 export const GroupSearchCriteria = {
     validate: GroupSearchCriteriaValidator as ValidateFunction<GroupSearchCriteria>,
     get schema() {
@@ -660,6 +649,17 @@ export const GroupSearchCriteria = {
         return { left: (GroupSearchCriteria.errors ?? []) as DefinedError[] }
     },
 } as const
+
+/**
+ * Wrapper that holds a list of filtering criteria and a sorting criteria for Groups client directed query
+ */
+export interface GroupSearchCriteria {
+    /**
+     * The list of filtering criteria
+     */
+    filterCriteria: GroupFilterCriteria[]
+    sortingCriteria?: GroupSortingCriteria | undefined
+}
 
 /**
  * The sorting criteria used for Groups search
@@ -706,8 +706,6 @@ export interface PatchOperation {
     value?: unknown
 }
 
-export type PatchRequest = PatchOperation[]
-
 export const PatchRequest = {
     validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
@@ -725,13 +723,13 @@ export const PatchRequest = {
     },
 } as const
 
+export type PatchRequest = PatchOperation[]
+
 export interface RestError {
     errorCode?: number | undefined
     errorReason?: string | undefined
     errorSource?: string | undefined
 }
-
-export type SearchResponse = Group[]
 
 export const SearchResponse = {
     validate: SearchResponseValidator as ValidateFunction<SearchResponse>,
@@ -749,3 +747,5 @@ export const SearchResponse = {
         return { left: (SearchResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type SearchResponse = Group[]

@@ -1,4 +1,4 @@
-import { cloneDeep, omitUndefined, pick } from '@skyleague/axioms'
+import { omitUndefined, pick } from '@skyleague/axioms'
 import { $restclient } from '@skyleague/therefore'
 import type { OpenapiV3 } from '@skyleague/therefore'
 import type { APIKeySecurityScheme, Operation, PathItem, Schema } from '@skyleague/therefore/src/types/openapi.type.js'
@@ -41,13 +41,13 @@ export const baseMambuStreaming = got
                 }
             }
 
-            const cursor = cloneDeep(schemas.Cursor as Schema)
+            const cursor = structuredClone(schemas.Cursor as Schema)
             schemas['Subscription-Cursor'] = omitUndefined({
-                ...cloneDeep(cursor),
+                ...structuredClone(cursor),
                 ...schemas['Subscription-Cursor'],
                 allOf: undefined,
                 properties: {
-                    ...cloneDeep(cursor.properties),
+                    ...structuredClone(cursor.properties),
                     event_type: {
                         type: 'string',
                         minLength: 1,
@@ -62,11 +62,11 @@ export const baseMambuStreaming = got
                 required: [...(cursor.required ?? []), 'event_type', 'cursor_token'] as unknown as [string, ...string[]],
             }) as Schema
             schemas['Subscription-Cursor-Without-Token'] = omitUndefined({
-                ...cloneDeep(cursor),
+                ...structuredClone(cursor),
                 ...schemas['Subscription-Cursor-Without-Token'],
                 allOf: undefined,
                 properties: {
-                    ...cloneDeep(cursor.properties),
+                    ...structuredClone(cursor.properties),
                     event_type: {
                         type: 'string',
                         minLength: 1,

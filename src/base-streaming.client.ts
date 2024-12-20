@@ -38,6 +38,7 @@ export class BaseMambuStreaming {
         options,
         auth = {},
         defaultAuth,
+        client = got,
     }: {
         prefixUrl?: string | 'http://MYTENANT.mambu.com/api/v1'
         options?: Options | OptionsInit
@@ -45,14 +46,19 @@ export class BaseMambuStreaming {
             apiKeyAuth?: string | (() => Promise<string>)
         }
         defaultAuth?: string[][] | string[]
+        client?: Got
     }) {
-        this.client = got.extend(...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined))
+        this.client = client.extend(
+            ...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined),
+        )
         this.auth = auth
         this.availableAuth = new Set(Object.keys(auth))
         this.defaultAuth = defaultAuth
     }
 
     /**
+     * POST /subscriptions/{subscription_id}/cursors
+     *
      * Commit Cursors
      *
      * This endpoint commits offsets of the subscription.
@@ -81,7 +87,7 @@ export class BaseMambuStreaming {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '403' | '404' | '422'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -93,7 +99,7 @@ export class BaseMambuStreaming {
 
         return this.awaitResponse(
             this.buildClient().post(`subscriptions/${path.subscriptionId}/cursors`, {
-                json: body,
+                json: _body.right,
                 headers: headers,
                 responseType: 'json',
             }),
@@ -108,6 +114,8 @@ export class BaseMambuStreaming {
     }
 
     /**
+     * POST /subscriptions
+     *
      * Create a Subscription
      *
      * This endpoint creates a subscription for `event_types`. Event types must first be specified using the Mambu UI following the instructions in our [Event Streaming API](https://support.mambu.com/docs/streaming-api) article.
@@ -128,7 +136,7 @@ export class BaseMambuStreaming {
         | FailureResponse<'422', Problem, 'response:statuscode'>
         | FailureResponse<undefined, unknown, 'request:body', undefined>
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
-        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '422'>, string, 'response:statuscode', IncomingHttpHeaders>
+        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '422'>, unknown, 'response:statuscode', IncomingHttpHeaders>
     > {
         const _body = this.validateRequestBody(Subscription, body)
         if ('left' in _body) {
@@ -137,7 +145,7 @@ export class BaseMambuStreaming {
 
         return this.awaitResponse(
             this.buildClient().post('subscriptions', {
-                json: body,
+                json: _body.right,
                 headers: headers ?? {},
                 responseType: 'json',
             }),
@@ -151,6 +159,8 @@ export class BaseMambuStreaming {
     }
 
     /**
+     * DELETE /subscriptions/{subscription_id}
+     *
      * Delete a Subscription
      *
      * This endpoint deletes an existing subscription for event types.
@@ -170,7 +180,7 @@ export class BaseMambuStreaming {
         | SuccessResponse<'204', unknown>
         | FailureResponse<'404', DeleteSubscriptionBySubscriptionIdResponse404, 'response:statuscode'>
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
-        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '404'>, string, 'response:statuscode', IncomingHttpHeaders>
+        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '404'>, unknown, 'response:statuscode', IncomingHttpHeaders>
     > {
         return this.awaitResponse(
             this.buildClient().delete(`subscriptions/${path.subscriptionId}`, {
@@ -185,6 +195,8 @@ export class BaseMambuStreaming {
     }
 
     /**
+     * GET /subscriptions/{subscription_id}/events
+     *
      * Start Event Stream
      *
      * This endpoint starts a new stream for reading events from this subscription. The data will be automatically rebalanced between streams of one subscription.
@@ -235,7 +247,7 @@ export class BaseMambuStreaming {
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '403' | '404' | '409'>,
-              string,
+              unknown,
               'response:statuscode',
               IncomingHttpHeaders
           >
@@ -257,6 +269,8 @@ export class BaseMambuStreaming {
     }
 
     /**
+     * GET /subscriptions/{subscription_id}/stats
+     *
      * Get Statistics
      *
      * This endpoint exposes statistics of a specified subscription. An example use for the statistics provided could be monitoring lag in consumers.
@@ -280,7 +294,7 @@ export class BaseMambuStreaming {
         | SuccessResponse<'200', GetSubscriptionStatsResponse>
         | FailureResponse<'404', Problem, 'response:statuscode'>
         | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
-        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '404'>, string, 'response:statuscode', IncomingHttpHeaders>
+        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '404'>, unknown, 'response:statuscode', IncomingHttpHeaders>
     > {
         return this.awaitResponse(
             this.buildClient().get(`subscriptions/${path.subscriptionId}/stats`, {
@@ -295,13 +309,14 @@ export class BaseMambuStreaming {
         ) as ReturnType<this['getSubscriptionStats']>
     }
 
-    public validateRequestBody<Parser extends { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } }, Body>(
-        parser: Parser,
+    public validateRequestBody<Body>(
+        parser: { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } },
         body: unknown,
     ) {
         const _body = parser.parse(body)
         if ('left' in _body) {
             return {
+                success: false as const,
                 statusCode: undefined,
                 status: undefined,
                 headers: undefined,
@@ -315,8 +330,8 @@ export class BaseMambuStreaming {
 
     public async awaitResponse<
         I,
-        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } } | undefined>,
-    >(response: CancelableRequest<Response<I>>, schemas: S) {
+        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } }>,
+    >(response: CancelableRequest<NoInfer<Response<I>>>, schemas: S) {
         const result = await response
         const status =
             result.statusCode < 200
@@ -332,6 +347,7 @@ export class BaseMambuStreaming {
         const body = validator?.parse?.(result.body)
         if (result.statusCode < 200 || result.statusCode >= 300) {
             return {
+                success: false as const,
                 statusCode: result.statusCode.toString(),
                 status,
                 headers: result.headers,
@@ -342,6 +358,7 @@ export class BaseMambuStreaming {
         }
         if (body === undefined || 'left' in body) {
             return {
+                success: false as const,
                 statusCode: result.statusCode.toString(),
                 status,
                 headers: result.headers,
@@ -350,7 +367,13 @@ export class BaseMambuStreaming {
                 where: 'response:body',
             }
         }
-        return { statusCode: result.statusCode.toString(), status, headers: result.headers, right: result.body }
+        return {
+            success: true as const,
+            statusCode: result.statusCode.toString(),
+            status,
+            headers: result.headers,
+            right: result.body,
+        }
     }
 
     protected buildApiKeyAuthClient(client: Got) {
@@ -393,12 +416,14 @@ export type Status<Major> = Major extends string
               : 'server-error'
     : undefined
 export interface SuccessResponse<StatusCode extends string, T> {
+    success: true
     statusCode: StatusCode
     status: Status<StatusCode>
     headers: IncomingHttpHeaders
     right: T
 }
 export interface FailureResponse<StatusCode = string, T = unknown, Where = never, Headers = IncomingHttpHeaders> {
+    success: false
     statusCode: StatusCode
     status: Status<StatusCode>
     headers: Headers

@@ -10,6 +10,23 @@ import { validate as CommentValidator } from './schemas/comment.schema.js'
 import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
 import { validate as GetCommentsResponseValidator } from './schemas/get-comments-response.schema.js'
 
+export const Comment = {
+    validate: CommentValidator as ValidateFunction<Comment>,
+    get schema() {
+        return Comment.validate.schema
+    },
+    get errors() {
+        return Comment.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Comment => Comment.validate(o) === true,
+    parse: (o: unknown): { right: Comment } | { left: DefinedError[] } => {
+        if (Comment.is(o)) {
+            return { right: o }
+        }
+        return { left: (Comment.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Represents information about the comment data transfer object.
  */
@@ -57,27 +74,6 @@ export interface Comment {
     userKey?: string | undefined
 }
 
-export const Comment = {
-    validate: CommentValidator as ValidateFunction<Comment>,
-    get schema() {
-        return Comment.validate.schema
-    },
-    get errors() {
-        return Comment.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Comment => Comment.validate(o) === true,
-    parse: (o: unknown): { right: Comment } | { left: DefinedError[] } => {
-        if (Comment.is(o)) {
-            return { right: o }
-        }
-        return { left: (Comment.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
-
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -95,7 +91,9 @@ export const ErrorResponse = {
     },
 } as const
 
-export type GetCommentsResponse = Comment[]
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
 
 export const GetCommentsResponse = {
     validate: GetCommentsResponseValidator as ValidateFunction<GetCommentsResponse>,
@@ -113,6 +111,8 @@ export const GetCommentsResponse = {
         return { left: (GetCommentsResponse.errors ?? []) as DefinedError[] }
     },
 } as const
+
+export type GetCommentsResponse = Comment[]
 
 export interface RestError {
     errorCode?: number | undefined
