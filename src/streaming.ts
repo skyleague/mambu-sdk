@@ -1,13 +1,20 @@
+import https from 'node:https'
+import { PassThrough } from 'node:stream'
+import { ValidationError } from 'ajv'
+import type {} from 'ky'
+import split2 from 'split2'
 import { BaseMambuStreaming } from './base-streaming.client.js'
 import { SubscriptionEventStreamBatch } from './base-streaming.type.js'
 
-import { ValidationError } from 'ajv'
-import split2 from 'split2'
-
-import https from 'node:https'
-import { PassThrough } from 'node:stream'
-
 export class MambuStreaming extends BaseMambuStreaming {
+    public prefixUrl: string | undefined
+
+    public constructor(params: ConstructorParameters<typeof BaseMambuStreaming>[0]) {
+        super(params)
+
+        this.prefixUrl = params.prefixUrl
+    }
+
     public async *getSubscriptionEventBatches({
         path,
         query,
@@ -27,7 +34,7 @@ export class MambuStreaming extends BaseMambuStreaming {
     }) {
         const apiKey = typeof this.auth.apiKeyAuth === 'string' ? this.auth.apiKeyAuth : await this.auth.apiKeyAuth?.()
         const stream = new PassThrough()
-        const url = new URL(`${this.client.defaults.options.prefixUrl.toString()}subscriptions/${path.subscriptionId}/events`)
+        const url = new URL(`${this.prefixUrl}subscriptions/${path.subscriptionId}/events`)
         for (const [k, v] of Object.entries(query ?? {})) {
             url.searchParams.set(k, v)
         }

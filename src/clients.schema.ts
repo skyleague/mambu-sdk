@@ -1,16 +1,16 @@
-import { groupBy, hasPropertiesDefined, pick, valuesOf } from '@skyleague/axioms'
+import { pick, valuesOf } from '@skyleague/axioms'
 import type { OpenapiV3 } from '@skyleague/therefore'
 import { $restclient } from '@skyleague/therefore'
 import type { PathItem } from '@skyleague/therefore/src/types/openapi.type.js'
 import camelCase from 'camelcase'
-import got from 'got'
+import ky from 'ky'
 
 export interface Clients {
     items: { jsonPath: string; label: string; hashValue: string; index?: number }[]
 }
 const baseUrl = 'https://demotenant.dev.mambucloud.com/api/swagger/'
 
-const client = got.extend({ prefixUrl: baseUrl })
+const client = ky.extend({ prefixUrl: baseUrl })
 const clients = await client.get('resources').json<Clients>()
 
 const clientList = [
@@ -36,8 +36,8 @@ for (const manifest of clientList) {
         manifest.label = 'Mambu Function Secrets'
     }
 }
-for (const [group, vals] of Object.entries(groupBy(clientList, (l) => l.label))) {
-    if (vals.length > 1) {
+for (const [group, vals] of Object.entries(Object.groupBy(clientList, (l) => l.label))) {
+    if (vals && vals.length > 1) {
         throw new Error(`Found duplicate labels on group ${group}`)
     }
 }
@@ -50,10 +50,14 @@ for (const item of clientList) {
     clientName = clientName.includes('a-p-i') ? clientName.replace('a-p-i', 'api') : clientName
     clientName = clientName.includes('i-d-') ? clientName.replace('i-d-', 'id-') : clientName
 
+    openapi.info.title ??= item.label
+    openapi.info.version ??= '1.0.0'
+
     exports[camelCase(`mambu_${clientName}`)] = $restclient(openapi, {
         filename: `${clientName}/rest.client.ts`,
         strict: false,
         formats: false,
+        client: 'ky',
         transformOpenapi: (api: OpenapiV3) => {
             const securitySchemes = api.components?.securitySchemes
             const injectApiKey =
@@ -71,8 +75,8 @@ for (const item of clientList) {
                     const pathItem = path as PathItem
                     for (const method of valuesOf(
                         pick(pathItem, ['get', 'delete', 'put', 'head', 'options', 'trace', 'patch', 'post']),
-                    ).filter(hasPropertiesDefined('security'))) {
-                        method.security.unshift({ apiKey: [] })
+                    ).filter((method) => method?.security !== undefined)) {
+                        method?.security?.unshift({ apiKey: [] })
                     }
                 }
             }

@@ -98,7 +98,7 @@ export interface ExchangeRateInput {
     /**
      * The exchange rate applies starting with this date.
      */
-    startDate: string
+    startDate?: string | undefined
 }
 
 export const ExchangeRateInput = {

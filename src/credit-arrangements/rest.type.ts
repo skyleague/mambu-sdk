@@ -958,6 +958,10 @@ export interface DepositAccount {
     overdraftInterestSettings?: DepositAccountOverdraftInterestSettings | undefined
     overdraftSettings?: DepositAccountOverdraftSettings | undefined
     /**
+     * The history of deposit account ownership
+     */
+    ownershipHistory?: DepositAccountOwnershipHistory[] | undefined
+    /**
      * The key to the product type that this account is based on.
      */
     productTypeKey: string
@@ -1248,6 +1252,20 @@ export interface DepositAccountOverdraftSettings {
 }
 
 /**
+ * The history of deposit account ownership
+ */
+export interface DepositAccountOwnershipHistory {
+    /**
+     * They key of the previous account holder
+     */
+    previousOwnerKey?: string | undefined
+    /**
+     * The transfer date of the account ownership
+     */
+    transferDate?: string | undefined
+}
+
+/**
  * The the disbursement details it holds the information related to the disbursement details as disbursement date, first repayment date, disbursement fees.
  */
 export interface DisbursementDetails {
@@ -1479,6 +1497,10 @@ export interface InterestSettings {
      * Indicates whether late interest is accrued for this loan account
      */
     accrueLateInterest?: boolean | undefined
+    /**
+     * The effective interest rate. Represents the interest rate for the loan accounts with semi-annually compounding product.
+     */
+    effectiveInterestRate?: number | undefined
     interestApplicationDays?: DaysInMonth | undefined
     /**
      * The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.

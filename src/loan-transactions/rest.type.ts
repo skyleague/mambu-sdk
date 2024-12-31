@@ -18,6 +18,7 @@ import { validate as LockLoanAccountInputValidator } from './schemas/lock-loan-a
 import { validate as LockLoanTransactionsWrapperValidator } from './schemas/lock-loan-transactions-wrapper.schema.js'
 import { validate as PaymentMadeTransactionInputValidator } from './schemas/payment-made-transaction-input.schema.js'
 import { validate as RedrawRepaymentTransactionInputDTOValidator } from './schemas/redraw-repayment-transaction-input-dto.schema.js'
+import { validate as RefundLoanTransactionInputValidator } from './schemas/refund-loan-transaction-input.schema.js'
 import { validate as RepaymentLoanTransactionInputValidator } from './schemas/repayment-loan-transaction-input.schema.js'
 import { validate as SearchResponseValidator } from './schemas/search-response.schema.js'
 import { validate as UnlockLoanAccountInputValidator } from './schemas/unlock-loan-account-input.schema.js'
@@ -333,6 +334,7 @@ export interface CustomPaymentAmount {
         | 'LATE_REPAYMENT_FEE'
         | 'PAYMENT_DUE_FEE'
         | 'PENALTY'
+        | 'INTEREST_FROM_ARREARS'
     /**
      * The encodedKey of the predefined fee to be paid.
      */
@@ -511,6 +513,10 @@ export interface FeeLoanTransactionInput {
      * The external id of the repayment transaction, customizable, unique
      */
     externalId?: string | undefined
+    /**
+     * This flag indicates whether the fee should be capitalised or not
+     */
+    feeCapitalisation?: boolean | undefined
     /**
      * The date of the first repayment for the loan account (as Organization Time)
      */
@@ -769,12 +775,17 @@ export interface LoanTransaction {
         | 'WITHDRAWAL_REDRAW_ADJUSTMENT'
         | 'FEE_APPLIED'
         | 'FEE_CHARGED'
+        | 'FEE_CAPITALISED'
+        | 'SCHEDULE_FIX_APPLIED'
         | 'FEES_DUE_REDUCED'
+        | 'FEE_REFUND'
+        | 'FEE_REFUND_ADJUSTMENT'
         | 'FEE_ADJUSTMENT'
         | 'PENALTY_APPLIED'
         | 'PENALTY_ADJUSTMENT'
         | 'PENALTIES_DUE_REDUCED'
         | 'REPAYMENT_ADJUSTMENT'
+        | 'FEE_CAPITALISED_ADJUSTMENT'
         | 'PAYMENT_MADE_ADJUSTMENT'
         | 'INTEREST_RATE_CHANGED'
         | 'TAX_RATE_CHANGED'
@@ -809,6 +820,8 @@ export interface LoanTransaction {
         | 'DUE_DATE_CHANGED_ADJUSTMENT'
         | 'ACCOUNT_TERMINATED'
         | 'ACCOUNT_TERMINATED_ADJUSTMENT'
+        | 'REFUND'
+        | 'REFUND_ADJUSTMENT'
         | undefined
     /**
      * The user that performed the transaction.
@@ -897,6 +910,7 @@ export interface LoanTransactionFilterCriteria {
         | 'creationDate'
         | 'valueDate'
         | 'parentAccountKey'
+        | 'parentAccountHolderKey'
         | 'productTypeKey'
         | 'productID'
         | 'type'
@@ -1215,6 +1229,54 @@ export const RedrawRepaymentTransactionInputDTO = {
             return { right: o }
         }
         return { left: (RedrawRepaymentTransactionInputDTO.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+/**
+ * Represents the request payload for creating a transaction of type REFUND
+ */
+export interface RefundLoanTransactionInput {
+    /**
+     * The amount of the refund
+     */
+    amount: number
+    /**
+     * The booking date of the refund (as Organization Time)
+     */
+    bookingDate?: string | undefined
+    /**
+     * The external id of the refund transaction. Customizable and unique
+     */
+    externalId?: string | undefined
+    /**
+     * The disbursement key for which the refund is performed
+     */
+    linkedDisbursementKey: string
+    /**
+     * Extra notes about the refund transaction. Notes can have at most 255 characters in length.
+     */
+    notes?: string | undefined
+    transactionDetails?: LoanTransactionDetailsInput | undefined
+    /**
+     * The entry date of the refund (as Organization Time)
+     */
+    valueDate?: string | undefined
+}
+
+export const RefundLoanTransactionInput = {
+    validate: RefundLoanTransactionInputValidator as ValidateFunction<RefundLoanTransactionInput>,
+    get schema() {
+        return RefundLoanTransactionInput.validate.schema
+    },
+    get errors() {
+        return RefundLoanTransactionInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is RefundLoanTransactionInput => RefundLoanTransactionInput.validate(o) === true,
+    parse: (o: unknown): { right: RefundLoanTransactionInput } | { left: DefinedError[] } => {
+        if (RefundLoanTransactionInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (RefundLoanTransactionInput.errors ?? []) as DefinedError[] }
     },
 } as const
 

@@ -4,17 +4,15 @@
  */
 /* eslint-disable */
 
-import type { IncomingHttpHeaders } from 'node:http'
-
 import type { DefinedError } from 'ajv'
-import { got } from 'got'
-import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
+import ky from 'ky'
+import type { KyInstance, Options, ResponsePromise } from 'ky'
 
 /**
  * configuration/organization
  */
 export class MambuOrganizationConfiguration {
-    public client: Got
+    public client: KyInstance
 
     public auth: {
         basic?: [username: string, password: string] | (() => Promise<[username: string, password: string]>)
@@ -29,22 +27,26 @@ export class MambuOrganizationConfiguration {
         options,
         auth = {},
         defaultAuth,
+        client = ky,
     }: {
         prefixUrl: string | 'http://localhost:8889/api' | 'https://localhost:8889/api'
-        options?: Options | OptionsInit
+        options?: Options
         auth: {
             basic?: [username: string, password: string] | (() => Promise<[username: string, password: string]>)
             apiKey?: string | (() => Promise<string>)
         }
         defaultAuth?: string[][] | string[]
+        client?: KyInstance
     }) {
-        this.client = got.extend(...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined))
+        this.client = client.extend({ prefixUrl, throwHttpErrors: false, ...options })
         this.auth = auth
         this.availableAuth = new Set(Object.keys(auth))
         this.defaultAuth = defaultAuth
     }
 
     /**
+     * GET /configuration/organization.yaml
+     *
      * Get organization details configuration
      */
     public get({
@@ -55,18 +57,17 @@ export class MambuOrganizationConfiguration {
         | FailureResponse<'401', unknown, 'response:statuscode'>
         | FailureResponse<'403', unknown, 'response:statuscode'>
         | FailureResponse<'404', unknown, 'response:statuscode'>
-        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
-              IncomingHttpHeaders
+              Headers
           >
     > {
         return this.awaitResponse(
             this.buildClient(auth).get('configuration/organization.yaml', {
                 headers: { Accept: 'application/vnd.mambu.v2+yaml' },
-                responseType: 'text',
             }),
             {
                 200: { parse: (x: unknown) => ({ right: x }) },
@@ -75,10 +76,13 @@ export class MambuOrganizationConfiguration {
                 403: { parse: (x: unknown) => ({ right: x }) },
                 404: { parse: (x: unknown) => ({ right: x }) },
             },
+            'text',
         ) as ReturnType<this['get']>
     }
 
     /**
+     * GET /configuration/organization/template.yaml
+     *
      * Get organization details configuration template
      */
     public getTemplate({
@@ -89,18 +93,17 @@ export class MambuOrganizationConfiguration {
         | FailureResponse<'401', unknown, 'response:statuscode'>
         | FailureResponse<'403', unknown, 'response:statuscode'>
         | FailureResponse<'404', unknown, 'response:statuscode'>
-        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
-              IncomingHttpHeaders
+              Headers
           >
     > {
         return this.awaitResponse(
             this.buildClient(auth).get('configuration/organization/template.yaml', {
                 headers: { Accept: 'application/vnd.mambu.v2+yaml' },
-                responseType: 'text',
             }),
             {
                 200: { parse: (x: unknown) => ({ right: x }) },
@@ -109,10 +112,13 @@ export class MambuOrganizationConfiguration {
                 403: { parse: (x: unknown) => ({ right: x }) },
                 404: { parse: (x: unknown) => ({ right: x }) },
             },
+            'text',
         ) as ReturnType<this['getTemplate']>
     }
 
     /**
+     * PUT /configuration/organization.yaml
+     *
      * Update organization details configuration
      */
     public update({
@@ -123,18 +129,17 @@ export class MambuOrganizationConfiguration {
         | FailureResponse<'401', unknown, 'response:statuscode'>
         | FailureResponse<'403', unknown, 'response:statuscode'>
         | FailureResponse<'404', unknown, 'response:statuscode'>
-        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
-              IncomingHttpHeaders
+              Headers
           >
     > {
         return this.awaitResponse(
             this.buildClient(auth).put('configuration/organization.yaml', {
                 headers: { Accept: 'application/vnd.mambu.v2+yaml' },
-                responseType: 'text',
             }),
             {
                 200: { parse: (x: unknown) => ({ right: x }) },
@@ -143,50 +148,54 @@ export class MambuOrganizationConfiguration {
                 403: { parse: (x: unknown) => ({ right: x }) },
                 404: { parse: (x: unknown) => ({ right: x }) },
             },
+            'text',
         ) as ReturnType<this['update']>
     }
 
     public async awaitResponse<
         I,
-        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } } | undefined>,
-    >(response: CancelableRequest<Response<I>>, schemas: S) {
+        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } }>,
+    >(response: ResponsePromise<I>, schemas: S, responseType?: 'json' | 'text') {
+        const _body = (await (responseType !== undefined ? response[responseType]() : response.text())) as I
         const result = await response
         const status =
-            result.statusCode < 200
+            result.status < 200
                 ? 'informational'
-                : result.statusCode < 300
+                : result.status < 300
                   ? 'success'
-                  : result.statusCode < 400
+                  : result.status < 400
                     ? 'redirection'
-                    : result.statusCode < 500
+                    : result.status < 500
                       ? 'client-error'
                       : 'server-error'
-        const validator = schemas[result.statusCode] ?? schemas.default
-        const body = validator?.parse?.(result.body)
-        if (result.statusCode < 200 || result.statusCode >= 300) {
+        const validator = schemas[result.status] ?? schemas.default
+        const body = validator?.parse?.(_body)
+        if (result.status < 200 || result.status >= 300) {
             return {
-                statusCode: result.statusCode.toString(),
+                success: false as const,
+                statusCode: result.status.toString(),
                 status,
                 headers: result.headers,
-                left: body !== undefined && 'right' in body ? body.right : result.body,
+                left: body !== undefined && 'right' in body ? body.right : _body,
                 validationErrors: body !== undefined && 'left' in body ? body.left : undefined,
                 where: 'response:statuscode',
             }
         }
         if (body === undefined || 'left' in body) {
             return {
-                statusCode: result.statusCode.toString(),
+                success: body === undefined,
+                statusCode: result.status.toString(),
                 status,
                 headers: result.headers,
-                left: result.body,
+                left: _body,
                 validationErrors: body?.left,
                 where: 'response:body',
             }
         }
-        return { statusCode: result.statusCode.toString(), status, headers: result.headers, right: result.body }
+        return { success: true as const, statusCode: result.status.toString(), status, headers: result.headers, right: _body }
     }
 
-    protected buildBasicClient(client: Got) {
+    protected buildBasicClient(client: KyInstance) {
         return client.extend({
             hooks: {
                 beforeRequest: [
@@ -194,8 +203,7 @@ export class MambuOrganizationConfiguration {
                         const basic = this.auth.basic
                         if (basic !== undefined) {
                             const [username, password] = typeof basic === 'function' ? await basic() : basic
-                            options.username = username
-                            options.password = password
+                            options.headers.set('Authorization', `Basic ${btoa(`${username}:${password}`)}`)
                         }
                     },
                 ],
@@ -203,21 +211,21 @@ export class MambuOrganizationConfiguration {
         })
     }
 
-    protected buildApiKeyClient(client: Got) {
+    protected buildApiKeyClient(client: KyInstance) {
         return client.extend({
             hooks: {
                 beforeRequest: [
                     async (options) => {
                         const apiKey = this.auth.apiKey
                         const key = typeof apiKey === 'function' ? await apiKey() : apiKey
-                        options.headers.apiKey = key
+                        options.headers.set('apiKey', `${key}`)
                     },
                 ],
             },
         })
     }
 
-    protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client?: Got): Got {
+    protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client?: KyInstance): KyInstance {
         const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
@@ -245,15 +253,17 @@ export type Status<Major> = Major extends string
               : 'server-error'
     : undefined
 export interface SuccessResponse<StatusCode extends string, T> {
-    statusCode: StatusCode
-    status: Status<StatusCode>
-    headers: IncomingHttpHeaders
-    right: T
-}
-export interface FailureResponse<StatusCode = string, T = unknown, Where = never, Headers = IncomingHttpHeaders> {
+    success: true
     statusCode: StatusCode
     status: Status<StatusCode>
     headers: Headers
+    right: T
+}
+export interface FailureResponse<StatusCode = string, T = unknown, Where = never, HeaderResponse = Headers> {
+    success: false
+    statusCode: StatusCode
+    status: Status<StatusCode>
+    headers: HeaderResponse
     validationErrors: DefinedError[] | undefined
     left: T
     where: Where

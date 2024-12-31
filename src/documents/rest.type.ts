@@ -6,9 +6,63 @@
 
 import type { DefinedError, ValidateFunction } from 'ajv'
 
+import { validate as CreateDocumentRequestValidator } from './schemas/create-document-request.schema.js'
 import { validate as DocumentValidator } from './schemas/document.schema.js'
 import { validate as ErrorResponseValidator } from './schemas/error-response.schema.js'
 import { validate as GetDocumentsByEntityIdResponseValidator } from './schemas/get-documents-by-entity-id-response.schema.js'
+
+export interface CreateDocumentRequest {
+    /**
+     * The file to be attached for an entity.
+     */
+    file: string
+    /**
+     * The ID or encoded key of the entity that owns the document. The ID or encoded key must belong to the entity indicated by the `entity` parameter. Possible entity types are :`CLIENT`, `GROUP`, `LOAN_PRODUCT`, `SAVINGS_PRODUCT`, `CENTRE`, `BRANCH`, `USER`, `LOAN_ACCOUNT`, `DEPOSIT_ACCOUNT`, `ID_DOCUMENT`, `LINE_OF_CREDIT`, `GL_JOURNAL_ENTRY`. If the entity is `GL_JOURNAL_ENTRY`, the value can also represent the Journal Entry Transaction ID.
+     */
+    id?: string | undefined
+    /**
+     * The name (title) of the attached file.
+     */
+    name?: string | undefined
+    /**
+     * The description of the attached file.
+     */
+    notes?: string | undefined
+    /**
+     * The type of the owner of the document.
+     */
+    ownerType?:
+        | 'CLIENT'
+        | 'GROUP'
+        | 'LOAN_PRODUCT'
+        | 'SAVINGS_PRODUCT'
+        | 'CENTRE'
+        | 'BRANCH'
+        | 'USER'
+        | 'LOAN_ACCOUNT'
+        | 'DEPOSIT_ACCOUNT'
+        | 'ID_DOCUMENT'
+        | 'LINE_OF_CREDIT'
+        | 'GL_JOURNAL_ENTRY'
+        | undefined
+}
+
+export const CreateDocumentRequest = {
+    validate: CreateDocumentRequestValidator as ValidateFunction<CreateDocumentRequest>,
+    get schema() {
+        return CreateDocumentRequest.validate.schema
+    },
+    get errors() {
+        return CreateDocumentRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CreateDocumentRequest => CreateDocumentRequest.validate(o) === true,
+    parse: (o: unknown): { right: CreateDocumentRequest } | { left: DefinedError[] } => {
+        if (CreateDocumentRequest.is(o)) {
+            return { right: o }
+        }
+        return { left: (CreateDocumentRequest.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Holds information regarding the documents uploaded as attachments

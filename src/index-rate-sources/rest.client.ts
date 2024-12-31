@@ -4,11 +4,9 @@
  */
 /* eslint-disable */
 
-import type { IncomingHttpHeaders } from 'node:http'
-
 import type { DefinedError } from 'ajv'
-import { got } from 'got'
-import type { CancelableRequest, Got, Options, OptionsInit, Response } from 'got'
+import ky from 'ky'
+import type { KyInstance, Options, ResponsePromise } from 'ky'
 
 import {
     ErrorResponse,
@@ -22,7 +20,7 @@ import {
  * indexratesources
  */
 export class MambuIndexRateSources {
-    public client: Got
+    public client: KyInstance
 
     public auth: {
         basic?: [username: string, password: string] | (() => Promise<[username: string, password: string]>)
@@ -37,22 +35,26 @@ export class MambuIndexRateSources {
         options,
         auth = {},
         defaultAuth,
+        client = ky,
     }: {
         prefixUrl: string | 'http://localhost:8889/api' | 'https://localhost:8889/api'
-        options?: Options | OptionsInit
+        options?: Options
         auth: {
             basic?: [username: string, password: string] | (() => Promise<[username: string, password: string]>)
             apiKey?: string | (() => Promise<string>)
         }
         defaultAuth?: string[][] | string[]
+        client?: KyInstance
     }) {
-        this.client = got.extend(...[{ prefixUrl, throwHttpErrors: false }, options].filter((o): o is Options => o !== undefined))
+        this.client = client.extend({ prefixUrl, throwHttpErrors: false, ...options })
         this.auth = auth
         this.availableAuth = new Set(Object.keys(auth))
         this.defaultAuth = defaultAuth
     }
 
     /**
+     * POST /indexratesources/{indexRateSourceId}/indexrates
+     *
      * Create index rate
      */
     public createIndexRate({
@@ -72,12 +74,12 @@ export class MambuIndexRateSources {
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
         | FailureResponse<undefined, unknown, 'request:body', undefined>
-        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403'>,
-              string,
+              unknown,
               'response:statuscode',
-              IncomingHttpHeaders
+              Headers
           >
     > {
         const _body = this.validateRequestBody(IndexRate, body)
@@ -87,9 +89,8 @@ export class MambuIndexRateSources {
 
         return this.awaitResponse(
             this.buildClient(auth).post(`indexratesources/${path.indexRateSourceId}/indexrates`, {
-                json: body,
+                json: _body.right,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -98,10 +99,13 @@ export class MambuIndexRateSources {
                 401: ErrorResponse,
                 403: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['createIndexRate']>
     }
 
     /**
+     * POST /indexratesources
+     *
      * Create index rate source
      */
     public createIndexRateSource({
@@ -115,12 +119,12 @@ export class MambuIndexRateSources {
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
         | FailureResponse<undefined, unknown, 'request:body', undefined>
-        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403'>,
-              string,
+              unknown,
               'response:statuscode',
-              IncomingHttpHeaders
+              Headers
           >
     > {
         const _body = this.validateRequestBody(IndexRateSource, body)
@@ -130,9 +134,8 @@ export class MambuIndexRateSources {
 
         return this.awaitResponse(
             this.buildClient(auth).post('indexratesources', {
-                json: body,
+                json: _body.right,
                 headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
-                responseType: 'json',
             }),
             {
                 102: { parse: (x: unknown) => ({ right: x }) },
@@ -141,10 +144,13 @@ export class MambuIndexRateSources {
                 401: ErrorResponse,
                 403: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['createIndexRateSource']>
     }
 
     /**
+     * DELETE /indexratesources/{indexRateSourceId}/indexrates/{indexRateId}
+     *
      * Delete index rate
      */
     public deleteIndexRate({
@@ -156,18 +162,16 @@ export class MambuIndexRateSources {
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
-              IncomingHttpHeaders
+              Headers
           >
     > {
         return this.awaitResponse(
-            this.buildClient(auth).delete(`indexratesources/${path.indexRateSourceId}/indexrates/${path.indexRateId}`, {
-                responseType: 'text',
-            }),
+            this.buildClient(auth).delete(`indexratesources/${path.indexRateSourceId}/indexrates/${path.indexRateId}`, {}),
             {
                 204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
@@ -175,10 +179,13 @@ export class MambuIndexRateSources {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['deleteIndexRate']>
     }
 
     /**
+     * DELETE /indexratesources/{indexRateSourceId}
+     *
      * Delete index rate source
      */
     public deleteIndexRateSource({
@@ -190,18 +197,16 @@ export class MambuIndexRateSources {
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
-              IncomingHttpHeaders
+              Headers
           >
     > {
         return this.awaitResponse(
-            this.buildClient(auth).delete(`indexratesources/${path.indexRateSourceId}`, {
-                responseType: 'text',
-            }),
+            this.buildClient(auth).delete(`indexratesources/${path.indexRateSourceId}`, {}),
             {
                 204: { parse: (x: unknown) => ({ right: x }) },
                 400: ErrorResponse,
@@ -209,10 +214,13 @@ export class MambuIndexRateSources {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'text',
         ) as ReturnType<this['deleteIndexRateSource']>
     }
 
     /**
+     * GET /indexratesources/{indexRateSourceId}/indexrates
+     *
      * Get index rates for a source
      */
     public getAllIndexRates({
@@ -223,18 +231,12 @@ export class MambuIndexRateSources {
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
-        | FailureResponse<
-              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
-              string,
-              'response:statuscode',
-              IncomingHttpHeaders
-          >
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
+        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
     > {
         return this.awaitResponse(
             this.buildClient(auth).get(`indexratesources/${path.indexRateSourceId}/indexrates`, {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: GetAllIndexRatesResponse,
@@ -242,10 +244,13 @@ export class MambuIndexRateSources {
                 401: ErrorResponse,
                 403: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getAllIndexRates']>
     }
 
     /**
+     * GET /indexratesources
+     *
      * Get index rate sources
      */
     public getAllIndexRateSources({
@@ -255,18 +260,12 @@ export class MambuIndexRateSources {
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
-        | FailureResponse<
-              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>,
-              string,
-              'response:statuscode',
-              IncomingHttpHeaders
-          >
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
+        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
     > {
         return this.awaitResponse(
             this.buildClient(auth).get('indexratesources', {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: GetAllIndexRateSourcesResponse,
@@ -274,10 +273,13 @@ export class MambuIndexRateSources {
                 401: ErrorResponse,
                 403: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getAllIndexRateSources']>
     }
 
     /**
+     * GET /indexratesources/{indexRateSourceId}
+     *
      * Get index rate sources
      */
     public getIndexRateSourceById({
@@ -289,18 +291,17 @@ export class MambuIndexRateSources {
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<StatusCode<2>, string, 'response:body', IncomingHttpHeaders>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
         | FailureResponse<
               Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
-              string,
+              unknown,
               'response:statuscode',
-              IncomingHttpHeaders
+              Headers
           >
     > {
         return this.awaitResponse(
             this.buildClient(auth).get(`indexratesources/${path.indexRateSourceId}`, {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
-                responseType: 'json',
             }),
             {
                 200: IndexRateSource,
@@ -309,16 +310,18 @@ export class MambuIndexRateSources {
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
+            'json',
         ) as ReturnType<this['getIndexRateSourceById']>
     }
 
-    public validateRequestBody<Parser extends { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } }, Body>(
-        parser: Parser,
+    public validateRequestBody<Body>(
+        parser: { parse: (o: unknown) => { left: DefinedError[] } | { right: Body } },
         body: unknown,
     ) {
         const _body = parser.parse(body)
         if ('left' in _body) {
             return {
+                success: false as const,
                 statusCode: undefined,
                 status: undefined,
                 headers: undefined,
@@ -332,45 +335,48 @@ export class MambuIndexRateSources {
 
     public async awaitResponse<
         I,
-        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } } | undefined>,
-    >(response: CancelableRequest<Response<I>>, schemas: S) {
+        S extends Record<PropertyKey, { parse: (o: I) => { left: DefinedError[] } | { right: unknown } }>,
+    >(response: ResponsePromise<I>, schemas: S, responseType?: 'json' | 'text') {
+        const _body = (await (responseType !== undefined ? response[responseType]() : response.text())) as I
         const result = await response
         const status =
-            result.statusCode < 200
+            result.status < 200
                 ? 'informational'
-                : result.statusCode < 300
+                : result.status < 300
                   ? 'success'
-                  : result.statusCode < 400
+                  : result.status < 400
                     ? 'redirection'
-                    : result.statusCode < 500
+                    : result.status < 500
                       ? 'client-error'
                       : 'server-error'
-        const validator = schemas[result.statusCode] ?? schemas.default
-        const body = validator?.parse?.(result.body)
-        if (result.statusCode < 200 || result.statusCode >= 300) {
+        const validator = schemas[result.status] ?? schemas.default
+        const body = validator?.parse?.(_body)
+        if (result.status < 200 || result.status >= 300) {
             return {
-                statusCode: result.statusCode.toString(),
+                success: false as const,
+                statusCode: result.status.toString(),
                 status,
                 headers: result.headers,
-                left: body !== undefined && 'right' in body ? body.right : result.body,
+                left: body !== undefined && 'right' in body ? body.right : _body,
                 validationErrors: body !== undefined && 'left' in body ? body.left : undefined,
                 where: 'response:statuscode',
             }
         }
         if (body === undefined || 'left' in body) {
             return {
-                statusCode: result.statusCode.toString(),
+                success: body === undefined,
+                statusCode: result.status.toString(),
                 status,
                 headers: result.headers,
-                left: result.body,
+                left: _body,
                 validationErrors: body?.left,
                 where: 'response:body',
             }
         }
-        return { statusCode: result.statusCode.toString(), status, headers: result.headers, right: result.body }
+        return { success: true as const, statusCode: result.status.toString(), status, headers: result.headers, right: _body }
     }
 
-    protected buildBasicClient(client: Got) {
+    protected buildBasicClient(client: KyInstance) {
         return client.extend({
             hooks: {
                 beforeRequest: [
@@ -378,8 +384,7 @@ export class MambuIndexRateSources {
                         const basic = this.auth.basic
                         if (basic !== undefined) {
                             const [username, password] = typeof basic === 'function' ? await basic() : basic
-                            options.username = username
-                            options.password = password
+                            options.headers.set('Authorization', `Basic ${btoa(`${username}:${password}`)}`)
                         }
                     },
                 ],
@@ -387,21 +392,21 @@ export class MambuIndexRateSources {
         })
     }
 
-    protected buildApiKeyClient(client: Got) {
+    protected buildApiKeyClient(client: KyInstance) {
         return client.extend({
             hooks: {
                 beforeRequest: [
                     async (options) => {
                         const apiKey = this.auth.apiKey
                         const key = typeof apiKey === 'function' ? await apiKey() : apiKey
-                        options.headers.apiKey = key
+                        options.headers.set('apiKey', `${key}`)
                     },
                 ],
             },
         })
     }
 
-    protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client?: Got): Got {
+    protected buildClient(auths: string[][] | string[] | undefined = this.defaultAuth, client?: KyInstance): KyInstance {
         const auth = (auths ?? [...this.availableAuth])
             .map((auth) => (Array.isArray(auth) ? auth : [auth]))
             .filter((auth) => auth.every((a) => this.availableAuth.has(a)))
@@ -429,15 +434,17 @@ export type Status<Major> = Major extends string
               : 'server-error'
     : undefined
 export interface SuccessResponse<StatusCode extends string, T> {
-    statusCode: StatusCode
-    status: Status<StatusCode>
-    headers: IncomingHttpHeaders
-    right: T
-}
-export interface FailureResponse<StatusCode = string, T = unknown, Where = never, Headers = IncomingHttpHeaders> {
+    success: true
     statusCode: StatusCode
     status: Status<StatusCode>
     headers: Headers
+    right: T
+}
+export interface FailureResponse<StatusCode = string, T = unknown, Where = never, HeaderResponse = Headers> {
+    success: false
+    statusCode: StatusCode
+    status: Status<StatusCode>
+    headers: HeaderResponse
     validationErrors: DefinedError[] | undefined
     left: T
     where: Where
