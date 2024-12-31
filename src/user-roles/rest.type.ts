@@ -49,6 +49,10 @@ export interface BaseUserAccess {
     tellerAccess?: boolean | undefined
 }
 
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
+
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -66,9 +70,7 @@ export const ErrorResponse = {
     },
 } as const
 
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
+export type GetAllResponse = Role[]
 
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
@@ -86,8 +88,6 @@ export const GetAllResponse = {
         return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type GetAllResponse = Role[]
 
 /**
  * A single change that needs to be made to a resource
@@ -111,6 +111,8 @@ export interface PatchOperation {
     value?: unknown
 }
 
+export type PatchRequest = PatchOperation[]
+
 export const PatchRequest = {
     validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
@@ -127,8 +129,6 @@ export const PatchRequest = {
         return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type PatchRequest = PatchOperation[]
 
 type Permissions =
     | 'AUDIT_TRANSACTIONS'
@@ -402,23 +402,6 @@ export interface RestError {
     errorSource?: string | undefined
 }
 
-export const Role = {
-    validate: RoleValidator as ValidateFunction<Role>,
-    get schema() {
-        return Role.validate.schema
-    },
-    get errors() {
-        return Role.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Role => Role.validate(o) === true,
-    parse: (o: unknown): { right: Role } | { left: DefinedError[] } => {
-        if (Role.is(o)) {
-            return { right: o }
-        }
-        return { left: (Role.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents a user role.
  */
@@ -449,3 +432,20 @@ export interface Role {
      */
     notes?: string | undefined
 }
+
+export const Role = {
+    validate: RoleValidator as ValidateFunction<Role>,
+    get schema() {
+        return Role.validate.schema
+    },
+    get errors() {
+        return Role.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Role => Role.validate(o) === true,
+    parse: (o: unknown): { right: Role } | { left: DefinedError[] } => {
+        if (Role.is(o)) {
+            return { right: o }
+        }
+        return { left: (Role.errors ?? []) as DefinedError[] }
+    },
+} as const

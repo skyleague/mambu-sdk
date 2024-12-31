@@ -345,23 +345,6 @@ export interface CustomPaymentAmount {
     taxOnAmount?: number | undefined
 }
 
-export const DisbursementLoanTransactionInput = {
-    validate: DisbursementLoanTransactionInputValidator as ValidateFunction<DisbursementLoanTransactionInput>,
-    get schema() {
-        return DisbursementLoanTransactionInput.validate.schema
-    },
-    get errors() {
-        return DisbursementLoanTransactionInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is DisbursementLoanTransactionInput => DisbursementLoanTransactionInput.validate(o) === true,
-    parse: (o: unknown): { right: DisbursementLoanTransactionInput } | { left: DefinedError[] } => {
-        if (DisbursementLoanTransactionInput.is(o)) {
-            return { right: o }
-        }
-        return { left: (DisbursementLoanTransactionInput.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * The input representation of a loan transaction when making a disbursement
  */
@@ -406,6 +389,23 @@ export interface DisbursementLoanTransactionInput {
     valueDate?: string | undefined
 }
 
+export const DisbursementLoanTransactionInput = {
+    validate: DisbursementLoanTransactionInputValidator as ValidateFunction<DisbursementLoanTransactionInput>,
+    get schema() {
+        return DisbursementLoanTransactionInput.validate.schema
+    },
+    get errors() {
+        return DisbursementLoanTransactionInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is DisbursementLoanTransactionInput => DisbursementLoanTransactionInput.validate(o) === true,
+    parse: (o: unknown): { right: DisbursementLoanTransactionInput } | { left: DefinedError[] } => {
+        if (DisbursementLoanTransactionInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (DisbursementLoanTransactionInput.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Represents the input for the transfer details for a disbursement transaction
  */
@@ -418,6 +418,10 @@ export interface DisbursementTransferDetailsInput {
      * The encoded key of the linked deposit account
      */
     linkedAccountKey?: string | undefined
+}
+
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
@@ -436,10 +440,6 @@ export const ErrorResponse = {
         return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
 
 /**
  * An amount of predefined fee that was applied or paid on an account.
@@ -497,23 +497,6 @@ export interface FeeInput {
     predefinedFeeKey: string
 }
 
-export const FeeLoanTransactionInput = {
-    validate: FeeLoanTransactionInputValidator as ValidateFunction<FeeLoanTransactionInput>,
-    get schema() {
-        return FeeLoanTransactionInput.validate.schema
-    },
-    get errors() {
-        return FeeLoanTransactionInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is FeeLoanTransactionInput => FeeLoanTransactionInput.validate(o) === true,
-    parse: (o: unknown): { right: FeeLoanTransactionInput } | { left: DefinedError[] } => {
-        if (FeeLoanTransactionInput.is(o)) {
-            return { right: o }
-        }
-        return { left: (FeeLoanTransactionInput.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents the request payload for creating a transaction of type FEE_APPLIED
  */
@@ -556,6 +539,25 @@ export interface FeeLoanTransactionInput {
     valueDate?: string | undefined
 }
 
+export const FeeLoanTransactionInput = {
+    validate: FeeLoanTransactionInputValidator as ValidateFunction<FeeLoanTransactionInput>,
+    get schema() {
+        return FeeLoanTransactionInput.validate.schema
+    },
+    get errors() {
+        return FeeLoanTransactionInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is FeeLoanTransactionInput => FeeLoanTransactionInput.validate(o) === true,
+    parse: (o: unknown): { right: FeeLoanTransactionInput } | { left: DefinedError[] } => {
+        if (FeeLoanTransactionInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (FeeLoanTransactionInput.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+export type GetAllResponse = LoanTransaction[]
+
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
@@ -573,7 +575,7 @@ export const GetAllResponse = {
     },
 } as const
 
-export type GetAllResponse = LoanTransaction[]
+export type GetTransactionsForAllVersionsResponse = LoanTransaction[]
 
 export const GetTransactionsForAllVersionsResponse = {
     validate: GetTransactionsForAllVersionsResponseValidator as ValidateFunction<GetTransactionsForAllVersionsResponse>,
@@ -591,8 +593,6 @@ export const GetTransactionsForAllVersionsResponse = {
         return { left: (GetTransactionsForAllVersionsResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type GetTransactionsForAllVersionsResponse = LoanTransaction[]
 
 /**
  * The amounts affected after completing the loan transaction
@@ -654,23 +654,6 @@ export interface LoanTerms {
      */
     principalPaymentPercentage?: number | undefined
 }
-
-export const LoanTransaction = {
-    validate: LoanTransactionValidator as ValidateFunction<LoanTransaction>,
-    get schema() {
-        return LoanTransaction.validate.schema
-    },
-    get errors() {
-        return LoanTransaction.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanTransaction => LoanTransaction.validate(o) === true,
-    parse: (o: unknown): { right: LoanTransaction } | { left: DefinedError[] } => {
-        if (LoanTransaction.is(o)) {
-            return { right: o }
-        }
-        return { left: (LoanTransaction.errors ?? []) as DefinedError[] }
-    },
-} as const
 
 /**
  * Represents the action performed on a loan account after which the account's amount changes its value.
@@ -850,20 +833,20 @@ export interface LoanTransaction {
     valueDate?: string | undefined
 }
 
-export const LoanTransactionAdjustmentDetails = {
-    validate: LoanTransactionAdjustmentDetailsValidator as ValidateFunction<LoanTransactionAdjustmentDetails>,
+export const LoanTransaction = {
+    validate: LoanTransactionValidator as ValidateFunction<LoanTransaction>,
     get schema() {
-        return LoanTransactionAdjustmentDetails.validate.schema
+        return LoanTransaction.validate.schema
     },
     get errors() {
-        return LoanTransactionAdjustmentDetails.validate.errors ?? undefined
+        return LoanTransaction.validate.errors ?? undefined
     },
-    is: (o: unknown): o is LoanTransactionAdjustmentDetails => LoanTransactionAdjustmentDetails.validate(o) === true,
-    parse: (o: unknown): { right: LoanTransactionAdjustmentDetails } | { left: DefinedError[] } => {
-        if (LoanTransactionAdjustmentDetails.is(o)) {
+    is: (o: unknown): o is LoanTransaction => LoanTransaction.validate(o) === true,
+    parse: (o: unknown): { right: LoanTransaction } | { left: DefinedError[] } => {
+        if (LoanTransaction.is(o)) {
             return { right: o }
         }
-        return { left: (LoanTransactionAdjustmentDetails.errors ?? []) as DefinedError[] }
+        return { left: (LoanTransaction.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -884,6 +867,23 @@ export interface LoanTransactionAdjustmentDetails {
      */
     notes: string
 }
+
+export const LoanTransactionAdjustmentDetails = {
+    validate: LoanTransactionAdjustmentDetailsValidator as ValidateFunction<LoanTransactionAdjustmentDetails>,
+    get schema() {
+        return LoanTransactionAdjustmentDetails.validate.schema
+    },
+    get errors() {
+        return LoanTransactionAdjustmentDetails.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is LoanTransactionAdjustmentDetails => LoanTransactionAdjustmentDetails.validate(o) === true,
+    parse: (o: unknown): { right: LoanTransactionAdjustmentDetails } | { left: DefinedError[] } => {
+        if (LoanTransactionAdjustmentDetails.is(o)) {
+            return { right: o }
+        }
+        return { left: (LoanTransactionAdjustmentDetails.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Contains the details about transaction including fields like transaction channel key and channel ID
@@ -910,6 +910,7 @@ export interface LoanTransactionFilterCriteria {
         | 'creationDate'
         | 'valueDate'
         | 'parentAccountKey'
+        | 'parentAccountHolderKey'
         | 'productTypeKey'
         | 'productID'
         | 'type'
@@ -1010,6 +1011,17 @@ export interface LoanTransactionFilterCriteria {
     values?: string[] | undefined
 }
 
+/**
+ * Represents the filtering and sorting criteria when searching loan transactions.
+ */
+export interface LoanTransactionSearchCriteria {
+    /**
+     * The list of filtering criteria.
+     */
+    filterCriteria?: LoanTransactionFilterCriteria[] | undefined
+    sortingCriteria?: LoanTransactionSortingCriteria | undefined
+}
+
 export const LoanTransactionSearchCriteria = {
     validate: LoanTransactionSearchCriteriaValidator as ValidateFunction<LoanTransactionSearchCriteria>,
     get schema() {
@@ -1026,17 +1038,6 @@ export const LoanTransactionSearchCriteria = {
         return { left: (LoanTransactionSearchCriteria.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Represents the filtering and sorting criteria when searching loan transactions.
- */
-export interface LoanTransactionSearchCriteria {
-    /**
-     * The list of filtering criteria.
-     */
-    filterCriteria?: LoanTransactionFilterCriteria[] | undefined
-    sortingCriteria?: LoanTransactionSortingCriteria | undefined
-}
 
 /**
  * The sorting criteria used for when searching loan transactions.
@@ -1082,23 +1083,6 @@ export interface LoanTransactionSortingCriteria {
     order?: 'ASC' | 'DESC' | undefined
 }
 
-export const LockLoanAccountInput = {
-    validate: LockLoanAccountInputValidator as ValidateFunction<LockLoanAccountInput>,
-    get schema() {
-        return LockLoanAccountInput.validate.schema
-    },
-    get errors() {
-        return LockLoanAccountInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LockLoanAccountInput => LockLoanAccountInput.validate(o) === true,
-    parse: (o: unknown): { right: LockLoanAccountInput } | { left: DefinedError[] } => {
-        if (LockLoanAccountInput.is(o)) {
-            return { right: o }
-        }
-        return { left: (LockLoanAccountInput.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents the information for locking an account.
  */
@@ -1117,6 +1101,33 @@ export interface LockLoanAccountInput {
     notes?: string | undefined
 }
 
+export const LockLoanAccountInput = {
+    validate: LockLoanAccountInputValidator as ValidateFunction<LockLoanAccountInput>,
+    get schema() {
+        return LockLoanAccountInput.validate.schema
+    },
+    get errors() {
+        return LockLoanAccountInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is LockLoanAccountInput => LockLoanAccountInput.validate(o) === true,
+    parse: (o: unknown): { right: LockLoanAccountInput } | { left: DefinedError[] } => {
+        if (LockLoanAccountInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (LockLoanAccountInput.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+/**
+ * Represents a wrapper over a list of loan transactions, to be used when locking and unlocking an account.
+ */
+export interface LockLoanTransactionsWrapper {
+    /**
+     * The list of loan transactions
+     */
+    loanTransactions?: LoanTransaction[] | undefined
+}
+
 export const LockLoanTransactionsWrapper = {
     validate: LockLoanTransactionsWrapperValidator as ValidateFunction<LockLoanTransactionsWrapper>,
     get schema() {
@@ -1131,33 +1142,6 @@ export const LockLoanTransactionsWrapper = {
             return { right: o }
         }
         return { left: (LockLoanTransactionsWrapper.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-/**
- * Represents a wrapper over a list of loan transactions, to be used when locking and unlocking an account.
- */
-export interface LockLoanTransactionsWrapper {
-    /**
-     * The list of loan transactions
-     */
-    loanTransactions?: LoanTransaction[] | undefined
-}
-
-export const PaymentMadeTransactionInput = {
-    validate: PaymentMadeTransactionInputValidator as ValidateFunction<PaymentMadeTransactionInput>,
-    get schema() {
-        return PaymentMadeTransactionInput.validate.schema
-    },
-    get errors() {
-        return PaymentMadeTransactionInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PaymentMadeTransactionInput => PaymentMadeTransactionInput.validate(o) === true,
-    parse: (o: unknown): { right: PaymentMadeTransactionInput } | { left: DefinedError[] } => {
-        if (PaymentMadeTransactionInput.is(o)) {
-            return { right: o }
-        }
-        return { left: (PaymentMadeTransactionInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -1192,20 +1176,20 @@ export interface PaymentMadeTransactionInput {
     valueDate?: string | undefined
 }
 
-export const RedrawRepaymentTransactionInputDTO = {
-    validate: RedrawRepaymentTransactionInputDTOValidator as ValidateFunction<RedrawRepaymentTransactionInputDTO>,
+export const PaymentMadeTransactionInput = {
+    validate: PaymentMadeTransactionInputValidator as ValidateFunction<PaymentMadeTransactionInput>,
     get schema() {
-        return RedrawRepaymentTransactionInputDTO.validate.schema
+        return PaymentMadeTransactionInput.validate.schema
     },
     get errors() {
-        return RedrawRepaymentTransactionInputDTO.validate.errors ?? undefined
+        return PaymentMadeTransactionInput.validate.errors ?? undefined
     },
-    is: (o: unknown): o is RedrawRepaymentTransactionInputDTO => RedrawRepaymentTransactionInputDTO.validate(o) === true,
-    parse: (o: unknown): { right: RedrawRepaymentTransactionInputDTO } | { left: DefinedError[] } => {
-        if (RedrawRepaymentTransactionInputDTO.is(o)) {
+    is: (o: unknown): o is PaymentMadeTransactionInput => PaymentMadeTransactionInput.validate(o) === true,
+    parse: (o: unknown): { right: PaymentMadeTransactionInput } | { left: DefinedError[] } => {
+        if (PaymentMadeTransactionInput.is(o)) {
             return { right: o }
         }
-        return { left: (RedrawRepaymentTransactionInputDTO.errors ?? []) as DefinedError[] }
+        return { left: (PaymentMadeTransactionInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -1231,20 +1215,20 @@ export interface RedrawRepaymentTransactionInputDTO {
     valueDate?: string | undefined
 }
 
-export const RefundLoanTransactionInput = {
-    validate: RefundLoanTransactionInputValidator as ValidateFunction<RefundLoanTransactionInput>,
+export const RedrawRepaymentTransactionInputDTO = {
+    validate: RedrawRepaymentTransactionInputDTOValidator as ValidateFunction<RedrawRepaymentTransactionInputDTO>,
     get schema() {
-        return RefundLoanTransactionInput.validate.schema
+        return RedrawRepaymentTransactionInputDTO.validate.schema
     },
     get errors() {
-        return RefundLoanTransactionInput.validate.errors ?? undefined
+        return RedrawRepaymentTransactionInputDTO.validate.errors ?? undefined
     },
-    is: (o: unknown): o is RefundLoanTransactionInput => RefundLoanTransactionInput.validate(o) === true,
-    parse: (o: unknown): { right: RefundLoanTransactionInput } | { left: DefinedError[] } => {
-        if (RefundLoanTransactionInput.is(o)) {
+    is: (o: unknown): o is RedrawRepaymentTransactionInputDTO => RedrawRepaymentTransactionInputDTO.validate(o) === true,
+    parse: (o: unknown): { right: RedrawRepaymentTransactionInputDTO } | { left: DefinedError[] } => {
+        if (RedrawRepaymentTransactionInputDTO.is(o)) {
             return { right: o }
         }
-        return { left: (RefundLoanTransactionInput.errors ?? []) as DefinedError[] }
+        return { left: (RedrawRepaymentTransactionInputDTO.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -1279,20 +1263,20 @@ export interface RefundLoanTransactionInput {
     valueDate?: string | undefined
 }
 
-export const RepaymentLoanTransactionInput = {
-    validate: RepaymentLoanTransactionInputValidator as ValidateFunction<RepaymentLoanTransactionInput>,
+export const RefundLoanTransactionInput = {
+    validate: RefundLoanTransactionInputValidator as ValidateFunction<RefundLoanTransactionInput>,
     get schema() {
-        return RepaymentLoanTransactionInput.validate.schema
+        return RefundLoanTransactionInput.validate.schema
     },
     get errors() {
-        return RepaymentLoanTransactionInput.validate.errors ?? undefined
+        return RefundLoanTransactionInput.validate.errors ?? undefined
     },
-    is: (o: unknown): o is RepaymentLoanTransactionInput => RepaymentLoanTransactionInput.validate(o) === true,
-    parse: (o: unknown): { right: RepaymentLoanTransactionInput } | { left: DefinedError[] } => {
-        if (RepaymentLoanTransactionInput.is(o)) {
+    is: (o: unknown): o is RefundLoanTransactionInput => RefundLoanTransactionInput.validate(o) === true,
+    parse: (o: unknown): { right: RefundLoanTransactionInput } | { left: DefinedError[] } => {
+        if (RefundLoanTransactionInput.is(o)) {
             return { right: o }
         }
-        return { left: (RepaymentLoanTransactionInput.errors ?? []) as DefinedError[] }
+        return { left: (RefundLoanTransactionInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -1348,11 +1332,30 @@ export interface RepaymentLoanTransactionInput {
     valueDate?: string | undefined
 }
 
+export const RepaymentLoanTransactionInput = {
+    validate: RepaymentLoanTransactionInputValidator as ValidateFunction<RepaymentLoanTransactionInput>,
+    get schema() {
+        return RepaymentLoanTransactionInput.validate.schema
+    },
+    get errors() {
+        return RepaymentLoanTransactionInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is RepaymentLoanTransactionInput => RepaymentLoanTransactionInput.validate(o) === true,
+    parse: (o: unknown): { right: RepaymentLoanTransactionInput } | { left: DefinedError[] } => {
+        if (RepaymentLoanTransactionInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (RepaymentLoanTransactionInput.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 export interface RestError {
     errorCode?: number | undefined
     errorReason?: string | undefined
     errorSource?: string | undefined
 }
+
+export type SearchResponse = LoanTransaction[]
 
 export const SearchResponse = {
     validate: SearchResponseValidator as ValidateFunction<SearchResponse>,
@@ -1370,8 +1373,6 @@ export const SearchResponse = {
         return { left: (SearchResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type SearchResponse = LoanTransaction[]
 
 /**
  * The taxes applied within a transaction.
@@ -1493,6 +1494,16 @@ export interface TransferDetails {
     linkedLoanTransactionKey?: string | undefined
 }
 
+/**
+ * Represents the request payload for unlocking an account
+ */
+export interface UnlockLoanAccountInput {
+    /**
+     * Extra notes about the current unlocking of account
+     */
+    notes?: string | undefined
+}
+
 export const UnlockLoanAccountInput = {
     validate: UnlockLoanAccountInputValidator as ValidateFunction<UnlockLoanAccountInput>,
     get schema() {
@@ -1507,33 +1518,6 @@ export const UnlockLoanAccountInput = {
             return { right: o }
         }
         return { left: (UnlockLoanAccountInput.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-/**
- * Represents the request payload for unlocking an account
- */
-export interface UnlockLoanAccountInput {
-    /**
-     * Extra notes about the current unlocking of account
-     */
-    notes?: string | undefined
-}
-
-export const WithdrawalRedrawTransactionInput = {
-    validate: WithdrawalRedrawTransactionInputValidator as ValidateFunction<WithdrawalRedrawTransactionInput>,
-    get schema() {
-        return WithdrawalRedrawTransactionInput.validate.schema
-    },
-    get errors() {
-        return WithdrawalRedrawTransactionInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is WithdrawalRedrawTransactionInput => WithdrawalRedrawTransactionInput.validate(o) === true,
-    parse: (o: unknown): { right: WithdrawalRedrawTransactionInput } | { left: DefinedError[] } => {
-        if (WithdrawalRedrawTransactionInput.is(o)) {
-            return { right: o }
-        }
-        return { left: (WithdrawalRedrawTransactionInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -1567,3 +1551,20 @@ export interface WithdrawalRedrawTransactionInput {
      */
     valueDate?: string | undefined
 }
+
+export const WithdrawalRedrawTransactionInput = {
+    validate: WithdrawalRedrawTransactionInputValidator as ValidateFunction<WithdrawalRedrawTransactionInput>,
+    get schema() {
+        return WithdrawalRedrawTransactionInput.validate.schema
+    },
+    get errors() {
+        return WithdrawalRedrawTransactionInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is WithdrawalRedrawTransactionInput => WithdrawalRedrawTransactionInput.validate(o) === true,
+    parse: (o: unknown): { right: WithdrawalRedrawTransactionInput } | { left: DefinedError[] } => {
+        if (WithdrawalRedrawTransactionInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (WithdrawalRedrawTransactionInput.errors ?? []) as DefinedError[] }
+    },
+} as const

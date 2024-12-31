@@ -11,6 +11,10 @@ import { validate as ExchangeRateInputValidator } from './schemas/exchange-rate-
 import { validate as ExchangeRateValidator } from './schemas/exchange-rate.schema.js'
 import { validate as GetAllResponseValidator } from './schemas/get-all-response.schema.js'
 
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
+
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -25,27 +29,6 @@ export const ErrorResponse = {
             return { right: o }
         }
         return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
-
-export const ExchangeRate = {
-    validate: ExchangeRateValidator as ValidateFunction<ExchangeRate>,
-    get schema() {
-        return ExchangeRate.validate.schema
-    },
-    get errors() {
-        return ExchangeRate.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ExchangeRate => ExchangeRate.validate(o) === true,
-    parse: (o: unknown): { right: ExchangeRate } | { left: DefinedError[] } => {
-        if (ExchangeRate.is(o)) {
-            return { right: o }
-        }
-        return { left: (ExchangeRate.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -83,20 +66,20 @@ export interface ExchangeRate {
     userKey?: string | undefined
 }
 
-export const ExchangeRateInput = {
-    validate: ExchangeRateInputValidator as ValidateFunction<ExchangeRateInput>,
+export const ExchangeRate = {
+    validate: ExchangeRateValidator as ValidateFunction<ExchangeRate>,
     get schema() {
-        return ExchangeRateInput.validate.schema
+        return ExchangeRate.validate.schema
     },
     get errors() {
-        return ExchangeRateInput.validate.errors ?? undefined
+        return ExchangeRate.validate.errors ?? undefined
     },
-    is: (o: unknown): o is ExchangeRateInput => ExchangeRateInput.validate(o) === true,
-    parse: (o: unknown): { right: ExchangeRateInput } | { left: DefinedError[] } => {
-        if (ExchangeRateInput.is(o)) {
+    is: (o: unknown): o is ExchangeRate => ExchangeRate.validate(o) === true,
+    parse: (o: unknown): { right: ExchangeRate } | { left: DefinedError[] } => {
+        if (ExchangeRate.is(o)) {
             return { right: o }
         }
-        return { left: (ExchangeRateInput.errors ?? []) as DefinedError[] }
+        return { left: (ExchangeRate.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -118,6 +101,25 @@ export interface ExchangeRateInput {
     startDate?: string | undefined
 }
 
+export const ExchangeRateInput = {
+    validate: ExchangeRateInputValidator as ValidateFunction<ExchangeRateInput>,
+    get schema() {
+        return ExchangeRateInput.validate.schema
+    },
+    get errors() {
+        return ExchangeRateInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ExchangeRateInput => ExchangeRateInput.validate(o) === true,
+    parse: (o: unknown): { right: ExchangeRateInput } | { left: DefinedError[] } => {
+        if (ExchangeRateInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (ExchangeRateInput.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+export type GetAllResponse = ExchangeRate[]
+
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
@@ -134,8 +136,6 @@ export const GetAllResponse = {
         return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type GetAllResponse = ExchangeRate[]
 
 export interface RestError {
     errorCode?: number | undefined

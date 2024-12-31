@@ -79,23 +79,6 @@ export interface AccountArrearsSettings {
     tolerancePeriod?: number | undefined
 }
 
-export const AccountAuthorizationHold = {
-    validate: AccountAuthorizationHoldValidator as ValidateFunction<AccountAuthorizationHold>,
-    get schema() {
-        return AccountAuthorizationHold.validate.schema
-    },
-    get errors() {
-        return AccountAuthorizationHold.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is AccountAuthorizationHold => AccountAuthorizationHold.validate(o) === true,
-    parse: (o: unknown): { right: AccountAuthorizationHold } | { left: DefinedError[] } => {
-        if (AccountAuthorizationHold.is(o)) {
-            return { right: o }
-        }
-        return { left: (AccountAuthorizationHold.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * The account authorization hold corresponding to a deposit account
  */
@@ -158,6 +141,23 @@ export interface AccountAuthorizationHold {
      */
     userTransactionTime?: string | undefined
 }
+
+export const AccountAuthorizationHold = {
+    validate: AccountAuthorizationHoldValidator as ValidateFunction<AccountAuthorizationHold>,
+    get schema() {
+        return AccountAuthorizationHold.validate.schema
+    },
+    get errors() {
+        return AccountAuthorizationHold.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is AccountAuthorizationHold => AccountAuthorizationHold.validate(o) === true,
+    parse: (o: unknown): { right: AccountAuthorizationHold } | { left: DefinedError[] } => {
+        if (AccountAuthorizationHold.is(o)) {
+            return { right: o }
+        }
+        return { left: (AccountAuthorizationHold.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Account balances presented to inquirer such as card processor
@@ -307,23 +307,6 @@ export interface AmountWithReduced {
     reduced?: number | undefined
 }
 
-export const ApplyInterestInput = {
-    validate: ApplyInterestInputValidator as ValidateFunction<ApplyInterestInput>,
-    get schema() {
-        return ApplyInterestInput.validate.schema
-    },
-    get errors() {
-        return ApplyInterestInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ApplyInterestInput => ApplyInterestInput.validate(o) === true,
-    parse: (o: unknown): { right: ApplyInterestInput } | { left: DefinedError[] } => {
-        if (ApplyInterestInput.is(o)) {
-            return { right: o }
-        }
-        return { left: (ApplyInterestInput.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents a request for applying the accrued interest
  */
@@ -349,6 +332,23 @@ export interface ApplyInterestInput {
      */
     paymentHolidaysInterestAmount?: number | undefined
 }
+
+export const ApplyInterestInput = {
+    validate: ApplyInterestInputValidator as ValidateFunction<ApplyInterestInput>,
+    get schema() {
+        return ApplyInterestInput.validate.schema
+    },
+    get errors() {
+        return ApplyInterestInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ApplyInterestInput => ApplyInterestInput.validate(o) === true,
+    parse: (o: unknown): { right: ApplyInterestInput } | { left: DefinedError[] } => {
+        if (ApplyInterestInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (ApplyInterestInput.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Asset, holds information about a client asset entry.
@@ -469,23 +469,6 @@ export interface BillingCycleDays {
     days?: number[] | undefined
 }
 
-export const BlockFund = {
-    validate: BlockFundValidator as ValidateFunction<BlockFund>,
-    get schema() {
-        return BlockFund.validate.schema
-    },
-    get errors() {
-        return BlockFund.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is BlockFund => BlockFund.validate(o) === true,
-    parse: (o: unknown): { right: BlockFund } | { left: DefinedError[] } => {
-        if (BlockFund.is(o)) {
-            return { right: o }
-        }
-        return { left: (BlockFund.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents the block fund amount that can be later seized on the account
  */
@@ -524,6 +507,23 @@ export interface BlockFund {
     state?: 'PENDING' | 'SEIZED' | 'REMOVED' | 'PARTIALLY_SEIZED' | undefined
 }
 
+export const BlockFund = {
+    validate: BlockFundValidator as ValidateFunction<BlockFund>,
+    get schema() {
+        return BlockFund.validate.schema
+    },
+    get errors() {
+        return BlockFund.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is BlockFund => BlockFund.validate(o) === true,
+    parse: (o: unknown): { right: BlockFund } | { left: DefinedError[] } => {
+        if (BlockFund.is(o)) {
+            return { right: o }
+        }
+        return { left: (BlockFund.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Represents the filter to be used for selecting the accounts to which new interest availability settings will be pushed. One of the 2 fields: productId or ids should be supplied
  */
@@ -536,6 +536,14 @@ export interface BulkInterestAccountSettingsAvailabilityFilter {
      * Product id to be used for selecting all accounts that should be processed
      */
     productId?: string | undefined
+}
+
+/**
+ * Represents the bulk payload for storing interest availabilities to a group of accounts
+ */
+export interface BulkInterestAccountSettingsAvailabilityInput {
+    accountFilter: BulkInterestAccountSettingsAvailabilityFilter
+    interestAvailability: InterestAccountSettingsAvailability
 }
 
 export const BulkInterestAccountSettingsAvailabilityInput = {
@@ -558,11 +566,13 @@ export const BulkInterestAccountSettingsAvailabilityInput = {
 } as const
 
 /**
- * Represents the bulk payload for storing interest availabilities to a group of accounts
+ * Returns a card that can be associated to a deposit or loan  account. Cards consist only of card reference tokens and the card details are not stored in Mambu.
  */
-export interface BulkInterestAccountSettingsAvailabilityInput {
-    accountFilter: BulkInterestAccountSettingsAvailabilityFilter
-    interestAvailability: InterestAccountSettingsAvailability
+export interface Card {
+    /**
+     * The card's reference token.
+     */
+    referenceToken: string
 }
 
 export const Card = {
@@ -581,16 +591,6 @@ export const Card = {
         return { left: (Card.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Returns a card that can be associated to a deposit or loan  account. Cards consist only of card reference tokens and the card details are not stored in Mambu.
- */
-export interface Card {
-    /**
-     * The card's reference token.
-     */
-    referenceToken: string
-}
 
 /**
  * The details of the card acceptor (merchant) in a transaction hold.
@@ -626,23 +626,6 @@ export interface CardAcceptor {
     zip?: string | undefined
 }
 
-export const ChangeInterestRateAction = {
-    validate: ChangeInterestRateActionValidator as ValidateFunction<ChangeInterestRateAction>,
-    get schema() {
-        return ChangeInterestRateAction.validate.schema
-    },
-    get errors() {
-        return ChangeInterestRateAction.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ChangeInterestRateAction => ChangeInterestRateAction.validate(o) === true,
-    parse: (o: unknown): { right: ChangeInterestRateAction } | { left: DefinedError[] } => {
-        if (ChangeInterestRateAction.is(o)) {
-            return { right: o }
-        }
-        return { left: (ChangeInterestRateAction.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Change deposit account interest rate
  */
@@ -661,6 +644,33 @@ export interface ChangeInterestRateAction {
     valueDate: string
 }
 
+export const ChangeInterestRateAction = {
+    validate: ChangeInterestRateActionValidator as ValidateFunction<ChangeInterestRateAction>,
+    get schema() {
+        return ChangeInterestRateAction.validate.schema
+    },
+    get errors() {
+        return ChangeInterestRateAction.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ChangeInterestRateAction => ChangeInterestRateAction.validate(o) === true,
+    parse: (o: unknown): { right: ChangeInterestRateAction } | { left: DefinedError[] } => {
+        if (ChangeInterestRateAction.is(o)) {
+            return { right: o }
+        }
+        return { left: (ChangeInterestRateAction.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+/**
+ * Change deposit account withholding tax rate
+ */
+export interface ChangeWithholdingTaxAction {
+    /**
+     * The ID or encoded key of the new withholding tax to use for the account.
+     */
+    withholdingTaxSourceKey: string
+}
+
 export const ChangeWithholdingTaxAction = {
     validate: ChangeWithholdingTaxActionValidator as ValidateFunction<ChangeWithholdingTaxAction>,
     get schema() {
@@ -677,16 +687,6 @@ export const ChangeWithholdingTaxAction = {
         return { left: (ChangeWithholdingTaxAction.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Change deposit account withholding tax rate
- */
-export interface ChangeWithholdingTaxAction {
-    /**
-     * The ID or encoded key of the new withholding tax to use for the account.
-     */
-    withholdingTaxSourceKey: string
-}
 
 /**
  * Represents a currency eg. USD, EUR.
@@ -928,23 +928,6 @@ export interface DaysInMonth {
     shortMonthHandlingMethod?: 'LAST_DAY_IN_MONTH' | 'FIRST_DAY_OF_NEXT_MONTH' | undefined
 }
 
-export const DepositAccount = {
-    validate: DepositAccountValidator as ValidateFunction<DepositAccount>,
-    get schema() {
-        return DepositAccount.validate.schema
-    },
-    get errors() {
-        return DepositAccount.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is DepositAccount => DepositAccount.validate(o) === true,
-    parse: (o: unknown): { right: DepositAccount } | { left: DefinedError[] } => {
-        if (DepositAccount.is(o)) {
-            return { right: o }
-        }
-        return { left: (DepositAccount.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents information about a deposit account.
  */
@@ -1093,6 +1076,23 @@ export interface DepositAccount {
     withholdingTaxSourceKey?: string | undefined
 }
 
+export const DepositAccount = {
+    validate: DepositAccountValidator as ValidateFunction<DepositAccount>,
+    get schema() {
+        return DepositAccount.validate.schema
+    },
+    get errors() {
+        return DepositAccount.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is DepositAccount => DepositAccount.validate(o) === true,
+    parse: (o: unknown): { right: DepositAccount } | { left: DefinedError[] } => {
+        if (DepositAccount.is(o)) {
+            return { right: o }
+        }
+        return { left: (DepositAccount.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Represents information about the accrued amounts of deposit accounts.
  */
@@ -1115,6 +1115,20 @@ export interface DepositAccountAccruedAmounts {
     technicalOverdraftInterestAccrued?: number | undefined
 }
 
+/**
+ * Represents the action details for a deposit account.
+ */
+export interface DepositAccountAction {
+    /**
+     * The action type to be applied.
+     */
+    action: 'APPROVE' | 'UNDO_APPROVE' | 'LOCK' | 'UNLOCK' | 'CLOSE' | 'CLOSE_WITHDRAW' | 'CLOSE_REJECT' | 'CLOSE_WRITE_OFF'
+    /**
+     * The notes related to the action performed.
+     */
+    notes?: string | undefined
+}
+
 export const DepositAccountAction = {
     validate: DepositAccountActionValidator as ValidateFunction<DepositAccountAction>,
     get schema() {
@@ -1131,20 +1145,6 @@ export const DepositAccountAction = {
         return { left: (DepositAccountAction.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Represents the action details for a deposit account.
- */
-export interface DepositAccountAction {
-    /**
-     * The action type to be applied.
-     */
-    action: 'APPROVE' | 'UNDO_APPROVE' | 'LOCK' | 'UNLOCK' | 'CLOSE' | 'CLOSE_WITHDRAW' | 'CLOSE_REJECT' | 'CLOSE_WRITE_OFF'
-    /**
-     * The notes related to the action performed.
-     */
-    notes?: string | undefined
-}
 
 /**
  * Represents information about the balances of a deposit account.
@@ -1561,6 +1561,17 @@ export interface DepositAccountOwnershipHistory {
     transferDate?: string | undefined
 }
 
+/**
+ * Represents the filtering criteria list and the sorting criteria for searching deposit accounts.
+ */
+export interface DepositAccountSearchCriteria {
+    /**
+     * The list of filtering criteria.
+     */
+    filterCriteria?: DepositAccountFilterCriteria[] | undefined
+    sortingCriteria?: DepositAccountSortingCriteria | undefined
+}
+
 export const DepositAccountSearchCriteria = {
     validate: DepositAccountSearchCriteriaValidator as ValidateFunction<DepositAccountSearchCriteria>,
     get schema() {
@@ -1577,17 +1588,6 @@ export const DepositAccountSearchCriteria = {
         return { left: (DepositAccountSearchCriteria.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Represents the filtering criteria list and the sorting criteria for searching deposit accounts.
- */
-export interface DepositAccountSearchCriteria {
-    /**
-     * The list of filtering criteria.
-     */
-    filterCriteria?: DepositAccountFilterCriteria[] | undefined
-    sortingCriteria?: DepositAccountSortingCriteria | undefined
-}
 
 /**
  * The sorting criteria used for searching deposit accounts.
@@ -1683,6 +1683,10 @@ export interface DisbursementDetails {
     transactionDetails?: LoanTransactionDetails | undefined
 }
 
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
+
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -1699,10 +1703,6 @@ export const ErrorResponse = {
         return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
 
 /**
  * Represents a fee amount.
@@ -1726,6 +1726,8 @@ export interface FeeAmount {
     paid?: number | undefined
 }
 
+export type GetAllAuthorizationHoldsResponse = GetAuthorizationHold[]
+
 export const GetAllAuthorizationHoldsResponse = {
     validate: GetAllAuthorizationHoldsResponseValidator as ValidateFunction<GetAllAuthorizationHoldsResponse>,
     get schema() {
@@ -1743,7 +1745,7 @@ export const GetAllAuthorizationHoldsResponse = {
     },
 } as const
 
-export type GetAllAuthorizationHoldsResponse = GetAuthorizationHold[]
+export type GetAllBlocksResponse = BlockFund[]
 
 export const GetAllBlocksResponse = {
     validate: GetAllBlocksResponseValidator as ValidateFunction<GetAllBlocksResponse>,
@@ -1762,7 +1764,7 @@ export const GetAllBlocksResponse = {
     },
 } as const
 
-export type GetAllBlocksResponse = BlockFund[]
+export type GetAllCardsResponse = Card[]
 
 export const GetAllCardsResponse = {
     validate: GetAllCardsResponseValidator as ValidateFunction<GetAllCardsResponse>,
@@ -1781,7 +1783,7 @@ export const GetAllCardsResponse = {
     },
 } as const
 
-export type GetAllCardsResponse = Card[]
+export type GetAllResponse = DepositAccount[]
 
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
@@ -1799,8 +1801,6 @@ export const GetAllResponse = {
         return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type GetAllResponse = DepositAccount[]
 
 /**
  * Details for retrieving a authorization hold. Deprecated due to encodedKey field.
@@ -1882,6 +1882,8 @@ export interface GetAuthorizationHold {
     userTransactionTime?: string | undefined
 }
 
+export type GetDepositAccountDocumentResponse = string
+
 export const GetDepositAccountDocumentResponse = {
     validate: GetDepositAccountDocumentResponseValidator as ValidateFunction<GetDepositAccountDocumentResponse>,
     get schema() {
@@ -1899,7 +1901,7 @@ export const GetDepositAccountDocumentResponse = {
     },
 } as const
 
-export type GetDepositAccountDocumentResponse = string
+export type GetFundedLoansResponse = LoanAccount[]
 
 export const GetFundedLoansResponse = {
     validate: GetFundedLoansResponseValidator as ValidateFunction<GetFundedLoansResponse>,
@@ -1918,7 +1920,7 @@ export const GetFundedLoansResponse = {
     },
 } as const
 
-export type GetFundedLoansResponse = LoanAccount[]
+export type GetInterestAvailabilitiesListResponse = InterestAccountSettingsAvailabilityResponse[]
 
 export const GetInterestAvailabilitiesListResponse = {
     validate: GetInterestAvailabilitiesListResponseValidator as ValidateFunction<GetInterestAvailabilitiesListResponse>,
@@ -1937,7 +1939,7 @@ export const GetInterestAvailabilitiesListResponse = {
     },
 } as const
 
-export type GetInterestAvailabilitiesListResponse = InterestAccountSettingsAvailabilityResponse[]
+export type GetWithholdingTaxHistoryResponse = AccountTax[]
 
 export const GetWithholdingTaxHistoryResponse = {
     validate: GetWithholdingTaxHistoryResponseValidator as ValidateFunction<GetWithholdingTaxHistoryResponse>,
@@ -1955,8 +1957,6 @@ export const GetWithholdingTaxHistoryResponse = {
         return { left: (GetWithholdingTaxHistoryResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type GetWithholdingTaxHistoryResponse = AccountTax[]
 
 /**
  * Guarantor, holds information about a client guaranty entry. It can be defined based on another client which guarantees (including or not a savings account whether it is a client of the organization using Mambu or not) or based on a value the client holds (an asset)
@@ -2085,6 +2085,25 @@ export interface InstallmentFeeDetails {
     tax?: AmountWithReduced | undefined
 }
 
+/**
+ * Interest Availability of a Deposit Account
+ */
+export interface InterestAccountSettingsAvailability {
+    /**
+     * The encoded key of the Interest Availability, auto generated, unique.
+     */
+    encodedKey?: string | undefined
+    interestRateSettings: DepositAccountInterestAvailabilitySettings
+    /**
+     * Start date of the Interest Availability.
+     */
+    startDate: string
+    /**
+     * Type of the interest.
+     */
+    type: 'INTEREST' | 'OVERDRAFT' | 'TECHNICAL_OVERDRAFT'
+}
+
 export const InterestAccountSettingsAvailability = {
     validate: InterestAccountSettingsAvailabilityValidator as ValidateFunction<InterestAccountSettingsAvailability>,
     get schema() {
@@ -2105,20 +2124,20 @@ export const InterestAccountSettingsAvailability = {
 /**
  * Interest Availability of a Deposit Account
  */
-export interface InterestAccountSettingsAvailability {
+export interface InterestAccountSettingsAvailabilityResponse {
     /**
      * The encoded key of the Interest Availability, auto generated, unique.
      */
     encodedKey?: string | undefined
-    interestRateSettings: DepositAccountInterestAvailabilitySettings
+    interestRateSettings?: DepositAccountInterestRateSettings | undefined
     /**
      * Start date of the Interest Availability.
      */
-    startDate: string
+    startDate?: string | undefined
     /**
      * Type of the interest.
      */
-    type: 'INTEREST' | 'OVERDRAFT' | 'TECHNICAL_OVERDRAFT'
+    type?: 'INTEREST' | 'OVERDRAFT' | 'TECHNICAL_OVERDRAFT' | undefined
 }
 
 export const InterestAccountSettingsAvailabilityResponse = {
@@ -2143,20 +2162,12 @@ export const InterestAccountSettingsAvailabilityResponse = {
 /**
  * Interest Availability of a Deposit Account
  */
-export interface InterestAccountSettingsAvailabilityResponse {
+export interface InterestAccountSettingsAvailabilityUpdate {
     /**
      * The encoded key of the Interest Availability, auto generated, unique.
      */
     encodedKey?: string | undefined
-    interestRateSettings?: DepositAccountInterestRateSettings | undefined
-    /**
-     * Start date of the Interest Availability.
-     */
-    startDate?: string | undefined
-    /**
-     * Type of the interest.
-     */
-    type?: 'INTEREST' | 'OVERDRAFT' | 'TECHNICAL_OVERDRAFT' | undefined
+    interestRateSettings: DepositAccountInterestAvailabilitySettings
 }
 
 export const InterestAccountSettingsAvailabilityUpdate = {
@@ -2176,17 +2187,6 @@ export const InterestAccountSettingsAvailabilityUpdate = {
         return { left: (InterestAccountSettingsAvailabilityUpdate.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Interest Availability of a Deposit Account
- */
-export interface InterestAccountSettingsAvailabilityUpdate {
-    /**
-     * The encoded key of the Interest Availability, auto generated, unique.
-     */
-    encodedKey?: string | undefined
-    interestRateSettings: DepositAccountInterestAvailabilitySettings
-}
 
 /**
  * The interest settings, holds all the properties regarding interests for the loan account.
@@ -2550,6 +2550,17 @@ export interface LoanAccountRedrawSettings {
     restrictNextDueWithdrawal: boolean
 }
 
+/**
+ * Represents a single loan account schedule structure.
+ */
+export interface LoanAccountSchedule {
+    currency?: Currency | undefined
+    /**
+     * The loan account schedule installments list.
+     */
+    installments?: Installment[] | undefined
+}
+
 export const LoanAccountSchedule = {
     validate: LoanAccountScheduleValidator as ValidateFunction<LoanAccountSchedule>,
     get schema() {
@@ -2566,17 +2577,6 @@ export const LoanAccountSchedule = {
         return { left: (LoanAccountSchedule.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Represents a single loan account schedule structure.
- */
-export interface LoanAccountSchedule {
-    currency?: Currency | undefined
-    /**
-     * The loan account schedule installments list.
-     */
-    installments?: Installment[] | undefined
-}
 
 /**
  * In some cases organizations may approve loans but not disburse the full amount initially. They would like to spread the disbursement (and risk) over time. Likewise for the client, they may not need the full loan amount up front. They may want to have a loan to buy some equipment for their business but will make one purchase today and another purchase in a few months.  In these cases, they don't need the full amount and wouldn't want to pay interest on cash they don't need yet. A solution for this matter is the usage of disbursement in tranches. This class holds the information required for one of this tranche.
@@ -2641,6 +2641,8 @@ export interface MonthAndDay {
     month?: number | undefined
 }
 
+export type PatchBlockFundRequest = PatchOperation[]
+
 export const PatchBlockFundRequest = {
     validate: PatchBlockFundRequestValidator as ValidateFunction<PatchBlockFundRequest>,
     get schema() {
@@ -2657,8 +2659,6 @@ export const PatchBlockFundRequest = {
         return { left: (PatchBlockFundRequest.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type PatchBlockFundRequest = PatchOperation[]
 
 /**
  * A single change that needs to be made to a resource
@@ -2682,6 +2682,8 @@ export interface PatchOperation {
     value?: unknown
 }
 
+export type PatchRequest = PatchOperation[]
+
 export const PatchRequest = {
     validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
@@ -2698,8 +2700,6 @@ export const PatchRequest = {
         return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type PatchRequest = PatchOperation[]
 
 /**
  * The penalty settings, holds all the fields regarding penalties
@@ -2878,6 +2878,16 @@ export interface PrincipalPaymentAccountSettings {
         | undefined
 }
 
+/**
+ * Reopen a deposit account
+ */
+export interface ReopenDepositAction {
+    /**
+     * The notes or description attached to this object.
+     */
+    notes?: string | undefined
+}
+
 export const ReopenDepositAction = {
     validate: ReopenDepositActionValidator as ValidateFunction<ReopenDepositAction>,
     get schema() {
@@ -2894,16 +2904,6 @@ export const ReopenDepositAction = {
         return { left: (ReopenDepositAction.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Reopen a deposit account
- */
-export interface ReopenDepositAction {
-    /**
-     * The notes or description attached to this object.
-     */
-    notes?: string | undefined
-}
 
 export interface RestError {
     errorCode?: number | undefined
@@ -2989,6 +2989,8 @@ export interface ScheduleSettings {
     shortMonthHandlingMethod?: 'LAST_DAY_IN_MONTH' | 'FIRST_DAY_OF_NEXT_MONTH' | undefined
 }
 
+export type SearchResponse = DepositAccount[]
+
 export const SearchResponse = {
     validate: SearchResponseValidator as ValidateFunction<SearchResponse>,
     get schema() {
@@ -3006,7 +3008,19 @@ export const SearchResponse = {
     },
 } as const
 
-export type SearchResponse = DepositAccount[]
+/**
+ * The action to start the maturity period for a deposit account
+ */
+export interface StartMaturityAction {
+    /**
+     * The date when the maturity period starts.
+     */
+    maturityDate?: string | undefined
+    /**
+     * The notes or description attached to this object.
+     */
+    notes?: string | undefined
+}
 
 export const StartMaturityAction = {
     validate: StartMaturityActionValidator as ValidateFunction<StartMaturityAction>,
@@ -3026,20 +3040,6 @@ export const StartMaturityAction = {
 } as const
 
 /**
- * The action to start the maturity period for a deposit account
- */
-export interface StartMaturityAction {
-    /**
-     * The date when the maturity period starts.
-     */
-    maturityDate?: string | undefined
-    /**
-     * The notes or description attached to this object.
-     */
-    notes?: string | undefined
-}
-
-/**
  * The disbursement details regarding a loan tranche.
  */
 export interface TrancheDisbursementDetails {
@@ -3051,6 +3051,16 @@ export interface TrancheDisbursementDetails {
      * The date when this tranche is supposed to be disbursed (as Organization Time)
      */
     expectedDisbursementDate?: string | undefined
+}
+
+/**
+ * Transfer the account ownership from current account holder to a new one (client/group).
+ */
+export interface TransferOwnershipAction {
+    /**
+     * The ID or encoded key of the new account holder.
+     */
+    targetHolderKey: string
 }
 
 export const TransferOwnershipAction = {
@@ -3071,13 +3081,13 @@ export const TransferOwnershipAction = {
 } as const
 
 /**
- * Transfer the account ownership from current account holder to a new one (client/group).
+ * The action to undo the maturity period for a deposit account
  */
-export interface TransferOwnershipAction {
+export interface UndoMaturityAction {
     /**
-     * The ID or encoded key of the new account holder.
+     * The notes or description attached to this object.
      */
-    targetHolderKey: string
+    notes?: string | undefined
 }
 
 export const UndoMaturityAction = {
@@ -3096,13 +3106,3 @@ export const UndoMaturityAction = {
         return { left: (UndoMaturityAction.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * The action to undo the maturity period for a deposit account
- */
-export interface UndoMaturityAction {
-    /**
-     * The notes or description attached to this object.
-     */
-    notes?: string | undefined
-}

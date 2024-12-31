@@ -174,7 +174,7 @@ import { validate as LockLoanAccountInputValidator } from './schemas/lock-loan-a
 import { validate as LockLoanTransactionsWrapperValidator } from './schemas/lock-loan-transactions-wrapper.schema.js'
 import { validate as MultipleAtomicGroupsInputValidator } from './schemas/multiple-atomic-groups-input.schema.js'
 import { validate as MultipleAtomicGroupsResponseValidator } from './schemas/multiple-atomic-groups-response.schema.js'
-import { validate as NonWorkingDays2Validator } from './schemas/non-working-days.schema.js'
+import { validate as NonWorkingDaysValidator } from './schemas/non-working-days.schema.js'
 import { validate as OrganizationSetupValidator } from './schemas/organization-setup.schema.js'
 import { validate as PatchAuthorizationHoldRequestValidator } from './schemas/patch-authorization-hold-request.schema.js'
 import { validate as PatchBlockFundRequestValidator } from './schemas/patch-block-fund-request.schema.js'
@@ -286,23 +286,6 @@ export interface AccountArrearsSettings {
     tolerancePeriod?: number | undefined
 }
 
-export const AccountAuthorizationHold = {
-    validate: AccountAuthorizationHoldValidator as ValidateFunction<AccountAuthorizationHold>,
-    get schema() {
-        return AccountAuthorizationHold.validate.schema
-    },
-    get errors() {
-        return AccountAuthorizationHold.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is AccountAuthorizationHold => AccountAuthorizationHold.validate(o) === true,
-    parse: (o: unknown): { right: AccountAuthorizationHold } | { left: DefinedError[] } => {
-        if (AccountAuthorizationHold.is(o)) {
-            return { right: o }
-        }
-        return { left: (AccountAuthorizationHold.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * The account authorization hold corresponding to a deposit account
  */
@@ -366,20 +349,20 @@ export interface AccountAuthorizationHold {
     userTransactionTime?: string | undefined
 }
 
-export const AccountBalances = {
-    validate: AccountBalancesValidator as ValidateFunction<AccountBalances>,
+export const AccountAuthorizationHold = {
+    validate: AccountAuthorizationHoldValidator as ValidateFunction<AccountAuthorizationHold>,
     get schema() {
-        return AccountBalances.validate.schema
+        return AccountAuthorizationHold.validate.schema
     },
     get errors() {
-        return AccountBalances.validate.errors ?? undefined
+        return AccountAuthorizationHold.validate.errors ?? undefined
     },
-    is: (o: unknown): o is AccountBalances => AccountBalances.validate(o) === true,
-    parse: (o: unknown): { right: AccountBalances } | { left: DefinedError[] } => {
-        if (AccountBalances.is(o)) {
+    is: (o: unknown): o is AccountAuthorizationHold => AccountAuthorizationHold.validate(o) === true,
+    parse: (o: unknown): { right: AccountAuthorizationHold } | { left: DefinedError[] } => {
+        if (AccountAuthorizationHold.is(o)) {
             return { right: o }
         }
-        return { left: (AccountBalances.errors ?? []) as DefinedError[] }
+        return { left: (AccountAuthorizationHold.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -413,6 +396,23 @@ export interface AccountBalances {
     totalBalance?: number | undefined
 }
 
+export const AccountBalances = {
+    validate: AccountBalancesValidator as ValidateFunction<AccountBalances>,
+    get schema() {
+        return AccountBalances.validate.schema
+    },
+    get errors() {
+        return AccountBalances.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is AccountBalances => AccountBalances.validate(o) === true,
+    parse: (o: unknown): { right: AccountBalances } | { left: DefinedError[] } => {
+        if (AccountBalances.is(o)) {
+            return { right: o }
+        }
+        return { left: (AccountBalances.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * The account currency and identification
  */
@@ -434,23 +434,6 @@ export interface AccountIdentification {
     iban?: string | undefined
     other?: OtherAccountIdentification | undefined
 }
-
-export const AccountingRate = {
-    validate: AccountingRateValidator as ValidateFunction<AccountingRate>,
-    get schema() {
-        return AccountingRate.validate.schema
-    },
-    get errors() {
-        return AccountingRate.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is AccountingRate => AccountingRate.validate(o) === true,
-    parse: (o: unknown): { right: AccountingRate } | { left: DefinedError[] } => {
-        if (AccountingRate.is(o)) {
-            return { right: o }
-        }
-        return { left: (AccountingRate.errors ?? []) as DefinedError[] }
-    },
-} as const
 
 /**
  * Represents the conversion rate used in accounting to convert amounts from one currency to organisation currency
@@ -482,20 +465,20 @@ export interface AccountingRate {
     toCurrencyCode?: string | undefined
 }
 
-export const AccountingReport = {
-    validate: AccountingReportValidator as ValidateFunction<AccountingReport>,
+export const AccountingRate = {
+    validate: AccountingRateValidator as ValidateFunction<AccountingRate>,
     get schema() {
-        return AccountingReport.validate.schema
+        return AccountingRate.validate.schema
     },
     get errors() {
-        return AccountingReport.validate.errors ?? undefined
+        return AccountingRate.validate.errors ?? undefined
     },
-    is: (o: unknown): o is AccountingReport => AccountingReport.validate(o) === true,
-    parse: (o: unknown): { right: AccountingReport } | { left: DefinedError[] } => {
-        if (AccountingReport.is(o)) {
+    is: (o: unknown): o is AccountingRate => AccountingRate.validate(o) === true,
+    parse: (o: unknown): { right: AccountingRate } | { left: DefinedError[] } => {
+        if (AccountingRate.is(o)) {
             return { right: o }
         }
-        return { left: (AccountingReport.errors ?? []) as DefinedError[] }
+        return { left: (AccountingRate.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -529,6 +512,23 @@ export interface AccountingReport {
         | undefined
 }
 
+export const AccountingReport = {
+    validate: AccountingReportValidator as ValidateFunction<AccountingReport>,
+    get schema() {
+        return AccountingReport.validate.schema
+    },
+    get errors() {
+        return AccountingReport.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is AccountingReport => AccountingReport.validate(o) === true,
+    parse: (o: unknown): { right: AccountingReport } | { left: DefinedError[] } => {
+        if (AccountingReport.is(o)) {
+            return { right: o }
+        }
+        return { left: (AccountingReport.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Represents information about the accounting report amounts.
  */
@@ -554,23 +554,6 @@ export interface AccountingReportAmounts {
      */
     openingBalance?: number | undefined
 }
-
-export const AccountingReportGenerationInput = {
-    validate: AccountingReportGenerationInputValidator as ValidateFunction<AccountingReportGenerationInput>,
-    get schema() {
-        return AccountingReportGenerationInput.validate.schema
-    },
-    get errors() {
-        return AccountingReportGenerationInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is AccountingReportGenerationInput => AccountingReportGenerationInput.validate(o) === true,
-    parse: (o: unknown): { right: AccountingReportGenerationInput } | { left: DefinedError[] } => {
-        if (AccountingReportGenerationInput.is(o)) {
-            return { right: o }
-        }
-        return { left: (AccountingReportGenerationInput.errors ?? []) as DefinedError[] }
-    },
-} as const
 
 /**
  * Represents the input for the accounting report generation.
@@ -602,20 +585,20 @@ export interface AccountingReportGenerationInput {
     startDate: string
 }
 
-export const AccountingReportGenerationResponse = {
-    validate: AccountingReportGenerationResponseValidator as ValidateFunction<AccountingReportGenerationResponse>,
+export const AccountingReportGenerationInput = {
+    validate: AccountingReportGenerationInputValidator as ValidateFunction<AccountingReportGenerationInput>,
     get schema() {
-        return AccountingReportGenerationResponse.validate.schema
+        return AccountingReportGenerationInput.validate.schema
     },
     get errors() {
-        return AccountingReportGenerationResponse.validate.errors ?? undefined
+        return AccountingReportGenerationInput.validate.errors ?? undefined
     },
-    is: (o: unknown): o is AccountingReportGenerationResponse => AccountingReportGenerationResponse.validate(o) === true,
-    parse: (o: unknown): { right: AccountingReportGenerationResponse } | { left: DefinedError[] } => {
-        if (AccountingReportGenerationResponse.is(o)) {
+    is: (o: unknown): o is AccountingReportGenerationInput => AccountingReportGenerationInput.validate(o) === true,
+    parse: (o: unknown): { right: AccountingReportGenerationInput } | { left: DefinedError[] } => {
+        if (AccountingReportGenerationInput.is(o)) {
             return { right: o }
         }
-        return { left: (AccountingReportGenerationResponse.errors ?? []) as DefinedError[] }
+        return { left: (AccountingReportGenerationInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -644,6 +627,23 @@ export interface AccountingReportGenerationResponse {
         | 'RECOVERABLE_ERROR'
         | undefined
 }
+
+export const AccountingReportGenerationResponse = {
+    validate: AccountingReportGenerationResponseValidator as ValidateFunction<AccountingReportGenerationResponse>,
+    get schema() {
+        return AccountingReportGenerationResponse.validate.schema
+    },
+    get errors() {
+        return AccountingReportGenerationResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is AccountingReportGenerationResponse => AccountingReportGenerationResponse.validate(o) === true,
+    parse: (o: unknown): { right: AccountingReportGenerationResponse } | { left: DefinedError[] } => {
+        if (AccountingReportGenerationResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (AccountingReportGenerationResponse.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Represents the accounting report information about general ledger accounts and their amounts in both the organization's currency and foreign currencies.
@@ -776,6 +776,20 @@ export interface AccountTax {
     toDate?: string | undefined
 }
 
+/**
+ * Represents the account to add to the credit arrangement.
+ */
+export interface AddCreditArrangementAccountInput {
+    /**
+     * The encoded key of the account.
+     */
+    accountId: string
+    /**
+     * The type of the account.
+     */
+    accountType: 'LOAN' | 'DEPOSIT'
+}
+
 export const AddCreditArrangementAccountInput = {
     validate: AddCreditArrangementAccountInputValidator as ValidateFunction<AddCreditArrangementAccountInput>,
     get schema() {
@@ -792,20 +806,6 @@ export const AddCreditArrangementAccountInput = {
         return { left: (AddCreditArrangementAccountInput.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Represents the account to add to the credit arrangement.
- */
-export interface AddCreditArrangementAccountInput {
-    /**
-     * The encoded key of the account.
-     */
-    accountId: string
-    /**
-     * The type of the account.
-     */
-    accountType: 'LOAN' | 'DEPOSIT'
-}
 
 /**
  * Represents an address.
@@ -958,23 +958,6 @@ export interface AmountWithReduced {
     reduced?: number | undefined
 }
 
-export const ApiConsumer = {
-    validate: ApiConsumerValidator as ValidateFunction<ApiConsumer>,
-    get schema() {
-        return ApiConsumer.validate.schema
-    },
-    get errors() {
-        return ApiConsumer.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ApiConsumer => ApiConsumer.validate(o) === true,
-    parse: (o: unknown): { right: ApiConsumer } | { left: DefinedError[] } => {
-        if (ApiConsumer.is(o)) {
-            return { right: o }
-        }
-        return { left: (ApiConsumer.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents an API consumer.
  */
@@ -1015,6 +998,23 @@ export interface ApiConsumer {
         | undefined
 }
 
+export const ApiConsumer = {
+    validate: ApiConsumerValidator as ValidateFunction<ApiConsumer>,
+    get schema() {
+        return ApiConsumer.validate.schema
+    },
+    get errors() {
+        return ApiConsumer.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ApiConsumer => ApiConsumer.validate(o) === true,
+    parse: (o: unknown): { right: ApiConsumer } | { left: DefinedError[] } => {
+        if (ApiConsumer.is(o)) {
+            return { right: o }
+        }
+        return { left: (ApiConsumer.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Represents the API consumer permissions and access rights.
  */
@@ -1046,7 +1046,25 @@ export interface ApiConsumerAccess {
     /**
      * Permissions for the API consumer. The non-admin API consumers and users are authorized to do actions based a set of permissions in order to access Mambu features. Permissions may be relevant for the API and/or the Mambu UI.
      */
-    permissions?: Permissions3[] | undefined
+    permissions?: Permissions[] | undefined
+}
+
+/**
+ * Represents an API key of an API consumer.
+ */
+export interface ApiKey {
+    /**
+     * A six character cleartext prefix of the API key. The prefix is not guaranteed to be unique. You must base any identification process on the API key ID, not the prefix.
+     */
+    apiKey?: string | undefined
+    /**
+     * The time to live (TTL) for the API key in seconds.
+     */
+    expirationTime?: number | undefined
+    /**
+     * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
+     */
+    id?: string | undefined
 }
 
 export const ApiKey = {
@@ -1067,21 +1085,13 @@ export const ApiKey = {
 } as const
 
 /**
- * Represents an API key of an API consumer.
+ * Represents an API key expiration time.
  */
-export interface ApiKey {
-    /**
-     * A six character cleartext prefix of the API key. The prefix is not guaranteed to be unique. You must base any identification process on the API key ID, not the prefix.
-     */
-    apiKey?: string | undefined
+export interface ApiKeyInput {
     /**
      * The time to live (TTL) for the API key in seconds.
      */
     expirationTime?: number | undefined
-    /**
-     * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
-     */
-    id?: string | undefined
 }
 
 export const ApiKeyInput = {
@@ -1100,16 +1110,6 @@ export const ApiKeyInput = {
         return { left: (ApiKeyInput.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Represents an API key expiration time.
- */
-export interface ApiKeyInput {
-    /**
-     * The time to live (TTL) for the API key in seconds.
-     */
-    expirationTime?: number | undefined
-}
 
 /**
  * Represents the result of an API key rotation.
@@ -1146,6 +1146,16 @@ export const ApiKeyRotationResult = {
     },
 } as const
 
+/**
+ * Describes the application status regarding the data access
+ */
+export interface ApplicationStatus {
+    /**
+     * Data access state
+     */
+    dataAccessState?: 'READ_ONLY_STATE' | 'WRITE_READ_STATE' | undefined
+}
+
 export const ApplicationStatus = {
     validate: ApplicationStatusValidator as ValidateFunction<ApplicationStatus>,
     get schema() {
@@ -1160,33 +1170,6 @@ export const ApplicationStatus = {
             return { right: o }
         }
         return { left: (ApplicationStatus.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-/**
- * Describes the application status regarding the data access
- */
-export interface ApplicationStatus {
-    /**
-     * Data access state
-     */
-    dataAccessState?: 'READ_ONLY_STATE' | 'WRITE_READ_STATE' | undefined
-}
-
-export const ApplyInterestInput = {
-    validate: ApplyInterestInputValidator as ValidateFunction<ApplyInterestInput>,
-    get schema() {
-        return ApplyInterestInput.validate.schema
-    },
-    get errors() {
-        return ApplyInterestInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ApplyInterestInput => ApplyInterestInput.validate(o) === true,
-    parse: (o: unknown): { right: ApplyInterestInput } | { left: DefinedError[] } => {
-        if (ApplyInterestInput.is(o)) {
-            return { right: o }
-        }
-        return { left: (ApplyInterestInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -1216,6 +1199,25 @@ export interface ApplyInterestInput {
     paymentHolidaysInterestAmount?: number | undefined
 }
 
+export const ApplyInterestInput = {
+    validate: ApplyInterestInputValidator as ValidateFunction<ApplyInterestInput>,
+    get schema() {
+        return ApplyInterestInput.validate.schema
+    },
+    get errors() {
+        return ApplyInterestInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ApplyInterestInput => ApplyInterestInput.validate(o) === true,
+    parse: (o: unknown): { right: ApplyInterestInput } | { left: DefinedError[] } => {
+        if (ApplyInterestInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (ApplyInterestInput.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+export type ApplyPlannedFeesResponse = LoanTransaction[]
+
 export const ApplyPlannedFeesResponse = {
     validate: ApplyPlannedFeesResponseValidator as ValidateFunction<ApplyPlannedFeesResponse>,
     get schema() {
@@ -1233,7 +1235,19 @@ export const ApplyPlannedFeesResponse = {
     },
 } as const
 
-export type ApplyPlannedFeesResponse = LoanTransaction[]
+/**
+ * Represents the archived custom field values of a deposit transaction.
+ */
+export interface ArchivedDepositTransaction {
+    /**
+     * The id of the archived deposit transaction, unique
+     */
+    transactionId: number
+    /**
+     * The date of entry created for the deposit transaction to be archived
+     */
+    valueDate?: string | undefined
+}
 
 export const ArchivedDepositTransaction = {
     validate: ArchivedDepositTransactionValidator as ValidateFunction<ArchivedDepositTransaction>,
@@ -1251,20 +1265,6 @@ export const ArchivedDepositTransaction = {
         return { left: (ArchivedDepositTransaction.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Represents the archived custom field values of a deposit transaction.
- */
-export interface ArchivedDepositTransaction {
-    /**
-     * The id of the archived deposit transaction, unique
-     */
-    transactionId: number
-    /**
-     * The date of entry created for the deposit transaction to be archived
-     */
-    valueDate?: string | undefined
-}
 
 /**
  * Asset, holds information about a client asset entry.
@@ -1314,23 +1314,6 @@ export interface AtomicGroup {
      */
     transactions?: DepositsTransaction[] | undefined
 }
-
-export const AuthorizationHold = {
-    validate: AuthorizationHoldValidator as ValidateFunction<AuthorizationHold>,
-    get schema() {
-        return AuthorizationHold.validate.schema
-    },
-    get errors() {
-        return AuthorizationHold.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is AuthorizationHold => AuthorizationHold.validate(o) === true,
-    parse: (o: unknown): { right: AuthorizationHold } | { left: DefinedError[] } => {
-        if (AuthorizationHold.is(o)) {
-            return { right: o }
-        }
-        return { left: (AuthorizationHold.errors ?? []) as DefinedError[] }
-    },
-} as const
 
 /**
  * The authorization hold corresponding to a card token
@@ -1408,21 +1391,20 @@ export interface AuthorizationHold {
     userTransactionTime?: string | undefined
 }
 
-export const AuthorizationHoldAmountAdjustmentRequest = {
-    validate: AuthorizationHoldAmountAdjustmentRequestValidator as ValidateFunction<AuthorizationHoldAmountAdjustmentRequest>,
+export const AuthorizationHold = {
+    validate: AuthorizationHoldValidator as ValidateFunction<AuthorizationHold>,
     get schema() {
-        return AuthorizationHoldAmountAdjustmentRequest.validate.schema
+        return AuthorizationHold.validate.schema
     },
     get errors() {
-        return AuthorizationHoldAmountAdjustmentRequest.validate.errors ?? undefined
+        return AuthorizationHold.validate.errors ?? undefined
     },
-    is: (o: unknown): o is AuthorizationHoldAmountAdjustmentRequest =>
-        AuthorizationHoldAmountAdjustmentRequest.validate(o) === true,
-    parse: (o: unknown): { right: AuthorizationHoldAmountAdjustmentRequest } | { left: DefinedError[] } => {
-        if (AuthorizationHoldAmountAdjustmentRequest.is(o)) {
+    is: (o: unknown): o is AuthorizationHold => AuthorizationHold.validate(o) === true,
+    parse: (o: unknown): { right: AuthorizationHold } | { left: DefinedError[] } => {
+        if (AuthorizationHold.is(o)) {
             return { right: o }
         }
-        return { left: (AuthorizationHoldAmountAdjustmentRequest.errors ?? []) as DefinedError[] }
+        return { left: (AuthorizationHold.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -1451,6 +1433,24 @@ export interface AuthorizationHoldAmountAdjustmentRequest {
      */
     externalReferenceId?: string | undefined
 }
+
+export const AuthorizationHoldAmountAdjustmentRequest = {
+    validate: AuthorizationHoldAmountAdjustmentRequestValidator as ValidateFunction<AuthorizationHoldAmountAdjustmentRequest>,
+    get schema() {
+        return AuthorizationHoldAmountAdjustmentRequest.validate.schema
+    },
+    get errors() {
+        return AuthorizationHoldAmountAdjustmentRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is AuthorizationHoldAmountAdjustmentRequest =>
+        AuthorizationHoldAmountAdjustmentRequest.validate(o) === true,
+    parse: (o: unknown): { right: AuthorizationHoldAmountAdjustmentRequest } | { left: DefinedError[] } => {
+        if (AuthorizationHoldAmountAdjustmentRequest.is(o)) {
+            return { right: o }
+        }
+        return { left: (AuthorizationHoldAmountAdjustmentRequest.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Represents details of the Background Process
@@ -1612,7 +1612,7 @@ export interface BaseUserAccess {
     /**
      * Permissions for the user. The non-admin users are authorized to do actions based a set of permissions in order to access Mambu features. Permissions may be relevant for the API and/or the Mambu UI.
      */
-    permissions?: Permissions[] | undefined
+    permissions?: Permissions3[] | undefined
     /**
      * `TRUE` if the user can provide Mambu technical support, `FALSE` otherwise.
      */
@@ -1646,23 +1646,6 @@ export interface BillingCyclesProductSettings {
      */
     startDays?: number[] | undefined
 }
-
-export const BlockFund = {
-    validate: BlockFundValidator as ValidateFunction<BlockFund>,
-    get schema() {
-        return BlockFund.validate.schema
-    },
-    get errors() {
-        return BlockFund.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is BlockFund => BlockFund.validate(o) === true,
-    parse: (o: unknown): { right: BlockFund } | { left: DefinedError[] } => {
-        if (BlockFund.is(o)) {
-            return { right: o }
-        }
-        return { left: (BlockFund.errors ?? []) as DefinedError[] }
-    },
-} as const
 
 /**
  * Represents the block fund amount that can be later seized on the account
@@ -1702,20 +1685,20 @@ export interface BlockFund {
     state?: 'PENDING' | 'SEIZED' | 'REMOVED' | 'PARTIALLY_SEIZED' | undefined
 }
 
-export const Branch = {
-    validate: BranchValidator as ValidateFunction<Branch>,
+export const BlockFund = {
+    validate: BlockFundValidator as ValidateFunction<BlockFund>,
     get schema() {
-        return Branch.validate.schema
+        return BlockFund.validate.schema
     },
     get errors() {
-        return Branch.validate.errors ?? undefined
+        return BlockFund.validate.errors ?? undefined
     },
-    is: (o: unknown): o is Branch => Branch.validate(o) === true,
-    parse: (o: unknown): { right: Branch } | { left: DefinedError[] } => {
-        if (Branch.is(o)) {
+    is: (o: unknown): o is BlockFund => BlockFund.validate(o) === true,
+    parse: (o: unknown): { right: BlockFund } | { left: DefinedError[] } => {
+        if (BlockFund.is(o)) {
             return { right: o }
         }
-        return { left: (Branch.errors ?? []) as DefinedError[] }
+        return { left: (BlockFund.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -1768,6 +1751,23 @@ export interface Branch {
      */
     state?: 'ACTIVE' | 'INACTIVE' | undefined
 }
+
+export const Branch = {
+    validate: BranchValidator as ValidateFunction<Branch>,
+    get schema() {
+        return Branch.validate.schema
+    },
+    get errors() {
+        return Branch.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Branch => Branch.validate(o) === true,
+    parse: (o: unknown): { right: Branch } | { left: DefinedError[] } => {
+        if (Branch.is(o)) {
+            return { right: o }
+        }
+        return { left: (Branch.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Holds information about branch availability for the product.
@@ -1895,23 +1895,6 @@ export interface BulkProcessingSuccess {
     indexInRequest?: number | undefined
 }
 
-export const BulkProcessStatus = {
-    validate: BulkProcessStatusValidator as ValidateFunction<BulkProcessStatus>,
-    get schema() {
-        return BulkProcessStatus.validate.schema
-    },
-    get errors() {
-        return BulkProcessStatus.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is BulkProcessStatus => BulkProcessStatus.validate(o) === true,
-    parse: (o: unknown): { right: BulkProcessStatus } | { left: DefinedError[] } => {
-        if (BulkProcessStatus.is(o)) {
-            return { right: o }
-        }
-        return { left: (BulkProcessStatus.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Holds information about the status of a bulk process
  */
@@ -1942,6 +1925,33 @@ export interface BulkProcessStatus {
         | undefined
 }
 
+export const BulkProcessStatus = {
+    validate: BulkProcessStatusValidator as ValidateFunction<BulkProcessStatus>,
+    get schema() {
+        return BulkProcessStatus.validate.schema
+    },
+    get errors() {
+        return BulkProcessStatus.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is BulkProcessStatus => BulkProcessStatus.validate(o) === true,
+    parse: (o: unknown): { right: BulkProcessStatus } | { left: DefinedError[] } => {
+        if (BulkProcessStatus.is(o)) {
+            return { right: o }
+        }
+        return { left: (BulkProcessStatus.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+/**
+ * Returns a card that can be associated to a deposit or loan  account. Cards consist only of card reference tokens and the card details are not stored in Mambu.
+ */
+export interface Card {
+    /**
+     * The card's reference token.
+     */
+    referenceToken: string
+}
+
 export const Card = {
     validate: CardValidator as ValidateFunction<Card>,
     get schema() {
@@ -1958,16 +1968,6 @@ export const Card = {
         return { left: (Card.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Returns a card that can be associated to a deposit or loan  account. Cards consist only of card reference tokens and the card details are not stored in Mambu.
- */
-export interface Card {
-    /**
-     * The card's reference token.
-     */
-    referenceToken: string
-}
 
 /**
  * The details of the card acceptor (merchant) in a transaction hold.
@@ -2042,23 +2042,6 @@ export interface CardTransaction {
     userTransactionTime?: string | undefined
 }
 
-export const CardTransactionInput = {
-    validate: CardTransactionInputValidator as ValidateFunction<CardTransactionInput>,
-    get schema() {
-        return CardTransactionInput.validate.schema
-    },
-    get errors() {
-        return CardTransactionInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CardTransactionInput => CardTransactionInput.validate(o) === true,
-    parse: (o: unknown): { right: CardTransactionInput } | { left: DefinedError[] } => {
-        if (CardTransactionInput.is(o)) {
-            return { right: o }
-        }
-        return { left: (CardTransactionInput.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * A card transaction entry which will have a corresponding a financial transaction performed.
  */
@@ -2118,20 +2101,20 @@ export interface CardTransactionInput {
     userTransactionTime?: string | undefined
 }
 
-export const CardTransactionOutput = {
-    validate: CardTransactionOutputValidator as ValidateFunction<CardTransactionOutput>,
+export const CardTransactionInput = {
+    validate: CardTransactionInputValidator as ValidateFunction<CardTransactionInput>,
     get schema() {
-        return CardTransactionOutput.validate.schema
+        return CardTransactionInput.validate.schema
     },
     get errors() {
-        return CardTransactionOutput.validate.errors ?? undefined
+        return CardTransactionInput.validate.errors ?? undefined
     },
-    is: (o: unknown): o is CardTransactionOutput => CardTransactionOutput.validate(o) === true,
-    parse: (o: unknown): { right: CardTransactionOutput } | { left: DefinedError[] } => {
-        if (CardTransactionOutput.is(o)) {
+    is: (o: unknown): o is CardTransactionInput => CardTransactionInput.validate(o) === true,
+    parse: (o: unknown): { right: CardTransactionInput } | { left: DefinedError[] } => {
+        if (CardTransactionInput.is(o)) {
             return { right: o }
         }
-        return { left: (CardTransactionOutput.errors ?? []) as DefinedError[] }
+        return { left: (CardTransactionInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -2196,20 +2179,20 @@ export interface CardTransactionOutput {
     userTransactionTime?: string | undefined
 }
 
-export const CardTransactionReversal = {
-    validate: CardTransactionReversalValidator as ValidateFunction<CardTransactionReversal>,
+export const CardTransactionOutput = {
+    validate: CardTransactionOutputValidator as ValidateFunction<CardTransactionOutput>,
     get schema() {
-        return CardTransactionReversal.validate.schema
+        return CardTransactionOutput.validate.schema
     },
     get errors() {
-        return CardTransactionReversal.validate.errors ?? undefined
+        return CardTransactionOutput.validate.errors ?? undefined
     },
-    is: (o: unknown): o is CardTransactionReversal => CardTransactionReversal.validate(o) === true,
-    parse: (o: unknown): { right: CardTransactionReversal } | { left: DefinedError[] } => {
-        if (CardTransactionReversal.is(o)) {
+    is: (o: unknown): o is CardTransactionOutput => CardTransactionOutput.validate(o) === true,
+    parse: (o: unknown): { right: CardTransactionOutput } | { left: DefinedError[] } => {
+        if (CardTransactionOutput.is(o)) {
             return { right: o }
         }
-        return { left: (CardTransactionReversal.errors ?? []) as DefinedError[] }
+        return { left: (CardTransactionOutput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -2243,20 +2226,20 @@ export interface CardTransactionReversal {
     transactionChannelId?: string | undefined
 }
 
-export const Centre = {
-    validate: CentreValidator as ValidateFunction<Centre>,
+export const CardTransactionReversal = {
+    validate: CardTransactionReversalValidator as ValidateFunction<CardTransactionReversal>,
     get schema() {
-        return Centre.validate.schema
+        return CardTransactionReversal.validate.schema
     },
     get errors() {
-        return Centre.validate.errors ?? undefined
+        return CardTransactionReversal.validate.errors ?? undefined
     },
-    is: (o: unknown): o is Centre => Centre.validate(o) === true,
-    parse: (o: unknown): { right: Centre } | { left: DefinedError[] } => {
-        if (Centre.is(o)) {
+    is: (o: unknown): o is CardTransactionReversal => CardTransactionReversal.validate(o) === true,
+    parse: (o: unknown): { right: CardTransactionReversal } | { left: DefinedError[] } => {
+        if (CardTransactionReversal.is(o)) {
             return { right: o }
         }
-        return { left: (Centre.errors ?? []) as DefinedError[] }
+        return { left: (CardTransactionReversal.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -2306,20 +2289,20 @@ export interface Centre {
     state?: 'ACTIVE' | 'INACTIVE' | undefined
 }
 
-export const ChangeArrearsSettingsInput = {
-    validate: ChangeArrearsSettingsInputValidator as ValidateFunction<ChangeArrearsSettingsInput>,
+export const Centre = {
+    validate: CentreValidator as ValidateFunction<Centre>,
     get schema() {
-        return ChangeArrearsSettingsInput.validate.schema
+        return Centre.validate.schema
     },
     get errors() {
-        return ChangeArrearsSettingsInput.validate.errors ?? undefined
+        return Centre.validate.errors ?? undefined
     },
-    is: (o: unknown): o is ChangeArrearsSettingsInput => ChangeArrearsSettingsInput.validate(o) === true,
-    parse: (o: unknown): { right: ChangeArrearsSettingsInput } | { left: DefinedError[] } => {
-        if (ChangeArrearsSettingsInput.is(o)) {
+    is: (o: unknown): o is Centre => Centre.validate(o) === true,
+    parse: (o: unknown): { right: Centre } | { left: DefinedError[] } => {
+        if (Centre.is(o)) {
             return { right: o }
         }
-        return { left: (ChangeArrearsSettingsInput.errors ?? []) as DefinedError[] }
+        return { left: (Centre.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -2341,20 +2324,20 @@ export interface ChangeArrearsSettingsInput {
     notes?: string | undefined
 }
 
-export const ChangeDueDatesSettingsInput = {
-    validate: ChangeDueDatesSettingsInputValidator as ValidateFunction<ChangeDueDatesSettingsInput>,
+export const ChangeArrearsSettingsInput = {
+    validate: ChangeArrearsSettingsInputValidator as ValidateFunction<ChangeArrearsSettingsInput>,
     get schema() {
-        return ChangeDueDatesSettingsInput.validate.schema
+        return ChangeArrearsSettingsInput.validate.schema
     },
     get errors() {
-        return ChangeDueDatesSettingsInput.validate.errors ?? undefined
+        return ChangeArrearsSettingsInput.validate.errors ?? undefined
     },
-    is: (o: unknown): o is ChangeDueDatesSettingsInput => ChangeDueDatesSettingsInput.validate(o) === true,
-    parse: (o: unknown): { right: ChangeDueDatesSettingsInput } | { left: DefinedError[] } => {
-        if (ChangeDueDatesSettingsInput.is(o)) {
+    is: (o: unknown): o is ChangeArrearsSettingsInput => ChangeArrearsSettingsInput.validate(o) === true,
+    parse: (o: unknown): { right: ChangeArrearsSettingsInput } | { left: DefinedError[] } => {
+        if (ChangeArrearsSettingsInput.is(o)) {
             return { right: o }
         }
-        return { left: (ChangeDueDatesSettingsInput.errors ?? []) as DefinedError[] }
+        return { left: (ChangeArrearsSettingsInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -2380,20 +2363,20 @@ export interface ChangeDueDatesSettingsInput {
     valueDate?: string | undefined
 }
 
-export const ChangeInterestRateAction = {
-    validate: ChangeInterestRateActionValidator as ValidateFunction<ChangeInterestRateAction>,
+export const ChangeDueDatesSettingsInput = {
+    validate: ChangeDueDatesSettingsInputValidator as ValidateFunction<ChangeDueDatesSettingsInput>,
     get schema() {
-        return ChangeInterestRateAction.validate.schema
+        return ChangeDueDatesSettingsInput.validate.schema
     },
     get errors() {
-        return ChangeInterestRateAction.validate.errors ?? undefined
+        return ChangeDueDatesSettingsInput.validate.errors ?? undefined
     },
-    is: (o: unknown): o is ChangeInterestRateAction => ChangeInterestRateAction.validate(o) === true,
-    parse: (o: unknown): { right: ChangeInterestRateAction } | { left: DefinedError[] } => {
-        if (ChangeInterestRateAction.is(o)) {
+    is: (o: unknown): o is ChangeDueDatesSettingsInput => ChangeDueDatesSettingsInput.validate(o) === true,
+    parse: (o: unknown): { right: ChangeDueDatesSettingsInput } | { left: DefinedError[] } => {
+        if (ChangeDueDatesSettingsInput.is(o)) {
             return { right: o }
         }
-        return { left: (ChangeInterestRateAction.errors ?? []) as DefinedError[] }
+        return { left: (ChangeDueDatesSettingsInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -2415,20 +2398,20 @@ export interface ChangeInterestRateAction {
     valueDate: string
 }
 
-export const ChangeInterestRateLoanAccountInput = {
-    validate: ChangeInterestRateLoanAccountInputValidator as ValidateFunction<ChangeInterestRateLoanAccountInput>,
+export const ChangeInterestRateAction = {
+    validate: ChangeInterestRateActionValidator as ValidateFunction<ChangeInterestRateAction>,
     get schema() {
-        return ChangeInterestRateLoanAccountInput.validate.schema
+        return ChangeInterestRateAction.validate.schema
     },
     get errors() {
-        return ChangeInterestRateLoanAccountInput.validate.errors ?? undefined
+        return ChangeInterestRateAction.validate.errors ?? undefined
     },
-    is: (o: unknown): o is ChangeInterestRateLoanAccountInput => ChangeInterestRateLoanAccountInput.validate(o) === true,
-    parse: (o: unknown): { right: ChangeInterestRateLoanAccountInput } | { left: DefinedError[] } => {
-        if (ChangeInterestRateLoanAccountInput.is(o)) {
+    is: (o: unknown): o is ChangeInterestRateAction => ChangeInterestRateAction.validate(o) === true,
+    parse: (o: unknown): { right: ChangeInterestRateAction } | { left: DefinedError[] } => {
+        if (ChangeInterestRateAction.is(o)) {
             return { right: o }
         }
-        return { left: (ChangeInterestRateLoanAccountInput.errors ?? []) as DefinedError[] }
+        return { left: (ChangeInterestRateAction.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -2454,20 +2437,20 @@ export interface ChangeInterestRateLoanAccountInput {
     valueDate: string
 }
 
-export const ChangePeriodicPaymentLoanAccountInput = {
-    validate: ChangePeriodicPaymentLoanAccountInputValidator as ValidateFunction<ChangePeriodicPaymentLoanAccountInput>,
+export const ChangeInterestRateLoanAccountInput = {
+    validate: ChangeInterestRateLoanAccountInputValidator as ValidateFunction<ChangeInterestRateLoanAccountInput>,
     get schema() {
-        return ChangePeriodicPaymentLoanAccountInput.validate.schema
+        return ChangeInterestRateLoanAccountInput.validate.schema
     },
     get errors() {
-        return ChangePeriodicPaymentLoanAccountInput.validate.errors ?? undefined
+        return ChangeInterestRateLoanAccountInput.validate.errors ?? undefined
     },
-    is: (o: unknown): o is ChangePeriodicPaymentLoanAccountInput => ChangePeriodicPaymentLoanAccountInput.validate(o) === true,
-    parse: (o: unknown): { right: ChangePeriodicPaymentLoanAccountInput } | { left: DefinedError[] } => {
-        if (ChangePeriodicPaymentLoanAccountInput.is(o)) {
+    is: (o: unknown): o is ChangeInterestRateLoanAccountInput => ChangeInterestRateLoanAccountInput.validate(o) === true,
+    parse: (o: unknown): { right: ChangeInterestRateLoanAccountInput } | { left: DefinedError[] } => {
+        if (ChangeInterestRateLoanAccountInput.is(o)) {
             return { right: o }
         }
-        return { left: (ChangePeriodicPaymentLoanAccountInput.errors ?? []) as DefinedError[] }
+        return { left: (ChangeInterestRateLoanAccountInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -2489,20 +2472,20 @@ export interface ChangePeriodicPaymentLoanAccountInput {
     valueDate: string
 }
 
-export const ChangeRepaymentValueLoanAccountInput = {
-    validate: ChangeRepaymentValueLoanAccountInputValidator as ValidateFunction<ChangeRepaymentValueLoanAccountInput>,
+export const ChangePeriodicPaymentLoanAccountInput = {
+    validate: ChangePeriodicPaymentLoanAccountInputValidator as ValidateFunction<ChangePeriodicPaymentLoanAccountInput>,
     get schema() {
-        return ChangeRepaymentValueLoanAccountInput.validate.schema
+        return ChangePeriodicPaymentLoanAccountInput.validate.schema
     },
     get errors() {
-        return ChangeRepaymentValueLoanAccountInput.validate.errors ?? undefined
+        return ChangePeriodicPaymentLoanAccountInput.validate.errors ?? undefined
     },
-    is: (o: unknown): o is ChangeRepaymentValueLoanAccountInput => ChangeRepaymentValueLoanAccountInput.validate(o) === true,
-    parse: (o: unknown): { right: ChangeRepaymentValueLoanAccountInput } | { left: DefinedError[] } => {
-        if (ChangeRepaymentValueLoanAccountInput.is(o)) {
+    is: (o: unknown): o is ChangePeriodicPaymentLoanAccountInput => ChangePeriodicPaymentLoanAccountInput.validate(o) === true,
+    parse: (o: unknown): { right: ChangePeriodicPaymentLoanAccountInput } | { left: DefinedError[] } => {
+        if (ChangePeriodicPaymentLoanAccountInput.is(o)) {
             return { right: o }
         }
-        return { left: (ChangeRepaymentValueLoanAccountInput.errors ?? []) as DefinedError[] }
+        return { left: (ChangePeriodicPaymentLoanAccountInput.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -2528,6 +2511,33 @@ export interface ChangeRepaymentValueLoanAccountInput {
     valueDate: string
 }
 
+export const ChangeRepaymentValueLoanAccountInput = {
+    validate: ChangeRepaymentValueLoanAccountInputValidator as ValidateFunction<ChangeRepaymentValueLoanAccountInput>,
+    get schema() {
+        return ChangeRepaymentValueLoanAccountInput.validate.schema
+    },
+    get errors() {
+        return ChangeRepaymentValueLoanAccountInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ChangeRepaymentValueLoanAccountInput => ChangeRepaymentValueLoanAccountInput.validate(o) === true,
+    parse: (o: unknown): { right: ChangeRepaymentValueLoanAccountInput } | { left: DefinedError[] } => {
+        if (ChangeRepaymentValueLoanAccountInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (ChangeRepaymentValueLoanAccountInput.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+/**
+ * Change deposit account withholding tax rate
+ */
+export interface ChangeWithholdingTaxAction {
+    /**
+     * The ID or encoded key of the new withholding tax to use for the account.
+     */
+    withholdingTaxSourceKey: string
+}
+
 export const ChangeWithholdingTaxAction = {
     validate: ChangeWithholdingTaxActionValidator as ValidateFunction<ChangeWithholdingTaxAction>,
     get schema() {
@@ -2542,33 +2552,6 @@ export const ChangeWithholdingTaxAction = {
             return { right: o }
         }
         return { left: (ChangeWithholdingTaxAction.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-/**
- * Change deposit account withholding tax rate
- */
-export interface ChangeWithholdingTaxAction {
-    /**
-     * The ID or encoded key of the new withholding tax to use for the account.
-     */
-    withholdingTaxSourceKey: string
-}
-
-export const Client = {
-    validate: ClientValidator as ValidateFunction<Client>,
-    get schema() {
-        return Client.validate.schema
-    },
-    get errors() {
-        return Client.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Client => Client.validate(o) === true,
-    parse: (o: unknown): { right: Client } | { left: DefinedError[] } => {
-        if (Client.is(o)) {
-            return { right: o }
-        }
-        return { left: (Client.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -2720,6 +2703,23 @@ export interface Client {
      */
     state?: 'PENDING_APPROVAL' | 'INACTIVE' | 'ACTIVE' | 'EXITED' | 'BLACKLISTED' | 'REJECTED' | undefined
 }
+
+export const Client = {
+    validate: ClientValidator as ValidateFunction<Client>,
+    get schema() {
+        return Client.validate.schema
+    },
+    get errors() {
+        return Client.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Client => Client.validate(o) === true,
+    parse: (o: unknown): { right: Client } | { left: DefinedError[] } => {
+        if (Client.is(o)) {
+            return { right: o }
+        }
+        return { left: (Client.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * The unit that composes the list used for Clients searching
@@ -3027,23 +3027,6 @@ export const CollateralAssetsReevaluationResponse = {
     },
 } as const
 
-export const Comment = {
-    validate: CommentValidator as ValidateFunction<Comment>,
-    get schema() {
-        return Comment.validate.schema
-    },
-    get errors() {
-        return Comment.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Comment => Comment.validate(o) === true,
-    parse: (o: unknown): { right: Comment } | { left: DefinedError[] } => {
-        if (Comment.is(o)) {
-            return { right: o }
-        }
-        return { left: (Comment.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents information about the comment data transfer object.
  */
@@ -3091,20 +3074,20 @@ export interface Comment {
     userKey?: string | undefined
 }
 
-export const CommunicationMessage = {
-    validate: CommunicationMessageValidator as ValidateFunction<CommunicationMessage>,
+export const Comment = {
+    validate: CommentValidator as ValidateFunction<Comment>,
     get schema() {
-        return CommunicationMessage.validate.schema
+        return Comment.validate.schema
     },
     get errors() {
-        return CommunicationMessage.validate.errors ?? undefined
+        return Comment.validate.errors ?? undefined
     },
-    is: (o: unknown): o is CommunicationMessage => CommunicationMessage.validate(o) === true,
-    parse: (o: unknown): { right: CommunicationMessage } | { left: DefinedError[] } => {
-        if (CommunicationMessage.is(o)) {
+    is: (o: unknown): o is Comment => Comment.validate(o) === true,
+    parse: (o: unknown): { right: Comment } | { left: DefinedError[] } => {
+        if (Comment.is(o)) {
             return { right: o }
         }
-        return { left: (CommunicationMessage.errors ?? []) as DefinedError[] }
+        return { left: (Comment.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -3297,6 +3280,33 @@ export interface CommunicationMessage {
     userKey?: string | undefined
 }
 
+export const CommunicationMessage = {
+    validate: CommunicationMessageValidator as ValidateFunction<CommunicationMessage>,
+    get schema() {
+        return CommunicationMessage.validate.schema
+    },
+    get errors() {
+        return CommunicationMessage.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CommunicationMessage => CommunicationMessage.validate(o) === true,
+    parse: (o: unknown): { right: CommunicationMessage } | { left: DefinedError[] } => {
+        if (CommunicationMessage.is(o)) {
+            return { right: o }
+        }
+        return { left: (CommunicationMessage.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+/**
+ * Represents a list of failed communication messages to resend.
+ */
+export interface CommunicationMessageAction {
+    /**
+     * The list of failed communication messages to resend.
+     */
+    messages: string[]
+}
+
 export const CommunicationMessageAction = {
     validate: CommunicationMessageActionValidator as ValidateFunction<CommunicationMessageAction>,
     get schema() {
@@ -3311,33 +3321,6 @@ export const CommunicationMessageAction = {
             return { right: o }
         }
         return { left: (CommunicationMessageAction.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-/**
- * Represents a list of failed communication messages to resend.
- */
-export interface CommunicationMessageAction {
-    /**
-     * The list of failed communication messages to resend.
-     */
-    messages: string[]
-}
-
-export const CommunicationMessageEnqueueAction = {
-    validate: CommunicationMessageEnqueueActionValidator as ValidateFunction<CommunicationMessageEnqueueAction>,
-    get schema() {
-        return CommunicationMessageEnqueueAction.validate.schema
-    },
-    get errors() {
-        return CommunicationMessageEnqueueAction.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CommunicationMessageEnqueueAction => CommunicationMessageEnqueueAction.validate(o) === true,
-    parse: (o: unknown): { right: CommunicationMessageEnqueueAction } | { left: DefinedError[] } => {
-        if (CommunicationMessageEnqueueAction.is(o)) {
-            return { right: o }
-        }
-        return { left: (CommunicationMessageEnqueueAction.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -3358,6 +3341,23 @@ export interface CommunicationMessageEnqueueAction {
      */
     templateTypes?: TemplateTypes[] | undefined
 }
+
+export const CommunicationMessageEnqueueAction = {
+    validate: CommunicationMessageEnqueueActionValidator as ValidateFunction<CommunicationMessageEnqueueAction>,
+    get schema() {
+        return CommunicationMessageEnqueueAction.validate.schema
+    },
+    get errors() {
+        return CommunicationMessageEnqueueAction.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CommunicationMessageEnqueueAction => CommunicationMessageEnqueueAction.validate(o) === true,
+    parse: (o: unknown): { right: CommunicationMessageEnqueueAction } | { left: DefinedError[] } => {
+        if (CommunicationMessageEnqueueAction.is(o)) {
+            return { right: o }
+        }
+        return { left: (CommunicationMessageEnqueueAction.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * The unit that composes the list used for communication messages client directed searching
@@ -3498,6 +3498,8 @@ export interface Constraint {
     usage?: 'UNCONSTRAINED' | 'LIMITED' | undefined
 }
 
+export type Create10Response = GLJournalEntry[]
+
 export const Create10Response = {
     validate: Create10ResponseValidator as ValidateFunction<Create10Response>,
     get schema() {
@@ -3515,7 +3517,7 @@ export const Create10Response = {
     },
 } as const
 
-export type Create10Response = GLJournalEntry[]
+export type Create19Request = Holiday[]
 
 export const Create19Request = {
     validate: Create19RequestValidator as ValidateFunction<Create19Request>,
@@ -3534,7 +3536,7 @@ export const Create19Request = {
     },
 } as const
 
-export type Create19Request = Holiday[]
+export type Create19Response = Holiday[]
 
 export const Create19Response = {
     validate: Create19ResponseValidator as ValidateFunction<Create19Response>,
@@ -3553,7 +3555,7 @@ export const Create19Response = {
     },
 } as const
 
-export type Create19Response = Holiday[]
+export type Create9Request = GLAccountInput[]
 
 export const Create9Request = {
     validate: Create9RequestValidator as ValidateFunction<Create9Request>,
@@ -3572,7 +3574,7 @@ export const Create9Request = {
     },
 } as const
 
-export type Create9Request = GLAccountInput[]
+export type Create9Response = GLAccount[]
 
 export const Create9Response = {
     validate: Create9ResponseValidator as ValidateFunction<Create9Response>,
@@ -3588,25 +3590,6 @@ export const Create9Response = {
             return { right: o }
         }
         return { left: (Create9Response.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-export type Create9Response = GLAccount[]
-
-export const CreateDocument1Request = {
-    validate: CreateDocument1RequestValidator as ValidateFunction<CreateDocument1Request>,
-    get schema() {
-        return CreateDocument1Request.validate.schema
-    },
-    get errors() {
-        return CreateDocument1Request.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CreateDocument1Request => CreateDocument1Request.validate(o) === true,
-    parse: (o: unknown): { right: CreateDocument1Request } | { left: DefinedError[] } => {
-        if (CreateDocument1Request.is(o)) {
-            return { right: o }
-        }
-        return { left: (CreateDocument1Request.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -3646,20 +3629,20 @@ export interface CreateDocument1Request {
         | undefined
 }
 
-export const CreateDocumentRequest = {
-    validate: CreateDocumentRequestValidator as ValidateFunction<CreateDocumentRequest>,
+export const CreateDocument1Request = {
+    validate: CreateDocument1RequestValidator as ValidateFunction<CreateDocument1Request>,
     get schema() {
-        return CreateDocumentRequest.validate.schema
+        return CreateDocument1Request.validate.schema
     },
     get errors() {
-        return CreateDocumentRequest.validate.errors ?? undefined
+        return CreateDocument1Request.validate.errors ?? undefined
     },
-    is: (o: unknown): o is CreateDocumentRequest => CreateDocumentRequest.validate(o) === true,
-    parse: (o: unknown): { right: CreateDocumentRequest } | { left: DefinedError[] } => {
-        if (CreateDocumentRequest.is(o)) {
+    is: (o: unknown): o is CreateDocument1Request => CreateDocument1Request.validate(o) === true,
+    parse: (o: unknown): { right: CreateDocument1Request } | { left: DefinedError[] } => {
+        if (CreateDocument1Request.is(o)) {
             return { right: o }
         }
-        return { left: (CreateDocumentRequest.errors ?? []) as DefinedError[] }
+        return { left: (CreateDocument1Request.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -3678,6 +3661,25 @@ export interface CreateDocumentRequest {
     notes?: string | undefined
 }
 
+export const CreateDocumentRequest = {
+    validate: CreateDocumentRequestValidator as ValidateFunction<CreateDocumentRequest>,
+    get schema() {
+        return CreateDocumentRequest.validate.schema
+    },
+    get errors() {
+        return CreateDocumentRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CreateDocumentRequest => CreateDocumentRequest.validate(o) === true,
+    parse: (o: unknown): { right: CreateDocumentRequest } | { left: DefinedError[] } => {
+        if (CreateDocumentRequest.is(o)) {
+            return { right: o }
+        }
+        return { left: (CreateDocumentRequest.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+export type CreateLoanAccountFundingSourcesRequest = InvestorFund[]
+
 export const CreateLoanAccountFundingSourcesRequest = {
     validate: CreateLoanAccountFundingSourcesRequestValidator as ValidateFunction<CreateLoanAccountFundingSourcesRequest>,
     get schema() {
@@ -3695,7 +3697,7 @@ export const CreateLoanAccountFundingSourcesRequest = {
     },
 } as const
 
-export type CreateLoanAccountFundingSourcesRequest = InvestorFund[]
+export type CreateLoanAccountFundingSourcesResponse = InvestorFund[]
 
 export const CreateLoanAccountFundingSourcesResponse = {
     validate: CreateLoanAccountFundingSourcesResponseValidator as ValidateFunction<CreateLoanAccountFundingSourcesResponse>,
@@ -3715,7 +3717,7 @@ export const CreateLoanAccountFundingSourcesResponse = {
     },
 } as const
 
-export type CreateLoanAccountFundingSourcesResponse = InvestorFund[]
+export type CreatePlannedFeesRequest = PlannedInstallmentFee[]
 
 export const CreatePlannedFeesRequest = {
     validate: CreatePlannedFeesRequestValidator as ValidateFunction<CreatePlannedFeesRequest>,
@@ -3734,7 +3736,7 @@ export const CreatePlannedFeesRequest = {
     },
 } as const
 
-export type CreatePlannedFeesRequest = PlannedInstallmentFee[]
+export type CreatePlannedFeesResponse = PlannedInstallmentFee[]
 
 export const CreatePlannedFeesResponse = {
     validate: CreatePlannedFeesResponseValidator as ValidateFunction<CreatePlannedFeesResponse>,
@@ -3750,25 +3752,6 @@ export const CreatePlannedFeesResponse = {
             return { right: o }
         }
         return { left: (CreatePlannedFeesResponse.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-export type CreatePlannedFeesResponse = PlannedInstallmentFee[]
-
-export const CreditArrangement = {
-    validate: CreditArrangementValidator as ValidateFunction<CreditArrangement>,
-    get schema() {
-        return CreditArrangement.validate.schema
-    },
-    get errors() {
-        return CreditArrangement.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CreditArrangement => CreditArrangement.validate(o) === true,
-    parse: (o: unknown): { right: CreditArrangement } | { left: DefinedError[] } => {
-        if (CreditArrangement.is(o)) {
-            return { right: o }
-        }
-        return { left: (CreditArrangement.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -3847,6 +3830,37 @@ export interface CreditArrangement {
     subState?: 'PENDING_APPROVAL' | 'APPROVED' | 'ACTIVE' | 'CLOSED' | 'WITHDRAWN' | 'REJECTED' | undefined
 }
 
+export const CreditArrangement = {
+    validate: CreditArrangementValidator as ValidateFunction<CreditArrangement>,
+    get schema() {
+        return CreditArrangement.validate.schema
+    },
+    get errors() {
+        return CreditArrangement.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CreditArrangement => CreditArrangement.validate(o) === true,
+    parse: (o: unknown): { right: CreditArrangement } | { left: DefinedError[] } => {
+        if (CreditArrangement.is(o)) {
+            return { right: o }
+        }
+        return { left: (CreditArrangement.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+/**
+ * Represents loan and deposit accounts linked to a credit arrangement.
+ */
+export interface CreditArrangementAccounts {
+    /**
+     * List of the deposit accounts linked to the credit arrangement.
+     */
+    depositAccounts?: DepositAccount[] | undefined
+    /**
+     * List of loan accounts linked to the credit arrangement.
+     */
+    loanAccounts?: LoanAccount[] | undefined
+}
+
 export const CreditArrangementAccounts = {
     validate: CreditArrangementAccountsValidator as ValidateFunction<CreditArrangementAccounts>,
     get schema() {
@@ -3865,17 +3879,17 @@ export const CreditArrangementAccounts = {
 } as const
 
 /**
- * Represents loan and deposit accounts linked to a credit arrangement.
+ * The state change to perform on the credit arrangement.
  */
-export interface CreditArrangementAccounts {
+export interface CreditArrangementAction {
     /**
-     * List of the deposit accounts linked to the credit arrangement.
+     * The action type to be applied.
      */
-    depositAccounts?: DepositAccount[] | undefined
+    action: 'APPROVE' | 'UNDO_APPROVE' | 'REJECT' | 'UNDO_REJECT' | 'WITHDRAW' | 'UNDO_WITHDRAW' | 'CLOSE' | 'UNDO_CLOSE'
     /**
-     * List of loan accounts linked to the credit arrangement.
+     * The notes related to the action performed.
      */
-    loanAccounts?: LoanAccount[] | undefined
+    notes?: string | undefined
 }
 
 export const CreditArrangementAction = {
@@ -3894,20 +3908,6 @@ export const CreditArrangementAction = {
         return { left: (CreditArrangementAction.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * The state change to perform on the credit arrangement.
- */
-export interface CreditArrangementAction {
-    /**
-     * The action type to be applied.
-     */
-    action: 'APPROVE' | 'UNDO_APPROVE' | 'REJECT' | 'UNDO_REJECT' | 'WITHDRAW' | 'UNDO_WITHDRAW' | 'CLOSE' | 'UNDO_CLOSE'
-    /**
-     * The notes related to the action performed.
-     */
-    notes?: string | undefined
-}
 
 /**
  * Represents credit arrangment filter and search criteria.
@@ -4274,23 +4274,6 @@ export interface Currency {
     currencyCode?: string | undefined
 }
 
-export const CurrencyDetails = {
-    validate: CurrencyDetailsValidator as ValidateFunction<CurrencyDetails>,
-    get schema() {
-        return CurrencyDetails.validate.schema
-    },
-    get errors() {
-        return CurrencyDetails.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CurrencyDetails => CurrencyDetails.validate(o) === true,
-    parse: (o: unknown): { right: CurrencyDetails } | { left: DefinedError[] } => {
-        if (CurrencyDetails.is(o)) {
-            return { right: o }
-        }
-        return { left: (CurrencyDetails.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents a currency.
  */
@@ -4340,6 +4323,23 @@ export interface CurrencyDetails {
      */
     type: 'FIAT_CURRENCY' | 'CRYPTOCURRENCY' | 'NON_TRADITIONAL_CURRENCY'
 }
+
+export const CurrencyDetails = {
+    validate: CurrencyDetailsValidator as ValidateFunction<CurrencyDetails>,
+    get schema() {
+        return CurrencyDetails.validate.schema
+    },
+    get errors() {
+        return CurrencyDetails.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CurrencyDetails => CurrencyDetails.validate(o) === true,
+    parse: (o: unknown): { right: CurrencyDetails } | { left: DefinedError[] } => {
+        if (CurrencyDetails.is(o)) {
+            return { right: o }
+        }
+        return { left: (CurrencyDetails.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Represents one option of a selection custom field definition.
@@ -4423,23 +4423,6 @@ export interface CustomFieldIdentity {
     id?: string | undefined
 }
 
-export const CustomFieldMeta = {
-    validate: CustomFieldMetaValidator as ValidateFunction<CustomFieldMeta>,
-    get schema() {
-        return CustomFieldMeta.validate.schema
-    },
-    get errors() {
-        return CustomFieldMeta.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is CustomFieldMeta => CustomFieldMeta.validate(o) === true,
-    parse: (o: unknown): { right: CustomFieldMeta } | { left: DefinedError[] } => {
-        if (CustomFieldMeta.is(o)) {
-            return { right: o }
-        }
-        return { left: (CustomFieldMeta.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents a custom field definition.
  */
@@ -4513,6 +4496,23 @@ export interface CustomFieldMeta {
     valueValidationSettings?: CustomFieldValueValidationSettings | undefined
     viewRights?: CustomFieldViewRights | undefined
 }
+
+export const CustomFieldMeta = {
+    validate: CustomFieldMetaValidator as ValidateFunction<CustomFieldMeta>,
+    get schema() {
+        return CustomFieldMeta.validate.schema
+    },
+    get errors() {
+        return CustomFieldMeta.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is CustomFieldMeta => CustomFieldMeta.validate(o) === true,
+    parse: (o: unknown): { right: CustomFieldMeta } | { left: DefinedError[] } => {
+        if (CustomFieldMeta.is(o)) {
+            return { right: o }
+        }
+        return { left: (CustomFieldMeta.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Represents the information related to the options of a selection custom field definition.
@@ -4726,6 +4726,16 @@ export interface DashboardConfiguration {
         | undefined
 }
 
+/**
+ * Holds information about the data import action
+ */
+export interface DataImportAction {
+    /**
+     * Type of the data import action
+     */
+    type: 'APPROVE' | 'REJECT'
+}
+
 export const DataImportAction = {
     validate: DataImportActionValidator as ValidateFunction<DataImportAction>,
     get schema() {
@@ -4742,16 +4752,6 @@ export const DataImportAction = {
         return { left: (DataImportAction.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Holds information about the data import action
- */
-export interface DataImportAction {
-    /**
-     * Type of the data import action
-     */
-    type: 'APPROVE' | 'REJECT'
-}
 
 /**
  * Holds information about the data import error
@@ -4786,6 +4786,13 @@ export interface DataImportErrorColumn {
     name?: string | undefined
 }
 
+export interface DataImportRequest {
+    /**
+     * The file to import
+     */
+    file: string
+}
+
 export const DataImportRequest = {
     validate: DataImportRequestValidator as ValidateFunction<DataImportRequest>,
     get schema() {
@@ -4800,30 +4807,6 @@ export const DataImportRequest = {
             return { right: o }
         }
         return { left: (DataImportRequest.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-export interface DataImportRequest {
-    /**
-     * The file to import
-     */
-    file: string
-}
-
-export const DataImportResponse = {
-    validate: DataImportResponseValidator as ValidateFunction<DataImportResponse>,
-    get schema() {
-        return DataImportResponse.validate.schema
-    },
-    get errors() {
-        return DataImportResponse.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is DataImportResponse => DataImportResponse.validate(o) === true,
-    parse: (o: unknown): { right: DataImportResponse } | { left: DefinedError[] } => {
-        if (DataImportResponse.is(o)) {
-            return { right: o }
-        }
-        return { left: (DataImportResponse.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -4852,6 +4835,23 @@ export interface DataImportResponse {
         | 'RECOVERABLE_ERROR'
         | undefined
 }
+
+export const DataImportResponse = {
+    validate: DataImportResponseValidator as ValidateFunction<DataImportResponse>,
+    get schema() {
+        return DataImportResponse.validate.schema
+    },
+    get errors() {
+        return DataImportResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is DataImportResponse => DataImportResponse.validate(o) === true,
+    parse: (o: unknown): { right: DataImportResponse } | { left: DefinedError[] } => {
+        if (DataImportResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (DataImportResponse.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Holds information about the data import status
@@ -4953,23 +4953,6 @@ export interface DecimalInterval {
      */
     minValue?: number | undefined
 }
-
-export const DepositAccount = {
-    validate: DepositAccountValidator as ValidateFunction<DepositAccount>,
-    get schema() {
-        return DepositAccount.validate.schema
-    },
-    get errors() {
-        return DepositAccount.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is DepositAccount => DepositAccount.validate(o) === true,
-    parse: (o: unknown): { right: DepositAccount } | { left: DefinedError[] } => {
-        if (DepositAccount.is(o)) {
-            return { right: o }
-        }
-        return { left: (DepositAccount.errors ?? []) as DefinedError[] }
-    },
-} as const
 
 /**
  * Represents information about a deposit account.
@@ -5119,6 +5102,23 @@ export interface DepositAccount {
     withholdingTaxSourceKey?: string | undefined
 }
 
+export const DepositAccount = {
+    validate: DepositAccountValidator as ValidateFunction<DepositAccount>,
+    get schema() {
+        return DepositAccount.validate.schema
+    },
+    get errors() {
+        return DepositAccount.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is DepositAccount => DepositAccount.validate(o) === true,
+    parse: (o: unknown): { right: DepositAccount } | { left: DefinedError[] } => {
+        if (DepositAccount.is(o)) {
+            return { right: o }
+        }
+        return { left: (DepositAccount.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Represents information about the accrued amounts of deposit accounts.
  */
@@ -5141,6 +5141,20 @@ export interface DepositAccountAccruedAmounts {
     technicalOverdraftInterestAccrued?: number | undefined
 }
 
+/**
+ * Represents the action details for a deposit account.
+ */
+export interface DepositAccountAction {
+    /**
+     * The action type to be applied.
+     */
+    action: 'APPROVE' | 'UNDO_APPROVE' | 'LOCK' | 'UNLOCK' | 'CLOSE' | 'CLOSE_WITHDRAW' | 'CLOSE_REJECT' | 'CLOSE_WRITE_OFF'
+    /**
+     * The notes related to the action performed.
+     */
+    notes?: string | undefined
+}
+
 export const DepositAccountAction = {
     validate: DepositAccountActionValidator as ValidateFunction<DepositAccountAction>,
     get schema() {
@@ -5157,20 +5171,6 @@ export const DepositAccountAction = {
         return { left: (DepositAccountAction.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Represents the action details for a deposit account.
- */
-export interface DepositAccountAction {
-    /**
-     * The action type to be applied.
-     */
-    action: 'APPROVE' | 'UNDO_APPROVE' | 'LOCK' | 'UNLOCK' | 'CLOSE' | 'CLOSE_WITHDRAW' | 'CLOSE_REJECT' | 'CLOSE_WRITE_OFF'
-    /**
-     * The notes related to the action performed.
-     */
-    notes?: string | undefined
-}
 
 /**
  * Represents information about the balances of a deposit account.
@@ -5871,23 +5871,6 @@ export interface DepositOverdraftSettings {
     overdraftLimit?: number | undefined
 }
 
-export const DepositProduct = {
-    validate: DepositProductValidator as ValidateFunction<DepositProduct>,
-    get schema() {
-        return DepositProduct.validate.schema
-    },
-    get errors() {
-        return DepositProduct.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is DepositProduct => DepositProduct.validate(o) === true,
-    parse: (o: unknown): { right: DepositProduct } | { left: DefinedError[] } => {
-        if (DepositProduct.is(o)) {
-            return { right: o }
-        }
-        return { left: (DepositProduct.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * A deposit product defines the terms and constraints on deposit accounts
  */
@@ -5954,6 +5937,23 @@ export interface DepositProduct {
     type: 'CURRENT_ACCOUNT' | 'REGULAR_SAVINGS' | 'FIXED_DEPOSIT' | 'SAVINGS_PLAN' | 'INVESTOR_ACCOUNT'
 }
 
+export const DepositProduct = {
+    validate: DepositProductValidator as ValidateFunction<DepositProduct>,
+    get schema() {
+        return DepositProduct.validate.schema
+    },
+    get errors() {
+        return DepositProduct.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is DepositProduct => DepositProduct.validate(o) === true,
+    parse: (o: unknown): { right: DepositProduct } | { left: DefinedError[] } => {
+        if (DepositProduct.is(o)) {
+            return { right: o }
+        }
+        return { left: (DepositProduct.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Accounting settings, defines the accounting settings for the product.
  */
@@ -5976,6 +5976,16 @@ export interface DepositProductAccountingSettings {
     interestAccruedAccountingMethod?: 'NONE' | 'DAILY' | 'END_OF_MONTH' | undefined
 }
 
+/**
+ * Specify the batch update action details for a deposit product.
+ */
+export interface DepositProductAction {
+    /**
+     * The action type to be applied. When UPDATE_INTEREST_SETTINGS action type is used, all the existing deposit accounts will be updated with the latest interest-related fields at the end of day job execution
+     */
+    action: 'UPDATE_INTEREST_SETTINGS'
+}
+
 export const DepositProductAction = {
     validate: DepositProductActionValidator as ValidateFunction<DepositProductAction>,
     get schema() {
@@ -5994,13 +6004,13 @@ export const DepositProductAction = {
 } as const
 
 /**
- * Specify the batch update action details for a deposit product.
+ * Represents the response returned after a batch update action for a deposit product.
  */
-export interface DepositProductAction {
+export interface DepositProductActionResponse {
     /**
-     * The action type to be applied. When UPDATE_INTEREST_SETTINGS action type is used, all the existing deposit accounts will be updated with the latest interest-related fields at the end of day job execution
+     * The state of the deposit product action
      */
-    action: 'UPDATE_INTEREST_SETTINGS'
+    state?: 'QUEUED' | undefined
 }
 
 export const DepositProductActionResponse = {
@@ -6019,16 +6029,6 @@ export const DepositProductActionResponse = {
         return { left: (DepositProductActionResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Represents the response returned after a batch update action for a deposit product.
- */
-export interface DepositProductActionResponse {
-    /**
-     * The state of the deposit product action
-     */
-    state?: 'QUEUED' | undefined
-}
 
 /**
  * Holds information about product availability.
@@ -6394,23 +6394,6 @@ export interface DepositTerms {
     overdraftSettings?: DepositOverdraftSettings | undefined
 }
 
-export const DepositTransaction = {
-    validate: DepositTransactionValidator as ValidateFunction<DepositTransaction>,
-    get schema() {
-        return DepositTransaction.validate.schema
-    },
-    get errors() {
-        return DepositTransaction.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is DepositTransaction => DepositTransaction.validate(o) === true,
-    parse: (o: unknown): { right: DepositTransaction } | { left: DefinedError[] } => {
-        if (DepositTransaction.is(o)) {
-            return { right: o }
-        }
-        return { left: (DepositTransaction.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents the action performed on an Deposit Account after which the account's amount changes its value.
  */
@@ -6553,20 +6536,20 @@ export interface DepositTransaction {
     valueDate?: string | undefined
 }
 
-export const DepositTransactionAdjustmentDetails = {
-    validate: DepositTransactionAdjustmentDetailsValidator as ValidateFunction<DepositTransactionAdjustmentDetails>,
+export const DepositTransaction = {
+    validate: DepositTransactionValidator as ValidateFunction<DepositTransaction>,
     get schema() {
-        return DepositTransactionAdjustmentDetails.validate.schema
+        return DepositTransaction.validate.schema
     },
     get errors() {
-        return DepositTransactionAdjustmentDetails.validate.errors ?? undefined
+        return DepositTransaction.validate.errors ?? undefined
     },
-    is: (o: unknown): o is DepositTransactionAdjustmentDetails => DepositTransactionAdjustmentDetails.validate(o) === true,
-    parse: (o: unknown): { right: DepositTransactionAdjustmentDetails } | { left: DefinedError[] } => {
-        if (DepositTransactionAdjustmentDetails.is(o)) {
+    is: (o: unknown): o is DepositTransaction => DepositTransaction.validate(o) === true,
+    parse: (o: unknown): { right: DepositTransaction } | { left: DefinedError[] } => {
+        if (DepositTransaction.is(o)) {
             return { right: o }
         }
-        return { left: (DepositTransactionAdjustmentDetails.errors ?? []) as DefinedError[] }
+        return { left: (DepositTransaction.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -6583,6 +6566,23 @@ export interface DepositTransactionAdjustmentDetails {
      */
     notes?: string | undefined
 }
+
+export const DepositTransactionAdjustmentDetails = {
+    validate: DepositTransactionAdjustmentDetailsValidator as ValidateFunction<DepositTransactionAdjustmentDetails>,
+    get schema() {
+        return DepositTransactionAdjustmentDetails.validate.schema
+    },
+    get errors() {
+        return DepositTransactionAdjustmentDetails.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is DepositTransactionAdjustmentDetails => DepositTransactionAdjustmentDetails.validate(o) === true,
+    parse: (o: unknown): { right: DepositTransactionAdjustmentDetails } | { left: DefinedError[] } => {
+        if (DepositTransactionAdjustmentDetails.is(o)) {
+            return { right: o }
+        }
+        return { left: (DepositTransactionAdjustmentDetails.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * The balances changed within a transaction.
@@ -6992,23 +6992,6 @@ export interface DisbursementTransferDetailsInput {
     linkedAccountKey?: string | undefined
 }
 
-export const Document = {
-    validate: DocumentValidator as ValidateFunction<Document>,
-    get schema() {
-        return Document.validate.schema
-    },
-    get errors() {
-        return Document.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Document => Document.validate(o) === true,
-    parse: (o: unknown): { right: Document } | { left: DefinedError[] } => {
-        if (Document.is(o)) {
-            return { right: o }
-        }
-        return { left: (Document.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Holds information regarding the documents uploaded as attachments
  */
@@ -7075,6 +7058,23 @@ export interface Document {
      */
     type: string
 }
+
+export const Document = {
+    validate: DocumentValidator as ValidateFunction<Document>,
+    get schema() {
+        return Document.validate.schema
+    },
+    get errors() {
+        return Document.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Document => Document.validate(o) === true,
+    parse: (o: unknown): { right: Document } | { left: DefinedError[] } => {
+        if (Document.is(o)) {
+            return { right: o }
+        }
+        return { left: (Document.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Template documents of the product.
@@ -7187,6 +7187,8 @@ export interface DuplicateFieldConstraint {
     groupIndex?: number | undefined
 }
 
+export type EditScheduleRequest = Installment[]
+
 export const EditScheduleRequest = {
     validate: EditScheduleRequestValidator as ValidateFunction<EditScheduleRequest>,
     get schema() {
@@ -7204,7 +7206,7 @@ export const EditScheduleRequest = {
     },
 } as const
 
-export type EditScheduleRequest = Installment[]
+export type EditTranchesRequest = LoanTranche[]
 
 export const EditTranchesRequest = {
     validate: EditTranchesRequestValidator as ValidateFunction<EditTranchesRequest>,
@@ -7223,7 +7225,7 @@ export const EditTranchesRequest = {
     },
 } as const
 
-export type EditTranchesRequest = LoanTranche[]
+export type EditTranchesResponse = LoanTranche[]
 
 export const EditTranchesResponse = {
     validate: EditTranchesResponseValidator as ValidateFunction<EditTranchesResponse>,
@@ -7242,7 +7244,7 @@ export const EditTranchesResponse = {
     },
 } as const
 
-export type EditTranchesResponse = LoanTranche[]
+export type EditTransactionDetailsRequest = PatchOperation[]
 
 export const EditTransactionDetailsRequest = {
     validate: EditTransactionDetailsRequestValidator as ValidateFunction<EditTransactionDetailsRequest>,
@@ -7261,9 +7263,11 @@ export const EditTransactionDetailsRequest = {
     },
 } as const
 
-export type EditTransactionDetailsRequest = PatchOperation[]
-
 type EnabledComponents = 'LOANS' | 'DEPOSITS' | 'BRANCHES' | 'CENTRES' | 'CLIENTS' | 'GROUPS' | 'ACCOUNTING' | 'CREDIT_OFFICERS'
+
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
 
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
@@ -7279,27 +7283,6 @@ export const ErrorResponse = {
             return { right: o }
         }
         return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
-
-export const ExchangeRate = {
-    validate: ExchangeRateValidator as ValidateFunction<ExchangeRate>,
-    get schema() {
-        return ExchangeRate.validate.schema
-    },
-    get errors() {
-        return ExchangeRate.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ExchangeRate => ExchangeRate.validate(o) === true,
-    parse: (o: unknown): { right: ExchangeRate } | { left: DefinedError[] } => {
-        if (ExchangeRate.is(o)) {
-            return { right: o }
-        }
-        return { left: (ExchangeRate.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -7337,20 +7320,20 @@ export interface ExchangeRate {
     userKey?: string | undefined
 }
 
-export const ExchangeRateInput = {
-    validate: ExchangeRateInputValidator as ValidateFunction<ExchangeRateInput>,
+export const ExchangeRate = {
+    validate: ExchangeRateValidator as ValidateFunction<ExchangeRate>,
     get schema() {
-        return ExchangeRateInput.validate.schema
+        return ExchangeRate.validate.schema
     },
     get errors() {
-        return ExchangeRateInput.validate.errors ?? undefined
+        return ExchangeRate.validate.errors ?? undefined
     },
-    is: (o: unknown): o is ExchangeRateInput => ExchangeRateInput.validate(o) === true,
-    parse: (o: unknown): { right: ExchangeRateInput } | { left: DefinedError[] } => {
-        if (ExchangeRateInput.is(o)) {
+    is: (o: unknown): o is ExchangeRate => ExchangeRate.validate(o) === true,
+    parse: (o: unknown): { right: ExchangeRate } | { left: DefinedError[] } => {
+        if (ExchangeRate.is(o)) {
             return { right: o }
         }
-        return { left: (ExchangeRateInput.errors ?? []) as DefinedError[] }
+        return { left: (ExchangeRate.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -7371,6 +7354,23 @@ export interface ExchangeRateInput {
      */
     startDate?: string | undefined
 }
+
+export const ExchangeRateInput = {
+    validate: ExchangeRateInputValidator as ValidateFunction<ExchangeRateInput>,
+    get schema() {
+        return ExchangeRateInput.validate.schema
+    },
+    get errors() {
+        return ExchangeRateInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ExchangeRateInput => ExchangeRateInput.validate(o) === true,
+    parse: (o: unknown): { right: ExchangeRateInput } | { left: DefinedError[] } => {
+        if (ExchangeRateInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (ExchangeRateInput.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * An amount of predefined fee that was applied or paid on an account.
@@ -7432,23 +7432,6 @@ export interface FeeAmount {
     paid?: number | undefined
 }
 
-export const FeeAppliedDepositTransactionInput = {
-    validate: FeeAppliedDepositTransactionInputValidator as ValidateFunction<FeeAppliedDepositTransactionInput>,
-    get schema() {
-        return FeeAppliedDepositTransactionInput.validate.schema
-    },
-    get errors() {
-        return FeeAppliedDepositTransactionInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is FeeAppliedDepositTransactionInput => FeeAppliedDepositTransactionInput.validate(o) === true,
-    parse: (o: unknown): { right: FeeAppliedDepositTransactionInput } | { left: DefinedError[] } => {
-        if (FeeAppliedDepositTransactionInput.is(o)) {
-            return { right: o }
-        }
-        return { left: (FeeAppliedDepositTransactionInput.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents the request payload for creating a transaction of type FEE_APPLIED.
  */
@@ -7471,6 +7454,23 @@ export interface FeeAppliedDepositTransactionInput {
     predefinedFeeKey?: string | undefined
 }
 
+export const FeeAppliedDepositTransactionInput = {
+    validate: FeeAppliedDepositTransactionInputValidator as ValidateFunction<FeeAppliedDepositTransactionInput>,
+    get schema() {
+        return FeeAppliedDepositTransactionInput.validate.schema
+    },
+    get errors() {
+        return FeeAppliedDepositTransactionInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is FeeAppliedDepositTransactionInput => FeeAppliedDepositTransactionInput.validate(o) === true,
+    parse: (o: unknown): { right: FeeAppliedDepositTransactionInput } | { left: DefinedError[] } => {
+        if (FeeAppliedDepositTransactionInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (FeeAppliedDepositTransactionInput.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * An amount of predefined fee to apply on account.
  */
@@ -7488,23 +7488,6 @@ export interface FeeInput {
      */
     predefinedFeeKey: string
 }
-
-export const FeeLoanTransactionInput = {
-    validate: FeeLoanTransactionInputValidator as ValidateFunction<FeeLoanTransactionInput>,
-    get schema() {
-        return FeeLoanTransactionInput.validate.schema
-    },
-    get errors() {
-        return FeeLoanTransactionInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is FeeLoanTransactionInput => FeeLoanTransactionInput.validate(o) === true,
-    parse: (o: unknown): { right: FeeLoanTransactionInput } | { left: DefinedError[] } => {
-        if (FeeLoanTransactionInput.is(o)) {
-            return { right: o }
-        }
-        return { left: (FeeLoanTransactionInput.errors ?? []) as DefinedError[] }
-    },
-} as const
 
 /**
  * Represents the request payload for creating a transaction of type FEE_APPLIED
@@ -7547,6 +7530,23 @@ export interface FeeLoanTransactionInput {
      */
     valueDate?: string | undefined
 }
+
+export const FeeLoanTransactionInput = {
+    validate: FeeLoanTransactionInputValidator as ValidateFunction<FeeLoanTransactionInput>,
+    get schema() {
+        return FeeLoanTransactionInput.validate.schema
+    },
+    get errors() {
+        return FeeLoanTransactionInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is FeeLoanTransactionInput => FeeLoanTransactionInput.validate(o) === true,
+    parse: (o: unknown): { right: FeeLoanTransactionInput } | { left: DefinedError[] } => {
+        if (FeeLoanTransactionInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (FeeLoanTransactionInput.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Defines fees settings for the product.
@@ -7844,6 +7844,8 @@ export const GeneralSetup = {
     },
 } as const
 
+export type GetAll10Response = ExchangeRate[]
+
 export const GetAll10Response = {
     validate: GetAll10ResponseValidator as ValidateFunction<GetAll10Response>,
     get schema() {
@@ -7861,7 +7863,7 @@ export const GetAll10Response = {
     },
 } as const
 
-export type GetAll10Response = ExchangeRate[]
+export type GetAll11Response = GLAccount[]
 
 export const GetAll11Response = {
     validate: GetAll11ResponseValidator as ValidateFunction<GetAll11Response>,
@@ -7880,7 +7882,7 @@ export const GetAll11Response = {
     },
 } as const
 
-export type GetAll11Response = GLAccount[]
+export type GetAll12Response = GLJournalEntry[]
 
 export const GetAll12Response = {
     validate: GetAll12ResponseValidator as ValidateFunction<GetAll12Response>,
@@ -7899,7 +7901,7 @@ export const GetAll12Response = {
     },
 } as const
 
-export type GetAll12Response = GLJournalEntry[]
+export type GetAll13Response = Group[]
 
 export const GetAll13Response = {
     validate: GetAll13ResponseValidator as ValidateFunction<GetAll13Response>,
@@ -7918,7 +7920,7 @@ export const GetAll13Response = {
     },
 } as const
 
-export type GetAll13Response = Group[]
+export type GetAll14Response = IdentificationDocumentTemplate[]
 
 export const GetAll14Response = {
     validate: GetAll14ResponseValidator as ValidateFunction<GetAll14Response>,
@@ -7937,7 +7939,7 @@ export const GetAll14Response = {
     },
 } as const
 
-export type GetAll14Response = IdentificationDocumentTemplate[]
+export type GetAll15Response = Installment[]
 
 export const GetAll15Response = {
     validate: GetAll15ResponseValidator as ValidateFunction<GetAll15Response>,
@@ -7956,7 +7958,7 @@ export const GetAll15Response = {
     },
 } as const
 
-export type GetAll15Response = Installment[]
+export type GetAll16Response = LoanAccount[]
 
 export const GetAll16Response = {
     validate: GetAll16ResponseValidator as ValidateFunction<GetAll16Response>,
@@ -7975,7 +7977,7 @@ export const GetAll16Response = {
     },
 } as const
 
-export type GetAll16Response = LoanAccount[]
+export type GetAll17Response = LoanProduct[]
 
 export const GetAll17Response = {
     validate: GetAll17ResponseValidator as ValidateFunction<GetAll17Response>,
@@ -7994,7 +7996,7 @@ export const GetAll17Response = {
     },
 } as const
 
-export type GetAll17Response = LoanProduct[]
+export type GetAll18Response = LoanTransaction[]
 
 export const GetAll18Response = {
     validate: GetAll18ResponseValidator as ValidateFunction<GetAll18Response>,
@@ -8013,7 +8015,7 @@ export const GetAll18Response = {
     },
 } as const
 
-export type GetAll18Response = LoanTransaction[]
+export type GetAll19Response = Task[]
 
 export const GetAll19Response = {
     validate: GetAll19ResponseValidator as ValidateFunction<GetAll19Response>,
@@ -8032,7 +8034,7 @@ export const GetAll19Response = {
     },
 } as const
 
-export type GetAll19Response = Task[]
+export type GetAll1Response = ApiConsumer[]
 
 export const GetAll1Response = {
     validate: GetAll1ResponseValidator as ValidateFunction<GetAll1Response>,
@@ -8051,7 +8053,7 @@ export const GetAll1Response = {
     },
 } as const
 
-export type GetAll1Response = ApiConsumer[]
+export type GetAll20Response = TransactionChannel[]
 
 export const GetAll20Response = {
     validate: GetAll20ResponseValidator as ValidateFunction<GetAll20Response>,
@@ -8070,7 +8072,7 @@ export const GetAll20Response = {
     },
 } as const
 
-export type GetAll20Response = TransactionChannel[]
+export type GetAll21Response = Role[]
 
 export const GetAll21Response = {
     validate: GetAll21ResponseValidator as ValidateFunction<GetAll21Response>,
@@ -8089,7 +8091,7 @@ export const GetAll21Response = {
     },
 } as const
 
-export type GetAll21Response = Role[]
+export type GetAll22Response = User[]
 
 export const GetAll22Response = {
     validate: GetAll22ResponseValidator as ValidateFunction<GetAll22Response>,
@@ -8108,7 +8110,7 @@ export const GetAll22Response = {
     },
 } as const
 
-export type GetAll22Response = User[]
+export type GetAll23Response = CurrencyDetails[]
 
 export const GetAll23Response = {
     validate: GetAll23ResponseValidator as ValidateFunction<GetAll23Response>,
@@ -8127,7 +8129,7 @@ export const GetAll23Response = {
     },
 } as const
 
-export type GetAll23Response = CurrencyDetails[]
+export type GetAll2Response = Branch[]
 
 export const GetAll2Response = {
     validate: GetAll2ResponseValidator as ValidateFunction<GetAll2Response>,
@@ -8146,7 +8148,7 @@ export const GetAll2Response = {
     },
 } as const
 
-export type GetAll2Response = Branch[]
+export type GetAll3Response = Centre[]
 
 export const GetAll3Response = {
     validate: GetAll3ResponseValidator as ValidateFunction<GetAll3Response>,
@@ -8165,7 +8167,7 @@ export const GetAll3Response = {
     },
 } as const
 
-export type GetAll3Response = Centre[]
+export type GetAll4Response = Client[]
 
 export const GetAll4Response = {
     validate: GetAll4ResponseValidator as ValidateFunction<GetAll4Response>,
@@ -8184,7 +8186,7 @@ export const GetAll4Response = {
     },
 } as const
 
-export type GetAll4Response = Client[]
+export type GetAll5Response = CreditArrangement[]
 
 export const GetAll5Response = {
     validate: GetAll5ResponseValidator as ValidateFunction<GetAll5Response>,
@@ -8203,7 +8205,7 @@ export const GetAll5Response = {
     },
 } as const
 
-export type GetAll5Response = CreditArrangement[]
+export type GetAll6Response = CustomFieldSetMeta[]
 
 export const GetAll6Response = {
     validate: GetAll6ResponseValidator as ValidateFunction<GetAll6Response>,
@@ -8222,7 +8224,7 @@ export const GetAll6Response = {
     },
 } as const
 
-export type GetAll6Response = CustomFieldSetMeta[]
+export type GetAll7Response = DepositAccount[]
 
 export const GetAll7Response = {
     validate: GetAll7ResponseValidator as ValidateFunction<GetAll7Response>,
@@ -8241,7 +8243,7 @@ export const GetAll7Response = {
     },
 } as const
 
-export type GetAll7Response = DepositAccount[]
+export type GetAll8Response = DepositProduct[]
 
 export const GetAll8Response = {
     validate: GetAll8ResponseValidator as ValidateFunction<GetAll8Response>,
@@ -8260,7 +8262,7 @@ export const GetAll8Response = {
     },
 } as const
 
-export type GetAll8Response = DepositProduct[]
+export type GetAll9Response = DepositTransaction[]
 
 export const GetAll9Response = {
     validate: GetAll9ResponseValidator as ValidateFunction<GetAll9Response>,
@@ -8279,7 +8281,7 @@ export const GetAll9Response = {
     },
 } as const
 
-export type GetAll9Response = DepositTransaction[]
+export type GetAllAuthorizationHolds1Response = GetAuthorizationHold[]
 
 export const GetAllAuthorizationHolds1Response = {
     validate: GetAllAuthorizationHolds1ResponseValidator as ValidateFunction<GetAllAuthorizationHolds1Response>,
@@ -8298,7 +8300,7 @@ export const GetAllAuthorizationHolds1Response = {
     },
 } as const
 
-export type GetAllAuthorizationHolds1Response = GetAuthorizationHold[]
+export type GetAllAuthorizationHoldsResponse = GetAuthorizationHold[]
 
 export const GetAllAuthorizationHoldsResponse = {
     validate: GetAllAuthorizationHoldsResponseValidator as ValidateFunction<GetAllAuthorizationHoldsResponse>,
@@ -8317,7 +8319,7 @@ export const GetAllAuthorizationHoldsResponse = {
     },
 } as const
 
-export type GetAllAuthorizationHoldsResponse = GetAuthorizationHold[]
+export type GetAllBlocksResponse = BlockFund[]
 
 export const GetAllBlocksResponse = {
     validate: GetAllBlocksResponseValidator as ValidateFunction<GetAllBlocksResponse>,
@@ -8336,7 +8338,7 @@ export const GetAllBlocksResponse = {
     },
 } as const
 
-export type GetAllBlocksResponse = BlockFund[]
+export type GetAllBySetIdResponse = CustomFieldMeta[]
 
 export const GetAllBySetIdResponse = {
     validate: GetAllBySetIdResponseValidator as ValidateFunction<GetAllBySetIdResponse>,
@@ -8355,7 +8357,7 @@ export const GetAllBySetIdResponse = {
     },
 } as const
 
-export type GetAllBySetIdResponse = CustomFieldMeta[]
+export type GetAllCards1Response = Card[]
 
 export const GetAllCards1Response = {
     validate: GetAllCards1ResponseValidator as ValidateFunction<GetAllCards1Response>,
@@ -8374,7 +8376,7 @@ export const GetAllCards1Response = {
     },
 } as const
 
-export type GetAllCards1Response = Card[]
+export type GetAllCardsResponse = Card[]
 
 export const GetAllCardsResponse = {
     validate: GetAllCardsResponseValidator as ValidateFunction<GetAllCardsResponse>,
@@ -8393,7 +8395,7 @@ export const GetAllCardsResponse = {
     },
 } as const
 
-export type GetAllCardsResponse = Card[]
+export type GetAllIndexRateSourcesResponse = IndexRateSource[]
 
 export const GetAllIndexRateSourcesResponse = {
     validate: GetAllIndexRateSourcesResponseValidator as ValidateFunction<GetAllIndexRateSourcesResponse>,
@@ -8412,7 +8414,7 @@ export const GetAllIndexRateSourcesResponse = {
     },
 } as const
 
-export type GetAllIndexRateSourcesResponse = IndexRateSource[]
+export type GetAllIndexRatesResponse = IndexRate[]
 
 export const GetAllIndexRatesResponse = {
     validate: GetAllIndexRatesResponseValidator as ValidateFunction<GetAllIndexRatesResponse>,
@@ -8431,7 +8433,7 @@ export const GetAllIndexRatesResponse = {
     },
 } as const
 
-export type GetAllIndexRatesResponse = IndexRate[]
+export type GetAllPlannedFeesResponse = PlannedInstallmentFee[]
 
 export const GetAllPlannedFeesResponse = {
     validate: GetAllPlannedFeesResponseValidator as ValidateFunction<GetAllPlannedFeesResponse>,
@@ -8450,7 +8452,7 @@ export const GetAllPlannedFeesResponse = {
     },
 } as const
 
-export type GetAllPlannedFeesResponse = PlannedInstallmentFee[]
+export type GetAllResponse = AccountingRate[]
 
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
@@ -8466,25 +8468,6 @@ export const GetAllResponse = {
             return { right: o }
         }
         return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-export type GetAllResponse = AccountingRate[]
-
-export const GetAuthorizationHold = {
-    validate: GetAuthorizationHoldValidator as ValidateFunction<GetAuthorizationHold>,
-    get schema() {
-        return GetAuthorizationHold.validate.schema
-    },
-    get errors() {
-        return GetAuthorizationHold.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GetAuthorizationHold => GetAuthorizationHold.validate(o) === true,
-    parse: (o: unknown): { right: GetAuthorizationHold } | { left: DefinedError[] } => {
-        if (GetAuthorizationHold.is(o)) {
-            return { right: o }
-        }
-        return { left: (GetAuthorizationHold.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -8568,20 +8551,20 @@ export interface GetAuthorizationHold {
     userTransactionTime?: string | undefined
 }
 
-export const GetCardTransaction = {
-    validate: GetCardTransactionValidator as ValidateFunction<GetCardTransaction>,
+export const GetAuthorizationHold = {
+    validate: GetAuthorizationHoldValidator as ValidateFunction<GetAuthorizationHold>,
     get schema() {
-        return GetCardTransaction.validate.schema
+        return GetAuthorizationHold.validate.schema
     },
     get errors() {
-        return GetCardTransaction.validate.errors ?? undefined
+        return GetAuthorizationHold.validate.errors ?? undefined
     },
-    is: (o: unknown): o is GetCardTransaction => GetCardTransaction.validate(o) === true,
-    parse: (o: unknown): { right: GetCardTransaction } | { left: DefinedError[] } => {
-        if (GetCardTransaction.is(o)) {
+    is: (o: unknown): o is GetAuthorizationHold => GetAuthorizationHold.validate(o) === true,
+    parse: (o: unknown): { right: GetAuthorizationHold } | { left: DefinedError[] } => {
+        if (GetAuthorizationHold.is(o)) {
             return { right: o }
         }
-        return { left: (GetCardTransaction.errors ?? []) as DefinedError[] }
+        return { left: (GetAuthorizationHold.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -8726,6 +8709,23 @@ export interface GetCardTransaction {
      */
     valueDate?: string | undefined
 }
+
+export const GetCardTransaction = {
+    validate: GetCardTransactionValidator as ValidateFunction<GetCardTransaction>,
+    get schema() {
+        return GetCardTransaction.validate.schema
+    },
+    get errors() {
+        return GetCardTransaction.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GetCardTransaction => GetCardTransaction.validate(o) === true,
+    parse: (o: unknown): { right: GetCardTransaction } | { left: DefinedError[] } => {
+        if (GetCardTransaction.is(o)) {
+            return { right: o }
+        }
+        return { left: (GetCardTransaction.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 export type GetCommentsResponse = Comment[]
 
@@ -9035,23 +9035,6 @@ export const GetWithholdingTaxHistoryResponse = {
     },
 } as const
 
-export const GLAccount = {
-    validate: GLAccountValidator as ValidateFunction<GLAccount>,
-    get schema() {
-        return GLAccount.validate.schema
-    },
-    get errors() {
-        return GLAccount.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is GLAccount => GLAccount.validate(o) === true,
-    parse: (o: unknown): { right: GLAccount } | { left: DefinedError[] } => {
-        if (GLAccount.is(o)) {
-            return { right: o }
-        }
-        return { left: (GLAccount.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents a general ledger account.
  */
@@ -9110,6 +9093,23 @@ export interface GLAccount {
      */
     usage?: 'DETAIL' | 'HEADER' | undefined
 }
+
+export const GLAccount = {
+    validate: GLAccountValidator as ValidateFunction<GLAccount>,
+    get schema() {
+        return GLAccount.validate.schema
+    },
+    get errors() {
+        return GLAccount.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is GLAccount => GLAccount.validate(o) === true,
+    parse: (o: unknown): { right: GLAccount } | { left: DefinedError[] } => {
+        if (GLAccount.is(o)) {
+            return { right: o }
+        }
+        return { left: (GLAccount.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Represents the general ledger account and amount used in a journal entry record.
@@ -9445,23 +9445,6 @@ export interface GracePeriodSettings {
     gracePeriodType?: 'NONE' | 'PAY_INTEREST_ONLY' | 'INTEREST_FORGIVENESS' | undefined
 }
 
-export const Group = {
-    validate: GroupValidator as ValidateFunction<Group>,
-    get schema() {
-        return Group.validate.schema
-    },
-    get errors() {
-        return Group.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Group => Group.validate(o) === true,
-    parse: (o: unknown): { right: Group } | { left: DefinedError[] } => {
-        if (Group.is(o)) {
-            return { right: o }
-        }
-        return { left: (Group.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents a group. A group is a type of client that can represent a non-physical person such as a company client or a grouping of individual clients. A group can have its own accounts and can optionally have individual clients as members, in which case they also need to have an individual profile in Mambu.
  */
@@ -9557,6 +9540,23 @@ export interface Group {
         | 'PHRASE'
         | undefined
 }
+
+export const Group = {
+    validate: GroupValidator as ValidateFunction<Group>,
+    get schema() {
+        return Group.validate.schema
+    },
+    get errors() {
+        return Group.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Group => Group.validate(o) === true,
+    parse: (o: unknown): { right: Group } | { left: DefinedError[] } => {
+        if (Group.is(o)) {
+            return { right: o }
+        }
+        return { left: (Group.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * The unit that composes the list used for Groups searching
@@ -9755,23 +9755,6 @@ export interface Guarantor {
     guarantorType: 'CLIENT' | 'GROUP'
 }
 
-export const Holiday = {
-    validate: HolidayValidator as ValidateFunction<Holiday>,
-    get schema() {
-        return Holiday.validate.schema
-    },
-    get errors() {
-        return Holiday.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Holiday => Holiday.validate(o) === true,
-    parse: (o: unknown): { right: Holiday } | { left: DefinedError[] } => {
-        if (Holiday.is(o)) {
-            return { right: o }
-        }
-        return { left: (Holiday.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents the holiday.
  */
@@ -9802,6 +9785,37 @@ export interface Holiday {
     name?: string | undefined
 }
 
+export const Holiday = {
+    validate: HolidayValidator as ValidateFunction<Holiday>,
+    get schema() {
+        return Holiday.validate.schema
+    },
+    get errors() {
+        return Holiday.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Holiday => Holiday.validate(o) === true,
+    parse: (o: unknown): { right: Holiday } | { left: DefinedError[] } => {
+        if (Holiday.is(o)) {
+            return { right: o }
+        }
+        return { left: (Holiday.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+/**
+ * Represents the holidays of the organization.
+ */
+export interface Holidays {
+    /**
+     * The general holidays of the organization.
+     */
+    holidays?: Holiday[] | undefined
+    /**
+     * The non-working days of the organization.
+     */
+    nonWorkingDays?: NonWorkingDays2[] | undefined
+}
+
 export const Holidays = {
     validate: HolidaysValidator as ValidateFunction<Holidays>,
     get schema() {
@@ -9818,20 +9832,6 @@ export const Holidays = {
         return { left: (Holidays.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Represents the holidays of the organization.
- */
-export interface Holidays {
-    /**
-     * The general holidays of the organization.
-     */
-    holidays?: Holiday[] | undefined
-    /**
-     * The non-working days of the organization.
-     */
-    nonWorkingDays?: NonWorkingDays[] | undefined
-}
 
 /**
  * An Id document represents a document that can be used to identify a person like a passport, a drivers license an id card etc.
@@ -9909,23 +9909,6 @@ export interface IdentificationDocumentTemplate {
     mandatory?: boolean | undefined
 }
 
-export const IndexRate = {
-    validate: IndexRateValidator as ValidateFunction<IndexRate>,
-    get schema() {
-        return IndexRate.validate.schema
-    },
-    get errors() {
-        return IndexRate.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is IndexRate => IndexRate.validate(o) === true,
-    parse: (o: unknown): { right: IndexRate } | { left: DefinedError[] } => {
-        if (IndexRate.is(o)) {
-            return { right: o }
-        }
-        return { left: (IndexRate.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents an index rate.
  */
@@ -9960,20 +9943,20 @@ export interface IndexRate {
     userKey?: string | undefined
 }
 
-export const IndexRateSource = {
-    validate: IndexRateSourceValidator as ValidateFunction<IndexRateSource>,
+export const IndexRate = {
+    validate: IndexRateValidator as ValidateFunction<IndexRate>,
     get schema() {
-        return IndexRateSource.validate.schema
+        return IndexRate.validate.schema
     },
     get errors() {
-        return IndexRateSource.validate.errors ?? undefined
+        return IndexRate.validate.errors ?? undefined
     },
-    is: (o: unknown): o is IndexRateSource => IndexRateSource.validate(o) === true,
-    parse: (o: unknown): { right: IndexRateSource } | { left: DefinedError[] } => {
-        if (IndexRateSource.is(o)) {
+    is: (o: unknown): o is IndexRate => IndexRate.validate(o) === true,
+    parse: (o: unknown): { right: IndexRate } | { left: DefinedError[] } => {
+        if (IndexRate.is(o)) {
             return { right: o }
         }
-        return { left: (IndexRateSource.errors ?? []) as DefinedError[] }
+        return { left: (IndexRate.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -10010,6 +9993,23 @@ export interface IndexRateSource {
      */
     type?: 'INTEREST_RATE' | 'TAX_RATE' | 'WITHHOLDING_TAX_RATE' | 'PRINCIPAL_TAX_RATE' | undefined
 }
+
+export const IndexRateSource = {
+    validate: IndexRateSourceValidator as ValidateFunction<IndexRateSource>,
+    get schema() {
+        return IndexRateSource.validate.schema
+    },
+    get errors() {
+        return IndexRateSource.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is IndexRateSource => IndexRateSource.validate(o) === true,
+    parse: (o: unknown): { right: IndexRateSource } | { left: DefinedError[] } => {
+        if (IndexRateSource.is(o)) {
+            return { right: o }
+        }
+        return { left: (IndexRateSource.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Represents a single installment details structure.
@@ -10148,23 +10148,6 @@ export interface IntegerIntervalConstraints {
     minValue?: number | undefined
 }
 
-export const InterestAccountSettingsAvailability = {
-    validate: InterestAccountSettingsAvailabilityValidator as ValidateFunction<InterestAccountSettingsAvailability>,
-    get schema() {
-        return InterestAccountSettingsAvailability.validate.schema
-    },
-    get errors() {
-        return InterestAccountSettingsAvailability.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is InterestAccountSettingsAvailability => InterestAccountSettingsAvailability.validate(o) === true,
-    parse: (o: unknown): { right: InterestAccountSettingsAvailability } | { left: DefinedError[] } => {
-        if (InterestAccountSettingsAvailability.is(o)) {
-            return { right: o }
-        }
-        return { left: (InterestAccountSettingsAvailability.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Interest Availability of a Deposit Account
  */
@@ -10184,22 +10167,20 @@ export interface InterestAccountSettingsAvailability {
     type: 'INTEREST' | 'OVERDRAFT' | 'TECHNICAL_OVERDRAFT'
 }
 
-export const InterestAccountSettingsAvailabilityResponse = {
-    validate:
-        InterestAccountSettingsAvailabilityResponseValidator as ValidateFunction<InterestAccountSettingsAvailabilityResponse>,
+export const InterestAccountSettingsAvailability = {
+    validate: InterestAccountSettingsAvailabilityValidator as ValidateFunction<InterestAccountSettingsAvailability>,
     get schema() {
-        return InterestAccountSettingsAvailabilityResponse.validate.schema
+        return InterestAccountSettingsAvailability.validate.schema
     },
     get errors() {
-        return InterestAccountSettingsAvailabilityResponse.validate.errors ?? undefined
+        return InterestAccountSettingsAvailability.validate.errors ?? undefined
     },
-    is: (o: unknown): o is InterestAccountSettingsAvailabilityResponse =>
-        InterestAccountSettingsAvailabilityResponse.validate(o) === true,
-    parse: (o: unknown): { right: InterestAccountSettingsAvailabilityResponse } | { left: DefinedError[] } => {
-        if (InterestAccountSettingsAvailabilityResponse.is(o)) {
+    is: (o: unknown): o is InterestAccountSettingsAvailability => InterestAccountSettingsAvailability.validate(o) === true,
+    parse: (o: unknown): { right: InterestAccountSettingsAvailability } | { left: DefinedError[] } => {
+        if (InterestAccountSettingsAvailability.is(o)) {
             return { right: o }
         }
-        return { left: (InterestAccountSettingsAvailabilityResponse.errors ?? []) as DefinedError[] }
+        return { left: (InterestAccountSettingsAvailability.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -10221,6 +10202,25 @@ export interface InterestAccountSettingsAvailabilityResponse {
      */
     type?: 'INTEREST' | 'OVERDRAFT' | 'TECHNICAL_OVERDRAFT' | undefined
 }
+
+export const InterestAccountSettingsAvailabilityResponse = {
+    validate:
+        InterestAccountSettingsAvailabilityResponseValidator as ValidateFunction<InterestAccountSettingsAvailabilityResponse>,
+    get schema() {
+        return InterestAccountSettingsAvailabilityResponse.validate.schema
+    },
+    get errors() {
+        return InterestAccountSettingsAvailabilityResponse.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is InterestAccountSettingsAvailabilityResponse =>
+        InterestAccountSettingsAvailabilityResponse.validate(o) === true,
+    parse: (o: unknown): { right: InterestAccountSettingsAvailabilityResponse } | { left: DefinedError[] } => {
+        if (InterestAccountSettingsAvailabilityResponse.is(o)) {
+            return { right: o }
+        }
+        return { left: (InterestAccountSettingsAvailabilityResponse.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Interest Availability of a Deposit Account
@@ -10733,23 +10733,6 @@ export interface LinkedTransaction {
     linkedTransactionType?: 'LOAN' | 'DEPOSIT' | undefined
 }
 
-export const LoanAccount = {
-    validate: LoanAccountValidator as ValidateFunction<LoanAccount>,
-    get schema() {
-        return LoanAccount.validate.schema
-    },
-    get errors() {
-        return LoanAccount.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanAccount => LoanAccount.validate(o) === true,
-    parse: (o: unknown): { right: LoanAccount } | { left: DefinedError[] } => {
-        if (LoanAccount.is(o)) {
-            return { right: o }
-        }
-        return { left: (LoanAccount.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents a loan account. A loan account defines the amount that your organization lends to a client. The terms and conditions of a loan account are defined by a loan product. In a loan account, Mambu stores all the information related to disbursements, repayments, interest rates, and withdrawals.
  */
@@ -10989,20 +10972,20 @@ export interface LoanAccount {
     tranches?: LoanTranche[] | undefined
 }
 
-export const LoanAccountAction = {
-    validate: LoanAccountActionValidator as ValidateFunction<LoanAccountAction>,
+export const LoanAccount = {
+    validate: LoanAccountValidator as ValidateFunction<LoanAccount>,
     get schema() {
-        return LoanAccountAction.validate.schema
+        return LoanAccount.validate.schema
     },
     get errors() {
-        return LoanAccountAction.validate.errors ?? undefined
+        return LoanAccount.validate.errors ?? undefined
     },
-    is: (o: unknown): o is LoanAccountAction => LoanAccountAction.validate(o) === true,
-    parse: (o: unknown): { right: LoanAccountAction } | { left: DefinedError[] } => {
-        if (LoanAccountAction.is(o)) {
+    is: (o: unknown): o is LoanAccount => LoanAccount.validate(o) === true,
+    parse: (o: unknown): { right: LoanAccount } | { left: DefinedError[] } => {
+        if (LoanAccount.is(o)) {
             return { right: o }
         }
-        return { left: (LoanAccountAction.errors ?? []) as DefinedError[] }
+        return { left: (LoanAccount.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -11029,6 +11012,23 @@ export interface LoanAccountAction {
      */
     notes?: string | undefined
 }
+
+export const LoanAccountAction = {
+    validate: LoanAccountActionValidator as ValidateFunction<LoanAccountAction>,
+    get schema() {
+        return LoanAccountAction.validate.schema
+    },
+    get errors() {
+        return LoanAccountAction.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is LoanAccountAction => LoanAccountAction.validate(o) === true,
+    parse: (o: unknown): { right: LoanAccountAction } | { left: DefinedError[] } => {
+        if (LoanAccountAction.is(o)) {
+            return { right: o }
+        }
+        return { left: (LoanAccountAction.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Wrapper that holds a list of filtering criteria and a sorting criteria for Loan account directed query
@@ -11275,6 +11275,17 @@ export interface LoanAccountRepaymentScheduleVersioning {
     versioningContent?: Installment[] | undefined
 }
 
+/**
+ * Represents a single loan account schedule structure.
+ */
+export interface LoanAccountSchedule {
+    currency?: Currency | undefined
+    /**
+     * The loan account schedule installments list.
+     */
+    installments?: Installment[] | undefined
+}
+
 export const LoanAccountSchedule = {
     validate: LoanAccountScheduleValidator as ValidateFunction<LoanAccountSchedule>,
     get schema() {
@@ -11291,17 +11302,6 @@ export const LoanAccountSchedule = {
         return { left: (LoanAccountSchedule.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Represents a single loan account schedule structure.
- */
-export interface LoanAccountSchedule {
-    currency?: Currency | undefined
-    /**
-     * The loan account schedule installments list.
-     */
-    installments?: Installment[] | undefined
-}
 
 /**
  * Payload structure to preview the loan account schedule differences when processing PMT transactionally.
@@ -11497,23 +11497,6 @@ export interface LoanAmountSettings {
     trancheSettings?: TrancheSettings | undefined
 }
 
-export const LoanProduct = {
-    validate: LoanProductValidator as ValidateFunction<LoanProduct>,
-    get schema() {
-        return LoanProduct.validate.schema
-    },
-    get errors() {
-        return LoanProduct.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanProduct => LoanProduct.validate(o) === true,
-    parse: (o: unknown): { right: LoanProduct } | { left: DefinedError[] } => {
-        if (LoanProduct.is(o)) {
-            return { right: o }
-        }
-        return { left: (LoanProduct.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents a loan product.
  */
@@ -11600,6 +11583,23 @@ export interface LoanProduct {
         | 'REVOLVING_CREDIT'
         | 'INTEREST_ONLY_EQUAL_INSTALLMENTS'
 }
+
+export const LoanProduct = {
+    validate: LoanProductValidator as ValidateFunction<LoanProduct>,
+    get schema() {
+        return LoanProduct.validate.schema
+    },
+    get errors() {
+        return LoanProduct.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is LoanProduct => LoanProduct.validate(o) === true,
+    parse: (o: unknown): { right: LoanProduct } | { left: DefinedError[] } => {
+        if (LoanProduct.is(o)) {
+            return { right: o }
+        }
+        return { left: (LoanProduct.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Defines the settings and constraints for schedule for the loans that are created based on this product.
@@ -11699,23 +11699,6 @@ export interface LoanTranche {
      */
     trancheNumber?: number | undefined
 }
-
-export const LoanTransaction = {
-    validate: LoanTransactionValidator as ValidateFunction<LoanTransaction>,
-    get schema() {
-        return LoanTransaction.validate.schema
-    },
-    get errors() {
-        return LoanTransaction.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanTransaction => LoanTransaction.validate(o) === true,
-    parse: (o: unknown): { right: LoanTransaction } | { left: DefinedError[] } => {
-        if (LoanTransaction.is(o)) {
-            return { right: o }
-        }
-        return { left: (LoanTransaction.errors ?? []) as DefinedError[] }
-    },
-} as const
 
 /**
  * Represents the action performed on a loan account after which the account's amount changes its value.
@@ -11895,20 +11878,20 @@ export interface LoanTransaction {
     valueDate?: string | undefined
 }
 
-export const LoanTransactionAdjustmentDetails = {
-    validate: LoanTransactionAdjustmentDetailsValidator as ValidateFunction<LoanTransactionAdjustmentDetails>,
+export const LoanTransaction = {
+    validate: LoanTransactionValidator as ValidateFunction<LoanTransaction>,
     get schema() {
-        return LoanTransactionAdjustmentDetails.validate.schema
+        return LoanTransaction.validate.schema
     },
     get errors() {
-        return LoanTransactionAdjustmentDetails.validate.errors ?? undefined
+        return LoanTransaction.validate.errors ?? undefined
     },
-    is: (o: unknown): o is LoanTransactionAdjustmentDetails => LoanTransactionAdjustmentDetails.validate(o) === true,
-    parse: (o: unknown): { right: LoanTransactionAdjustmentDetails } | { left: DefinedError[] } => {
-        if (LoanTransactionAdjustmentDetails.is(o)) {
+    is: (o: unknown): o is LoanTransaction => LoanTransaction.validate(o) === true,
+    parse: (o: unknown): { right: LoanTransaction } | { left: DefinedError[] } => {
+        if (LoanTransaction.is(o)) {
             return { right: o }
         }
-        return { left: (LoanTransactionAdjustmentDetails.errors ?? []) as DefinedError[] }
+        return { left: (LoanTransaction.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -11929,6 +11912,23 @@ export interface LoanTransactionAdjustmentDetails {
      */
     notes: string
 }
+
+export const LoanTransactionAdjustmentDetails = {
+    validate: LoanTransactionAdjustmentDetailsValidator as ValidateFunction<LoanTransactionAdjustmentDetails>,
+    get schema() {
+        return LoanTransactionAdjustmentDetails.validate.schema
+    },
+    get errors() {
+        return LoanTransactionAdjustmentDetails.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is LoanTransactionAdjustmentDetails => LoanTransactionAdjustmentDetails.validate(o) === true,
+    parse: (o: unknown): { right: LoanTransactionAdjustmentDetails } | { left: DefinedError[] } => {
+        if (LoanTransactionAdjustmentDetails.is(o)) {
+            return { right: o }
+        }
+        return { left: (LoanTransactionAdjustmentDetails.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Represents the loan transaction details.
@@ -11981,6 +11981,7 @@ export interface LoanTransactionFilterCriteria {
         | 'creationDate'
         | 'valueDate'
         | 'parentAccountKey'
+        | 'parentAccountHolderKey'
         | 'productTypeKey'
         | 'productID'
         | 'type'
@@ -12153,23 +12154,6 @@ export interface LoanTransactionSortingCriteria {
     order?: 'ASC' | 'DESC' | undefined
 }
 
-export const LockLoanAccountInput = {
-    validate: LockLoanAccountInputValidator as ValidateFunction<LockLoanAccountInput>,
-    get schema() {
-        return LockLoanAccountInput.validate.schema
-    },
-    get errors() {
-        return LockLoanAccountInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LockLoanAccountInput => LockLoanAccountInput.validate(o) === true,
-    parse: (o: unknown): { right: LockLoanAccountInput } | { left: DefinedError[] } => {
-        if (LockLoanAccountInput.is(o)) {
-            return { right: o }
-        }
-        return { left: (LockLoanAccountInput.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents the information for locking an account.
  */
@@ -12188,6 +12172,33 @@ export interface LockLoanAccountInput {
     notes?: string | undefined
 }
 
+export const LockLoanAccountInput = {
+    validate: LockLoanAccountInputValidator as ValidateFunction<LockLoanAccountInput>,
+    get schema() {
+        return LockLoanAccountInput.validate.schema
+    },
+    get errors() {
+        return LockLoanAccountInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is LockLoanAccountInput => LockLoanAccountInput.validate(o) === true,
+    parse: (o: unknown): { right: LockLoanAccountInput } | { left: DefinedError[] } => {
+        if (LockLoanAccountInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (LockLoanAccountInput.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+/**
+ * Represents a wrapper over a list of loan transactions, to be used when locking and unlocking an account.
+ */
+export interface LockLoanTransactionsWrapper {
+    /**
+     * The list of loan transactions
+     */
+    loanTransactions?: LoanTransaction[] | undefined
+}
+
 export const LockLoanTransactionsWrapper = {
     validate: LockLoanTransactionsWrapperValidator as ValidateFunction<LockLoanTransactionsWrapper>,
     get schema() {
@@ -12204,16 +12215,6 @@ export const LockLoanTransactionsWrapper = {
         return { left: (LockLoanTransactionsWrapper.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Represents a wrapper over a list of loan transactions, to be used when locking and unlocking an account.
- */
-export interface LockLoanTransactionsWrapper {
-    /**
-     * The list of loan transactions
-     */
-    loanTransactions?: LoanTransaction[] | undefined
-}
 
 /**
  * Settings applied when transitioning accounts to Locked state
@@ -12329,32 +12330,32 @@ export interface NewAccountSettings {
 
 type NonWorkingDays3 = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
 
-type NonWorkingDays = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
+type NonWorkingDays2 = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
 
 /**
  * Represents the non-working days of the organization.
  */
-export interface NonWorkingDays2 {
+export interface NonWorkingDays {
     /**
      * The non-working days of the organization.
      */
     nonWorkingDays: NonWorkingDays3[]
 }
 
-export const NonWorkingDays2 = {
-    validate: NonWorkingDays2Validator as ValidateFunction<NonWorkingDays2>,
+export const NonWorkingDays = {
+    validate: NonWorkingDaysValidator as ValidateFunction<NonWorkingDays>,
     get schema() {
-        return NonWorkingDays2.validate.schema
+        return NonWorkingDays.validate.schema
     },
     get errors() {
-        return NonWorkingDays2.validate.errors ?? undefined
+        return NonWorkingDays.validate.errors ?? undefined
     },
-    is: (o: unknown): o is NonWorkingDays2 => NonWorkingDays2.validate(o) === true,
-    parse: (o: unknown): { right: NonWorkingDays2 } | { left: DefinedError[] } => {
-        if (NonWorkingDays2.is(o)) {
+    is: (o: unknown): o is NonWorkingDays => NonWorkingDays.validate(o) === true,
+    parse: (o: unknown): { right: NonWorkingDays } | { left: DefinedError[] } => {
+        if (NonWorkingDays.is(o)) {
             return { right: o }
         }
-        return { left: (NonWorkingDays2.errors ?? []) as DefinedError[] }
+        return { left: (NonWorkingDays.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -12827,23 +12828,6 @@ export interface PaymentIdentification {
     transactionIdentification?: string | undefined
 }
 
-export const PaymentMadeTransactionInput = {
-    validate: PaymentMadeTransactionInputValidator as ValidateFunction<PaymentMadeTransactionInput>,
-    get schema() {
-        return PaymentMadeTransactionInput.validate.schema
-    },
-    get errors() {
-        return PaymentMadeTransactionInput.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PaymentMadeTransactionInput => PaymentMadeTransactionInput.validate(o) === true,
-    parse: (o: unknown): { right: PaymentMadeTransactionInput } | { left: DefinedError[] } => {
-        if (PaymentMadeTransactionInput.is(o)) {
-            return { right: o }
-        }
-        return { left: (PaymentMadeTransactionInput.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents the request payload for creating a transaction of type PAYMENT_MADE
  */
@@ -12874,6 +12858,23 @@ export interface PaymentMadeTransactionInput {
      */
     valueDate?: string | undefined
 }
+
+export const PaymentMadeTransactionInput = {
+    validate: PaymentMadeTransactionInputValidator as ValidateFunction<PaymentMadeTransactionInput>,
+    get schema() {
+        return PaymentMadeTransactionInput.validate.schema
+    },
+    get errors() {
+        return PaymentMadeTransactionInput.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PaymentMadeTransactionInput => PaymentMadeTransactionInput.validate(o) === true,
+    parse: (o: unknown): { right: PaymentMadeTransactionInput } | { left: DefinedError[] } => {
+        if (PaymentMadeTransactionInput.is(o)) {
+            return { right: o }
+        }
+        return { left: (PaymentMadeTransactionInput.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Defines the payment settings for the loan product and for loans crated based on this product.
@@ -13020,7 +13021,7 @@ export interface PeriodIntervalSettings {
     periodUnit?: 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS' | undefined
 }
 
-type Permissions =
+type Permissions3 =
     | 'AUDIT_TRANSACTIONS'
     | 'VIEW_COMMENTS'
     | 'CREATE_COMMENTS'
@@ -13552,7 +13553,7 @@ type Permissions2 =
     | 'DELETE_PROFIT_SHARING_PRODUCT_SETTINGS'
     | 'MAKE_BULK_CHANGE_INTEREST_AVAILABILITY'
 
-type Permissions3 =
+type Permissions =
     | 'AUDIT_TRANSACTIONS'
     | 'VIEW_EXCHANGE_RATES'
     | 'CREATE_EXCHANGE_RATE'
@@ -13775,6 +13776,16 @@ type Permissions3 =
     | 'EDIT_PROFIT_SHARING_PRODUCT_SETTINGS'
     | 'DELETE_PROFIT_SHARING_PRODUCT_SETTINGS'
 
+/**
+ * The planned installment fees encoded keys list
+ */
+export interface PlannedFeeKeys {
+    /**
+     * The list of encoded keys of the planned installment fees.
+     */
+    encodedKeys: string[]
+}
+
 export const PlannedFeeKeys = {
     validate: PlannedFeeKeysValidator as ValidateFunction<PlannedFeeKeys>,
     get schema() {
@@ -13791,16 +13802,6 @@ export const PlannedFeeKeys = {
         return { left: (PlannedFeeKeys.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * The planned installment fees encoded keys list
- */
-export interface PlannedFeeKeys {
-    /**
-     * The list of encoded keys of the planned installment fees.
-     */
-    encodedKeys: string[]
-}
 
 /**
  * The planned fee details holds the information related to the installment key, predefined fee key and amount
@@ -13864,23 +13865,6 @@ export interface PortalSettings {
     portalState?: 'ENABLED' | 'DISABLED' | undefined
 }
 
-export const PostAccountingRateDTO = {
-    validate: PostAccountingRateDTOValidator as ValidateFunction<PostAccountingRateDTO>,
-    get schema() {
-        return PostAccountingRateDTO.validate.schema
-    },
-    get errors() {
-        return PostAccountingRateDTO.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is PostAccountingRateDTO => PostAccountingRateDTO.validate(o) === true,
-    parse: (o: unknown): { right: PostAccountingRateDTO } | { left: DefinedError[] } => {
-        if (PostAccountingRateDTO.is(o)) {
-            return { right: o }
-        }
-        return { left: (PostAccountingRateDTO.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * The representation of a payload for creating Accounting Rate
  */
@@ -13895,20 +13879,20 @@ export interface PostAccountingRateDTO {
     startDate?: string | undefined
 }
 
-export const PostGLJournalEntriesDTO = {
-    validate: PostGLJournalEntriesDTOValidator as ValidateFunction<PostGLJournalEntriesDTO>,
+export const PostAccountingRateDTO = {
+    validate: PostAccountingRateDTOValidator as ValidateFunction<PostAccountingRateDTO>,
     get schema() {
-        return PostGLJournalEntriesDTO.validate.schema
+        return PostAccountingRateDTO.validate.schema
     },
     get errors() {
-        return PostGLJournalEntriesDTO.validate.errors ?? undefined
+        return PostAccountingRateDTO.validate.errors ?? undefined
     },
-    is: (o: unknown): o is PostGLJournalEntriesDTO => PostGLJournalEntriesDTO.validate(o) === true,
-    parse: (o: unknown): { right: PostGLJournalEntriesDTO } | { left: DefinedError[] } => {
-        if (PostGLJournalEntriesDTO.is(o)) {
+    is: (o: unknown): o is PostAccountingRateDTO => PostAccountingRateDTO.validate(o) === true,
+    parse: (o: unknown): { right: PostAccountingRateDTO } | { left: DefinedError[] } => {
+        if (PostAccountingRateDTO.is(o)) {
             return { right: o }
         }
-        return { left: (PostGLJournalEntriesDTO.errors ?? []) as DefinedError[] }
+        return { left: (PostAccountingRateDTO.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -13941,6 +13925,23 @@ export interface PostGLJournalEntriesDTO {
      */
     transactionId?: string | undefined
 }
+
+export const PostGLJournalEntriesDTO = {
+    validate: PostGLJournalEntriesDTOValidator as ValidateFunction<PostGLJournalEntriesDTO>,
+    get schema() {
+        return PostGLJournalEntriesDTO.validate.schema
+    },
+    get errors() {
+        return PostGLJournalEntriesDTO.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is PostGLJournalEntriesDTO => PostGLJournalEntriesDTO.validate(o) === true,
+    parse: (o: unknown): { right: PostGLJournalEntriesDTO } | { left: DefinedError[] } => {
+        if (PostGLJournalEntriesDTO.is(o)) {
+            return { right: o }
+        }
+        return { left: (PostGLJournalEntriesDTO.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * The response representation of the PredefinedFee. Represents a fee with a defined name and a fixed value.
@@ -15127,23 +15128,6 @@ export interface RevolvingAccountSettings {
     numberOfPreviewedInstalments?: number | undefined
 }
 
-export const Role = {
-    validate: RoleValidator as ValidateFunction<Role>,
-    get schema() {
-        return Role.validate.schema
-    },
-    get errors() {
-        return Role.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Role => Role.validate(o) === true,
-    parse: (o: unknown): { right: Role } | { left: DefinedError[] } => {
-        if (Role.is(o)) {
-            return { right: o }
-        }
-        return { left: (Role.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents a user role.
  */
@@ -15174,6 +15158,23 @@ export interface Role {
      */
     notes?: string | undefined
 }
+
+export const Role = {
+    validate: RoleValidator as ValidateFunction<Role>,
+    get schema() {
+        return Role.validate.schema
+    },
+    get errors() {
+        return Role.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Role => Role.validate(o) === true,
+    parse: (o: unknown): { right: Role } | { left: DefinedError[] } => {
+        if (Role.is(o)) {
+            return { right: o }
+        }
+        return { left: (Role.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Represents the role identifier.
@@ -15567,6 +15568,16 @@ export const SearchResponse = {
     },
 } as const
 
+/**
+ * Representation of an API Consumer's Secret Key
+ */
+export interface SecretKey {
+    /**
+     * The secret key
+     */
+    secretKey?: string | undefined
+}
+
 export const SecretKey = {
     validate: SecretKeyValidator as ValidateFunction<SecretKey>,
     get schema() {
@@ -15583,16 +15594,6 @@ export const SecretKey = {
         return { left: (SecretKey.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Representation of an API Consumer's Secret Key
- */
-export interface SecretKey {
-    /**
-     * The secret key
-     */
-    secretKey?: string | undefined
-}
 
 /**
  * The settings and constraints for securities.
@@ -15749,23 +15750,6 @@ export interface Structured {
     creditorReferenceInformation?: CreditorReferenceInformation | undefined
 }
 
-export const Task = {
-    validate: TaskValidator as ValidateFunction<Task>,
-    get schema() {
-        return Task.validate.schema
-    },
-    get errors() {
-        return Task.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Task => Task.validate(o) === true,
-    parse: (o: unknown): { right: Task } | { left: DefinedError[] } => {
-        if (Task.is(o)) {
-            return { right: o }
-        }
-        return { left: (Task.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents a human task that can be assigned by one user to another. When a task is created, it's status is set to `OPEN`.
  */
@@ -15840,6 +15824,23 @@ export interface Task {
      */
     title?: string | undefined
 }
+
+export const Task = {
+    validate: TaskValidator as ValidateFunction<Task>,
+    get schema() {
+        return Task.validate.schema
+    },
+    get errors() {
+        return Task.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Task => Task.validate(o) === true,
+    parse: (o: unknown): { right: Task } | { left: DefinedError[] } => {
+        if (Task.is(o)) {
+            return { right: o }
+        }
+        return { left: (Task.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * The taxes applied within a transaction.
@@ -15988,23 +15989,6 @@ export interface TransactionBalances {
     totalBalance?: number | undefined
 }
 
-export const TransactionChannel = {
-    validate: TransactionChannelValidator as ValidateFunction<TransactionChannel>,
-    get schema() {
-        return TransactionChannel.validate.schema
-    },
-    get errors() {
-        return TransactionChannel.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is TransactionChannel => TransactionChannel.validate(o) === true,
-    parse: (o: unknown): { right: TransactionChannel } | { left: DefinedError[] } => {
-        if (TransactionChannel.is(o)) {
-            return { right: o }
-        }
-        return { left: (TransactionChannel.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents a transaction channel.
  */
@@ -16044,6 +16028,23 @@ export interface TransactionChannel {
      */
     usageRights?: string[] | undefined
 }
+
+export const TransactionChannel = {
+    validate: TransactionChannelValidator as ValidateFunction<TransactionChannel>,
+    get schema() {
+        return TransactionChannel.validate.schema
+    },
+    get errors() {
+        return TransactionChannel.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is TransactionChannel => TransactionChannel.validate(o) === true,
+    parse: (o: unknown): { right: TransactionChannel } | { left: DefinedError[] } => {
+        if (TransactionChannel.is(o)) {
+            return { right: o }
+        }
+        return { left: (TransactionChannel.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * The constraints applied on the transaction channel
@@ -16362,6 +16363,16 @@ export const UndoMaturityAction = {
     },
 } as const
 
+/**
+ * Represents the request payload for unlocking an account
+ */
+export interface UnlockLoanAccountInput {
+    /**
+     * Extra notes about the current unlocking of account
+     */
+    notes?: string | undefined
+}
+
 export const UnlockLoanAccountInput = {
     validate: UnlockLoanAccountInputValidator as ValidateFunction<UnlockLoanAccountInput>,
     get schema() {
@@ -16378,16 +16389,6 @@ export const UnlockLoanAccountInput = {
         return { left: (UnlockLoanAccountInput.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Represents the request payload for unlocking an account
- */
-export interface UnlockLoanAccountInput {
-    /**
-     * Extra notes about the current unlocking of account
-     */
-    notes?: string | undefined
-}
 
 export type UpdateLoanAccountFundingSourcesRequest = InvestorFund[]
 
@@ -16463,23 +16464,6 @@ export const UpdatePlannedFeesResponse = {
             return { right: o }
         }
         return { left: (UpdatePlannedFeesResponse.errors ?? []) as DefinedError[] }
-    },
-} as const
-
-export const User = {
-    validate: UserValidator as ValidateFunction<User>,
-    get schema() {
-        return User.validate.schema
-    },
-    get errors() {
-        return User.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is User => User.validate(o) === true,
-    parse: (o: unknown): { right: User } | { left: DefinedError[] } => {
-        if (User.is(o)) {
-            return { right: o }
-        }
-        return { left: (User.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -16585,20 +16569,20 @@ export interface User {
     userState?: 'ACTIVE' | 'INACTIVE' | 'LOCKED' | undefined
 }
 
-export const UserRequest = {
-    validate: UserRequestValidator as ValidateFunction<UserRequest>,
+export const User = {
+    validate: UserValidator as ValidateFunction<User>,
     get schema() {
-        return UserRequest.validate.schema
+        return User.validate.schema
     },
     get errors() {
-        return UserRequest.validate.errors ?? undefined
+        return User.validate.errors ?? undefined
     },
-    is: (o: unknown): o is UserRequest => UserRequest.validate(o) === true,
-    parse: (o: unknown): { right: UserRequest } | { left: DefinedError[] } => {
-        if (UserRequest.is(o)) {
+    is: (o: unknown): o is User => User.validate(o) === true,
+    parse: (o: unknown): { right: User } | { left: DefinedError[] } => {
+        if (User.is(o)) {
             return { right: o }
         }
-        return { left: (UserRequest.errors ?? []) as DefinedError[] }
+        return { left: (User.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -16687,6 +16671,23 @@ export interface UserRequest {
      */
     username: string
 }
+
+export const UserRequest = {
+    validate: UserRequestValidator as ValidateFunction<UserRequest>,
+    get schema() {
+        return UserRequest.validate.schema
+    },
+    get errors() {
+        return UserRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is UserRequest => UserRequest.validate(o) === true,
+    parse: (o: unknown): { right: UserRequest } | { left: DefinedError[] } => {
+        if (UserRequest.is(o)) {
+            return { right: o }
+        }
+        return { left: (UserRequest.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Represents the user permissions and access rights.

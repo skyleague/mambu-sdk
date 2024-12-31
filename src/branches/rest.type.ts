@@ -60,23 +60,6 @@ export interface Address {
     region?: string | undefined
 }
 
-export const Branch = {
-    validate: BranchValidator as ValidateFunction<Branch>,
-    get schema() {
-        return Branch.validate.schema
-    },
-    get errors() {
-        return Branch.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is Branch => Branch.validate(o) === true,
-    parse: (o: unknown): { right: Branch } | { left: DefinedError[] } => {
-        if (Branch.is(o)) {
-            return { right: o }
-        }
-        return { left: (Branch.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents a branch.
  */
@@ -127,6 +110,27 @@ export interface Branch {
     state?: 'ACTIVE' | 'INACTIVE' | undefined
 }
 
+export const Branch = {
+    validate: BranchValidator as ValidateFunction<Branch>,
+    get schema() {
+        return Branch.validate.schema
+    },
+    get errors() {
+        return Branch.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is Branch => Branch.validate(o) === true,
+    parse: (o: unknown): { right: Branch } | { left: DefinedError[] } => {
+        if (Branch.is(o)) {
+            return { right: o }
+        }
+        return { left: (Branch.errors ?? []) as DefinedError[] }
+    },
+} as const
+
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
+
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -144,9 +148,7 @@ export const ErrorResponse = {
     },
 } as const
 
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
+export type GetAllResponse = Branch[]
 
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
@@ -164,8 +166,6 @@ export const GetAllResponse = {
         return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type GetAllResponse = Branch[]
 
 /**
  * Represents the holiday.

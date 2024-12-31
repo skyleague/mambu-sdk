@@ -3,14 +3,14 @@ import type { OpenapiV3 } from '@skyleague/therefore'
 import { $restclient } from '@skyleague/therefore'
 import type { PathItem } from '@skyleague/therefore/src/types/openapi.type.js'
 import camelCase from 'camelcase'
-import got from 'got'
+import ky from 'ky'
 
 export interface Clients {
     items: { jsonPath: string; label: string; hashValue: string; index?: number }[]
 }
 const baseUrl = 'https://demotenant.dev.mambucloud.com/api/swagger/'
 
-const client = got.extend({ prefixUrl: baseUrl })
+const client = ky.extend({ prefixUrl: baseUrl })
 const clients = await client.get('resources').json<Clients>()
 
 const clientList = [
@@ -57,6 +57,7 @@ for (const item of clientList) {
         filename: `${clientName}/rest.client.ts`,
         strict: false,
         formats: false,
+        client: 'ky',
         transformOpenapi: (api: OpenapiV3) => {
             const securitySchemes = api.components?.securitySchemes
             const injectApiKey =

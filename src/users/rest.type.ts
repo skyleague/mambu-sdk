@@ -12,6 +12,10 @@ import { validate as PatchRequestValidator } from './schemas/patch-request.schem
 import { validate as UserValidator } from './schemas/user.schema.js'
 import { validate as UserRequestValidator } from './schemas/user_request.schema.js'
 
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
+
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -29,9 +33,7 @@ export const ErrorResponse = {
     },
 } as const
 
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
+export type GetAllResponse = User[]
 
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
@@ -49,8 +51,6 @@ export const GetAllResponse = {
         return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type GetAllResponse = User[]
 
 /**
  * A single change that needs to be made to a resource
@@ -74,6 +74,8 @@ export interface PatchOperation {
     value?: unknown
 }
 
+export type PatchRequest = PatchOperation[]
+
 export const PatchRequest = {
     validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
@@ -90,8 +92,6 @@ export const PatchRequest = {
         return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type PatchRequest = PatchOperation[]
 
 type Permissions =
     | 'AUDIT_TRANSACTIONS'
@@ -379,23 +379,6 @@ export interface RoleIdentifier {
     id?: string | undefined
 }
 
-export const User = {
-    validate: UserValidator as ValidateFunction<User>,
-    get schema() {
-        return User.validate.schema
-    },
-    get errors() {
-        return User.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is User => User.validate(o) === true,
-    parse: (o: unknown): { right: User } | { left: DefinedError[] } => {
-        if (User.is(o)) {
-            return { right: o }
-        }
-        return { left: (User.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents a user.
  */
@@ -498,20 +481,20 @@ export interface User {
     userState?: 'ACTIVE' | 'INACTIVE' | 'LOCKED' | undefined
 }
 
-export const UserRequest = {
-    validate: UserRequestValidator as ValidateFunction<UserRequest>,
+export const User = {
+    validate: UserValidator as ValidateFunction<User>,
     get schema() {
-        return UserRequest.validate.schema
+        return User.validate.schema
     },
     get errors() {
-        return UserRequest.validate.errors ?? undefined
+        return User.validate.errors ?? undefined
     },
-    is: (o: unknown): o is UserRequest => UserRequest.validate(o) === true,
-    parse: (o: unknown): { right: UserRequest } | { left: DefinedError[] } => {
-        if (UserRequest.is(o)) {
+    is: (o: unknown): o is User => User.validate(o) === true,
+    parse: (o: unknown): { right: User } | { left: DefinedError[] } => {
+        if (User.is(o)) {
             return { right: o }
         }
-        return { left: (UserRequest.errors ?? []) as DefinedError[] }
+        return { left: (User.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -600,6 +583,23 @@ export interface UserRequest {
      */
     username: string
 }
+
+export const UserRequest = {
+    validate: UserRequestValidator as ValidateFunction<UserRequest>,
+    get schema() {
+        return UserRequest.validate.schema
+    },
+    get errors() {
+        return UserRequest.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is UserRequest => UserRequest.validate(o) === true,
+    parse: (o: unknown): { right: UserRequest } | { left: DefinedError[] } => {
+        if (UserRequest.is(o)) {
+            return { right: o }
+        }
+        return { left: (UserRequest.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Represents the user permissions and access rights.

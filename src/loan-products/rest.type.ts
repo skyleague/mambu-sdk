@@ -399,6 +399,10 @@ export interface DocumentTemplate {
     type?: 'ACCOUNT' | 'TRANSACTION' | 'ACCOUNT_WITH_TRANSACTIONS' | undefined
 }
 
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
+
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
     get schema() {
@@ -415,10 +419,6 @@ export const ErrorResponse = {
         return { left: (ErrorResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
 
 /**
  * Defines fees settings for the product.
@@ -478,6 +478,8 @@ export interface FundingSettings {
     requiredFunds?: number | undefined
 }
 
+export type GetAllResponse = LoanProduct[]
+
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
     get schema() {
@@ -494,8 +496,6 @@ export const GetAllResponse = {
         return { left: (GetAllResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type GetAllResponse = LoanProduct[]
 
 /**
  * The GL accounting rule, it maps a financial resource with a GL account for a specific product (i.e loan or saving).
@@ -688,23 +688,6 @@ export interface LoanAmountSettings {
     trancheSettings?: TrancheSettings | undefined
 }
 
-export const LoanProduct = {
-    validate: LoanProductValidator as ValidateFunction<LoanProduct>,
-    get schema() {
-        return LoanProduct.validate.schema
-    },
-    get errors() {
-        return LoanProduct.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is LoanProduct => LoanProduct.validate(o) === true,
-    parse: (o: unknown): { right: LoanProduct } | { left: DefinedError[] } => {
-        if (LoanProduct.is(o)) {
-            return { right: o }
-        }
-        return { left: (LoanProduct.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents a loan product.
  */
@@ -791,6 +774,23 @@ export interface LoanProduct {
         | 'REVOLVING_CREDIT'
         | 'INTEREST_ONLY_EQUAL_INSTALLMENTS'
 }
+
+export const LoanProduct = {
+    validate: LoanProductValidator as ValidateFunction<LoanProduct>,
+    get schema() {
+        return LoanProduct.validate.schema
+    },
+    get errors() {
+        return LoanProduct.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is LoanProduct => LoanProduct.validate(o) === true,
+    parse: (o: unknown): { right: LoanProduct } | { left: DefinedError[] } => {
+        if (LoanProduct.is(o)) {
+            return { right: o }
+        }
+        return { left: (LoanProduct.errors ?? []) as DefinedError[] }
+    },
+} as const
 
 /**
  * Defines the settings and constraints for schedule for the loans that are created based on this product.
@@ -921,6 +921,8 @@ export interface PatchOperation {
     value?: unknown
 }
 
+export type PatchRequest = PatchOperation[]
+
 export const PatchRequest = {
     validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
@@ -937,8 +939,6 @@ export const PatchRequest = {
         return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type PatchRequest = PatchOperation[]
 
 /**
  * Holds Payment Holidays Settings

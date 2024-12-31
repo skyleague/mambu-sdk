@@ -33,6 +33,8 @@ export interface CustomPredefinedFee {
     predefinedFeeEncodedKey?: string | undefined
 }
 
+export type EditTranchesRequest = LoanTranche[]
+
 export const EditTranchesRequest = {
     validate: EditTranchesRequestValidator as ValidateFunction<EditTranchesRequest>,
     get schema() {
@@ -50,7 +52,7 @@ export const EditTranchesRequest = {
     },
 } as const
 
-export type EditTranchesRequest = LoanTranche[]
+export type EditTranchesResponse = LoanTranche[]
 
 export const EditTranchesResponse = {
     validate: EditTranchesResponseValidator as ValidateFunction<EditTranchesResponse>,
@@ -69,7 +71,9 @@ export const EditTranchesResponse = {
     },
 } as const
 
-export type EditTranchesResponse = LoanTranche[]
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
+}
 
 export const ErrorResponse = {
     validate: ErrorResponseValidator as ValidateFunction<ErrorResponse>,
@@ -88,9 +92,7 @@ export const ErrorResponse = {
     },
 } as const
 
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
+export type GetTranchesResponse = LoanTranche[]
 
 export const GetTranchesResponse = {
     validate: GetTranchesResponseValidator as ValidateFunction<GetTranchesResponse>,
@@ -108,8 +110,6 @@ export const GetTranchesResponse = {
         return { left: (GetTranchesResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type GetTranchesResponse = LoanTranche[]
 
 /**
  * In some cases organizations may approve loans but not disburse the full amount initially. They would like to spread the disbursement (and risk) over time. Likewise for the client, they may not need the full loan amount up front. They may want to have a loan to buy some equipment for their business but will make one purchase today and another purchase in a few months.  In these cases, they don't need the full amount and wouldn't want to pay interest on cash they don't need yet. A solution for this matter is the usage of disbursement in tranches. This class holds the information required for one of this tranche.

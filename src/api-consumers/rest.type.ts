@@ -15,23 +15,6 @@ import { validate as GetKeysByConsumerIdResponseValidator } from './schemas/get-
 import { validate as PatchRequestValidator } from './schemas/patch-request.schema.js'
 import { validate as SecretKeyValidator } from './schemas/secret-key.schema.js'
 
-export const ApiConsumer = {
-    validate: ApiConsumerValidator as ValidateFunction<ApiConsumer>,
-    get schema() {
-        return ApiConsumer.validate.schema
-    },
-    get errors() {
-        return ApiConsumer.validate.errors ?? undefined
-    },
-    is: (o: unknown): o is ApiConsumer => ApiConsumer.validate(o) === true,
-    parse: (o: unknown): { right: ApiConsumer } | { left: DefinedError[] } => {
-        if (ApiConsumer.is(o)) {
-            return { right: o }
-        }
-        return { left: (ApiConsumer.errors ?? []) as DefinedError[] }
-    },
-} as const
-
 /**
  * Represents an API consumer.
  */
@@ -72,6 +55,23 @@ export interface ApiConsumer {
         | undefined
 }
 
+export const ApiConsumer = {
+    validate: ApiConsumerValidator as ValidateFunction<ApiConsumer>,
+    get schema() {
+        return ApiConsumer.validate.schema
+    },
+    get errors() {
+        return ApiConsumer.validate.errors ?? undefined
+    },
+    is: (o: unknown): o is ApiConsumer => ApiConsumer.validate(o) === true,
+    parse: (o: unknown): { right: ApiConsumer } | { left: DefinedError[] } => {
+        if (ApiConsumer.is(o)) {
+            return { right: o }
+        }
+        return { left: (ApiConsumer.errors ?? []) as DefinedError[] }
+    },
+} as const
+
 /**
  * Represents the API consumer permissions and access rights.
  */
@@ -106,6 +106,24 @@ export interface ApiConsumerAccess {
     permissions?: Permissions[] | undefined
 }
 
+/**
+ * Represents an API key of an API consumer.
+ */
+export interface ApiKey {
+    /**
+     * A six character cleartext prefix of the API key. The prefix is not guaranteed to be unique. You must base any identification process on the API key ID, not the prefix.
+     */
+    apiKey?: string | undefined
+    /**
+     * The time to live (TTL) for the API key in seconds.
+     */
+    expirationTime?: number | undefined
+    /**
+     * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
+     */
+    id?: string | undefined
+}
+
 export const ApiKey = {
     validate: ApiKeyValidator as ValidateFunction<ApiKey>,
     get schema() {
@@ -124,21 +142,13 @@ export const ApiKey = {
 } as const
 
 /**
- * Represents an API key of an API consumer.
+ * Represents an API key expiration time.
  */
-export interface ApiKey {
-    /**
-     * A six character cleartext prefix of the API key. The prefix is not guaranteed to be unique. You must base any identification process on the API key ID, not the prefix.
-     */
-    apiKey?: string | undefined
+export interface ApiKeyInput {
     /**
      * The time to live (TTL) for the API key in seconds.
      */
     expirationTime?: number | undefined
-    /**
-     * The API key ID. You must base any identification process on the the API key ID as it is guaranteed to be unique.
-     */
-    id?: string | undefined
 }
 
 export const ApiKeyInput = {
@@ -158,14 +168,8 @@ export const ApiKeyInput = {
     },
 } as const
 
-/**
- * Represents an API key expiration time.
- */
-export interface ApiKeyInput {
-    /**
-     * The time to live (TTL) for the API key in seconds.
-     */
-    expirationTime?: number | undefined
+export interface ErrorResponse {
+    errors?: RestError[] | undefined
 }
 
 export const ErrorResponse = {
@@ -185,9 +189,7 @@ export const ErrorResponse = {
     },
 } as const
 
-export interface ErrorResponse {
-    errors?: RestError[] | undefined
-}
+export type GetAllResponse = ApiConsumer[]
 
 export const GetAllResponse = {
     validate: GetAllResponseValidator as ValidateFunction<GetAllResponse>,
@@ -206,7 +208,7 @@ export const GetAllResponse = {
     },
 } as const
 
-export type GetAllResponse = ApiConsumer[]
+export type GetKeysByConsumerIdResponse = ApiKey[]
 
 export const GetKeysByConsumerIdResponse = {
     validate: GetKeysByConsumerIdResponseValidator as ValidateFunction<GetKeysByConsumerIdResponse>,
@@ -224,8 +226,6 @@ export const GetKeysByConsumerIdResponse = {
         return { left: (GetKeysByConsumerIdResponse.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type GetKeysByConsumerIdResponse = ApiKey[]
 
 /**
  * A single change that needs to be made to a resource
@@ -249,6 +249,8 @@ export interface PatchOperation {
     value?: unknown
 }
 
+export type PatchRequest = PatchOperation[]
+
 export const PatchRequest = {
     validate: PatchRequestValidator as ValidateFunction<PatchRequest>,
     get schema() {
@@ -265,8 +267,6 @@ export const PatchRequest = {
         return { left: (PatchRequest.errors ?? []) as DefinedError[] }
     },
 } as const
-
-export type PatchRequest = PatchOperation[]
 
 type Permissions =
     | 'AUDIT_TRANSACTIONS'
@@ -511,6 +511,16 @@ export interface RoleIdentifier {
     id?: string | undefined
 }
 
+/**
+ * Representation of an API Consumer's Secret Key
+ */
+export interface SecretKey {
+    /**
+     * The secret key
+     */
+    secretKey?: string | undefined
+}
+
 export const SecretKey = {
     validate: SecretKeyValidator as ValidateFunction<SecretKey>,
     get schema() {
@@ -527,16 +537,6 @@ export const SecretKey = {
         return { left: (SecretKey.errors ?? []) as DefinedError[] }
     },
 } as const
-
-/**
- * Representation of an API Consumer's Secret Key
- */
-export interface SecretKey {
-    /**
-     * The secret key
-     */
-    secretKey?: string | undefined
-}
 
 /**
  * Represents a branch that can be managed by the user or API consumer.
