@@ -1,2 +1,2 @@
 export { MambuDepositTransactions } from './rest.client.js'
-export * as depositTransactions from './rest.type.js'
+export * as depositTransactions from './rest.zod.js'

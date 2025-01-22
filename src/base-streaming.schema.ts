@@ -1,6 +1,6 @@
 import { omitUndefined, pick } from '@skyleague/axioms'
-import { $restclient } from '@skyleague/therefore'
 import type { OpenapiV3 } from '@skyleague/therefore'
+import { $restclient } from '@skyleague/therefore'
 import type { APIKeySecurityScheme, Operation, PathItem, Schema } from '@skyleague/therefore/src/types/openapi.type.js'
 import ky from 'ky'
 
@@ -83,5 +83,6 @@ export const baseMambuStreaming = ky
             formats: false,
             strict: false,
             client: 'ky',
+            validator: 'zod',
         })
     })

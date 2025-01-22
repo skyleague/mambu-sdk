@@ -1,2 +1,2 @@
 export { MambuBackgroundProcess } from './rest.client.js'
-export * as backgroundProcess from './rest.type.js'
+export * as backgroundProcess from './rest.zod.js'

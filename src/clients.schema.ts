@@ -58,6 +58,7 @@ for (const item of clientList) {
         strict: false,
         formats: false,
         client: 'ky',
+        validator: 'zod',
         transformOpenapi: (api: OpenapiV3) => {
             const securitySchemes = api.components?.securitySchemes
             const injectApiKey =

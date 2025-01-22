@@ -37,14 +37,14 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@skyleague/axioms": "^6.2.1",
+    "@skyleague/axioms": "^6.5.1",
     "@skyleague/node-standards": "^9.5.1",
-    "@skyleague/therefore": "^7.0.0",
+    "@skyleague/therefore": "^7.11.1",
     "@types/split2": "^4.2.3",
     "camelcase": "^8.0.0",
     "ky": "^1.7.4",
     "nock": "14.0.0-beta.19",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.3"
   },
   "peerDependencies": {
     "ky": "^1.7.4"
