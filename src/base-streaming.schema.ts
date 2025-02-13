@@ -1,4 +1,4 @@
-import { omitUndefined, pick } from '@skyleague/axioms'
+import { isDefined, omitUndefined, pick } from '@skyleague/axioms'
 import type { OpenapiV3 } from '@skyleague/therefore'
 import { $restclient } from '@skyleague/therefore'
 import type { APIKeySecurityScheme, Operation, PathItem, Schema } from '@skyleague/therefore/src/types/openapi.type.js'
@@ -75,6 +75,26 @@ export const baseMambuStreaming = ky
                 },
                 required: [...(cursor.required ?? []), 'cursor_token'] as unknown as [string, ...string[]],
             }) as Schema
+
+            if (
+                isDefined(schemas['Subscription-Event-Stream-Batch']) &&
+                'properties' in schemas['Subscription-Event-Stream-Batch']
+            ) {
+                schemas['Subscription-Event-Stream-Batch'] = omitUndefined({
+                    ...schemas['Subscription-Event-Stream-Batch'],
+                    properties: {
+                        ...schemas['Subscription-Event-Stream-Batch'].properties,
+                        events: {
+                            type: 'array',
+                            minItems: 1,
+                            description: '[Payload of an Event. Usually represents a status transition in a Business process.]',
+                            items: {
+                                $ref: '#/components/schemas/Event',
+                            },
+                        },
+                    },
+                }) as Schema
+            }
         }
 
         data.security ??= [{ ApiKeyAuth: [] }]

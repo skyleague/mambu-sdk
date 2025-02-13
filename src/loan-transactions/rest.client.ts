@@ -14,6 +14,7 @@ import {
     LockLoanAccountInput,
     LockLoanTransactionsWrapper,
     PaymentMadeTransactionInput,
+    PrincipalOverpaymentLoanTransactionInput,
     RedrawRepaymentTransactionInputDTO,
     RefundLoanTransactionInput,
     RepaymentLoanTransactionInput,
@@ -499,6 +500,59 @@ export class MambuLoanTransactions {
             },
             'json',
         ) as ReturnType<this['makeDisbursement']>
+    }
+
+    /**
+     * POST /loans/{loanAccountId}/principal-overpayment-transactions
+     *
+     * Make non-scheduled principal overpayment transaction on loan account
+     */
+    public makePrincipalOverpayment({
+        body,
+        path,
+        headers,
+        auth = [['apiKey'], ['basic']],
+    }: {
+        body: PrincipalOverpaymentLoanTransactionInput
+        path: { loanAccountId: string }
+        headers?: { 'Idempotency-Key'?: string }
+        auth?: string[][] | string[]
+    }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'201', LoanTransaction>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404'>,
+              unknown,
+              'response:statuscode',
+              Headers
+          >
+    > {
+        const _body = this.validateRequestBody(PrincipalOverpaymentLoanTransactionInput, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`loans/${path.loanAccountId}/principal-overpayment-transactions`, {
+                json: _body.right,
+                headers: { Accept: 'application/vnd.mambu.v2+json', ...headers },
+            }),
+            {
+                102: { safeParse: (x: unknown) => ({ success: true, data: x }) },
+                201: LoanTransaction,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            },
+            'json',
+        ) as ReturnType<this['makePrincipalOverpayment']>
     }
 
     /**

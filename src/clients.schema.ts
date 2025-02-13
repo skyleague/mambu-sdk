@@ -14,9 +14,24 @@ const client = ky.extend({ prefixUrl: baseUrl })
 const clients = await client.get('resources').json<Clients>()
 
 const clientList = [
-    ...clients.items.filter((i) => !i.jsonPath.includes('{') && i.hashValue !== 'Loan_Accounts'),
-    { jsonPath: 'json/loans_v2_swagger.json', label: 'Loan Accounts', hashValue: 'Loan_Accounts' },
-    { jsonPath: 'json/loans_schedule_v2_swagger.json', label: 'Loan Account Schedule', hashValue: 'Loan_Account_Schedule' },
+    ...clients.items.filter(
+        (i) => !i.jsonPath.includes('{') && i.hashValue !== 'Loan_Accounts' && i.hashValue !== 'Loan_Transactions',
+    ),
+    {
+        jsonPath: 'json/loans_v2_swagger.json',
+        label: 'Loan Accounts',
+        hashValue: 'Loan_Accounts',
+    },
+    {
+        jsonPath: 'json/loans_schedule_v2_swagger.json',
+        label: 'Loan Account Schedule',
+        hashValue: 'Loan_Account_Schedule',
+    },
+    {
+        jsonPath: 'json/loans_transactions_v2_swagger.json',
+        label: 'Loan Transactions',
+        hashValue: 'Loan_Transactions',
+    },
 ]
 
 for (const manifest of clientList) {
