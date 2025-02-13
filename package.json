@@ -19,7 +19,6 @@
   "files": [".dist", "package.json"],
   "scripts": {
     "build": "tsc -p tsconfig.dist.json",
-    "build:docs": "npx typedoc",
     "build:index": "node --import tsx/esm scripts/build-index.ts",
     "check:coverage": "vitest run --coverage=true",
     "check:project": "node-standards lint",
