@@ -118,6 +118,7 @@ export type SubscriptionCursorWithoutToken = z.infer<typeof SubscriptionCursorWi
 
 export const StreamInfo = z
     .object({})
+    .passthrough()
     .describe(
         'This object contains general information about the stream. Used only for debugging purposes. We recommend logging this object in order to solve connection issues. \\n\\nClients should not parse this structure.',
     )
@@ -126,7 +127,7 @@ export type StreamInfo = z.infer<typeof StreamInfo>
 
 export const Event = z
     .object({
-        body: z.union([z.string(), z.object({})]),
+        body: z.union([z.string(), z.object({}).passthrough()]),
         metadata: EventMetadata,
         template_name: z.string().nonempty().describe('Name of the notification template.'),
     })

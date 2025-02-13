@@ -37,7 +37,7 @@ export const baseMambuStreaming = ky
             const eventProperties = (schemas.Event as Schema).properties
             if (eventProperties?.body !== undefined) {
                 eventProperties.body = {
-                    anyOf: [{ type: 'string' }, { type: 'object' }],
+                    anyOf: [{ type: 'string' }, { type: 'object', additionalProperties: true }],
                 }
             }
 
@@ -61,6 +61,7 @@ export const baseMambuStreaming = ky
                 },
                 required: [...(cursor.required ?? []), 'event_type', 'cursor_token'] as unknown as [string, ...string[]],
             }) as Schema
+
             schemas['Subscription-Cursor-Without-Token'] = omitUndefined({
                 ...structuredClone(cursor),
                 ...schemas['Subscription-Cursor-Without-Token'],
@@ -74,6 +75,13 @@ export const baseMambuStreaming = ky
                     },
                 },
                 required: [...(cursor.required ?? []), 'cursor_token'] as unknown as [string, ...string[]],
+            }) as Schema
+
+            schemas['Stream-Info'] = omitUndefined({
+                description:
+                    'This object contains general information about the stream. Used only for debugging purposes. We recommend logging this object in order to solve connection issues. \n\nClients should not parse this structure.',
+                type: 'object',
+                additionalProperties: true,
             }) as Schema
 
             if (
