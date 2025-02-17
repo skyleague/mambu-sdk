@@ -36,7 +36,8 @@ export const TriggerDatabaseBackupRequest = z
             )
             .optional(),
         tables: z
-            .set(z.string())
+            .string()
+            .array()
             .describe(
                 'If provided, it needs to be a list of tables that exist in the database schema. The backup will only include the specified tables. If not provided, the backup will include all tables.',
             )

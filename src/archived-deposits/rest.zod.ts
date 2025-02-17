@@ -764,7 +764,7 @@ export type PeriodicPayment = z.infer<typeof PeriodicPayment>
 
 export const BillingCycleDays = z
     .object({
-        days: z.set(z.number().int()).describe('The billing cycle start days in case it is enabled').optional(),
+        days: z.number().int().array().describe('The billing cycle start days in case it is enabled').optional(),
     })
     .describe('Defines the billing cycles settings for a loan account')
 
@@ -1047,7 +1047,7 @@ export type IntegerIntervalConstraints = z.infer<typeof IntegerIntervalConstrain
 export const BillingCyclesProductSettings = z
     .object({
         enabled: z.boolean().describe('The billing cycle status if it is enabled or disabled').optional(),
-        startDays: z.set(z.number().int()).describe('The billing cycle start days in case it is enabled').optional(),
+        startDays: z.number().int().array().describe('The billing cycle start days in case it is enabled').optional(),
     })
     .describe('Defines the billing cycles settings for revolving credit products')
 
@@ -3119,7 +3119,8 @@ export type CreditArrangementSettings = z.infer<typeof CreditArrangementSettings
 export const ProductAvailabilitySettings = z
     .object({
         availableFor: z
-            .set(z.enum(['INDIVIDUALS', 'PURE_GROUPS', 'SOLIDARITY_GROUPS']))
+            .enum(['INDIVIDUALS', 'PURE_GROUPS', 'SOLIDARITY_GROUPS'])
+            .array()
             .describe('Holds the entities this product is available for. i.e Individuals')
             .optional(),
         branchSettings: BranchSettings.optional(),
@@ -3168,7 +3169,8 @@ export const AccountLinkSettings = z
             )
             .optional(),
         linkedAccountOptions: z
-            .set(z.enum(['AUTO_LINK_ACCOUNTS', 'AUTO_CREATE_LINKED_ACCOUNTS']))
+            .enum(['AUTO_LINK_ACCOUNTS', 'AUTO_CREATE_LINKED_ACCOUNTS'])
+            .array()
             .describe('A set of linked account options.')
             .optional(),
         settlementMethod: z
@@ -4361,7 +4363,8 @@ export type DepositProductCurrencySettings = z.infer<typeof DepositProductCurren
 export const DepositProductAvailabilitySettings = z
     .object({
         availableFor: z
-            .set(z.enum(['INDIVIDUALS', 'PURE_GROUPS']))
+            .enum(['INDIVIDUALS', 'PURE_GROUPS'])
+            .array()
             .describe('Holds the entities this product is available for. i.e Individuals')
             .optional(),
         branchSettings: BranchSettings.optional(),
@@ -4651,6 +4654,10 @@ export const Installment = z
             .describe('`TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.')
             .optional(),
         lastPaidDate: z.string().datetime({ offset: true }).describe('The installment last paid date.').optional(),
+        nonScheduledPrincipalBalanceOverpayment: z
+            .number()
+            .describe('The non-scheduled principal balance overpayment for the loan account')
+            .optional(),
         number: z
             .string()
             .describe(
@@ -9329,7 +9336,7 @@ export const GeneralSetup = z
             )
             .optional(),
         clientIdFormat: z.string().describe('The pattern for generating individual client IDs.').optional(),
-        dashboardConfigurations: z.set(DashboardConfiguration).describe('The dashboard configuration.').optional(),
+        dashboardConfigurations: DashboardConfiguration.array().describe('The dashboard configuration.').optional(),
         dateFormats: z
             .record(z.string().optional())
             .describe('The date (dd-MM-yyyy) or date time (dd-MM-yyyy HH:mm:ss) formats.')
@@ -10452,7 +10459,8 @@ export const TriggerDatabaseBackupRequest = z
             )
             .optional(),
         tables: z
-            .set(z.string())
+            .string()
+            .array()
             .describe(
                 'If provided, it needs to be a list of tables that exist in the database schema. The backup will only include the specified tables. If not provided, the backup will include all tables.',
             )

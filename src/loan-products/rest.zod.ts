@@ -224,7 +224,7 @@ export type IntegerIntervalConstraints = z.infer<typeof IntegerIntervalConstrain
 export const BillingCyclesProductSettings = z
     .object({
         enabled: z.boolean().describe('The billing cycle status if it is enabled or disabled').optional(),
-        startDays: z.set(z.number().int()).describe('The billing cycle start days in case it is enabled').optional(),
+        startDays: z.number().int().array().describe('The billing cycle start days in case it is enabled').optional(),
     })
     .describe('Defines the billing cycles settings for revolving credit products')
 
@@ -1131,7 +1131,8 @@ export type CreditArrangementSettings = z.infer<typeof CreditArrangementSettings
 export const ProductAvailabilitySettings = z
     .object({
         availableFor: z
-            .set(z.enum(['INDIVIDUALS', 'PURE_GROUPS', 'SOLIDARITY_GROUPS']))
+            .enum(['INDIVIDUALS', 'PURE_GROUPS', 'SOLIDARITY_GROUPS'])
+            .array()
             .describe('Holds the entities this product is available for. i.e Individuals')
             .optional(),
         branchSettings: BranchSettings.optional(),
@@ -1180,7 +1181,8 @@ export const AccountLinkSettings = z
             )
             .optional(),
         linkedAccountOptions: z
-            .set(z.enum(['AUTO_LINK_ACCOUNTS', 'AUTO_CREATE_LINKED_ACCOUNTS']))
+            .enum(['AUTO_LINK_ACCOUNTS', 'AUTO_CREATE_LINKED_ACCOUNTS'])
+            .array()
             .describe('A set of linked account options.')
             .optional(),
         settlementMethod: z

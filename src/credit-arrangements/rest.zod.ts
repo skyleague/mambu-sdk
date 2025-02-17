@@ -90,7 +90,7 @@ export type PeriodicPayment = z.infer<typeof PeriodicPayment>
 
 export const BillingCycleDays = z
     .object({
-        days: z.set(z.number().int()).describe('The billing cycle start days in case it is enabled').optional(),
+        days: z.number().int().array().describe('The billing cycle start days in case it is enabled').optional(),
     })
     .describe('Defines the billing cycles settings for a loan account')
 
@@ -1576,6 +1576,10 @@ export const Installment = z
             .describe('`TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.')
             .optional(),
         lastPaidDate: z.string().datetime({ offset: true }).describe('The installment last paid date.').optional(),
+        nonScheduledPrincipalBalanceOverpayment: z
+            .number()
+            .describe('The non-scheduled principal balance overpayment for the loan account')
+            .optional(),
         number: z
             .string()
             .describe(

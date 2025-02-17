@@ -141,7 +141,7 @@ export const GeneralSetup = z
             )
             .optional(),
         clientIdFormat: z.string().describe('The pattern for generating individual client IDs.').optional(),
-        dashboardConfigurations: z.set(DashboardConfiguration).describe('The dashboard configuration.').optional(),
+        dashboardConfigurations: DashboardConfiguration.array().describe('The dashboard configuration.').optional(),
         dateFormats: z
             .record(z.string().optional())
             .describe('The date (dd-MM-yyyy) or date time (dd-MM-yyyy HH:mm:ss) formats.')

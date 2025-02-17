@@ -657,7 +657,8 @@ export type CreditArrangementSettings = z.infer<typeof CreditArrangementSettings
 export const DepositProductAvailabilitySettings = z
     .object({
         availableFor: z
-            .set(z.enum(['INDIVIDUALS', 'PURE_GROUPS']))
+            .enum(['INDIVIDUALS', 'PURE_GROUPS'])
+            .array()
             .describe('Holds the entities this product is available for. i.e Individuals')
             .optional(),
         branchSettings: BranchSettings.optional(),
