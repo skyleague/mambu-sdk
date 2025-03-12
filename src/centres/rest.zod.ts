@@ -63,6 +63,7 @@ export const Centre = z
         notes: z.string().describe('The notes or description attached to this object.').optional(),
         state: z.enum(['ACTIVE', 'INACTIVE']).describe('The state of the centre.').optional(),
     })
+    .passthrough()
     .describe(
         'Represents a centre. A centre is a common meeting area that credit officers and the individual and group clients go to. Each centre is assigned to a branch (a branch can have multiple centres) and might have a specific meeting day and location.',
     )

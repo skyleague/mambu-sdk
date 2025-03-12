@@ -1279,6 +1279,7 @@ export const LoanProduct = z
                 'TRANCHED_LOAN',
                 'REVOLVING_CREDIT',
                 'INTEREST_ONLY_EQUAL_INSTALLMENTS',
+                'DYNAMIC_MORTGAGE',
             ])
             .describe('The type of the loan product.'),
     })

@@ -471,6 +471,7 @@ export const DepositTransaction = z
             .describe('Date of the entry (eg date of repayment or disbursal, etc.) (as Organization Time)')
             .optional(),
     })
+    .passthrough()
     .describe(`Represents the action performed on an Deposit Account after which the account's amount changes its value.`)
 
 export type DepositTransaction = z.infer<typeof DepositTransaction>

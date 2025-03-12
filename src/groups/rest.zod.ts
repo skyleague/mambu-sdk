@@ -322,6 +322,7 @@ export const Group = z
             .describe('The preferred language associated with the group (used for the notifications).')
             .optional(),
     })
+    .passthrough()
     .describe(
         'Represents a group. A group is a type of client that can represent a non-physical person such as a company client or a grouping of individual clients. A group can have its own accounts and can optionally have individual clients as members, in which case they also need to have an individual profile in Mambu.',
     )
@@ -386,6 +387,7 @@ export const CreditArrangement = z
             .describe('The substate of credit arrangement.')
             .optional(),
     })
+    .passthrough()
     .describe('Represents a credit arrangement.')
 
 export type CreditArrangement = z.infer<typeof CreditArrangement>

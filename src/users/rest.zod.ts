@@ -417,6 +417,7 @@ export const User = z
         username: z.string().describe('The Mambu login user name.'),
         userState: z.enum(['ACTIVE', 'INACTIVE', 'LOCKED']).describe('The current state of the user.').optional(),
     })
+    .passthrough()
     .describe('Represents a user.')
 
 export type User = z.infer<typeof User>

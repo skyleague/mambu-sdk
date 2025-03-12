@@ -81,8 +81,21 @@ export const InstallmentFee = z
 
 export type InstallmentFee = z.infer<typeof InstallmentFee>
 
+export const CustomSettingDetails = z
+    .object({
+        loanTransactionKey: z.string().describe('The loan transaction associated with the custom setting.').optional(),
+        source: z.string().describe('The source of the custom setting').optional(),
+        type: z.string().describe('The type of custom setting.').optional(),
+    })
+    .describe('Represents the custom settings for a loan schedule.')
+
+export type CustomSettingDetails = z.infer<typeof CustomSettingDetails>
+
 export const Installment = z
     .object({
+        customSettingDetails: CustomSettingDetails.array()
+            .describe('Custom settings associated with the installment.')
+            .optional(),
         dueDate: z.string().datetime({ offset: true }).describe('The installment due date.').optional(),
         encodedKey: z.string().describe('The encoded key of the installment, which is auto generated, and unique.').optional(),
         expectedClosingBalance: z
@@ -95,6 +108,7 @@ export const Installment = z
         feeDetails: InstallmentFeeDetails.array()
             .describe('The breakdown of the fee amounts that have been applied to the loan account.')
             .optional(),
+        fundersInterestDue: z.number().describe('The amount of interest allocated to funders for P2P accounts only.').optional(),
         interest: InstallmentAllocationElementTaxableAmount.optional(),
         interestAccrued: z
             .number()
@@ -107,15 +121,25 @@ export const Installment = z
             .describe('`TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.')
             .optional(),
         lastPaidDate: z.string().datetime({ offset: true }).describe('The installment last paid date.').optional(),
+        lastPenaltyAppliedDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The most recent date on which a penalty was applied to the account.')
+            .optional(),
         nonScheduledPrincipalBalanceOverpayment: z
             .number()
             .describe('The non-scheduled principal balance overpayment for the loan account')
             .optional(),
+        notes: z.string().describe('Any comment or notes added to the installment.').optional(),
         number: z
             .string()
             .describe(
                 'The order number of an installment among all the installments generated for a loan. Loan installments are put in ascending order by due date. The order number only applies to the content of a particular JSON response therefore it is not unique.',
             )
+            .optional(),
+        organizationCommissionDue: z
+            .number()
+            .describe('The amount of interest allocated to organization as commission for P2P accounts only.')
             .optional(),
         parentAccountKey: z.string().describe('The parent account key of the installment.').optional(),
         penalty: InstallmentAllocationElementTaxableAmount.optional(),

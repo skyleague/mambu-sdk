@@ -165,7 +165,7 @@ export const CustomPaymentAmount = z
                 'PAYMENT_DUE_FEE',
                 'PENALTY',
                 'INTEREST_FROM_ARREARS',
-                'NON_ALLOCATED_FEE',
+                'NON_SCHEDULED_FEE',
             ])
             .describe('The type of the custom payment'),
         predefinedFeeKey: z.string().describe('The encodedKey of the predefined fee to be paid.').optional(),
@@ -675,6 +675,7 @@ export const LoanTransaction = z
             .describe('The date of the entry in the organization time format and timezone.')
             .optional(),
     })
+    .passthrough()
     .describe(`Represents the action performed on a loan account after which the account's amount changes its value.`)
 
 export type LoanTransaction = z.infer<typeof LoanTransaction>

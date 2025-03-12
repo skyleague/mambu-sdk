@@ -525,6 +525,7 @@ export const Client = z
             .describe('The state of a client. It shows where the client is in the client life cycle.')
             .optional(),
     })
+    .passthrough()
     .describe('Represents a client.')
 
 export type Client = z.infer<typeof Client>
@@ -587,6 +588,7 @@ export const CreditArrangement = z
             .describe('The substate of credit arrangement.')
             .optional(),
     })
+    .passthrough()
     .describe('Represents a credit arrangement.')
 
 export type CreditArrangement = z.infer<typeof CreditArrangement>

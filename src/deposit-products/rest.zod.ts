@@ -730,6 +730,7 @@ export const DepositProduct = z
             .enum(['CURRENT_ACCOUNT', 'REGULAR_SAVINGS', 'FIXED_DEPOSIT', 'SAVINGS_PLAN', 'INVESTOR_ACCOUNT'])
             .describe('Indicates the type of product.'),
     })
+    .passthrough()
     .describe('A deposit product defines the terms and constraints on deposit accounts')
 
 export type DepositProduct = z.infer<typeof DepositProduct>

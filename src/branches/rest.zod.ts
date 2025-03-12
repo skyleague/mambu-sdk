@@ -76,6 +76,7 @@ export const Branch = z
         phoneNumber: z.string().describe('The branch phone number.').optional(),
         state: z.enum(['ACTIVE', 'INACTIVE']).describe('The branch state.').optional(),
     })
+    .passthrough()
     .describe('Represents a branch.')
 
 export type Branch = z.infer<typeof Branch>

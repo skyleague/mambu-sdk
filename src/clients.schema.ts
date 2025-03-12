@@ -96,6 +96,30 @@ for (const item of clientList) {
                     }
                 }
             }
+
+            // allow custom fields
+            for (const schema of Object.values(
+                pick(api.components?.schemas ?? {}, [
+                    'Client',
+                    'Group',
+                    'LoanAccount',
+                    'DepositAccount',
+                    'DepositProduct',
+                    'CreditArrangement',
+                    'Guarantor',
+                    'Asset',
+                    'Branch',
+                    'User',
+                    'LoanTransaction',
+                    'DepositTransaction',
+                    'Centre',
+                ]),
+            )) {
+                if (!('$ref' in schema)) {
+                    schema.additionalProperties = true
+                }
+            }
+
             // biome-ignore lint/suspicious/noExplicitAny: ignoe
             if ((api.components?.schemas?.RestError as any)?.properties?.errorReason?.enum !== undefined) {
                 // biome-ignore lint/performance/noDelete: This is necessary

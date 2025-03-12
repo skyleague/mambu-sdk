@@ -1059,6 +1059,7 @@ export const Guarantor = z
         guarantorKey: z.string().describe('The key of the client/group used as the guarantor.'),
         guarantorType: z.enum(['CLIENT', 'GROUP']).describe('The type of the guarantor (client/group)'),
     })
+    .passthrough()
     .describe(
         'Guarantor, holds information about a client guaranty entry. It can be defined based on another client which guarantees (including or not a savings account whether it is a client of the organization using Mambu or not) or based on a value the client holds (an asset)',
     )
@@ -1196,6 +1197,7 @@ export const Asset = z
         originalAmount: z.number().describe('The original amount used by the client for a collateral asset').optional(),
         originalCurrency: Currency.optional(),
     })
+    .passthrough()
     .describe('Asset, holds information about a client asset entry.')
 
 export type Asset = z.infer<typeof Asset>
@@ -1263,6 +1265,16 @@ export const InstallmentFee = z
     .describe('Represents an installment fee structure.')
 
 export type InstallmentFee = z.infer<typeof InstallmentFee>
+
+export const CustomSettingDetails = z
+    .object({
+        loanTransactionKey: z.string().describe('The loan transaction associated with the custom setting.').optional(),
+        source: z.string().describe('The source of the custom setting').optional(),
+        type: z.string().describe('The type of custom setting.').optional(),
+    })
+    .describe('Represents the custom settings for a loan schedule.')
+
+export type CustomSettingDetails = z.infer<typeof CustomSettingDetails>
 
 export const InterestAccountSettingsAvailability = z
     .object({
@@ -1694,6 +1706,7 @@ export const DepositAccount = z
             .describe('The tax source where the account withholding taxes will be updated.')
             .optional(),
     })
+    .passthrough()
     .describe('Represents information about a deposit account.')
 
 export type DepositAccount = z.infer<typeof DepositAccount>
@@ -1890,6 +1903,7 @@ export const LoanAccount = z
         terminationDate: z.string().datetime({ offset: true }).describe('The date this loan account was terminated.').optional(),
         tranches: LoanTranche.array().describe('The list of disbursement tranches available for the loan account.').optional(),
     })
+    .passthrough()
     .describe(
         'Represents a loan account. A loan account defines the amount that your organization lends to a client. The terms and conditions of a loan account are defined by a loan product. In a loan account, Mambu stores all the information related to disbursements, repayments, interest rates, and withdrawals.',
     )
@@ -1940,6 +1954,9 @@ export type AccountTax = z.infer<typeof AccountTax>
 
 export const Installment = z
     .object({
+        customSettingDetails: CustomSettingDetails.array()
+            .describe('Custom settings associated with the installment.')
+            .optional(),
         dueDate: z.string().datetime({ offset: true }).describe('The installment due date.').optional(),
         encodedKey: z.string().describe('The encoded key of the installment, which is auto generated, and unique.').optional(),
         expectedClosingBalance: z
@@ -1952,6 +1969,7 @@ export const Installment = z
         feeDetails: InstallmentFeeDetails.array()
             .describe('The breakdown of the fee amounts that have been applied to the loan account.')
             .optional(),
+        fundersInterestDue: z.number().describe('The amount of interest allocated to funders for P2P accounts only.').optional(),
         interest: InstallmentAllocationElementTaxableAmount.optional(),
         interestAccrued: z
             .number()
@@ -1964,15 +1982,25 @@ export const Installment = z
             .describe('`TRUE` if a payment holiday is offered for the installment, `FALSE` otherwise.')
             .optional(),
         lastPaidDate: z.string().datetime({ offset: true }).describe('The installment last paid date.').optional(),
+        lastPenaltyAppliedDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The most recent date on which a penalty was applied to the account.')
+            .optional(),
         nonScheduledPrincipalBalanceOverpayment: z
             .number()
             .describe('The non-scheduled principal balance overpayment for the loan account')
             .optional(),
+        notes: z.string().describe('Any comment or notes added to the installment.').optional(),
         number: z
             .string()
             .describe(
                 'The order number of an installment among all the installments generated for a loan. Loan installments are put in ascending order by due date. The order number only applies to the content of a particular JSON response therefore it is not unique.',
             )
+            .optional(),
+        organizationCommissionDue: z
+            .number()
+            .describe('The amount of interest allocated to organization as commission for P2P accounts only.')
             .optional(),
         parentAccountKey: z.string().describe('The parent account key of the installment.').optional(),
         penalty: InstallmentAllocationElementTaxableAmount.optional(),
