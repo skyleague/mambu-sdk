@@ -91,8 +91,18 @@ export const CustomSettingDetails = z
 
 export type CustomSettingDetails = z.infer<typeof CustomSettingDetails>
 
+export const CarryForwardInterestSplit = z
+    .object({
+        amount: z.number().describe('The carry forward interest amount.').optional(),
+        tax: z.number().describe('The taxes amount on the carry forward interest.').optional(),
+    })
+    .describe('Represents carry forward interest split')
+
+export type CarryForwardInterestSplit = z.infer<typeof CarryForwardInterestSplit>
+
 export const Installment = z
     .object({
+        carryForwardInterestSplit: CarryForwardInterestSplit.optional(),
         customSettingDetails: CustomSettingDetails.array()
             .describe('Custom settings associated with the installment.')
             .optional(),

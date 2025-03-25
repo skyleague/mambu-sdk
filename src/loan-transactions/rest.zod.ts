@@ -144,6 +144,7 @@ export const Fee = z
                 'ARBITRARY',
                 'IOF',
                 'EARLY_REPAYMENT_CHARGE',
+                'FEE_INCLUDED_IN_PMT',
             ])
             .describe('Shows the event that will trigger a fee')
             .optional(),

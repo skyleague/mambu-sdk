@@ -43,7 +43,7 @@ export class MambuClients {
         defaultAuth?: string[][] | string[]
         client?: KyInstance
     }) {
-        this.client = client.extend({ prefixUrl, throwHttpErrors: false, ...options })
+        this.client = client.extend({ prefixUrl, throwHttpErrors: false, timeout: false, ...options })
         this.auth = auth
         this.availableAuth = new Set(Object.keys(auth))
         this.defaultAuth = defaultAuth

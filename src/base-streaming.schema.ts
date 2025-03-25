@@ -112,5 +112,8 @@ export const baseMambuStreaming = ky
             strict: false,
             client: 'ky',
             validator: 'zod',
+            options: {
+                timeout: false,
+            },
         })
     })

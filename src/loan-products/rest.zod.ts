@@ -528,6 +528,7 @@ export const PredefinedFee = z
                 'IOF_PERCENTAGE_OF_INSTALLMENT_PRINCIPAL',
                 'IOF_PERCENTAGE_OF_LATE_INSTALLMENT_PRINCIPAL',
                 'MAMBU_FUNCTION',
+                'FEE_RATE_ON_OUTSTANDING_PRINCIPAL',
             ])
             .describe('The amount from which the fee is calculated using percentageAmount')
             .optional(),
@@ -562,6 +563,7 @@ export const PredefinedFee = z
                 'ARBITRARY',
                 'IOF',
                 'EARLY_REPAYMENT_CHARGE',
+                'FEE_INCLUDED_IN_PMT',
             ])
             .describe('Shows the event that will trigger a fee'),
     })
@@ -1229,6 +1231,12 @@ export const LoanProduct = z
             .boolean()
             .describe(
                 '`TRUE` if it is possible to adjust the interest for the first repayment when the first repayment period is different than the repayment frequency, `FALSE` otherwise.',
+            )
+            .optional(),
+        adjustTotalDueForInstallmentsWithDifferentInterval: z
+            .boolean()
+            .describe(
+                '`TRUE` if it is possible to adjust the total due for the repayment when the repayment period is different than the repayment frequency, `FALSE` otherwise.',
             )
             .optional(),
         allowCustomRepaymentAllocation: z
