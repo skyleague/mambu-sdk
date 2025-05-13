@@ -1,10 +1,8 @@
 import https from 'node:https'
 import { PassThrough } from 'node:stream'
-import { ValidationError } from 'ajv'
-import type {} from 'ky'
 import split2 from 'split2'
 import { BaseMambuStreaming } from './base-streaming.client.js'
-import { SubscriptionEventStreamBatch } from './base-streaming.type.js'
+import { SubscriptionEventStreamBatch } from './base-streaming.zod.js'
 
 export class MambuStreaming extends BaseMambuStreaming {
     public prefixUrl: string | undefined
@@ -62,10 +60,11 @@ export class MambuStreaming extends BaseMambuStreaming {
         for await (const chunk of stream.pipe(split2())) {
             const batch = JSON.parse((chunk as Buffer).toString()) as unknown
 
-            if (SubscriptionEventStreamBatch.is(batch)) {
-                yield { batch: batch, streamId }
+            const result = SubscriptionEventStreamBatch.safeParse(batch)
+            if (result.success && typeof batch === 'object' && batch !== null) {
+                yield { batch: Object.assign(batch, result.data) satisfies SubscriptionEventStreamBatch, streamId }
             } else {
-                throw new ValidationError(SubscriptionEventStreamBatch.validate.errors ?? [])
+                throw result.error
             }
         }
         await response

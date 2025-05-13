@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url'
     const globalExports: string[] = [
         `export * from './pagination.js'`,
         `export * from './streaming.js'`,
-        `export * as streaming from './base-streaming.type.js'`,
+        `export * as streaming from './base-streaming.zod.js'`,
     ]
     for (const dir of directories) {
         if (fs.lstatSync(`${__dirname}/../src/${dir}`).isDirectory()) {
@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url'
 
             const exports: string[] = []
             for (const file of files) {
-                if (file.endsWith('.type.ts')) {
+                if (file.endsWith('.zod.ts')) {
                     exports.push(`export * as ${camelcase(dir)} from './${file.replace('.ts', '.js')}'`)
                 } else if (file.endsWith('.client.ts')) {
                     const contents = fs.readFileSync(`${__dirname}/../src/${dir}/${file}`, 'utf-8')

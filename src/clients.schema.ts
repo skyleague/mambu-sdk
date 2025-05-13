@@ -14,9 +14,24 @@ const client = ky.extend({ prefixUrl: baseUrl })
 const clients = await client.get('resources').json<Clients>()
 
 const clientList = [
-    ...clients.items.filter((i) => !i.jsonPath.includes('{') && i.hashValue !== 'Loan_Accounts'),
-    { jsonPath: 'json/loans_v2_swagger.json', label: 'Loan Accounts', hashValue: 'Loan_Accounts' },
-    { jsonPath: 'json/loans_schedule_v2_swagger.json', label: 'Loan Account Schedule', hashValue: 'Loan_Account_Schedule' },
+    ...clients.items.filter(
+        (i) => !i.jsonPath.includes('{') && i.hashValue !== 'Loan_Accounts' && i.hashValue !== 'Loan_Transactions',
+    ),
+    {
+        jsonPath: 'json/loans_v2_swagger.json',
+        label: 'Loan Accounts',
+        hashValue: 'Loan_Accounts',
+    },
+    {
+        jsonPath: 'json/loans_schedule_v2_swagger.json',
+        label: 'Loan Account Schedule',
+        hashValue: 'Loan_Account_Schedule',
+    },
+    {
+        jsonPath: 'json/loans_transactions_v2_swagger.json',
+        label: 'Loan Transactions',
+        hashValue: 'Loan_Transactions',
+    },
 ]
 
 for (const manifest of clientList) {
@@ -58,6 +73,10 @@ for (const item of clientList) {
         strict: false,
         formats: false,
         client: 'ky',
+        validator: 'zod',
+        options: {
+            timeout: false,
+        },
         transformOpenapi: (api: OpenapiV3) => {
             const securitySchemes = api.components?.securitySchemes
             const injectApiKey =
@@ -80,6 +99,30 @@ for (const item of clientList) {
                     }
                 }
             }
+
+            // allow custom fields
+            for (const schema of Object.values(
+                pick(api.components?.schemas ?? {}, [
+                    'Client',
+                    'Group',
+                    'LoanAccount',
+                    'DepositAccount',
+                    'DepositProduct',
+                    'CreditArrangement',
+                    'Guarantor',
+                    'Asset',
+                    'Branch',
+                    'User',
+                    'LoanTransaction',
+                    'DepositTransaction',
+                    'Centre',
+                ]),
+            )) {
+                if (!('$ref' in schema)) {
+                    schema.additionalProperties = true
+                }
+            }
+
             // biome-ignore lint/suspicious/noExplicitAny: ignoe
             if ((api.components?.schemas?.RestError as any)?.properties?.errorReason?.enum !== undefined) {
                 // biome-ignore lint/performance/noDelete: This is necessary

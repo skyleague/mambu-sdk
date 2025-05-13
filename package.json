@@ -19,7 +19,6 @@
   "files": [".dist", "package.json"],
   "scripts": {
     "build": "tsc -p tsconfig.dist.json",
-    "build:docs": "npx typedoc",
     "build:index": "node --import tsx/esm scripts/build-index.ts",
     "check:coverage": "vitest run --coverage=true",
     "check:project": "node-standards lint",
@@ -32,19 +31,18 @@
     "prebuild:docs": "npm ci"
   },
   "dependencies": {
-    "ajv": "^8.17.1",
     "split2": "^4.2.0",
-    "zod": "^3.24.1"
+    "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@skyleague/axioms": "^6.2.1",
-    "@skyleague/node-standards": "^9.5.1",
-    "@skyleague/therefore": "^7.0.0",
+    "@skyleague/axioms": "^6.5.1",
+    "@skyleague/node-standards": "^10.0.1",
+    "@skyleague/therefore": "^7.14.0",
     "@types/split2": "^4.2.3",
     "camelcase": "^8.0.0",
-    "ky": "^1.7.4",
-    "nock": "14.0.0-beta.19",
-    "typescript": "^5.7.2"
+    "ky": "^1.7.5",
+    "nock": "^14.0.1",
+    "typescript": "^5.8.2"
   },
   "peerDependencies": {
     "ky": "^1.7.4"

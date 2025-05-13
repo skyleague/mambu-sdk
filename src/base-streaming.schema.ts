@@ -1,6 +1,6 @@
-import { omitUndefined, pick } from '@skyleague/axioms'
-import { $restclient } from '@skyleague/therefore'
+import { isDefined, omitUndefined, pick } from '@skyleague/axioms'
 import type { OpenapiV3 } from '@skyleague/therefore'
+import { $restclient } from '@skyleague/therefore'
 import type { APIKeySecurityScheme, Operation, PathItem, Schema } from '@skyleague/therefore/src/types/openapi.type.js'
 import ky from 'ky'
 
@@ -37,7 +37,7 @@ export const baseMambuStreaming = ky
             const eventProperties = (schemas.Event as Schema).properties
             if (eventProperties?.body !== undefined) {
                 eventProperties.body = {
-                    anyOf: [{ type: 'string' }, { type: 'object' }],
+                    anyOf: [{ type: 'string' }, { type: 'object', additionalProperties: true }],
                 }
             }
 
@@ -61,6 +61,7 @@ export const baseMambuStreaming = ky
                 },
                 required: [...(cursor.required ?? []), 'event_type', 'cursor_token'] as unknown as [string, ...string[]],
             }) as Schema
+
             schemas['Subscription-Cursor-Without-Token'] = omitUndefined({
                 ...structuredClone(cursor),
                 ...schemas['Subscription-Cursor-Without-Token'],
@@ -75,6 +76,33 @@ export const baseMambuStreaming = ky
                 },
                 required: [...(cursor.required ?? []), 'cursor_token'] as unknown as [string, ...string[]],
             }) as Schema
+
+            schemas['Stream-Info'] = omitUndefined({
+                description:
+                    'This object contains general information about the stream. Used only for debugging purposes. We recommend logging this object in order to solve connection issues. \n\nClients should not parse this structure.',
+                type: 'object',
+                additionalProperties: true,
+            }) as Schema
+
+            if (
+                isDefined(schemas['Subscription-Event-Stream-Batch']) &&
+                'properties' in schemas['Subscription-Event-Stream-Batch']
+            ) {
+                schemas['Subscription-Event-Stream-Batch'] = omitUndefined({
+                    ...schemas['Subscription-Event-Stream-Batch'],
+                    properties: {
+                        ...schemas['Subscription-Event-Stream-Batch'].properties,
+                        events: {
+                            type: 'array',
+                            minItems: 1,
+                            description: '[Payload of an Event. Usually represents a status transition in a Business process.]',
+                            items: {
+                                $ref: '#/components/schemas/Event',
+                            },
+                        },
+                    },
+                }) as Schema
+            }
         }
 
         data.security ??= [{ ApiKeyAuth: [] }]
@@ -83,5 +111,9 @@ export const baseMambuStreaming = ky
             formats: false,
             strict: false,
             client: 'ky',
+            validator: 'zod',
+            options: {
+                timeout: false,
+            },
         })
     })
