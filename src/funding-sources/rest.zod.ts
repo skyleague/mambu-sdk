@@ -444,6 +444,8 @@ export const DepositTransaction = z
                 'INTEREST_APPLIED',
                 'INTEREST_APPLIED_ADJUSTMENT',
                 'NET_DIFF_INTEREST',
+                'PROFIT_APPLIED',
+                'PROFIT_APPLIED_ADJUSTMENT',
                 'FEE_REDUCTION_ADJUSTMENT',
                 'WITHHOLDING_TAX',
                 'WITHHOLDING_TAX_ADJUSTMENT',

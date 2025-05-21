@@ -300,6 +300,8 @@ export const BaseUserAccess = z
                 'EDIT_PROFIT_SHARING_PRODUCT_SETTINGS',
                 'DELETE_PROFIT_SHARING_PRODUCT_SETTINGS',
                 'MAKE_BULK_CHANGE_INTEREST_AVAILABILITY',
+                'CREATE_RATE_SHEET',
+                'VIEW_RATE_SHEET',
             ])
             .array()
             .describe(

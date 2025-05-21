@@ -6,6 +6,7 @@ import {
     AccountBalances,
     AuthorizationHold,
     AuthorizationHoldAmountAdjustmentRequest,
+    BulkCardAuthorizationHoldsInput,
     CardTransactionInput,
     CardTransactionOutput,
     CardTransactionReversal,
@@ -104,6 +105,55 @@ export class MambuCards {
             },
             'json',
         ) as ReturnType<this['createAuthorizationHold']>
+    }
+
+    /**
+     * POST /cards/{cardReferenceToken}/authorizationholds:bulk
+     *
+     * Create bulk authorization holds corresponding to a given card
+     */
+    public createBulkAuthorizationHolds({
+        body,
+        path,
+        auth = [['apiKey'], ['basic']],
+    }: { body: BulkCardAuthorizationHoldsInput; path: { cardReferenceToken: string }; auth?: string[][] | string[] }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'201', BulkCardAuthorizationHoldsInput>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'409', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
+              unknown,
+              'response:statuscode',
+              Headers
+          >
+    > {
+        const _body = this.validateRequestBody(BulkCardAuthorizationHoldsInput, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
+
+        return this.awaitResponse(
+            this.buildClient(auth).post(`cards/${path.cardReferenceToken}/authorizationholds:bulk`, {
+                json: _body.right,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            }),
+            {
+                102: { safeParse: (x: unknown) => ({ success: true, data: x }) },
+                201: BulkCardAuthorizationHoldsInput,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+                409: ErrorResponse,
+            },
+            'json',
+        ) as ReturnType<this['createBulkAuthorizationHolds']>
     }
 
     /**

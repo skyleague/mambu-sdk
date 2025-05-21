@@ -167,6 +167,11 @@ export const CustomPaymentAmount = z
                 'PENALTY',
                 'INTEREST_FROM_ARREARS',
                 'NON_SCHEDULED_FEE',
+                'INTEREST_BEARING_FEE',
+                'INTEREST_BEARING_FEE_INTEREST',
+                'CF_INTEREST',
+                'CF_INTEREST_FROM_ARREARS',
+                'CF_INTEREST_FROM_ARREARS_ACCRUED',
             ])
             .describe('The type of the custom payment'),
         predefinedFeeKey: z.string().describe('The encodedKey of the predefined fee to be paid.').optional(),
@@ -631,6 +636,7 @@ export const LoanTransaction = z
                 'TAX_RATE_CHANGED',
                 'PENALTY_RATE_CHANGED',
                 'INTEREST_APPLIED',
+                'IBF_INTEREST_APPLIED',
                 'INTEREST_APPLIED_ADJUSTMENT',
                 'INTEREST_DUE_REDUCED',
                 'PENALTY_REDUCTION_ADJUSTMENT',
@@ -875,6 +881,7 @@ export const DisbursementLoanTransactionInput = z
         transferDetails: DisbursementTransferDetailsInput.optional(),
         valueDate: z.string().datetime({ offset: true }).describe('The date of the disbursal (as Organization Time)').optional(),
     })
+    .passthrough()
     .describe('The input representation of a loan transaction when making a disbursement')
 
 export type DisbursementLoanTransactionInput = z.infer<typeof DisbursementLoanTransactionInput>
@@ -996,6 +1003,7 @@ export const PaymentMadeTransactionInput = z
             .describe('The entry date of the payment made transaction (as Organization Time)')
             .optional(),
     })
+    .passthrough()
     .describe('Represents the request payload for creating a transaction of type PAYMENT_MADE')
 
 export type PaymentMadeTransactionInput = z.infer<typeof PaymentMadeTransactionInput>
@@ -1111,6 +1119,7 @@ export const RepaymentLoanTransactionInput = z
             .describe('The entry date of the repayment (as Organization Time)')
             .optional(),
     })
+    .passthrough()
     .describe('Represents the request payload for creating a transaction of type REPAYMENT')
 
 export type RepaymentLoanTransactionInput = z.infer<typeof RepaymentLoanTransactionInput>
@@ -1148,6 +1157,7 @@ export const WithdrawalRedrawTransactionInput = z
             .describe('The value date of the withdrawal transaction (as Organization Time)')
             .optional(),
     })
+    .passthrough()
     .describe('Represents the request payload for creating a transaction of type WITHDRAWAL_REDRAW')
 
 export type WithdrawalRedrawTransactionInput = z.infer<typeof WithdrawalRedrawTransactionInput>

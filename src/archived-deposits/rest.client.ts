@@ -23,6 +23,7 @@ import {
     BackgroundProcess,
     BlockFund,
     Branch,
+    BulkCardAuthorizationHoldsInput,
     BulkDepositTransactionsInput,
     BulkInterestAccountSettingsAvailabilityInput,
     BulkProcessStatus,
@@ -72,6 +73,7 @@ import {
     DataImportStatus,
     DepositAccount,
     DepositAccountAction,
+    DepositAccountBalanceSummarySearchCriteria,
     DepositAccountSearchCriteria,
     DepositProduct,
     DepositProductAction,
@@ -118,6 +120,7 @@ import {
     GetAll21Response,
     GetAll22Response,
     GetAll23Response,
+    GetAll24Response,
     GetAllAuthorizationHolds1Response,
     GetAllAuthorizationHoldsResponse,
     GetAllBlocksResponse,
@@ -217,6 +220,7 @@ import {
     Search8Response,
     Search9Response,
     Search10Response,
+    Search11Response,
     SearchResponse,
     SecretKey,
     SeizeBlockAmount,
@@ -2492,6 +2496,54 @@ export class MambuArchivedDeposits {
             },
             'json',
         ) as ReturnType<this['createBlockFund']>
+    }
+
+    /**
+     * POST /cards/{cardReferenceToken}/authorizationholds:bulk
+     *
+     * Create bulk authorization holds corresponding to a given card
+     */
+    public createBulkAuthorizationHolds({
+        body,
+        path,
+    }: { body: BulkCardAuthorizationHoldsInput; path: { cardReferenceToken: string } }): Promise<
+        | FailureResponse<'102', unknown, 'response:statuscode'>
+        | SuccessResponse<'201', BulkCardAuthorizationHoldsInput>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'409', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '102' | '400' | '401' | '403' | '404' | '409'>,
+              unknown,
+              'response:statuscode',
+              Headers
+          >
+    > {
+        const _body = this.validateRequestBody(BulkCardAuthorizationHoldsInput, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
+
+        return this.awaitResponse(
+            this.client.post(`cards/${path.cardReferenceToken}/authorizationholds:bulk`, {
+                json: _body.right,
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            }),
+            {
+                102: { safeParse: (x: unknown) => ({ success: true, data: x }) },
+                201: BulkCardAuthorizationHoldsInput,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+                409: ErrorResponse,
+            },
+            'json',
+        ) as ReturnType<this['createBulkAuthorizationHolds']>
     }
 
     /**
@@ -4998,16 +5050,16 @@ export class MambuArchivedDeposits {
     }
 
     /**
-     * GET /currencies/{currencyCode}/rates
+     * GET /deposits/{depositAccountId}/transactions
      *
-     * Get exchange rates for a specific currency.
+     * Get deposit transactions
      */
     public getAll10({
         path,
         query,
     }: {
-        path: { currencyCode: string }
-        query?: { offset?: string; limit?: string; paginationDetails?: string; from?: string; to?: string }
+        path: { depositAccountId: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
     }): Promise<
         | SuccessResponse<'200', GetAll10Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
@@ -5017,7 +5069,7 @@ export class MambuArchivedDeposits {
         | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
     > {
         return this.awaitResponse(
-            this.client.get(`currencies/${path.currencyCode}/rates`, {
+            this.client.get(`deposits/${path.depositAccountId}/transactions`, {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
@@ -5032,23 +5084,16 @@ export class MambuArchivedDeposits {
     }
 
     /**
-     * GET /glaccounts
+     * GET /currencies/{currencyCode}/rates
      *
-     * Get general ledger accounts
+     * Get exchange rates for a specific currency.
      */
     public getAll11({
+        path,
         query,
     }: {
-        query?: {
-            offset?: string
-            limit?: string
-            paginationDetails?: string
-            type: string
-            from?: string
-            to?: string
-            branchId?: string
-            balanceExcluded?: string
-        }
+        path: { currencyCode: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string; from?: string; to?: string }
     }): Promise<
         | SuccessResponse<'200', GetAll11Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
@@ -5058,7 +5103,7 @@ export class MambuArchivedDeposits {
         | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
     > {
         return this.awaitResponse(
-            this.client.get('glaccounts', {
+            this.client.get(`currencies/${path.currencyCode}/rates`, {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
@@ -5073,9 +5118,9 @@ export class MambuArchivedDeposits {
     }
 
     /**
-     * GET /gljournalentries
+     * GET /glaccounts
      *
-     * Get general ledger journal entries
+     * Get general ledger accounts
      */
     public getAll12({
         query,
@@ -5084,10 +5129,11 @@ export class MambuArchivedDeposits {
             offset?: string
             limit?: string
             paginationDetails?: string
-            from: string
-            to: string
+            type: string
+            from?: string
+            to?: string
             branchId?: string
-            glAccountId?: string
+            balanceExcluded?: string
         }
     }): Promise<
         | SuccessResponse<'200', GetAll12Response>
@@ -5098,7 +5144,7 @@ export class MambuArchivedDeposits {
         | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
     > {
         return this.awaitResponse(
-            this.client.get('gljournalentries', {
+            this.client.get('glaccounts', {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
@@ -5113,9 +5159,9 @@ export class MambuArchivedDeposits {
     }
 
     /**
-     * GET /groups
+     * GET /gljournalentries
      *
-     * Get groups
+     * Get general ledger journal entries
      */
     public getAll13({
         query,
@@ -5124,13 +5170,12 @@ export class MambuArchivedDeposits {
             offset?: string
             limit?: string
             paginationDetails?: string
-            detailsLevel?: string
-            creditOfficerUsername?: string
+            from: string
+            to: string
             branchId?: string
-            centreId?: string
-            sortBy?: string
+            glAccountId?: string
         }
-    } = {}): Promise<
+    }): Promise<
         | SuccessResponse<'200', GetAll13Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
@@ -5139,7 +5184,7 @@ export class MambuArchivedDeposits {
         | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
     > {
         return this.awaitResponse(
-            this.client.get('groups', {
+            this.client.get('gljournalentries', {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
@@ -5154,13 +5199,24 @@ export class MambuArchivedDeposits {
     }
 
     /**
-     * GET /organization/identificationDocumentTemplates
+     * GET /groups
      *
-     * Get ID templates
+     * Get groups
      */
     public getAll14({
         query,
-    }: { query?: { detailsLevel?: string } } = {}): Promise<
+    }: {
+        query?: {
+            offset?: string
+            limit?: string
+            paginationDetails?: string
+            detailsLevel?: string
+            creditOfficerUsername?: string
+            branchId?: string
+            centreId?: string
+            sortBy?: string
+        }
+    } = {}): Promise<
         | SuccessResponse<'200', GetAll14Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
@@ -5169,7 +5225,7 @@ export class MambuArchivedDeposits {
         | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
     > {
         return this.awaitResponse(
-            this.client.get('organization/identificationDocumentTemplates', {
+            this.client.get('groups', {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
@@ -5184,11 +5240,41 @@ export class MambuArchivedDeposits {
     }
 
     /**
+     * GET /organization/identificationDocumentTemplates
+     *
+     * Get ID templates
+     */
+    public getAll15({
+        query,
+    }: { query?: { detailsLevel?: string } } = {}): Promise<
+        | SuccessResponse<'200', GetAll15Response>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
+        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
+    > {
+        return this.awaitResponse(
+            this.client.get('organization/identificationDocumentTemplates', {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            }),
+            {
+                200: GetAll15Response,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            },
+            'json',
+        ) as ReturnType<this['getAll15']>
+    }
+
+    /**
      * GET /installments
      *
      * Get installments for `ACTIVE` or `ACTIVE_IN_ARREARS` loan accounts
      */
-    public getAll15({
+    public getAll16({
         query,
     }: {
         query?: {
@@ -5202,7 +5288,7 @@ export class MambuArchivedDeposits {
             installmentState?: string
         }
     }): Promise<
-        | SuccessResponse<'200', GetAll15Response>
+        | SuccessResponse<'200', GetAll16Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
@@ -5221,14 +5307,14 @@ export class MambuArchivedDeposits {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
             {
-                200: GetAll15Response,
+                200: GetAll16Response,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
             'json',
-        ) as ReturnType<this['getAll15']>
+        ) as ReturnType<this['getAll16']>
     }
 
     /**
@@ -5236,7 +5322,7 @@ export class MambuArchivedDeposits {
      *
      * Get loan accounts
      */
-    public getAll16({
+    public getAll17({
         query,
     }: {
         query?: {
@@ -5253,36 +5339,6 @@ export class MambuArchivedDeposits {
             sortBy?: string
         }
     } = {}): Promise<
-        | SuccessResponse<'200', GetAll16Response>
-        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
-        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
-    > {
-        return this.awaitResponse(
-            this.client.get('loans', {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-            }),
-            {
-                200: GetAll16Response,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            },
-            'json',
-        ) as ReturnType<this['getAll16']>
-    }
-
-    /**
-     * GET /loanproducts
-     *
-     * Get loan products
-     */
-    public getAll17({
-        query,
-    }: { query?: { offset?: string; limit?: string; paginationDetails?: string; sortBy?: string } } = {}): Promise<
         | SuccessResponse<'200', GetAll17Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
@@ -5291,7 +5347,7 @@ export class MambuArchivedDeposits {
         | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
     > {
         return this.awaitResponse(
-            this.client.get('loanproducts', {
+            this.client.get('loans', {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
@@ -5306,18 +5362,48 @@ export class MambuArchivedDeposits {
     }
 
     /**
+     * GET /loanproducts
+     *
+     * Get loan products
+     */
+    public getAll18({
+        query,
+    }: { query?: { offset?: string; limit?: string; paginationDetails?: string; sortBy?: string } } = {}): Promise<
+        | SuccessResponse<'200', GetAll18Response>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
+        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
+    > {
+        return this.awaitResponse(
+            this.client.get('loanproducts', {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            }),
+            {
+                200: GetAll18Response,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            },
+            'json',
+        ) as ReturnType<this['getAll18']>
+    }
+
+    /**
      * GET /loans/{loanAccountId}/transactions
      *
      * Get loan transactions
      */
-    public getAll18({
+    public getAll19({
         path,
         query,
     }: {
         path: { loanAccountId: string }
         query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
     }): Promise<
-        | SuccessResponse<'200', GetAll18Response>
+        | SuccessResponse<'200', GetAll19Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
@@ -5336,52 +5422,11 @@ export class MambuArchivedDeposits {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
             {
-                200: GetAll18Response,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-                404: ErrorResponse,
-            },
-            'json',
-        ) as ReturnType<this['getAll18']>
-    }
-
-    /**
-     * GET /tasks
-     *
-     * Gets tasks
-     */
-    public getAll19({
-        query,
-    }: {
-        query?: {
-            offset?: string
-            limit?: string
-            paginationDetails?: string
-            detailsLevel?: string
-            username?: string
-            clientId?: string
-            groupId?: string
-            status?: string
-        }
-    } = {}): Promise<
-        | SuccessResponse<'200', GetAll19Response>
-        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
-        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
-    > {
-        return this.awaitResponse(
-            this.client.get('tasks', {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-            }),
-            {
                 200: GetAll19Response,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
+                404: ErrorResponse,
             },
             'json',
         ) as ReturnType<this['getAll19']>
@@ -5420,13 +5465,24 @@ export class MambuArchivedDeposits {
     }
 
     /**
-     * GET /organization/transactionChannels
+     * GET /tasks
      *
-     * Get transaction channels
+     * Gets tasks
      */
     public getAll20({
         query,
-    }: { query?: { detailsLevel?: string; transactionChannelState?: string } } = {}): Promise<
+    }: {
+        query?: {
+            offset?: string
+            limit?: string
+            paginationDetails?: string
+            detailsLevel?: string
+            username?: string
+            clientId?: string
+            groupId?: string
+            status?: string
+        }
+    } = {}): Promise<
         | SuccessResponse<'200', GetAll20Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
@@ -5435,7 +5491,7 @@ export class MambuArchivedDeposits {
         | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
     > {
         return this.awaitResponse(
-            this.client.get('organization/transactionChannels', {
+            this.client.get('tasks', {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
@@ -5450,13 +5506,13 @@ export class MambuArchivedDeposits {
     }
 
     /**
-     * GET /userroles
+     * GET /organization/transactionChannels
      *
-     * Get user roles
+     * Get transaction channels
      */
     public getAll21({
         query,
-    }: { query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string } } = {}): Promise<
+    }: { query?: { detailsLevel?: string; transactionChannelState?: string } } = {}): Promise<
         | SuccessResponse<'200', GetAll21Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
@@ -5465,7 +5521,7 @@ export class MambuArchivedDeposits {
         | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
     > {
         return this.awaitResponse(
-            this.client.get('userroles', {
+            this.client.get('organization/transactionChannels', {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
@@ -5480,22 +5536,13 @@ export class MambuArchivedDeposits {
     }
 
     /**
-     * GET /users
+     * GET /userroles
      *
-     * Get users
+     * Get user roles
      */
     public getAll22({
         query,
-    }: {
-        query?: {
-            offset?: string
-            limit?: string
-            paginationDetails?: string
-            detailsLevel?: string
-            branchId?: string
-            branchIdType?: string
-        }
-    } = {}): Promise<
+    }: { query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string } } = {}): Promise<
         | SuccessResponse<'200', GetAll22Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
@@ -5504,7 +5551,7 @@ export class MambuArchivedDeposits {
         | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
     > {
         return this.awaitResponse(
-            this.client.get('users', {
+            this.client.get('userroles', {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
@@ -5519,16 +5566,55 @@ export class MambuArchivedDeposits {
     }
 
     /**
-     * GET /currencies
+     * GET /users
      *
-     * Get all currencies
+     * Get users
      */
     public getAll23({
         query,
     }: {
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string; type?: string }
+        query?: {
+            offset?: string
+            limit?: string
+            paginationDetails?: string
+            detailsLevel?: string
+            branchId?: string
+            branchIdType?: string
+        }
     } = {}): Promise<
         | SuccessResponse<'200', GetAll23Response>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
+        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
+    > {
+        return this.awaitResponse(
+            this.client.get('users', {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            }),
+            {
+                200: GetAll23Response,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            },
+            'json',
+        ) as ReturnType<this['getAll23']>
+    }
+
+    /**
+     * GET /currencies
+     *
+     * Get all currencies
+     */
+    public getAll24({
+        query,
+    }: {
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string; type?: string }
+    } = {}): Promise<
+        | SuccessResponse<'200', GetAll24Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
@@ -5541,13 +5627,13 @@ export class MambuArchivedDeposits {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
             {
-                200: GetAll23Response,
+                200: GetAll24Response,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
             },
             'json',
-        ) as ReturnType<this['getAll23']>
+        ) as ReturnType<this['getAll24']>
     }
 
     /**
@@ -5707,11 +5793,52 @@ export class MambuArchivedDeposits {
     }
 
     /**
+     * GET /deposits/{depositAccountId}/balanceSummary
+     *
+     * Get balance summary for the deposit account
+     */
+    public getAll7({
+        path,
+        query,
+    }: {
+        path: { depositAccountId: string }
+        query?: { offset?: string; limit?: string; paginationDetails?: string; startDate?: string; endDate?: string }
+    }): Promise<
+        | SuccessResponse<'200', GetAll7Response>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              unknown,
+              'response:statuscode',
+              Headers
+          >
+    > {
+        return this.awaitResponse(
+            this.client.get(`deposits/${path.depositAccountId}/balanceSummary`, {
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            }),
+            {
+                200: GetAll7Response,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            },
+            'json',
+        ) as ReturnType<this['getAll7']>
+    }
+
+    /**
      * GET /deposits
      *
      * Get deposit accounts
      */
-    public getAll7({
+    public getAll8({
         query,
     }: {
         query?: {
@@ -5727,7 +5854,7 @@ export class MambuArchivedDeposits {
             accountHolderId?: string
         }
     } = {}): Promise<
-        | SuccessResponse<'200', GetAll7Response>
+        | SuccessResponse<'200', GetAll8Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
@@ -5746,14 +5873,14 @@ export class MambuArchivedDeposits {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
             {
-                200: GetAll7Response,
+                200: GetAll8Response,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
             'json',
-        ) as ReturnType<this['getAll7']>
+        ) as ReturnType<this['getAll8']>
     }
 
     /**
@@ -5761,45 +5888,11 @@ export class MambuArchivedDeposits {
      *
      * Get deposit products
      */
-    public getAll8({
+    public getAll9({
         query,
     }: {
         query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string; branchId?: string }
     } = {}): Promise<
-        | SuccessResponse<'200', GetAll8Response>
-        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
-        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
-    > {
-        return this.awaitResponse(
-            this.client.get('depositproducts', {
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-            }),
-            {
-                200: GetAll8Response,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            },
-            'json',
-        ) as ReturnType<this['getAll8']>
-    }
-
-    /**
-     * GET /deposits/{depositAccountId}/transactions
-     *
-     * Get deposit transactions
-     */
-    public getAll9({
-        path,
-        query,
-    }: {
-        path: { depositAccountId: string }
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
-    }): Promise<
         | SuccessResponse<'200', GetAll9Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
@@ -5808,7 +5901,7 @@ export class MambuArchivedDeposits {
         | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
     > {
         return this.awaitResponse(
-            this.client.get(`deposits/${path.depositAccountId}/transactions`, {
+            this.client.get('depositproducts', {
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
@@ -10660,18 +10753,59 @@ export class MambuArchivedDeposits {
     }
 
     /**
+     * POST /accounting/interestaccrual:search
+     *
+     * Allows search of interest accrual breakdown entries by various criteria.
+     */
+    public search10({
+        body,
+        query,
+    }: {
+        body: InterestAccrualSearchCriteria
+        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
+    }): Promise<
+        | SuccessResponse<'200', Search10Response>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
+        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
+    > {
+        const _body = this.validateRequestBody(InterestAccrualSearchCriteria, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
+
+        return this.awaitResponse(
+            this.client.post('accounting/interestaccrual:search', {
+                json: _body.right,
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            }),
+            {
+                200: Search10Response,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+            },
+            'json',
+        ) as ReturnType<this['search10']>
+    }
+
+    /**
      * POST /loans:search
      *
      * Search loan accounts
      */
-    public search10({
+    public search11({
         body,
         query,
     }: {
         body: LoanAccountSearchCriteria
         query?: { offset?: string; limit?: string; paginationDetails?: string; cursor?: string; detailsLevel?: string }
     }): Promise<
-        | SuccessResponse<'200', Search10Response>
+        | SuccessResponse<'200', Search11Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
@@ -10697,14 +10831,14 @@ export class MambuArchivedDeposits {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
             {
-                200: Search10Response,
+                200: Search11Response,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
                 404: ErrorResponse,
             },
             'json',
-        ) as ReturnType<this['search10']>
+        ) as ReturnType<this['search11']>
     }
 
     /**
@@ -10712,7 +10846,7 @@ export class MambuArchivedDeposits {
      *
      * Search loan transactions
      */
-    public search12({
+    public search13({
         body,
         query,
     }: {
@@ -10753,7 +10887,7 @@ export class MambuArchivedDeposits {
                 409: { safeParse: (x: unknown) => ({ success: true, data: x }) },
             },
             'text',
-        ) as ReturnType<this['search12']>
+        ) as ReturnType<this['search13']>
     }
 
     /**
@@ -10880,18 +11014,66 @@ export class MambuArchivedDeposits {
     }
 
     /**
+     * POST /deposits/balanceSummary:search
+     *
+     * Search deposit account balance summary
+     */
+    public search5({
+        body,
+        query,
+    }: {
+        body: DepositAccountBalanceSummarySearchCriteria
+        query?: { offset?: string; limit?: string; paginationDetails?: string }
+    }): Promise<
+        | SuccessResponse<'200', Search5Response>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<undefined, unknown, 'request:body', undefined>
+        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
+        | FailureResponse<
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
+              unknown,
+              'response:statuscode',
+              Headers
+          >
+    > {
+        const _body = this.validateRequestBody(DepositAccountBalanceSummarySearchCriteria, body)
+        if ('left' in _body) {
+            return Promise.resolve(_body)
+        }
+
+        return this.awaitResponse(
+            this.client.post('deposits/balanceSummary:search', {
+                json: _body.right,
+                searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
+            }),
+            {
+                200: Search5Response,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
+            },
+            'json',
+        ) as ReturnType<this['search5']>
+    }
+
+    /**
      * POST /deposits:search
      *
      * Search deposit accounts
      */
-    public search5({
+    public search6({
         body,
         query,
     }: {
         body: DepositAccountSearchCriteria
         query?: { offset?: string; limit?: string; paginationDetails?: string; cursor?: string; detailsLevel?: string }
     }): Promise<
-        | SuccessResponse<'200', Search5Response>
+        | SuccessResponse<'200', Search6Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
@@ -10911,13 +11093,13 @@ export class MambuArchivedDeposits {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
             {
-                200: Search5Response,
+                200: Search6Response,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
             },
             'json',
-        ) as ReturnType<this['search5']>
+        ) as ReturnType<this['search6']>
     }
 
     /**
@@ -10925,14 +11107,14 @@ export class MambuArchivedDeposits {
      *
      * Search deposit transactions for deposit accounts by various criteria
      */
-    public search6({
+    public search7({
         body,
         query,
     }: {
         body: DepositTransactionSearchCriteria
         query?: { offset?: string; limit?: string; paginationDetails?: string; cursor?: string; detailsLevel?: string }
     }): Promise<
-        | SuccessResponse<'200', Search6Response>
+        | SuccessResponse<'200', Search7Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
@@ -10952,13 +11134,13 @@ export class MambuArchivedDeposits {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
             {
-                200: Search6Response,
+                200: Search7Response,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
             },
             'json',
-        ) as ReturnType<this['search6']>
+        ) as ReturnType<this['search7']>
     }
 
     /**
@@ -10966,14 +11148,14 @@ export class MambuArchivedDeposits {
      *
      * Search for general ledger journal entries
      */
-    public search7({
+    public search8({
         body,
         query,
     }: {
         body: GLJournalEntrySearchCriteria
         query?: { offset?: string; limit?: string; paginationDetails?: string; cursor?: string }
     }): Promise<
-        | SuccessResponse<'200', Search7Response>
+        | SuccessResponse<'200', Search8Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
@@ -10993,13 +11175,13 @@ export class MambuArchivedDeposits {
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
             {
-                200: Search7Response,
+                200: Search8Response,
                 400: ErrorResponse,
                 401: ErrorResponse,
                 403: ErrorResponse,
             },
             'json',
-        ) as ReturnType<this['search7']>
+        ) as ReturnType<this['search8']>
     }
 
     /**
@@ -11007,14 +11189,14 @@ export class MambuArchivedDeposits {
      *
      * Search groups
      */
-    public search8({
+    public search9({
         body,
         query,
     }: {
         body: GroupSearchCriteria
         query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
     }): Promise<
-        | SuccessResponse<'200', Search8Response>
+        | SuccessResponse<'200', Search9Response>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
@@ -11029,47 +11211,6 @@ export class MambuArchivedDeposits {
 
         return this.awaitResponse(
             this.client.post('groups:search', {
-                json: _body.right,
-                searchParams: query ?? {},
-                headers: { Accept: 'application/vnd.mambu.v2+json' },
-            }),
-            {
-                200: Search8Response,
-                400: ErrorResponse,
-                401: ErrorResponse,
-                403: ErrorResponse,
-            },
-            'json',
-        ) as ReturnType<this['search8']>
-    }
-
-    /**
-     * POST /accounting/interestaccrual:search
-     *
-     * Allows search of interest accrual breakdown entries by various criteria.
-     */
-    public search9({
-        body,
-        query,
-    }: {
-        body: InterestAccrualSearchCriteria
-        query?: { offset?: string; limit?: string; paginationDetails?: string; detailsLevel?: string }
-    }): Promise<
-        | SuccessResponse<'200', Search9Response>
-        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
-        | FailureResponse<undefined, unknown, 'request:body', undefined>
-        | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
-        | FailureResponse<Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403'>, unknown, 'response:statuscode', Headers>
-    > {
-        const _body = this.validateRequestBody(InterestAccrualSearchCriteria, body)
-        if ('left' in _body) {
-            return Promise.resolve(_body)
-        }
-
-        return this.awaitResponse(
-            this.client.post('accounting/interestaccrual:search', {
                 json: _body.right,
                 searchParams: query ?? {},
                 headers: { Accept: 'application/vnd.mambu.v2+json' },
