@@ -283,6 +283,8 @@ export const ApiConsumerAccess = z
                 'VIEW_PROFIT_SHARING_PRODUCT_SETTINGS',
                 'EDIT_PROFIT_SHARING_PRODUCT_SETTINGS',
                 'DELETE_PROFIT_SHARING_PRODUCT_SETTINGS',
+                'CREATE_RATE_SHEET',
+                'VIEW_RATE_SHEET',
             ])
             .array()
             .describe(

@@ -556,6 +556,11 @@ export const CustomPaymentAmount = z
                 'PENALTY',
                 'INTEREST_FROM_ARREARS',
                 'NON_SCHEDULED_FEE',
+                'INTEREST_BEARING_FEE',
+                'INTEREST_BEARING_FEE_INTEREST',
+                'CF_INTEREST',
+                'CF_INTEREST_FROM_ARREARS',
+                'CF_INTEREST_FROM_ARREARS_ACCRUED',
             ])
             .describe('The type of the custom payment'),
         predefinedFeeKey: z.string().describe('The encodedKey of the predefined fee to be paid.').optional(),
@@ -1057,6 +1062,19 @@ export const InvestorFund = z
 
 export type InvestorFund = z.infer<typeof InvestorFund>
 
+export const FeesAccountSettings = z
+    .object({
+        feeRate: z
+            .number()
+            .describe(
+                'The fee rate. Represents the fee rate for the loan account. The fee on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.',
+            )
+            .optional(),
+    })
+    .describe('The fee settings, holds all the properties regarding fees for the loan account.')
+
+export type FeesAccountSettings = z.infer<typeof FeesAccountSettings>
+
 export const DisbursementDetails = z
     .object({
         disbursementDate: z
@@ -1469,6 +1487,7 @@ export const LoanTransaction = z
                 'TAX_RATE_CHANGED',
                 'PENALTY_RATE_CHANGED',
                 'INTEREST_APPLIED',
+                'IBF_INTEREST_APPLIED',
                 'INTEREST_APPLIED_ADJUSTMENT',
                 'INTEREST_DUE_REDUCED',
                 'PENALTY_REDUCTION_ADJUSTMENT',
@@ -1600,7 +1619,16 @@ export const LoanAccount = z
         accountHolderKey: z.string().describe('The encoded key of the account holder.'),
         accountHolderType: z.enum(['CLIENT', 'GROUP']).describe('The type of the account holder.'),
         accountState: z
-            .enum(['PARTIAL_APPLICATION', 'PENDING_APPROVAL', 'APPROVED', 'ACTIVE', 'ACTIVE_IN_ARREARS', 'CLOSED'])
+            .enum([
+                'PARTIAL_APPLICATION',
+                'PENDING_APPROVAL',
+                'APPROVED',
+                'ACTIVE',
+                'ACTIVE_IN_ARREARS',
+                'CLOSED',
+                'CLOSED_WRITTEN_OFF',
+                'CLOSED_REJECTED',
+            ])
             .describe('The state of the loan account.')
             .optional(),
         accountSubState: z
@@ -1628,6 +1656,10 @@ export const LoanAccount = z
         activationTransactionKey: z
             .string()
             .describe('The encoded key of the transaction that activated the loan account.')
+            .optional(),
+        adjustTotalDueForInstallmentsWithDifferentInterval: z
+            .boolean()
+            .describe('Adjust the total due for repayment when the repayment period is different than the repayment frequency')
             .optional(),
         allowOffset: z.boolean().describe('DEPRECATED - Will always be false.').optional(),
         approvedDate: z.string().datetime({ offset: true }).describe('The date the loan account was approved.').optional(),
@@ -1660,6 +1692,7 @@ export const LoanAccount = z
             .string()
             .describe('The encoded key of the loan account, it is auto generated, and must be unique.')
             .optional(),
+        feesSettings: FeesAccountSettings.optional(),
         fundingSources: InvestorFund.array().describe('The list of funds associated with the loan account.').optional(),
         futurePaymentsAcceptance: z
             .enum(['NO_FUTURE_PAYMENTS', 'ACCEPT_FUTURE_PAYMENTS', 'ACCEPT_OVERPAYMENTS'])
@@ -2195,6 +2228,35 @@ export const RefinanceLoanAccount = z
 
 export type RefinanceLoanAccount = z.infer<typeof RefinanceLoanAccount>
 
+export const CarryForwardOptions = z
+    .object({
+        accruedInterestBalance: z
+            .boolean()
+            .describe('Choose whether to carry forward accruedInterestBalance from the originating account')
+            .optional(),
+        accruedInterestFromArrearsBalance: z
+            .boolean()
+            .describe('Choose whether to carry forward accruedInterestFromArrearsBalance from the originating account')
+            .optional(),
+        interestBalance: z
+            .boolean()
+            .describe('Choose whether to carry forward interestBalance from the originating account')
+            .optional(),
+        interestFromArrearsBalance: z
+            .boolean()
+            .describe('Choose whether to carry forward interestFromArrearsBalance from the originating account')
+            .optional(),
+        loanAccountState: z
+            .boolean()
+            .describe('Choose whether to carry forward loanAccountState from the originating account')
+            .optional(),
+    })
+    .describe(
+        'The carry forward options that indicates which fields will be carried forward to new account on the loan account reschedule/refinance',
+    )
+
+export type CarryForwardOptions = z.infer<typeof CarryForwardOptions>
+
 export const RescheduleWriteOffAmounts = z
     .object({
         fee: z.number().describe('Fee write-off amount').optional(),
@@ -2550,6 +2612,7 @@ export type PreviewPayOffDueAmountsInAFutureDateWrapper = z.infer<typeof Preview
 
 export const RefinanceLoanAccountAction = z
     .object({
+        carryForwardOptions: CarryForwardOptions.optional(),
         keepSameAccountId: z
             .boolean()
             .describe(
@@ -2566,6 +2629,7 @@ export type RefinanceLoanAccountAction = z.infer<typeof RefinanceLoanAccountActi
 
 export const RescheduleLoanAccountAction = z
     .object({
+        carryForwardOptions: CarryForwardOptions.optional(),
         keepSameAccountId: z
             .boolean()
             .describe(

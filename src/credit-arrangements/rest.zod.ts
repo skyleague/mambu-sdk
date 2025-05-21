@@ -924,6 +924,19 @@ export const InvestorFund = z
 
 export type InvestorFund = z.infer<typeof InvestorFund>
 
+export const FeesAccountSettings = z
+    .object({
+        feeRate: z
+            .number()
+            .describe(
+                'The fee rate. Represents the fee rate for the loan account. The fee on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.',
+            )
+            .optional(),
+    })
+    .describe('The fee settings, holds all the properties regarding fees for the loan account.')
+
+export type FeesAccountSettings = z.infer<typeof FeesAccountSettings>
+
 export const DisbursementDetails = z
     .object({
         disbursementDate: z
@@ -1239,7 +1252,16 @@ export const LoanAccount = z
         accountHolderKey: z.string().describe('The encoded key of the account holder.'),
         accountHolderType: z.enum(['CLIENT', 'GROUP']).describe('The type of the account holder.'),
         accountState: z
-            .enum(['PARTIAL_APPLICATION', 'PENDING_APPROVAL', 'APPROVED', 'ACTIVE', 'ACTIVE_IN_ARREARS', 'CLOSED'])
+            .enum([
+                'PARTIAL_APPLICATION',
+                'PENDING_APPROVAL',
+                'APPROVED',
+                'ACTIVE',
+                'ACTIVE_IN_ARREARS',
+                'CLOSED',
+                'CLOSED_WRITTEN_OFF',
+                'CLOSED_REJECTED',
+            ])
             .describe('The state of the loan account.')
             .optional(),
         accountSubState: z
@@ -1267,6 +1289,10 @@ export const LoanAccount = z
         activationTransactionKey: z
             .string()
             .describe('The encoded key of the transaction that activated the loan account.')
+            .optional(),
+        adjustTotalDueForInstallmentsWithDifferentInterval: z
+            .boolean()
+            .describe('Adjust the total due for repayment when the repayment period is different than the repayment frequency')
             .optional(),
         allowOffset: z.boolean().describe('DEPRECATED - Will always be false.').optional(),
         approvedDate: z.string().datetime({ offset: true }).describe('The date the loan account was approved.').optional(),
@@ -1299,6 +1325,7 @@ export const LoanAccount = z
             .string()
             .describe('The encoded key of the loan account, it is auto generated, and must be unique.')
             .optional(),
+        feesSettings: FeesAccountSettings.optional(),
         fundingSources: InvestorFund.array().describe('The list of funds associated with the loan account.').optional(),
         futurePaymentsAcceptance: z
             .enum(['NO_FUTURE_PAYMENTS', 'ACCEPT_FUTURE_PAYMENTS', 'ACCEPT_OVERPAYMENTS'])
@@ -1647,7 +1674,7 @@ export const CreditArrangementFilterCriteria = z
     .object({
         field: z.union([
             z
-                .enum(['id', 'startDate', 'expireDate', 'approvedDate', 'state', 'subState', 'exposureLimitType'])
+                .enum(['id', 'startDate', 'expireDate', 'approvedDate', 'state', 'subState', 'exposureLimitType', 'encodedKey'])
                 .describe('Contains the actual searching fields'),
             z.string(),
         ]),

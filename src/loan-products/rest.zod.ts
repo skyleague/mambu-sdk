@@ -156,6 +156,8 @@ export const GLAccountingRule = z
                 'INTEREST_FROM_ARREARS_INCOME',
                 'INTEREST_FROM_ARREARS_RECEIVABLE',
                 'INTEREST_FROM_ARREARS_WRITE_OFF_EXPENSE',
+                'PROFIT_EXPENSE',
+                'PROFIT_PAYABLE',
             ])
             .describe(
                 'General Ledger Financial Resources used to setup the product accounting rules and determine the credit and debit accounts when logging journal entries',
@@ -537,6 +539,7 @@ export const PredefinedFee = z
             .describe('Shows when a fee should be applied; to be used with monthly deposit fees')
             .optional(),
         creationDate: z.string().datetime({ offset: true }).describe('Shows the creation date of the fee').optional(),
+        defaultFeeRate: z.number().describe('The rate of the fee  applied to parentSource').optional(),
         encodedKey: z.string().describe('The encoded key of the predefined fee, auto generated, unique').optional(),
         feeApplication: z.enum(['REQUIRED', 'OPTIONAL']).describe('The type of fee application when disbursement is applied'),
         id: z.string().describe('The id of the fee').optional(),
@@ -774,7 +777,16 @@ export type OffsetSettings = z.infer<typeof OffsetSettings>
 export const NewAccountSettings = z
     .object({
         accountInitialState: z
-            .enum(['PARTIAL_APPLICATION', 'PENDING_APPROVAL', 'APPROVED', 'ACTIVE', 'ACTIVE_IN_ARREARS', 'CLOSED'])
+            .enum([
+                'PARTIAL_APPLICATION',
+                'PENDING_APPROVAL',
+                'APPROVED',
+                'ACTIVE',
+                'ACTIVE_IN_ARREARS',
+                'CLOSED',
+                'CLOSED_WRITTEN_OFF',
+                'CLOSED_REJECTED',
+            ])
             .describe('The initial state of the account when is created.'),
         idGeneratorType: z
             .enum(['INCREMENTAL_NUMBER', 'RANDOM_PATTERN'])
@@ -1290,6 +1302,10 @@ export const LoanProduct = z
                 'DYNAMIC_MORTGAGE',
             ])
             .describe('The type of the loan product.'),
+        useFeeIncludedInPMT: z
+            .boolean()
+            .describe('`TRUE` if Fee should be part of PMT calculation, `FALSE` otherwise.')
+            .optional(),
     })
     .describe('Represents a loan product.')
 
