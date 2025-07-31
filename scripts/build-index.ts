@@ -1,8 +1,8 @@
-import camelcase from 'camelcase'
-
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import camelcase from 'camelcase'
+
 ;(() => {
     const __dirname = path.dirname(fileURLToPath(import.meta.url))
     const directories = fs.readdirSync(`${__dirname}/../src`)

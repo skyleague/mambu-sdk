@@ -1,9 +1,8 @@
-import { MambuStreaming } from '../src/index.js'
-import type { streaming } from '../src/index.js'
-
 import { eitherToError } from '@skyleague/axioms'
 import nock from 'nock'
 import { afterEach, describe, expect, it } from 'vitest'
+import type { streaming } from '../src/index.js'
+import { MambuStreaming } from '../src/index.js'
 
 const prefixUrl = 'http://www.example.com'
 

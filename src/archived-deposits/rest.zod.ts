@@ -58,6 +58,23 @@ export const AccountIdentification = z
 
 export type AccountIdentification = z.infer<typeof AccountIdentification>
 
+export const CustomerShareTier = z
+    .object({
+        creationDate: z.string().datetime({ offset: true }).describe('The creation time of the customer share tier').optional(),
+        fromValue: z.number().describe('The starting value for the customer share tier').optional(),
+        id: z.number().int().describe('The identifier of the customer share tier').optional(),
+        lastModifiedDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The last modified time of the customer share tier')
+            .optional(),
+        percentage: z.number().describe('The percentage of the customer share tier').optional(),
+        productSettingsId: z.number().int().describe('The identifier of the associated product settings').optional(),
+    })
+    .describe('Customer share tier for product settings')
+
+export type CustomerShareTier = z.infer<typeof CustomerShareTier>
+
 export const RemittanceInformation = z
     .object({
         structured: Structured.optional(),
@@ -146,6 +163,35 @@ export const MonthAndDay = z
     .describe(`Wrapper for month and day for instances where the year isn't needed`)
 
 export type MonthAndDay = z.infer<typeof MonthAndDay>
+
+export const Profit = z
+    .object({
+        cappedRatePercentage: z.number().describe('Upper threshold limit on the calculated customer profit rate').optional(),
+        fixedRatePercentage: z.number().describe('A fixed percentage used to calculate the final profit amount').optional(),
+        fixedRateRule: z
+            .enum(['ALWAYS_USE_FIXED_RATE', 'TREAT_AS_MIN', 'USE_CALCULATED_RATE'])
+            .describe('The type of fixed rate')
+            .optional(),
+        tiers: CustomerShareTier.array().describe('List of customer share tiers associated with product settings').optional(),
+    })
+    .describe('Profit calculation configuration for accrual')
+
+export type Profit = z.infer<typeof Profit>
+
+export const BalanceEligibility = z
+    .object({
+        minimumEligible: z
+            .number()
+            .describe('The minimum eligible balance to be included in the profit computation flow')
+            .optional(),
+        type: z
+            .enum(['END_OF_THE_DAY_BALANCE', 'AVERAGE_BALANCE', 'MINIMUM_BALANCE'])
+            .describe('The balance eligibility type')
+            .optional(),
+    })
+    .describe('Criteria for eligibility of account balances')
+
+export type BalanceEligibility = z.infer<typeof BalanceEligibility>
 
 export const PaymentHolidaysSettings = z
     .object({
@@ -299,6 +345,10 @@ export const GLAccountingRule = z
                 'INTEREST_FROM_ARREARS_WRITE_OFF_EXPENSE',
                 'PROFIT_EXPENSE',
                 'PROFIT_PAYABLE',
+                'MUDARIB_SHARE',
+                'INTEREST_FROM_FEES_INCOME',
+                'INTEREST_FROM_FEES_RECEIVABLE',
+                'INTEREST_FROM_FEES_WRITE_OFF_EXPENSE',
             ])
             .describe(
                 'General Ledger Financial Resources used to setup the product accounting rules and determine the credit and debit accounts when logging journal entries',
@@ -311,6 +361,16 @@ export const GLAccountingRule = z
     )
 
 export type GLAccountingRule = z.infer<typeof GLAccountingRule>
+
+export const CustomFieldAvailableOption = z
+    .object({
+        score: z.number().describe('The score of the option.').optional(),
+        selectionKey: z.string().describe('The system-generated ID of the option.').optional(),
+        value: z.string().describe('The name of the option.').optional(),
+    })
+    .describe('Represents one option of a selection custom field definition.')
+
+export type CustomFieldAvailableOption = z.infer<typeof CustomFieldAvailableOption>
 
 export const DepositProductOverdraftInterestRateTier = z
     .object({
@@ -392,6 +452,10 @@ export const DepositGLAccountingRule = z
                 'INTEREST_FROM_ARREARS_WRITE_OFF_EXPENSE',
                 'PROFIT_EXPENSE',
                 'PROFIT_PAYABLE',
+                'MUDARIB_SHARE',
+                'INTEREST_FROM_FEES_INCOME',
+                'INTEREST_FROM_FEES_RECEIVABLE',
+                'INTEREST_FROM_FEES_WRITE_OFF_EXPENSE',
             ])
             .describe(
                 'General Ledger Financial Resources used to setup the product accounting rules and determine the credit and debit accounts when logging journal entries',
@@ -786,27 +850,6 @@ export const PMTAdjustmentThreshold = z
 
 export type PMTAdjustmentThreshold = z.infer<typeof PMTAdjustmentThreshold>
 
-export const DaysInMonth = z
-    .object({
-        daysInMonth: z
-            .number()
-            .int()
-            .array()
-            .describe(
-                ' Specifies the day(s) of the month when the interest application dates should be. Only available if the Interest Application Method is InterestApplicationMethodDTO#FIXED_DAYS_OF_MONTH. Currently only 1 value can be specified.',
-            )
-            .optional(),
-        shortMonthHandlingMethod: z
-            .enum(['LAST_DAY_IN_MONTH', 'FIRST_DAY_OF_NEXT_MONTH'])
-            .describe(
-                'Determines how to handle the short months, if they select a fixed day of month > 28. Will be null if no such date is selected. Only available if the Interest Application Method is InterestApplicationMethodDTO#FIXED_DAYS_OF_MONTH.',
-            )
-            .optional(),
-    })
-    .describe('Enumeration for days of month and method of handling shorter months.')
-
-export type DaysInMonth = z.infer<typeof DaysInMonth>
-
 export const AccountInterestRateSettings = z
     .object({
         encodedKey: z.string().describe('The encoded key of the interest rate settings, auto generated, unique').optional(),
@@ -979,6 +1022,68 @@ export const DepositAccountInterestPaymentSettings = z
     .describe('Represents information about the interest payment settings.')
 
 export type DepositAccountInterestPaymentSettings = z.infer<typeof DepositAccountInterestPaymentSettings>
+
+export const ProductCalculationCycle = z
+    .object({
+        accountNumber: z.number().int().describe('The account number for the product calculation cycle'),
+        aggregatedAccountBalancesPayment: z.number().describe('The aggregated account balances payment'),
+        aggregatedAccountBalancesProfit: z.number().describe('The aggregated account balances profit'),
+        averageBalance: z.number().describe('The average balance of the product calculation cycle'),
+        balanceEligibility: BalanceEligibility,
+        creationDate: z.string().datetime({ offset: true }).describe('The creation time of the product calculation cycle'),
+        endDate: z.string().date().describe('The end date for the product calculation cycle'),
+        id: z.number().int().describe('The identifier of the product calculation cycle').optional(),
+        lastModifiedDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The last modified time of the product calculation cycle'),
+        poolCalculationCycleId: z.number().int().describe('The identifier of the pool calculation cycle'),
+        productEncodedKey: z.string().describe('The associated product encoded key'),
+        profit: Profit,
+        profitRate: z.number().describe('The profit rate for the product calculation'),
+        startDate: z.string().date().describe('The start date for the product calculation cycle'),
+        status: z.enum(['ACTIVE', 'INACTIVE']).describe('The status of the product calculation cycle'),
+        totalAccruedProfitAmount: z.number().describe('The total accrued profit amount'),
+        totalBankShareAmountPayment: z.number().describe('The total bank share amount payment'),
+        totalBankShareAmountProfit: z.number().describe('The total bank share amount profit'),
+        totalFinalShareAmount: z.number().describe('The total final share amount'),
+        totalMudaribShareAmountPayment: z.number().describe('The total mudarib share amount payment'),
+        totalMudaribShareAmountProfit: z.number().describe('The total mudarib share amount profit'),
+        totalWithholdingTaxAmount: z.number().describe('The total Withholding tax amount'),
+        withholdingTaxEnabled: z.boolean().describe('Indicates whether withholding tax is enabled in the associated IPS product'),
+        withholdingTaxSourceKey: z
+            .string()
+            .describe('The key reference for the withholding tax source based on the the associated IPS product settings')
+            .optional(),
+    })
+    .describe('Profit calculation cycle for a product')
+
+export type ProductCalculationCycle = z.infer<typeof ProductCalculationCycle>
+
+export const CashFlowCalculationCycle = z
+    .object({
+        allocationMethod: z
+            .enum(['AVERAGE_BALANCE', 'NUMBER_OF_ACCOUNTS', 'PERCENTAGE'])
+            .describe('The allocation method of the cash flow'),
+        allocationPercentage: z.number().describe('Allocation percentage').optional(),
+        amount: z.number().describe('The amount of the cash flow calculation cycle').optional(),
+        cashFlowId: z.number().int().describe('The identifier of the cash flow').optional(),
+        cashFlowType: z.enum(['INCOME_CATEGORY', 'EXPENSE_CATEGORY']).describe('The type of the cash flow'),
+        creationDate: z.string().datetime({ offset: true }).describe('The creation time of the cash flow calculation cycle'),
+        glAccountEncodedKey: z.string().describe('The GL account encoded key').optional(),
+        id: z.number().int().describe('The identifier of the cash flow calculation cycle').optional(),
+        lastModifiedDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The last modified time of the cash flow calculation cycle'),
+        percentage: z.number().describe('The percentage of the cash flow calculation cycle').optional(),
+        poolCalculationCycleId: z.number().int().describe('The identifier of the pool calculation cycle').optional(),
+        proposalId: z.number().int().describe('The identifier of the proposal').optional(),
+        source: z.enum(['ISLAMIC_FINANCE', 'OTHERS']).describe('The source of the cash flow').optional(),
+    })
+    .describe('Profit calculation cycle for a cash flow')
+
+export type CashFlowCalculationCycle = z.infer<typeof CashFlowCalculationCycle>
 
 export const DepositOverdraftSettings = z
     .object({
@@ -1454,6 +1559,109 @@ export const TransactionChannelConstraint = z
 
 export type TransactionChannelConstraint = z.infer<typeof TransactionChannelConstraint>
 
+export const CustomFieldViewRights = z
+    .object({
+        allUsers: z
+            .boolean()
+            .describe(
+                '`TRUE` if custom field values of a custom field definition can be viewed by all users, `FALSE` if custom field values of a custom field definition can only be viewed by users with the specified roles.',
+            )
+            .optional(),
+        roles: z
+            .string()
+            .array()
+            .describe(
+                'Lists the IDs of the roles that have view rights for the custom field values of a custom field definition if it is not accessible by all users.',
+            )
+            .optional(),
+    })
+    .describe('Represents the view rights for custom field values for a particular custom field definition.')
+
+export type CustomFieldViewRights = z.infer<typeof CustomFieldViewRights>
+
+export const CustomFieldValueValidationSettings = z
+    .object({
+        unique: z.boolean().describe('`TRUE` if this field does not allow duplicate values, `FALSE` otherwise.').optional(),
+        validationPattern: z.string().describe('The expected format for the input.').optional(),
+    })
+    .describe('Represents the settings for field input validation.')
+
+export type CustomFieldValueValidationSettings = z.infer<typeof CustomFieldValueValidationSettings>
+
+export const CustomFieldUsage = z
+    .object({
+        default: z
+            .boolean()
+            .describe(
+                '`TRUE` if the field is displayed by default on create or edit pages for this record type, `FALSE` otherwise.',
+            )
+            .optional(),
+        objectKey: z.string().describe('The key of the record type.').optional(),
+        required: z.boolean().describe('`TRUE` if the field is required for this record type, `FALSE` otherwise.').optional(),
+    })
+    .describe('Represents the usage settings of the custom field definition.')
+
+export type CustomFieldUsage = z.infer<typeof CustomFieldUsage>
+
+export const CustomFieldSelectionOption = z
+    .object({
+        availableOptions: CustomFieldAvailableOption.array()
+            .describe(
+                'The list of options that that are available for the dependent selection custom field value based on the selected parent custom field value.',
+            )
+            .optional(),
+        forSelectionKey: z.string().describe('The key for the parent selection custom field value.').optional(),
+        forValue: z.string().describe('The parent selection custom field value.').optional(),
+    })
+    .describe('Represents the information related to the options of a selection custom field definition.')
+
+export type CustomFieldSelectionOption = z.infer<typeof CustomFieldSelectionOption>
+
+export const CustomFieldEditRights = z
+    .object({
+        allUsers: z
+            .boolean()
+            .describe(
+                '`TRUE` if custom field values of a custom field definition can be edited by all users, `FALSE` if custom field values of a custom field definition can only be edited by users with the specified roles.',
+            )
+            .optional(),
+        roles: z
+            .string()
+            .array()
+            .describe(
+                'The list of IDs of the roles that have edit rights for the custom field values of a custom field definition if it is not accessible by all users.',
+            )
+            .optional(),
+    })
+    .describe('Represents the edit rights for custom field values for a particular custom field definition.')
+
+export type CustomFieldEditRights = z.infer<typeof CustomFieldEditRights>
+
+export const CustomFieldDisplaySettings = z
+    .object({
+        builtInId: z
+            .enum([
+                'FIRST_NAME',
+                'MIDDLE_NAME',
+                'LAST_NAME',
+                'BIRTHDATE',
+                'GENDER',
+                'MOBILE_PHONE',
+                'MOBILE_PHONE_2',
+                'HOME_PHONE',
+                'EMAIL_ADDRESS',
+            ])
+            .describe('The original ID of the built-in custom field definition.')
+            .optional(),
+        description: z.string().describe('The user-provided description of the custom field definition.').optional(),
+        displayName: z.string().describe('The user-provided name of the custom field definition.').optional(),
+        fieldSize: z.enum(['SHORT', 'LONG']).describe('The custom field value display size in the UI.').optional(),
+        position: z.number().int().describe('The custom field definition position in the custom field set.').optional(),
+    })
+    .describe('Represents the display settings of a custom field definition.')
+
+export type CustomFieldDisplaySettings = z.infer<typeof CustomFieldDisplaySettings>
+
 export const Document = z
     .object({
         creationDate: z
@@ -1655,15 +1863,26 @@ export const DepositProductPredefinedFee = z
 
 export type DepositProductPredefinedFee = z.infer<typeof DepositProductPredefinedFee>
 
-export const CustomFieldAvailableOption = z
+export const CashFlowPoolSettings = z
     .object({
-        score: z.number().describe('The score of the option.').optional(),
-        selectionKey: z.string().describe('The system-generated ID of the option.').optional(),
-        value: z.string().describe('The name of the option.').optional(),
+        cashFlowSettingsId: z.number().int().describe('The identifier of the cash flow settings').optional(),
+        creationDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The creation time of the cash flow pool settings')
+            .optional(),
+        id: z.number().int().describe('The identifier of the cash flow pool settings').optional(),
+        lastModifiedDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The last modified time of the cash flow pool setting')
+            .optional(),
+        percentage: z.number().describe('The percentage of the income or expense category'),
+        poolId: z.number().int().describe('The identifier of the pool').optional(),
     })
-    .describe('Represents one option of a selection custom field definition.')
+    .describe('A cash flow settings')
 
-export type CustomFieldAvailableOption = z.infer<typeof CustomFieldAvailableOption>
+export type CashFlowPoolSettings = z.infer<typeof CashFlowPoolSettings>
 
 export const InstallmentAllocationElementAmount = z
     .object({
@@ -1746,7 +1965,6 @@ export const WithdrawalDepositTransactionInput = z
             )
             .optional(),
     })
-    .passthrough()
     .describe('Represents the input for a withdrawal transaction.')
 
 export type WithdrawalDepositTransactionInput = z.infer<typeof WithdrawalDepositTransactionInput>
@@ -1990,9 +2208,9 @@ export const CustomPaymentAmount = z
                 'NON_SCHEDULED_FEE',
                 'INTEREST_BEARING_FEE',
                 'INTEREST_BEARING_FEE_INTEREST',
+                'CF_PRINCIPAL_IN_ARREARS',
                 'CF_INTEREST',
                 'CF_INTEREST_FROM_ARREARS',
-                'CF_INTEREST_FROM_ARREARS_ACCRUED',
             ])
             .describe('The type of the custom payment'),
         predefinedFeeKey: z.string().describe('The encodedKey of the predefined fee to be paid.').optional(),
@@ -2091,25 +2309,6 @@ export const TransactionBalances = z
     .describe('The balances changed within a transaction.')
 
 export type TransactionBalances = z.infer<typeof TransactionBalances>
-
-export const AccountBalances = z
-    .object({
-        accountId: z.string().describe('The unique account identifier').optional(),
-        availableBalance: z.number().describe('The available balance of a deposit or credit account').optional(),
-        cardType: z.enum(['DEBIT', 'CREDIT']).describe('The card type either DEBIT or CREDIT').optional(),
-        creditLimit: z
-            .number()
-            .describe('The overdraft limit of a deposit account or the loan amount in case of a credit account')
-            .optional(),
-        currencyCode: z.string().describe('Currency code used for the account').optional(),
-        totalBalance: z
-            .number()
-            .describe('The current balance of a deposit account or principal balance of a revolving credit')
-            .optional(),
-    })
-    .describe('Account balances presented to inquirer such as card processor')
-
-export type AccountBalances = z.infer<typeof AccountBalances>
 
 export const DepositAccountInterestAvailabilitySettings = z
     .object({
@@ -2386,7 +2585,13 @@ export type PlannedInstallmentFee = z.infer<typeof PlannedInstallmentFee>
 export const PenaltySettings = z
     .object({
         loanPenaltyCalculationMethod: z
-            .enum(['NONE', 'OVERDUE_BALANCE', 'OVERDUE_BALANCE_AND_INTEREST', 'OUTSTANDING_PRINCIPAL'])
+            .enum([
+                'NONE',
+                'OVERDUE_BALANCE',
+                'OVERDUE_BALANCE_AND_INTEREST',
+                'OVERDUE_BALANCE_INTEREST_AND_FEE',
+                'OUTSTANDING_PRINCIPAL',
+            ])
             .describe('The last penalty calculation method, represents on what amount are the penalties calculated.')
             .optional(),
         penaltyRate: z
@@ -2416,9 +2621,8 @@ export const InterestSettings = z
                 'The effective interest rate. Represents the interest rate for the loan accounts with semi-annually compounding product.',
             )
             .optional(),
-        interestApplicationDays: DaysInMonth.optional(),
         interestApplicationMethod: z
-            .enum(['AFTER_DISBURSEMENT', 'REPAYMENT_DUE_DATE', 'FIXED_DAYS_OF_MONTH'])
+            .enum(['AFTER_DISBURSEMENT', 'REPAYMENT_DUE_DATE'])
             .describe(
                 `The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.`,
             )
@@ -2525,6 +2729,18 @@ export type InvestorFund = z.infer<typeof InvestorFund>
 
 export const FeesAccountSettings = z
     .object({
+        accruedFee: z
+            .number()
+            .describe(
+                'The accrued fee. Represents the accrued fee for the loan account. The fee on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.',
+            )
+            .optional(),
+        accruedFeeFromArrears: z
+            .number()
+            .describe(
+                'The accrued fee from arrears. Represents the accrued fee from arrears for the loan account. The fee on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.',
+            )
+            .optional(),
         feeRate: z
             .number()
             .describe(
@@ -2796,6 +3012,41 @@ export const DataImportErrorColumn = z
     .describe('Holds basic information for an error column: the index and the corresponding name')
 
 export type DataImportErrorColumn = z.infer<typeof DataImportErrorColumn>
+
+export const PoolCalculationCycle = z
+    .object({
+        accountNumber: z.number().int().describe('The account number for the pool calculation cycle'),
+        averageBalance: z.number().describe('The average balance of the pool calculation cycle'),
+        cashFlowCalculationCycles: CashFlowCalculationCycle.array()
+            .describe('The associated cash flow calculation cycles')
+            .optional(),
+        creationDate: z.string().datetime({ offset: true }).describe('The creation time of the pool calculation cycle'),
+        customerSharesLoss: z.boolean().describe('The loss is charged to customer account when true'),
+        daysInMonth: z
+            .literal('DAYS_ACTUAL')
+            .describe('The number of days in a month to be considered in the profit calculation'),
+        daysInYear: z.literal('DAYS365').describe('The number of days in a year to be considered in the profit calculation'),
+        endDate: z.string().date().describe('The end date of the pool calculation cycle'),
+        id: z.number().int().describe('The pool calculation cycle identifier').optional(),
+        lastModifiedDate: z.string().datetime({ offset: true }).describe('The last modified time of the pool calculation cycle'),
+        poolId: z.number().int().describe('The pool identifier'),
+        productCalculationCycles: ProductCalculationCycle.array()
+            .describe('The associated product calculation cycles')
+            .optional(),
+        profitAmount: z.number().describe('The profit amount per pool'),
+        profitCalculationBalanceType: z
+            .enum(['END_OF_THE_DAY_BALANCE', 'AVERAGE_BALANCE', 'MINIMUM_BALANCE'])
+            .describe('The aggregated balance type per account to be used in the calculation'),
+        profitRate: z.number().describe('The profit rate per pool'),
+        proposalId: z.number().int().describe('The proposal identifier').optional(),
+        startDate: z.string().date().describe('The start date of the pool calculation cycle'),
+        status: z.enum(['OPEN', 'CLOSE']).describe('The pool calculation cycle status'),
+        totalExpenses: z.number().describe('The total expense for a profit calculation cycle'),
+        totalIncome: z.number().describe('The total income for a profit calculation cycle'),
+    })
+    .describe('Profit calculation cycle for a pool')
+
+export type PoolCalculationCycle = z.infer<typeof PoolCalculationCycle>
 
 export const DepositTerms = z
     .object({
@@ -3096,7 +3347,13 @@ export type ProductRedrawSettings = z.infer<typeof ProductRedrawSettings>
 export const ProductPenaltySettings = z
     .object({
         loanPenaltyCalculationMethod: z
-            .enum(['NONE', 'OVERDUE_BALANCE', 'OVERDUE_BALANCE_AND_INTEREST', 'OUTSTANDING_PRINCIPAL'])
+            .enum([
+                'NONE',
+                'OVERDUE_BALANCE',
+                'OVERDUE_BALANCE_AND_INTEREST',
+                'OVERDUE_BALANCE_INTEREST_AND_FEE',
+                'OUTSTANDING_PRINCIPAL',
+            ])
             .describe('The penalty calculation method'),
         loanPenaltyGracePeriod: z
             .number()
@@ -3209,9 +3466,8 @@ export const ProductInterestSettings = z
             )
             .optional(),
         indexRateSettings: InterestProductSettings.optional(),
-        interestApplicationDays: DaysInMonth.optional(),
         interestApplicationMethod: z
-            .enum(['AFTER_DISBURSEMENT', 'REPAYMENT_DUE_DATE', 'FIXED_DAYS_OF_MONTH'])
+            .enum(['AFTER_DISBURSEMENT', 'REPAYMENT_DUE_DATE'])
             .describe(
                 `The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.`,
             )
@@ -3696,6 +3952,67 @@ export const Constraint = z
     .describe('The constraints applied to the transaction channel')
 
 export type Constraint = z.infer<typeof Constraint>
+
+export const CustomFieldMeta = z
+    .object({
+        availableFor: z
+            .enum([
+                'CLIENT',
+                'GROUP',
+                'CREDIT_ARRANGEMENT',
+                'LOAN_ACCOUNT',
+                'GUARANTOR',
+                'ASSET',
+                'DEPOSIT_ACCOUNT',
+                'DEPOSIT_PRODUCT',
+                'TRANSACTION_CHANNEL',
+                'TRANSACTION_TYPE',
+                'BRANCH',
+                'CENTRE',
+                'USER',
+            ])
+            .describe('The entity type the custom field definition is associated with.')
+            .optional(),
+        creationDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The date the custom field definition was created.')
+            .optional(),
+        dependentFieldKey: z
+            .string()
+            .describe(
+                'Can be defined only for selection custom field definitions. Indicates the parent custom field definition on which the dependency is based upon.',
+            )
+            .optional(),
+        displaySettings: CustomFieldDisplaySettings.optional(),
+        editRights: CustomFieldEditRights.optional(),
+        encodedKey: z.string().describe('The encoded key of the entity, generated, globally unique').optional(),
+        id: z.string().describe('The user-defined ID, which is globally unique.').optional(),
+        lastModifiedDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The date the latest update was performed for this custom field definition.')
+            .optional(),
+        selectionOptions: CustomFieldSelectionOption.array()
+            .describe(
+                'Can be defined only for selection custom field definitions. Indicates that the field has predefined selections and only those can be used to populate it.',
+            )
+            .optional(),
+        state: z
+            .enum(['ACTIVE', 'INACTIVE'])
+            .describe('Indicates whether the custom field definition is active or inactive.')
+            .optional(),
+        type: z
+            .enum(['FREE_TEXT', 'SELECTION', 'NUMBER', 'CHECKBOX', 'DATE', 'DATE_TIME', 'CLIENT_LINK', 'GROUP_LINK', 'USER_LINK'])
+            .describe('The type of custom field definition.')
+            .optional(),
+        usage: CustomFieldUsage.array().describe('Represents the usage settings of a custom field definition.').optional(),
+        valueValidationSettings: CustomFieldValueValidationSettings.optional(),
+        viewRights: CustomFieldViewRights.optional(),
+    })
+    .describe('Represents a custom field definition.')
+
+export type CustomFieldMeta = z.infer<typeof CustomFieldMeta>
 
 export const BaseUserAccess = z
     .object({
@@ -4588,108 +4905,47 @@ export const DepositProductAccountingSettings = z
 
 export type DepositProductAccountingSettings = z.infer<typeof DepositProductAccountingSettings>
 
-export const CustomFieldViewRights = z
+export const AccountBalances = z
     .object({
-        allUsers: z
-            .boolean()
-            .describe(
-                '`TRUE` if custom field values of a custom field definition can be viewed by all users, `FALSE` if custom field values of a custom field definition can only be viewed by users with the specified roles.',
-            )
+        accountId: z.string().describe('The unique account identifier').optional(),
+        availableBalance: z.number().describe('The available balance of a deposit or credit account').optional(),
+        cardType: z.enum(['DEBIT', 'CREDIT']).describe('The card type either DEBIT or CREDIT').optional(),
+        creditLimit: z
+            .number()
+            .describe('The overdraft limit of a deposit account or the loan amount in case of a credit account')
             .optional(),
-        roles: z
+        currencyCode: z.string().describe('Currency code used for the account').optional(),
+        totalBalance: z
+            .number()
+            .describe('The current balance of a deposit account or principal balance of a revolving credit')
+            .optional(),
+    })
+    .describe('Account balances presented to inquirer such as card processor')
+
+export type AccountBalances = z.infer<typeof AccountBalances>
+
+export const CashFlowSettings = z
+    .object({
+        allocationMethod: z
+            .enum(['AVERAGE_BALANCE', 'NUMBER_OF_ACCOUNTS', 'PERCENTAGE'])
+            .describe('The allocation method of the cash flow settings'),
+        assetGlAccountEncodedKey: z.string().describe('The asset GL account field value of the cash flow settings').optional(),
+        cashFlowId: z.number().int().describe('The identifier of the cash flow').optional(),
+        creationDate: z.string().datetime({ offset: true }).describe('The creation time of the cash flow settings').optional(),
+        effectiveDate: z.string().date().describe('The effective date of the cash flow settings'),
+        glAccountEncodedKey: z.string().describe('The GL account field value of the cash flow settings').optional(),
+        id: z.number().int().describe('The identifier of the cash flow settings').optional(),
+        lastModifiedDate: z
             .string()
-            .array()
-            .describe(
-                'Lists the IDs of the roles that have view rights for the custom field values of a custom field definition if it is not accessible by all users.',
-            )
+            .datetime({ offset: true })
+            .describe('The last modified time of the cash flow setting')
             .optional(),
+        pools: CashFlowPoolSettings.array().describe('The pools associations of the cash flow settings').optional(),
+        source: z.enum(['ISLAMIC_FINANCE', 'OTHERS']).describe('The source of the cash flow').optional(),
     })
-    .describe('Represents the view rights for custom field values for a particular custom field definition.')
+    .describe('Cash flow settings')
 
-export type CustomFieldViewRights = z.infer<typeof CustomFieldViewRights>
-
-export const CustomFieldValueValidationSettings = z
-    .object({
-        unique: z.boolean().describe('`TRUE` if this field does not allow duplicate values, `FALSE` otherwise.').optional(),
-        validationPattern: z.string().describe('The expected format for the input.').optional(),
-    })
-    .describe('Represents the settings for field input validation.')
-
-export type CustomFieldValueValidationSettings = z.infer<typeof CustomFieldValueValidationSettings>
-
-export const CustomFieldUsage = z
-    .object({
-        default: z
-            .boolean()
-            .describe(
-                '`TRUE` if the field is displayed by default on create or edit pages for this record type, `FALSE` otherwise.',
-            )
-            .optional(),
-        objectKey: z.string().describe('The key of the record type.').optional(),
-        required: z.boolean().describe('`TRUE` if the field is required for this record type, `FALSE` otherwise.').optional(),
-    })
-    .describe('Represents the usage settings of the custom field definition.')
-
-export type CustomFieldUsage = z.infer<typeof CustomFieldUsage>
-
-export const CustomFieldSelectionOption = z
-    .object({
-        availableOptions: CustomFieldAvailableOption.array()
-            .describe(
-                'The list of options that that are available for the dependent selection custom field value based on the selected parent custom field value.',
-            )
-            .optional(),
-        forSelectionKey: z.string().describe('The key for the parent selection custom field value.').optional(),
-        forValue: z.string().describe('The parent selection custom field value.').optional(),
-    })
-    .describe('Represents the information related to the options of a selection custom field definition.')
-
-export type CustomFieldSelectionOption = z.infer<typeof CustomFieldSelectionOption>
-
-export const CustomFieldEditRights = z
-    .object({
-        allUsers: z
-            .boolean()
-            .describe(
-                '`TRUE` if custom field values of a custom field definition can be edited by all users, `FALSE` if custom field values of a custom field definition can only be edited by users with the specified roles.',
-            )
-            .optional(),
-        roles: z
-            .string()
-            .array()
-            .describe(
-                'The list of IDs of the roles that have edit rights for the custom field values of a custom field definition if it is not accessible by all users.',
-            )
-            .optional(),
-    })
-    .describe('Represents the edit rights for custom field values for a particular custom field definition.')
-
-export type CustomFieldEditRights = z.infer<typeof CustomFieldEditRights>
-
-export const CustomFieldDisplaySettings = z
-    .object({
-        builtInId: z
-            .enum([
-                'FIRST_NAME',
-                'MIDDLE_NAME',
-                'LAST_NAME',
-                'BIRTHDATE',
-                'GENDER',
-                'MOBILE_PHONE',
-                'MOBILE_PHONE_2',
-                'HOME_PHONE',
-                'EMAIL_ADDRESS',
-            ])
-            .describe('The original ID of the built-in custom field definition.')
-            .optional(),
-        description: z.string().describe('The user-provided description of the custom field definition.').optional(),
-        displayName: z.string().describe('The user-provided name of the custom field definition.').optional(),
-        fieldSize: z.enum(['SHORT', 'LONG']).describe('The custom field value display size in the UI.').optional(),
-        position: z.number().int().describe('The custom field definition position in the custom field set.').optional(),
-    })
-    .describe('Represents the display settings of a custom field definition.')
-
-export type CustomFieldDisplaySettings = z.infer<typeof CustomFieldDisplaySettings>
+export type CashFlowSettings = z.infer<typeof CashFlowSettings>
 
 export const Installment = z
     .object({
@@ -4751,6 +5007,42 @@ export const Installment = z
     .describe('Represents a single installment details structure.')
 
 export type Installment = z.infer<typeof Installment>
+
+export const PoolSettings = z
+    .object({
+        bankPLAccountEncodedKey: z.string().describe('The bank P&L account encoded key of the pool settings').optional(),
+        creationDate: z.string().datetime({ offset: true }).describe('The creation time of the pool settings').optional(),
+        customerSharesLoss: z
+            .boolean()
+            .describe('The customerSharesLoss boolean field of the pool settings, currently False is the only supported value'),
+        daysInMonth: z.literal('DAYS_ACTUAL').describe('The days in month value of the pool settings'),
+        daysInYear: z.literal('DAYS365').describe('The days in year value of the pool settings'),
+        effectiveDate: z.string().date().describe('The effective date of the pool settings'),
+        firstProfitPeriodStartDate: z.string().date().describe('The first ProfitPeriod StartDate of the pool settings'),
+        id: z.number().int().describe('The identifier of the pool settings').optional(),
+        initialEquivalentRate: z.number().describe('The initial equivalent rate of the pool settings').optional(),
+        lastModifiedDate: z.string().datetime({ offset: true }).describe('The last modified time of the pool setting').optional(),
+        mudaribShareAccountEncodedKey: z
+            .string()
+            .describe('The mudarib share account encoded key of the pool settings')
+            .optional(),
+        poolId: z.number().int().describe('The identifier of the investment pool').optional(),
+        profitCalculationBalanceType: z
+            .enum(['END_OF_THE_DAY_BALANCE', 'AVERAGE_BALANCE', 'MINIMUM_BALANCE'])
+            .describe('Specify which intra-day account balance to be used for profit contribution calculations'),
+        profitDistributionFrequencyCount: z.number().int().describe('The profit Frequency count of the pool settings'),
+        profitDistributionFrequencyUnit: z
+            .enum(['DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'BIANNUALLY', 'ANNUALLY'])
+            .describe('The profit Frequency unit of the pool settings'),
+        profitSuspenseAccountEncodedKey: z
+            .string()
+            .describe('The profit suspense account encoded key of the pool settings')
+            .optional(),
+        reserveAccountEncodedKey: z.string().describe('The reserve account encoded key of the pool settings').optional(),
+    })
+    .describe('Pool settings for an investment pool')
+
+export type PoolSettings = z.infer<typeof PoolSettings>
 
 export const DepositsTransaction = z
     .object({
@@ -4921,6 +5213,7 @@ export const LoanTransaction = z
             .string()
             .describe('The external ID of the loan transaction, it is customizable, and must be unique.')
             .optional(),
+        feeIncludedInPmt: z.boolean().optional(),
         fees: Fee.array()
             .describe('The amounts that have been applied or paid as part of this transaction and involved predefined fees.')
             .optional(),
@@ -4931,6 +5224,11 @@ export const LoanTransaction = z
         installmentEncodedKey: z
             .string()
             .describe('The specific installment encoded key associated to the loan transaction.')
+            .optional(),
+        lateFeeIncludedInPmt: z.boolean().optional(),
+        linkedPrincipalOverpaymentTransactionKey: z
+            .string()
+            .describe('The specific principal overpayment transaction key associated to the loan transaction.')
             .optional(),
         migrationEventKey: z
             .string()
@@ -5007,6 +5305,7 @@ export const LoanTransaction = z
                 'PENALTY_RATE_CHANGED',
                 'INTEREST_APPLIED',
                 'IBF_INTEREST_APPLIED',
+                'IBF_INTEREST_APPLIED_ADJUSTMENT',
                 'INTEREST_APPLIED_ADJUSTMENT',
                 'INTEREST_DUE_REDUCED',
                 'PENALTY_REDUCTION_ADJUSTMENT',
@@ -5057,31 +5356,64 @@ export const LoanTransaction = z
 
 export type LoanTransaction = z.infer<typeof LoanTransaction>
 
-export const AuthorizationHold = z
+export const CustomFilterConstraint = z
     .object({
-        accountKey: z.string().describe('The key of the account linked with the authorization hold.').optional(),
-        advice: z.boolean().describe('Whether the given request should be accepted without balance validations.'),
+        dataFieldEntityType: z
+            .enum([
+                'CLIENT',
+                'GROUP',
+                'CENTRE',
+                'BRANCH',
+                'SAVINGS_TRANSACTION',
+                'SAVINGS_ACCOUNT',
+                'SAVINGS_PRODUCT',
+                'LOAN_TRANSACTION',
+                'LOAN_ACCOUNT',
+                'USER',
+                'GUARANTY',
+                'LINE_OF_CREDIT',
+                'DISBURSEMENT_DETAILS',
+                'UNKNOWN',
+            ])
+            .describe('The custom filter constraint data field entity type.'),
+        dataFieldType: z
+            .enum(['NATIVE', 'CUSTOM'])
+            .describe('The custom filter constraint data field type, which must be not null.'),
+        dataFieldValue: z.string().describe('The custom filter constraint data field value.'),
+        dataType: z
+            .enum([
+                'BIG_DECIMAL',
+                'DATE',
+                'DATE_UTC',
+                'ENUM',
+                'KEY',
+                'LONG',
+                'MONEY',
+                'PERCENT',
+                'NUMBER',
+                'OBJECT',
+                'STRING',
+                'BOOLEAN',
+                'JAVA_BLOB',
+            ])
+            .describe('The custom filter constraint data type, which must be not null.'),
+        filterElement: z
+            .enum(['EQUALS', 'EMPTY', 'NOT_EMPTY', 'MORE_THAN', 'LESS_THAN', 'BETWEEN', 'IN'])
+            .describe('The custom filter constraint filter element, which must be not null.'),
+        groupNumber: z.number().int().describe('The custom filter constraint group number.').optional(),
+        id: z.string().describe('The custom filter constraint ID, which must be unique.').optional(),
+        index: z.number().int().describe('The custom filter constraint index.').optional(),
+        secondValue: z.string().describe('The custom filter constraint second value.').optional(),
+        value: z.string().describe('The custom filter constraint value, which must be not null.'),
+    })
+    .describe('Represents a custom filter constraint.')
+
+export type CustomFilterConstraint = z.infer<typeof CustomFilterConstraint>
+
+export const CardAuthorizationHold = z
+    .object({
         amount: z.number().describe('The amount of money to be held as a result of the authorization hold request.'),
-        balances: AccountBalances.optional(),
         cardAcceptor: CardAcceptor.optional(),
-        cardToken: z.string().describe('The reference token of the card.').optional(),
-        creationDate: z
-            .string()
-            .datetime({ offset: true })
-            .describe('The organization time when the authorization hold was created')
-            .optional(),
-        creditDebitIndicator: z
-            .enum(['DBIT', 'CRDT'])
-            .describe(
-                'Indicates whether the authorization hold amount is credited or debited.If not provided, the default values is DBIT.',
-            )
-            .optional(),
-        currencyCode: z
-            .string()
-            .describe(
-                'The ISO currency code in which the hold was created. The amounts are stored in the base currency, but the user could have enter it in a foreign currency.',
-            )
-            .optional(),
         customExpirationPeriod: z
             .number()
             .int()
@@ -5096,22 +5428,60 @@ export const AuthorizationHold = z
             .describe('The original amount of money to be held as a result of the authorization hold request.')
             .optional(),
         originalCurrency: z.string().describe('The original currency in which the hold was created.').optional(),
-        partial: z.boolean().describe('Indicates whether the authorization is partial or not').optional(),
         referenceDateForExpiration: z
             .string()
             .datetime({ offset: true })
             .describe('The date to consider as start date when calculating the number of days passed until expiration')
             .optional(),
-        source: z
-            .enum(['CARD', 'ACCOUNT'])
-            .describe('Indicates the source of the authorization hold, the default values is CARD.')
-            .optional(),
-        status: z.enum(['PENDING', 'REVERSED', 'SETTLED', 'EXPIRED']).describe('The authorization hold status.').optional(),
         userTransactionTime: z.string().describe('The formatted time at which the user made this authorization hold.').optional(),
     })
     .describe('The authorization hold corresponding to a card token')
 
-export type AuthorizationHold = z.infer<typeof AuthorizationHold>
+export type CardAuthorizationHold = z.infer<typeof CardAuthorizationHold>
+
+export const BulkAccountBalances = z
+    .object({
+        availableBalance: z.number().describe('The available balance of a deposit or credit account').optional(),
+        blockedBalance: z.number().describe('The sum of all the blocked amounts on an account').optional(),
+        feesDue: z.number().describe('The fees due representing the total fees due for the account').optional(),
+        forwardAvailableBalance: z
+            .number()
+            .describe(
+                'The sum of all the authorization hold amounts that have `CRDT` as the `creditDebitIndicator` for an account',
+            )
+            .optional(),
+        holdBalance: z
+            .number()
+            .describe(
+                'The sum of all the authorization hold amounts that have `DBIT` as the `creditDebitIndicator` for an account',
+            )
+            .optional(),
+        lockedBalance: z.number().describe('The locked amount that is not available for withdrawal in the accountt').optional(),
+        overdraftAmount: z.number().describe('The overdraft amount that has been taken out in the account').optional(),
+        overdraftInterestDue: z
+            .number()
+            .describe('The amount of interest due to be paid on an account as a result of an authorized overdraft')
+            .optional(),
+        overdraftLimit: z
+            .number()
+            .describe('The overdraft limit of a deposit account or the loan amount in case of a credit account')
+            .optional(),
+        technicalOverdraftAmount: z
+            .number()
+            .describe('The technical overdraft amount that has been taken out in the account')
+            .optional(),
+        technicalOverdraftInterestDue: z
+            .number()
+            .describe('The amount of interest due to be paid on an account as a result of a technical overdraft')
+            .optional(),
+        totalBalance: z
+            .number()
+            .describe('The current balance of a deposit account or principal balance of a revolving credit')
+            .optional(),
+    })
+    .describe('Account balances presented to inquirer such as card processor')
+
+export type BulkAccountBalances = z.infer<typeof BulkAccountBalances>
 
 export const DepositTransactionBulkableInputDTO = z
     .object({
@@ -5128,7 +5498,6 @@ export const DepositTransactionBulkableInputDTO = z
             .optional(),
         transactionDetails: TransactionDetailsInput.optional(),
     })
-    .passthrough()
     .describe('Represents the request payload for creating a deposit transactions when sent in bulk.')
 
 export type DepositTransactionBulkableInputDTO = z.infer<typeof DepositTransactionBulkableInputDTO>
@@ -5840,7 +6209,17 @@ export const CreditArrangementFilterCriteria = z
     .object({
         field: z.union([
             z
-                .enum(['id', 'startDate', 'expireDate', 'approvedDate', 'state', 'subState', 'exposureLimitType', 'encodedKey'])
+                .enum([
+                    'id',
+                    'startDate',
+                    'expireDate',
+                    'approvedDate',
+                    'state',
+                    'subState',
+                    'exposureLimitType',
+                    'encodedKey',
+                    'ownerKey',
+                ])
                 .describe('Contains the actual searching fields'),
             z.string(),
         ]),
@@ -6288,6 +6667,120 @@ export const RestError = z.object({
 })
 
 export type RestError = z.infer<typeof RestError>
+
+export const ProposalAccountDetails = z
+    .object({
+        accountId: z.string().describe('The identifier of the account').optional(),
+        accountState: z
+            .enum([
+                'PENDING_APPROVAL',
+                'APPROVED',
+                'ACTIVE',
+                'ACTIVE_IN_ARREARS',
+                'MATURED',
+                'LOCKED',
+                'DORMANT',
+                'CLOSED',
+                'CLOSED_WRITTEN_OFF',
+                'WITHDRAWN',
+                'CLOSED_REJECTED',
+            ])
+            .describe('The account state')
+            .optional(),
+        paymentCycleAdjustedCustomerProfitRate: z
+            .number()
+            .describe('The profit rate applicable to the customer for the payment cycle, adjusted for other factors')
+            .optional(),
+        paymentCycleBankShareAmount: z
+            .number()
+            .describe(`The monetary value of the bank's share of the profit, for the payment cycle period`)
+            .optional(),
+        paymentCycleCustomerProfitAmount: z
+            .number()
+            .describe('The monetary value of the customer profit, for the payment cycle period')
+            .optional(),
+        paymentCycleCustomerProfitRate: z
+            .number()
+            .describe('The profit rate applicable to the customer for the payment cycle')
+            .optional(),
+        paymentCycleCustomerShareAmount: z
+            .number()
+            .describe(`The monetary value of the customer's share of the profit, for the payment cycle period`)
+            .optional(),
+        paymentCycleCustomerSharePercentage: z
+            .number()
+            .describe('The percentage of profit allocated to the customer for the payment cycle')
+            .optional(),
+        paymentCycleEligibleBalance: z.number().describe('The eligible balance of the account for the payment cycle').optional(),
+        paymentCycleEndDate: z.string().date().describe('The end date of the payment calculation cycle'),
+        paymentCycleMudaribShareAmount: z
+            .number()
+            .describe('The monetary value of the mudarib share, for the payment cycle period')
+            .optional(),
+        paymentCycleNumberOfDays: z.number().int().describe('length of the payment calculation cycle in days').optional(),
+        paymentCycleWithholdingTaxAmount: z
+            .number()
+            .describe('The monetary value of the withholding tax amount, for the payment cycle period')
+            .optional(),
+        profitCappedRatePercentage: z.number().describe('Capped rate percentage needed by the rate rule').optional(),
+        profitCycleAdjustedCustomerProfitRate: z
+            .number()
+            .describe('The profit rate applicable to the customer for the profit cycle, adjusted for other factors')
+            .optional(),
+        profitCycleBankShareAmount: z
+            .number()
+            .describe(`The monetary value of the bank's share of the profit, for the profit cycle period`)
+            .optional(),
+        profitCycleCustomerProfitAmount: z
+            .number()
+            .describe('The monetary value of the customer profit, for the profit cycle period')
+            .optional(),
+        profitCycleCustomerProfitRate: z
+            .number()
+            .describe('The profit rate applicable to the customer for the profit cycle')
+            .optional(),
+        profitCycleCustomerShareAmount: z
+            .number()
+            .describe(`The monetary value of the customer's share of the profit, for the profit cycle period`)
+            .optional(),
+        profitCycleCustomerSharePercentage: z
+            .number()
+            .describe('The percentage of profit allocated to the customer for the profit cycle')
+            .optional(),
+        profitCycleEligibleBalance: z.number().describe('The eligible balance of the account for the profit cycle').optional(),
+        profitCycleEndDate: z.string().date().describe('The end date of the profit calculation cycle'),
+        profitCycleMudaribShareAmount: z
+            .number()
+            .describe('The monetary value of the mudarib share, for the profit cycle period')
+            .optional(),
+        profitCycleNumberOfDays: z.number().int().describe('length of the profit calculation cycle in days').optional(),
+        profitFixedRatePercentage: z.number().describe('Fixed rate percentage needed by the rate rule').optional(),
+        profitFixedRateRule: z
+            .enum(['ALWAYS_USE_FIXED_RATE', 'TREAT_AS_MIN', 'USE_CALCULATED_RATE'])
+            .describe('Fixed rate rule for applying the fixed rate percentage')
+            .optional(),
+    })
+    .describe('Payment/Profit calculation cycle for an Account')
+
+export type ProposalAccountDetails = z.infer<typeof ProposalAccountDetails>
+
+export const Proposal = z
+    .object({
+        creationDate: z.string().datetime({ offset: true }).describe('The creation date of the proposal.').optional(),
+        endDate: z.string().date().describe('The end date of the proposal.'),
+        id: z.number().int().describe('The identifier of the proposal.').optional(),
+        lastModifiedDate: z.string().datetime({ offset: true }).describe('The last modified date of the proposal.').optional(),
+        ownerEncodedKey: z.string().describe('The encoded key of the proposal owner.').optional(),
+        poolCalculationCycles: PoolCalculationCycle.array().describe('The associated pool calculation cycles.'),
+        proposalType: z.enum(['DEFAULT', 'CUSTOM']).describe('The type of the proposal (DEFAULT, CUSTOM).'),
+        startDate: z.string().date().describe('The start date of the proposal.'),
+        status: z
+            .enum(['PENDING', 'APPROVED', 'REJECTED', 'APPLIED'])
+            .describe('The status of the proposal (PENDING, APPROVED, REJECTED, APPLIED).'),
+    })
+    .describe('Represents a single proposal with associated calculation cycles.')
+
+export type Proposal = z.infer<typeof Proposal>
 
 export const DuplicateFieldConstraint = z
     .object({
@@ -6744,6 +7237,9 @@ export const TransactionChannel = z
         availableForAll: z
             .boolean()
             .describe('`TRUE` if the transaction channel is available for all users, `FALSE` otherwise.')
+            .optional(),
+        customFields: CustomFieldMeta.array()
+            .describe('The custom field definition available for the transaction channel.')
             .optional(),
         depositConstraints: Constraint,
         encodedKey: z.string().describe('The encoded key of the entity, generated, globally unique').optional(),
@@ -7251,67 +7747,6 @@ export const BlockFund = z
 
 export type BlockFund = z.infer<typeof BlockFund>
 
-export const CustomFieldMeta = z
-    .object({
-        availableFor: z
-            .enum([
-                'CLIENT',
-                'GROUP',
-                'CREDIT_ARRANGEMENT',
-                'LOAN_ACCOUNT',
-                'GUARANTOR',
-                'ASSET',
-                'DEPOSIT_ACCOUNT',
-                'DEPOSIT_PRODUCT',
-                'TRANSACTION_CHANNEL',
-                'TRANSACTION_TYPE',
-                'BRANCH',
-                'CENTRE',
-                'USER',
-            ])
-            .describe('The entity type the custom field definition is associated with.')
-            .optional(),
-        creationDate: z
-            .string()
-            .datetime({ offset: true })
-            .describe('The date the custom field definition was created.')
-            .optional(),
-        dependentFieldKey: z
-            .string()
-            .describe(
-                'Can be defined only for selection custom field definitions. Indicates the parent custom field definition on which the dependency is based upon.',
-            )
-            .optional(),
-        displaySettings: CustomFieldDisplaySettings.optional(),
-        editRights: CustomFieldEditRights.optional(),
-        encodedKey: z.string().describe('The encoded key of the entity, generated, globally unique').optional(),
-        id: z.string().describe('The user-defined ID, which is globally unique.').optional(),
-        lastModifiedDate: z
-            .string()
-            .datetime({ offset: true })
-            .describe('The date the latest update was performed for this custom field definition.')
-            .optional(),
-        selectionOptions: CustomFieldSelectionOption.array()
-            .describe(
-                'Can be defined only for selection custom field definitions. Indicates that the field has predefined selections and only those can be used to populate it.',
-            )
-            .optional(),
-        state: z
-            .enum(['ACTIVE', 'INACTIVE'])
-            .describe('Indicates whether the custom field definition is active or inactive.')
-            .optional(),
-        type: z
-            .enum(['FREE_TEXT', 'SELECTION', 'NUMBER', 'CHECKBOX', 'DATE', 'DATE_TIME', 'CLIENT_LINK', 'GROUP_LINK', 'USER_LINK'])
-            .describe('The type of custom field definition.')
-            .optional(),
-        usage: CustomFieldUsage.array().describe('Represents the usage settings of a custom field definition.').optional(),
-        valueValidationSettings: CustomFieldValueValidationSettings.optional(),
-        viewRights: CustomFieldViewRights.optional(),
-    })
-    .describe('Represents a custom field definition.')
-
-export type CustomFieldMeta = z.infer<typeof CustomFieldMeta>
-
 export const Card = z
     .object({
         referenceToken: z.string().describe(`The card's reference token.`),
@@ -7397,6 +7832,20 @@ export const CardTransactionReversal = z
 
 export type CardTransactionReversal = z.infer<typeof CardTransactionReversal>
 
+export const CashFlow = z
+    .object({
+        creationDate: z.string().datetime({ offset: true }).describe('The creation time of the cash flow').optional(),
+        description: z.string().min(0).max(1024).describe('The description of the cash flow').optional(),
+        id: z.number().int().describe('The identifier of the cash flow').optional(),
+        lastModifiedDate: z.string().datetime({ offset: true }).describe('The last modified time of the cash flow').optional(),
+        name: z.string().min(3).max(64).describe('The name of the cash flow'),
+        settings: CashFlowSettings.array().describe('List of cash flow settings').optional(),
+        type: z.enum(['INCOME_CATEGORY', 'EXPENSE_CATEGORY']).describe('The type of the cash flow'),
+    })
+    .describe('A cash flow that defines income and expenses')
+
+export type CashFlow = z.infer<typeof CashFlow>
+
 export const Comment = z
     .object({
         creationDate: z.string().datetime({ offset: true }).describe('The creation date of the comment.').optional(),
@@ -7473,6 +7922,20 @@ export const LoanAccountRepaymentScheduleVersioning = z
     .describe('Represents a single repayment versioning details structure.')
 
 export type LoanAccountRepaymentScheduleVersioning = z.infer<typeof LoanAccountRepaymentScheduleVersioning>
+
+export const Pool = z
+    .object({
+        creationDate: z.string().datetime({ offset: true }).describe('The creation time of the pool').optional(),
+        description: z.string().min(0).max(1024).describe('The description of the pool').optional(),
+        id: z.number().int().describe('The identifier of the pool').optional(),
+        lastModifiedDate: z.string().datetime({ offset: true }).describe('The last modified time of the pool').optional(),
+        name: z.string().min(3).max(64).describe('The name of the pool'),
+        settings: PoolSettings.array().describe('List of pool settings').optional(),
+        status: z.enum(['ACTIVE', 'INACTIVE']).describe('The status of the pool'),
+    })
+    .describe('An investment pool define the terms for profit pool')
+
+export type Pool = z.infer<typeof Pool>
 
 export const AccountTax = z
     .object({
@@ -7779,9 +8242,39 @@ export const InterestAccrualFilterCriteria = z
 
 export type InterestAccrualFilterCriteria = z.infer<typeof InterestAccrualFilterCriteria>
 
+export const LoanAccountBalanceChange = z
+    .object({
+        amount: z.number().describe('amount by which the balance was changed').optional(),
+        applicationDate: z.string().datetime({ offset: true }).describe('date/time when the change was applied').optional(),
+        creationDate: z.string().datetime({ offset: true }).describe('date/time when the change was recorded').optional(),
+        loanAccountEncodedKey: z.string().describe('encoded key of the loan account').optional(),
+        loanTransactionEncodedKey: z.string().describe('encoded key of the loan transaction').optional(),
+        type: z.string().describe('balance type').optional(),
+    })
+    .describe('Change on a loan account balance')
+
+export type LoanAccountBalanceChange = z.infer<typeof LoanAccountBalanceChange>
+
 export const PayOffAdjustableAmounts = z
     .object({
+        carriedForwardInterestAmount: z
+            .number()
+            .describe('The carried forward interest amount to be paid for Pay Off action')
+            .optional(),
+        carriedForwardInterestFromArrearsAmount: z
+            .number()
+            .describe('The carried forward interest from arrears amount to be paid for Pay Off action')
+            .optional(),
+        carriedForwardPrincipalInArrearsAmount: z
+            .number()
+            .describe('The carried forward principal in arrears amount to be paid for Pay Off action')
+            .optional(),
         feesPaid: z.number().describe('The fee amount to be paid for Pay Off action').optional(),
+        interestBearingFeeAmount: z.number().describe('The interest-bearing fee amount to be paid for Pay Off action').optional(),
+        interestBearingFeeInterestAmount: z
+            .number()
+            .describe('The interest-bearing fee interest amount to be paid for Pay Off action')
+            .optional(),
         interestFromArrearsPaid: z.number().describe('The interest from arrears amount to be paid for Pay Off action').optional(),
         interestPaid: z.number().describe('The interest amount to be paid for Pay Off action').optional(),
         nonScheduledFeeAmount: z.number().describe('The non-scheduled fee amount to be paid for Pay Off action').optional(),
@@ -8263,6 +8756,14 @@ export const InterestSettingsForSchedulePreview = z
 
 export type InterestSettingsForSchedulePreview = z.infer<typeof InterestSettingsForSchedulePreview>
 
+export const FeesSettingsForSchedulePreview = z
+    .object({
+        feeRate: z.number().describe('The fee rate. Represents the fee rate for the loan account.').optional(),
+    })
+    .describe('Defines fees settings for schedule preview.')
+
+export type FeesSettingsForSchedulePreview = z.infer<typeof FeesSettingsForSchedulePreview>
+
 export const DisbursementDetailsForSchedulePreview = z
     .object({
         expectedDisbursementDate: z
@@ -8283,10 +8784,25 @@ export const DisbursementDetailsForSchedulePreview = z
 
 export type DisbursementDetailsForSchedulePreview = z.infer<typeof DisbursementDetailsForSchedulePreview>
 
+export const ProposalAccountDetailsSortingCriteria = z
+    .object({
+        field: z
+            .literal('sa.id')
+            .describe(
+                'The field to use to sort the selection. This can be an enumerated value or a custom field using the format [customFieldSetId].[customFieldId].',
+            ),
+        order: z.enum(['ASC', 'DESC']).describe('The sorting order: `ASC` or `DESC`. The default order is `DESC`.').optional(),
+    })
+    .describe('The sorting criteria used for sorting account details.')
+
+export type ProposalAccountDetailsSortingCriteria = z.infer<typeof ProposalAccountDetailsSortingCriteria>
+
 export const RefinanceWriteOffAmounts = z
     .object({
         fee: z.number().describe('Fee write-off amount').optional(),
         interest: z.number().describe('Interest write-off amount').optional(),
+        interestBearingFees: z.number().describe('Interest Bearing Fees write-off amount').optional(),
+        interestBearingFeesInterest: z.number().describe('Interest Bearing Fees Interest write-off amount').optional(),
         interestFromArrears: z.number().optional(),
         penalty: z.number().describe('Penalty write-off amount').optional(),
     })
@@ -8323,6 +8839,46 @@ export const CarryForwardOptions = z
             .boolean()
             .describe('Choose whether to carry forward accruedInterestFromArrearsBalance from the originating account')
             .optional(),
+        capitaliseInterest: z
+            .boolean()
+            .describe('Choose whether to capitalise interestBalance from the initial account')
+            .optional(),
+        capitaliseInterestAccrued: z
+            .boolean()
+            .describe('Choose whether to capitalise accruedInterestBalance from the initial account')
+            .optional(),
+        capitaliseInterestFromArrears: z
+            .boolean()
+            .describe('Choose whether to capitalise interestFromArrearsBalance from the initial account')
+            .optional(),
+        capitaliseInterestFromArrearsAccrued: z
+            .boolean()
+            .describe('Choose whether to capitalise accruedInterestFromArrearsBalance from the initial account')
+            .optional(),
+        capitalisePrincipalInArrears: z
+            .boolean()
+            .describe('Choose whether to capitalise Principal In Arrears from the initial account')
+            .optional(),
+        carryForwardInterest: z
+            .boolean()
+            .describe('Choose whether to carry forward interestBalance from the initial account')
+            .optional(),
+        carryForwardInterestAccrued: z
+            .boolean()
+            .describe('Choose whether to carry forward accruedInterestBalance from the initial account')
+            .optional(),
+        carryForwardInterestFromArrears: z
+            .boolean()
+            .describe('Choose whether to carry forward interestFromArrearsBalance from the initial account')
+            .optional(),
+        carryForwardInterestFromArrearsAccrued: z
+            .boolean()
+            .describe('Choose whether to carry forward accruedInterestFromArrearsBalance from the initial account')
+            .optional(),
+        carryForwardPrincipalInArrears: z
+            .boolean()
+            .describe('Choose whether to carry forward Principal In Arrears from the initial account')
+            .optional(),
         interestBalance: z
             .boolean()
             .describe('Choose whether to carry forward interestBalance from the originating account')
@@ -8335,6 +8891,23 @@ export const CarryForwardOptions = z
             .boolean()
             .describe('Choose whether to carry forward loanAccountState from the originating account')
             .optional(),
+        writeOffInterest: z.boolean().describe('Choose whether to write off interestBalance from the initial account').optional(),
+        writeOffInterestAccrued: z
+            .boolean()
+            .describe('Choose whether to write off accruedInterestBalance from the initial account')
+            .optional(),
+        writeOffInterestFromArrears: z
+            .boolean()
+            .describe('Choose whether to write off interestFromArrearsBalance from the initial account')
+            .optional(),
+        writeOffInterestFromArrearsAccrued: z
+            .boolean()
+            .describe('Choose whether to write off accruedInterestFromArrearsBalance from the initial account')
+            .optional(),
+        writeOffPrincipalInArrears: z
+            .boolean()
+            .describe('Choose whether to write off Principal In Arrears from the initial account')
+            .optional(),
     })
     .describe(
         'The carry forward options that indicates which fields will be carried forward to new account on the loan account reschedule/refinance',
@@ -8346,6 +8919,8 @@ export const RescheduleWriteOffAmounts = z
     .object({
         fee: z.number().describe('Fee write-off amount').optional(),
         interest: z.number().describe('Interest write-off amount').optional(),
+        interestBearingFees: z.number().describe('Interest Bearing Fees write-off amount').optional(),
+        interestBearingFeesInterest: z.number().describe('Interest Bearing Fees Interest write-off amount').optional(),
         interestFromArrears: z.number().describe('Interest from Arrears write-off amount').optional(),
         penalty: z.number().describe('Penalty write-off amount').optional(),
         principal: z.number().describe('Principal write-off amount').optional(),
@@ -8571,6 +9146,41 @@ export const CommunicationMessage = z
 
 export type CommunicationMessage = z.infer<typeof CommunicationMessage>
 
+export const ProductSettings = z
+    .object({
+        balanceEligibility: BalanceEligibility.optional(),
+        creationDate: z.string().datetime({ offset: true }).describe('The creation time of the product settings').optional(),
+        effectiveDate: z.string().date().describe('The effective date of the product settings'),
+        id: z.number().int().describe('The identifier of the product settings').optional(),
+        lastModifiedDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The last modified time of the product settings')
+            .optional(),
+        poolId: z
+            .number()
+            .int()
+            .describe('The identifier of the associated pool from which a product will inherit parameters')
+            .optional(),
+        productEncodedKey: z.string().describe('The encoded key of the linked deposit product'),
+        productPaymentPoint: z.enum(['MONTHLY', 'EVERY_CALENDAR_MONTH']).describe('Product payment point'),
+        profit: Profit.optional(),
+        profitApplicationPoint: z
+            .enum(['PAYMENT_CYCLE_END_DATE', 'NEXT_DAY_AFTER_PAYMENT_CYCLE_END_DATE'])
+            .describe('Profit application point'),
+        withholdingTaxEnabled: z
+            .boolean()
+            .describe('Indicates whether withholding tax is enabled for the IPS product')
+            .optional(),
+        withholdingTaxSourceKey: z
+            .string()
+            .describe('The key reference for the withholding tax source associated with the IPS product settings')
+            .optional(),
+    })
+    .describe('Defines the profit computation settings for a deposit product')
+
+export type ProductSettings = z.infer<typeof ProductSettings>
+
 export const ArchivedDepositTransaction = z
     .object({
         transactionId: z.number().int().describe('The id of the archived deposit transaction, unique'),
@@ -8767,6 +9377,19 @@ export const ApplicationStatus = z
 
 export type ApplicationStatus = z.infer<typeof ApplicationStatus>
 
+export const ApplyBalanceInterestInput = z
+    .object({
+        interestApplicationDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The date up to which interest is to be posted')
+            .optional(),
+        notes: z.string().describe('Additional information for this action').optional(),
+    })
+    .describe('Represents a request for applying the accrued interest on a loan account balance')
+
+export type ApplyBalanceInterestInput = z.infer<typeof ApplyBalanceInterestInput>
+
 export const ApplyInterestInput = z
     .object({
         interestApplicationDate: z.string().datetime({ offset: true }).describe('The date up to which interest is to be posted'),
@@ -8792,6 +9415,62 @@ export type ApplyInterestInput = z.infer<typeof ApplyInterestInput>
 export const ApplyPlannedFeesResponse = LoanTransaction.array()
 
 export type ApplyPlannedFeesResponse = z.infer<typeof ApplyPlannedFeesResponse>
+
+export const AuthorizationHold = z
+    .object({
+        accountKey: z.string().describe('The key of the account linked with the authorization hold.').optional(),
+        advice: z.boolean().describe('Whether the given request should be accepted without balance validations.'),
+        amount: z.number().describe('The amount of money to be held as a result of the authorization hold request.'),
+        balances: AccountBalances.optional(),
+        cardAcceptor: CardAcceptor.optional(),
+        cardToken: z.string().describe('The reference token of the card.').optional(),
+        creationDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The organization time when the authorization hold was created')
+            .optional(),
+        creditDebitIndicator: z
+            .enum(['DBIT', 'CRDT'])
+            .describe(
+                'Indicates whether the authorization hold amount is credited or debited.If not provided, the default values is DBIT.',
+            )
+            .optional(),
+        currencyCode: z
+            .string()
+            .describe(
+                'The ISO currency code in which the hold was created. The amounts are stored in the base currency, but the user could have enter it in a foreign currency.',
+            )
+            .optional(),
+        customExpirationPeriod: z
+            .number()
+            .int()
+            .describe('The custom expiration period for the hold which overwrites mcc and default expiration periods')
+            .optional(),
+        exchangeRate: z.number().describe('The exchange rate for the original currency.').optional(),
+        externalReferenceId: z
+            .string()
+            .describe('The external reference ID to be used to reference the account hold in subsequent requests.'),
+        originalAmount: z
+            .number()
+            .describe('The original amount of money to be held as a result of the authorization hold request.')
+            .optional(),
+        originalCurrency: z.string().describe('The original currency in which the hold was created.').optional(),
+        partial: z.boolean().describe('Indicates whether the authorization is partial or not').optional(),
+        referenceDateForExpiration: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The date to consider as start date when calculating the number of days passed until expiration')
+            .optional(),
+        source: z
+            .enum(['CARD', 'ACCOUNT'])
+            .describe('Indicates the source of the authorization hold, the default values is CARD.')
+            .optional(),
+        status: z.enum(['PENDING', 'REVERSED', 'SETTLED', 'EXPIRED']).describe('The authorization hold status.').optional(),
+        userTransactionTime: z.string().describe('The formatted time at which the user made this authorization hold.').optional(),
+    })
+    .describe('The authorization hold corresponding to a card token')
+
+export type AuthorizationHold = z.infer<typeof AuthorizationHold>
 
 export const AuthorizationHoldAmountAdjustmentRequest = z
     .object({
@@ -8846,19 +9525,148 @@ export const BackgroundProcess = z
             ])
             .describe('The current status of this process')
             .optional(),
-        type: z.enum(['CRON_JOBS', 'MANUAL_CRON_JOBS_TRIGGER']).describe('The type of the background process').optional(),
+        type: z
+            .enum(['CRON_JOBS', 'EARLY_MANUAL_CRON_JOBS_TRIGGER', 'MANUAL_CRON_JOBS_TRIGGER'])
+            .describe('The type of the background process')
+            .optional(),
     })
     .describe('Represents details of the Background Process')
 
 export type BackgroundProcess = z.infer<typeof BackgroundProcess>
 
+export const BaseTemplateConfiguration = z
+    .object({
+        activated: z.boolean().describe('The template activation state. If empty, default is false.').optional(),
+        body: z.string().describe('The template body'),
+        event: z
+            .enum([
+                'DO_NOTHING',
+                'MANUAL',
+                'CLIENT_CREATED',
+                'CLIENT_APPROVED',
+                'GROUP_ACTIVITY',
+                'GROUP_CREATED',
+                'LOAN_CREATED',
+                'INTEREST_RATE_CHANGED',
+                'CLIENT_REJECTED',
+                'CLIENT_ACTIVITY',
+                'LOAN_REPAYMENT',
+                'LOAN_REPAYMENT_REVERSAL',
+                'FEE_APPLIED',
+                'FEE_ADJUSTED',
+                'FEE_CHARGED',
+                'FEES_DUE_REDUCED',
+                'FEE_REDUCTION_ADJUSTMENT',
+                'PENALTY_APPLIED',
+                'PENALTY_ADJUSTMENT',
+                'LOAN_APPROVAL',
+                'LOAN_ACCOUNT_CLOSURE',
+                'LOAN_ACCOUNT_WRITE_OFF',
+                'LOAN_ACCOUNT_REJECTION',
+                'LOAN_ACCOUNT_RESCHEDULED',
+                'LOAN_ACCOUNT_REFINANCED',
+                'REPAYMENT_REMINDER',
+                'ACCOUNT_IN_ARREARS',
+                'LOAN_DISBURSEMENT',
+                'LOAN_DISBURSEMENT_REVERSAL',
+                'LOAN_ACCOUNT_ACTIVITY',
+                'LOAN_ANTICIPATED_DISBURSEMENT',
+                'SAVINGS_CREATED',
+                'SAVINGS_DEPOSIT',
+                'REAPPLIED_SAVINGS_DEPOSIT',
+                'SAVINGS_DEPOSIT_REVERSAL',
+                'SAVINGS_APPROVAL',
+                'SAVINGS_ACCOUNT_ACTIVATED',
+                'SAVINGS_ACCOUNT_CLOSURE',
+                'SAVINGS_ACCOUNT_REJECTION',
+                'SAVINGS_WITHDRAWAL',
+                'REAPPLIED_SAVINGS_WITHDRAWAL',
+                'SAVINGS_WITHDRAWAL_REVERSAL',
+                'SAVINGS_ACCOUNT_ACTIVITY',
+                'DEPOSIT_INTEREST_APPLIED',
+                'DEPOSIT_INTEREST_APPLIED_ADJUSTMENT',
+                'ACCOUNT_AUTHORISATION_HOLD_CREATED',
+                'ACCOUNT_AUTHORISATION_HOLD_SETTLED',
+                'CARDS_AUTHORISATION_HOLD_CREATED',
+                'CARDS_AUTHORISATION_HOLD_SETTLED',
+                'CARDS_AUTHORISATION_HOLD_AMOUNT_DECREASED',
+                'CARDS_AUTHORISATION_HOLD_AMOUNT_INCREASED',
+                'CARDS_AUTHORISATION_HOLD_EXPIRED',
+                'CARDS_AUTHORISATION_HOLD_REVERSED',
+                'CARD_WITHDRAWAL_REVERSAL',
+                'CARD_DEPOSIT_REVERSAL',
+                'ACCOUNT_AUTHORISATION_HOLD_REVERSED',
+                'PORTAL_ACTIVATED',
+                'PORTAL_PASSWORD_RESET',
+                'END_OF_DAY_PROCESSING_COMPLETED',
+                'DATA_ACCESS_STATE_CHANGED',
+                'PAYMENT_ORDER_ACTIVITY',
+                'COLLECTION_ORDER_ACTIVITY',
+                'CREDIT_ARRANGEMENT_CREATED',
+                'CREDIT_ARRANGEMENT_CLOSED',
+                'CREDIT_ARRANGEMENT_APPROVED',
+                'CREDIT_ARRANGEMENT_REJECTED',
+                'CREDIT_ARRANGEMENT_WITHDRAWN',
+                'CREDIT_ARRANGEMENT_DELETED',
+                'CREDIT_ARRANGEMENT_ACCOUNT_ADDED',
+                'CREDIT_ARRANGEMENT_ACCOUNT_REMOVED',
+                'CREDIT_ARRANGEMENT_EDITED',
+                'JOURNAL_ENTRY_ADDED',
+                'JOURNAL_ENTRY_ADJUSTED',
+                'SAVINGS_TRANSACTION_EDITED',
+            ])
+            .describe('The template event, which must be not null'),
+        filterConstraints: CustomFilterConstraint.array().describe('The template filter constraints.').optional(),
+        filtersLinkingOperator: z.enum(['MATCH_ALL', 'MATCH_ANY']).describe('The template filters linking operator.').optional(),
+        id: z.string().describe('The template ID, which must be unique.').optional(),
+        name: z.string().describe('The template name, which must be unique'),
+        subscriptionOption: z
+            .enum(['OPT_IN', 'OPT_OUT'])
+            .describe('The template subscription option. If empty, default is OPT_IN')
+            .optional(),
+        target: z
+            .enum(['CLIENT', 'GROUP', 'LOANS', 'SAVINGS', 'BACKGROUND_PROCESS', 'DATA_ACCESS', 'PAYMENT_ORDER', 'ACCOUNTING'])
+            .describe('The template target, which must be not null.'),
+        trigger: z
+            .enum(['AUTOMATIC', 'MANUAL'])
+            .describe('The template trigger type. If empty, default is AUTOMATIC.')
+            .optional(),
+        triggerDays: z.number().int().describe('The template trigger days period. If empty, default is 0').optional(),
+        type: z.literal('WEB_HOOK').describe('The template type, which must be not null'),
+    })
+    .describe('Represents a simple template.')
+
+export type BaseTemplateConfiguration = z.infer<typeof BaseTemplateConfiguration>
+
 export const BulkCardAuthorizationHoldsInput = z
     .object({
-        holds: AuthorizationHold.array().describe('The list of authorization holds').optional(),
+        accountKey: z.string().describe('The key of the account linked with the authorization hold.').optional(),
+        advice: z.boolean().describe('Whether the given request should be accepted without balance validations.'),
+        cardToken: z.string().describe('The reference token of the card.').optional(),
+        creditDebitIndicator: z
+            .enum(['DBIT', 'CRDT'])
+            .describe(
+                'Indicates whether the authorization hold amount is credited or debited.If not provided, the default values is DBIT.',
+            )
+            .optional(),
+        holds: CardAuthorizationHold.array().describe('The list of authorization holds').optional(),
+        partial: z.boolean().describe('Indicates whether the authorization is partial or not').optional(),
+        source: z
+            .enum(['CARD', 'ACCOUNT'])
+            .describe('Indicates the source of the authorization hold, the default values is CARD.')
+            .optional(),
     })
     .describe('Represents the request payload for creating a bulk card authorization holds.')
 
 export type BulkCardAuthorizationHoldsInput = z.infer<typeof BulkCardAuthorizationHoldsInput>
+
+export const BulkCardAuthorizationHoldsOutput = z
+    .object({
+        balances: BulkAccountBalances.optional(),
+    })
+    .describe('Represents the response payload for creating a bulk card authorization holds.')
+
+export type BulkCardAuthorizationHoldsOutput = z.infer<typeof BulkCardAuthorizationHoldsOutput>
 
 export const BulkDepositTransactionsInput = z
     .object({
@@ -9469,7 +10277,6 @@ export const DisbursementLoanTransactionInput = z
         transferDetails: DisbursementTransferDetailsInput.optional(),
         valueDate: z.string().datetime({ offset: true }).describe('The date of the disbursal (as Organization Time)').optional(),
     })
-    .passthrough()
     .describe('The input representation of a loan transaction when making a disbursement')
 
 export type DisbursementLoanTransactionInput = z.infer<typeof DisbursementLoanTransactionInput>
@@ -9547,6 +10354,14 @@ export const FilterCriteriaValueDateBetweenDTO = z
 
 export type FilterCriteriaValueDateBetweenDTO = z.infer<typeof FilterCriteriaValueDateBetweenDTO>
 
+export const FindProposalAccountDetailsResponse = ProposalAccountDetails.array()
+
+export type FindProposalAccountDetailsResponse = z.infer<typeof FindProposalAccountDetailsResponse>
+
+export const FindProposalsResponse = Proposal.array()
+
+export type FindProposalsResponse = z.infer<typeof FindProposalsResponse>
+
 export const GeneralSetup = z
     .object({
         accountingCutOffTime: z.string().describe('The accounting cut off time.').optional(),
@@ -9606,7 +10421,7 @@ export const GeneralSetup = z
             .optional(),
         encodedKey: z.string().describe('The encoded key of the general setup, which is auto generated, and unique.').optional(),
         eodProcessingMethod: z
-            .enum(['AUTOMATIC', 'MANUAL'])
+            .enum(['AUTOMATIC', 'MANUAL', 'EARLY_MANUAL'])
             .describe(
                 'The end of day (EOD) processing settings. The `AUTOMATIC` EOD processing runs every midnight. The `MANUAL` EOD processing runs when the client initiates the action from the Mambu UI.',
             )
@@ -9913,6 +10728,10 @@ export const GetCardTransaction = z
 
 export type GetCardTransaction = z.infer<typeof GetCardTransaction>
 
+export const GetCashFlowsResponse = CashFlow.array()
+
+export type GetCashFlowsResponse = z.infer<typeof GetCashFlowsResponse>
+
 export const GetCommentsResponse = Comment.array()
 
 export type GetCommentsResponse = z.infer<typeof GetCommentsResponse>
@@ -9960,6 +10779,10 @@ export type GetLoanAccountDocumentResponse = z.infer<typeof GetLoanAccountDocume
 export const GetLoanAccountRsvResponse = LoanAccountRepaymentScheduleVersioning.array()
 
 export type GetLoanAccountRsvResponse = z.infer<typeof GetLoanAccountRsvResponse>
+
+export const GetPoolsResponse = Pool.array()
+
+export type GetPoolsResponse = z.infer<typeof GetPoolsResponse>
 
 export const GetTranchesResponse = LoanTranche.array()
 
@@ -10047,6 +10870,14 @@ export const LoanAccountAction = z
     .describe('Represents information for an action to perform on a loan account.')
 
 export type LoanAccountAction = z.infer<typeof LoanAccountAction>
+
+export const LoanAccountBalanceChanges = z
+    .object({
+        balanceChanges: LoanAccountBalanceChange.array().describe('Changes on a loan account balance').optional(),
+    })
+    .describe('Changes on a loan account balance')
+
+export type LoanAccountBalanceChanges = z.infer<typeof LoanAccountBalanceChanges>
 
 export const LoanAccountBalances = z
     .object({
@@ -10287,7 +11118,6 @@ export const PaymentMadeTransactionInput = z
             .describe('The entry date of the payment made transaction (as Organization Time)')
             .optional(),
     })
-    .passthrough()
     .describe('Represents the request payload for creating a transaction of type PAYMENT_MADE')
 
 export type PaymentMadeTransactionInput = z.infer<typeof PaymentMadeTransactionInput>
@@ -10343,6 +11173,7 @@ export type PostGLJournalEntriesDTO = z.infer<typeof PostGLJournalEntriesDTO>
 export const PreviewLoanAccountSchedule = z
     .object({
         disbursementDetails: DisbursementDetailsForSchedulePreview.optional(),
+        feeRateSettings: FeesSettingsForSchedulePreview.optional(),
         interestCommission: z
             .number()
             .describe(
@@ -10376,12 +11207,32 @@ export type PreviewPayOffDueAmountsInAFutureDateInput = z.infer<typeof PreviewPa
 
 export const PreviewPayOffDueAmountsInAFutureDateWrapper = z
     .object({
+        carriedForwardInterestBalance: z
+            .number()
+            .describe('The carried forward interest balance due when pay off the account in a future date')
+            .optional(),
+        carriedForwardInterestFromArrearsBalance: z
+            .number()
+            .describe('The carried forward interest from arrears balance due when pay off the account in a future date')
+            .optional(),
+        carriedForwardPrincipalInArrears: z
+            .number()
+            .describe('The carried forward principal in arrears due when pay off the account in a future date')
+            .optional(),
         earlyRepaymentCharge: z
             .number()
             .describe('The early repayment charge balance due when pay off the account in a future date')
             .optional(),
         feeBalance: z.number().describe('The fee balance due when pay off the account in a future date').optional(),
         interestBalance: z.number().describe('The interest balance due when pay off the account in a future date').optional(),
+        interestBearingFeeBalance: z
+            .number()
+            .describe('The interest bearing fee balance due when pay off the account in a future date')
+            .optional(),
+        interestBearingFeeInterestBalance: z
+            .number()
+            .describe('The interest from interest bearing fee balance due when pay off the account in a future date')
+            .optional(),
         interestFromArrearsBalance: z
             .number()
             .describe('The interest from arrears balance due when pay off the account in a future date')
@@ -10422,6 +11273,41 @@ export const PrincipalOverpaymentLoanTransactionInput = z
     .describe('Represents the request payload for creating a transaction of type PRINCIPAL_OVERPAYMENT')
 
 export type PrincipalOverpaymentLoanTransactionInput = z.infer<typeof PrincipalOverpaymentLoanTransactionInput>
+
+export const ProductSettingsSearchCriteria = z
+    .object({
+        productEncodedKey: z.string().describe('The encoded key of the linked deposit product'),
+    })
+    .describe('Defines the search criteria for product settings')
+
+export type ProductSettingsSearchCriteria = z.infer<typeof ProductSettingsSearchCriteria>
+
+export const ProposalAccountDetailsSearchCriteria = z
+    .object({
+        accountId: z.string().describe('The identifier of the account').optional(),
+        sortingCriteria: ProposalAccountDetailsSortingCriteria.optional(),
+    })
+    .describe('Defines the search criteria for the proposal account details')
+
+export type ProposalAccountDetailsSearchCriteria = z.infer<typeof ProposalAccountDetailsSearchCriteria>
+
+export const ProposalsSearchCriteria = z
+    .object({
+        financialDate: z
+            .string()
+            .date()
+            .describe('A specific date to filter proposals. The date must fall within the start and end dates of the proposals.')
+            .optional(),
+        poolIds: z.number().int().array().describe('The pool identifier used to filter proposals.').optional(),
+        status: z
+            .enum(['PENDING', 'APPROVED', 'REJECTED', 'APPLIED'])
+            .describe('The status of the proposals to filter (e.g., PENDING, APPROVED, REJECTED, APPLIED).')
+            .optional(),
+        type: z.enum(['DEFAULT', 'CUSTOM']).describe('The type of the proposals to filter (e.g., DEFAULT, CUSTOM).').optional(),
+    })
+    .describe('Defines the search criteria for fetching proposals.')
+
+export type ProposalsSearchCriteria = z.infer<typeof ProposalsSearchCriteria>
 
 export const RedrawRepaymentTransactionInputDTO = z
     .object({
@@ -10536,6 +11422,7 @@ export const RepaymentLoanTransactionInput = z
             ])
             .describe('The prepayment recalculation method of the repayment')
             .optional(),
+        principalOverpaymentAmount: z.number().describe('The amount of the principal overpayment').optional(),
         transactionDetails: LoanTransactionDetailsInput.optional(),
         valueDate: z
             .string()
@@ -10543,7 +11430,6 @@ export const RepaymentLoanTransactionInput = z
             .describe('The entry date of the repayment (as Organization Time)')
             .optional(),
     })
-    .passthrough()
     .describe('Represents the request payload for creating a transaction of type REPAYMENT')
 
 export type RepaymentLoanTransactionInput = z.infer<typeof RepaymentLoanTransactionInput>
@@ -10612,6 +11498,10 @@ export const Search9Response = Group.array()
 
 export type Search9Response = z.infer<typeof Search9Response>
 
+export const SearchProductSettingsResponse = ProductSettings.array()
+
+export type SearchProductSettingsResponse = z.infer<typeof SearchProductSettingsResponse>
+
 export const SearchResponse = ArchivedDepositTransaction.array()
 
 export type SearchResponse = z.infer<typeof SearchResponse>
@@ -10632,7 +11522,6 @@ export const SeizeBlockAmount = z
         notes: z.string().describe('Extra notes about the current transaction').optional(),
         transactionChannelId: z.string().describe('The id of the channel through which the transaction is done.'),
     })
-    .passthrough()
     .describe('Represents the information for seizing a block amount on a deposit account.')
 
 export type SeizeBlockAmount = z.infer<typeof SeizeBlockAmount>
@@ -10682,7 +11571,6 @@ export const TransferDepositTransactionInput = z
             .describe('The entry date of the transfer. If not specified it is considered the current date (as Organization Time)')
             .optional(),
     })
-    .passthrough()
     .describe('Represents the input for a transfer deposit transaction.')
 
 export type TransferDepositTransactionInput = z.infer<typeof TransferDepositTransactionInput>
@@ -10800,6 +11688,10 @@ export const UpdatePlannedFeesResponse = PlannedInstallmentFee.array()
 
 export type UpdatePlannedFeesResponse = z.infer<typeof UpdatePlannedFeesResponse>
 
+export const UpdateTemplateRequest = PatchOperation.array()
+
+export type UpdateTemplateRequest = z.infer<typeof UpdateTemplateRequest>
+
 export const UserRequest = z
     .object({
         access: UserAccess,
@@ -10854,6 +11746,14 @@ export const UserRequest = z
 
 export type UserRequest = z.infer<typeof UserRequest>
 
+export const WebhookNotificationSettings = z
+    .object({
+        state: z.enum(['ENABLED', 'DISABLED']).describe('The notification state, enabled or disabled. Must not be null.'),
+    })
+    .describe('Webhook notification settings, enabled or disabled.')
+
+export type WebhookNotificationSettings = z.infer<typeof WebhookNotificationSettings>
+
 export const WithdrawalRedrawTransactionInput = z
     .object({
         amount: z.number().describe('The amount to be withdrawn from redraw balance'),
@@ -10875,7 +11775,6 @@ export const WithdrawalRedrawTransactionInput = z
             .describe('The value date of the withdrawal transaction (as Organization Time)')
             .optional(),
     })
-    .passthrough()
     .describe('Represents the request payload for creating a transaction of type WITHDRAWAL_REDRAW')
 
 export type WithdrawalRedrawTransactionInput = z.infer<typeof WithdrawalRedrawTransactionInput>

@@ -1,5 +1,5 @@
-import ky from 'ky'
 import type { KyInstance, Options, ResponsePromise } from 'ky'
+import ky from 'ky'
 import type { SafeParseReturnType, ZodError } from 'zod'
 
 import { ErrorResponse, TriggerHourlyAndEndOfDayProcessingResponse } from './rest.zod.js'
@@ -47,7 +47,9 @@ export class MambuCrons {
      */
     public runHourlyAndEndOfDayCrons({
         auth = [['apiKey'], ['basic']],
-    }: { auth?: string[][] | string[] } = {}): Promise<
+    }: {
+        auth?: string[][] | string[]
+    } = {}): Promise<
         | SuccessResponse<'202', TriggerHourlyAndEndOfDayProcessingResponse>
         | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
         | FailureResponse<'401', ErrorResponse, 'response:statuscode'>

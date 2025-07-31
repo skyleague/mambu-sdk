@@ -381,7 +381,6 @@ export const DepositTransactionBulkableInputDTO = z
             .optional(),
         transactionDetails: TransactionDetailsInput.optional(),
     })
-    .passthrough()
     .describe('Represents the request payload for creating a deposit transactions when sent in bulk.')
 
 export type DepositTransactionBulkableInputDTO = z.infer<typeof DepositTransactionBulkableInputDTO>
@@ -754,7 +753,6 @@ export const SeizeBlockAmount = z
         notes: z.string().describe('Extra notes about the current transaction').optional(),
         transactionChannelId: z.string().describe('The id of the channel through which the transaction is done.'),
     })
-    .passthrough()
     .describe('Represents the information for seizing a block amount on a deposit account.')
 
 export type SeizeBlockAmount = z.infer<typeof SeizeBlockAmount>
@@ -774,7 +772,6 @@ export const TransferDepositTransactionInput = z
             .describe('The entry date of the transfer. If not specified it is considered the current date (as Organization Time)')
             .optional(),
     })
-    .passthrough()
     .describe('Represents the input for a transfer deposit transaction.')
 
 export type TransferDepositTransactionInput = z.infer<typeof TransferDepositTransactionInput>
@@ -803,7 +800,6 @@ export const WithdrawalDepositTransactionInput = z
             )
             .optional(),
     })
-    .passthrough()
     .describe('Represents the input for a withdrawal transaction.')
 
 export type WithdrawalDepositTransactionInput = z.infer<typeof WithdrawalDepositTransactionInput>

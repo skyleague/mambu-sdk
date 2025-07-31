@@ -108,27 +108,6 @@ export const PMTAdjustmentThreshold = z
 
 export type PMTAdjustmentThreshold = z.infer<typeof PMTAdjustmentThreshold>
 
-export const DaysInMonth = z
-    .object({
-        daysInMonth: z
-            .number()
-            .int()
-            .array()
-            .describe(
-                ' Specifies the day(s) of the month when the interest application dates should be. Only available if the Interest Application Method is InterestApplicationMethodDTO#FIXED_DAYS_OF_MONTH. Currently only 1 value can be specified.',
-            )
-            .optional(),
-        shortMonthHandlingMethod: z
-            .enum(['LAST_DAY_IN_MONTH', 'FIRST_DAY_OF_NEXT_MONTH'])
-            .describe(
-                'Determines how to handle the short months, if they select a fixed day of month > 28. Will be null if no such date is selected. Only available if the Interest Application Method is InterestApplicationMethodDTO#FIXED_DAYS_OF_MONTH.',
-            )
-            .optional(),
-    })
-    .describe('Enumeration for days of month and method of handling shorter months.')
-
-export type DaysInMonth = z.infer<typeof DaysInMonth>
-
 export const AccountInterestRateSettings = z
     .object({
         encodedKey: z.string().describe('The encoded key of the interest rate settings, auto generated, unique').optional(),
@@ -787,7 +766,13 @@ export type PlannedInstallmentFee = z.infer<typeof PlannedInstallmentFee>
 export const PenaltySettings = z
     .object({
         loanPenaltyCalculationMethod: z
-            .enum(['NONE', 'OVERDUE_BALANCE', 'OVERDUE_BALANCE_AND_INTEREST', 'OUTSTANDING_PRINCIPAL'])
+            .enum([
+                'NONE',
+                'OVERDUE_BALANCE',
+                'OVERDUE_BALANCE_AND_INTEREST',
+                'OVERDUE_BALANCE_INTEREST_AND_FEE',
+                'OUTSTANDING_PRINCIPAL',
+            ])
             .describe('The last penalty calculation method, represents on what amount are the penalties calculated.')
             .optional(),
         penaltyRate: z
@@ -817,9 +802,8 @@ export const InterestSettings = z
                 'The effective interest rate. Represents the interest rate for the loan accounts with semi-annually compounding product.',
             )
             .optional(),
-        interestApplicationDays: DaysInMonth.optional(),
         interestApplicationMethod: z
-            .enum(['AFTER_DISBURSEMENT', 'REPAYMENT_DUE_DATE', 'FIXED_DAYS_OF_MONTH'])
+            .enum(['AFTER_DISBURSEMENT', 'REPAYMENT_DUE_DATE'])
             .describe(
                 `The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.`,
             )
@@ -926,6 +910,18 @@ export type InvestorFund = z.infer<typeof InvestorFund>
 
 export const FeesAccountSettings = z
     .object({
+        accruedFee: z
+            .number()
+            .describe(
+                'The accrued fee. Represents the accrued fee for the loan account. The fee on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.',
+            )
+            .optional(),
+        accruedFeeFromArrears: z
+            .number()
+            .describe(
+                'The accrued fee from arrears. Represents the accrued fee from arrears for the loan account. The fee on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.',
+            )
+            .optional(),
         feeRate: z
             .number()
             .describe(
@@ -1674,7 +1670,17 @@ export const CreditArrangementFilterCriteria = z
     .object({
         field: z.union([
             z
-                .enum(['id', 'startDate', 'expireDate', 'approvedDate', 'state', 'subState', 'exposureLimitType', 'encodedKey'])
+                .enum([
+                    'id',
+                    'startDate',
+                    'expireDate',
+                    'approvedDate',
+                    'state',
+                    'subState',
+                    'exposureLimitType',
+                    'encodedKey',
+                    'ownerKey',
+                ])
                 .describe('Contains the actual searching fields'),
             z.string(),
         ]),
