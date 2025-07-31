@@ -3,11 +3,12 @@ import type { OpenapiV3 } from '@skyleague/therefore'
 import { $restclient } from '@skyleague/therefore'
 import type { APIKeySecurityScheme, Operation, PathItem, Schema } from '@skyleague/therefore/src/types/openapi.type.js'
 import ky from 'ky'
+import converter from 'swagger2openapi'
 
 export const baseMambuStreaming = ky
     .get('https://api.mambu.com/streaming-api/mambu-streaming-api-spec-oas3.json')
     .json<OpenapiV3>()
-    .then((data) => {
+    .then(async (data) => {
         if (data.components?.securitySchemes?.ApiKeyAuth !== undefined) {
             const apiKeyAuth = data.components.securitySchemes.ApiKeyAuth as APIKeySecurityScheme
             apiKeyAuth.name = 'apikey'
@@ -105,11 +106,15 @@ export const baseMambuStreaming = ky
 
         data.security ??= [{ ApiKeyAuth: [] }]
 
-        return $restclient(data, {
+        const converted: { openapi: OpenapiV3 } = await converter.convertObj(data, {
+            path: true,
+        })
+
+        return $restclient(converted.openapi, {
             formats: false,
             strict: false,
             client: 'ky',
-            validator: 'zod',
+            validator: 'zod/v4',
             options: {
                 timeout: false,
             },
