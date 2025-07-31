@@ -6,7 +6,12 @@ import camelCase from 'camelcase'
 import ky from 'ky'
 
 export interface Clients {
-    items: { jsonPath: string; label: string; hashValue: string; index?: number }[]
+    items: {
+        jsonPath: string
+        label: string
+        hashValue: string
+        index?: number
+    }[]
 }
 const baseUrl = 'https://demotenant.dev.mambucloud.com/api/swagger/'
 
@@ -53,6 +58,10 @@ for (const manifest of clientList) {
         manifest.label = 'Mambu Functions'
     } else if (manifest.jsonPath === 'json/mambu-functions-secrets_v2_swagger.json') {
         manifest.label = 'Mambu Function Secrets'
+    } else if (manifest.jsonPath === 'json/crons_eod_v2_swagger.json') {
+        manifest.label = 'Crons EOD'
+    } else if (manifest.jsonPath === 'json/crons_earlyeod_v2_swagger.json') {
+        manifest.label = 'Crons Yearly EOD'
     }
 }
 for (const [group, vals] of Object.entries(Object.groupBy(clientList, (l) => l.label))) {
@@ -110,7 +119,6 @@ for (const item of clientList) {
                     'Client',
                     'Group',
                     'LoanAccount',
-                    'LoanAccountFullDetails',
                     'DepositAccount',
                     'DepositProduct',
                     'CreditArrangement',
@@ -121,14 +129,6 @@ for (const item of clientList) {
                     'LoanTransaction',
                     'DepositTransaction',
                     'Centre',
-                    'RepaymentLoanTransactionInput',
-                    'TransferDepositTransactionInput',
-                    'WithdrawalDepositTransactionInput',
-                    'PaymentMadeTransactionInput',
-                    'WithdrawalRedrawTransactionInput',
-                    'DisbursementLoanTransactionInput',
-                    'DepositTransactionBulkableInputDTO',
-                    'SeizeBlockAmount',
                 ]),
             )) {
                 if (!('$ref' in schema)) {
@@ -138,7 +138,6 @@ for (const item of clientList) {
 
             // biome-ignore lint/suspicious/noExplicitAny: ignoe
             if ((api.components?.schemas?.RestError as any)?.properties?.errorReason?.enum !== undefined) {
-                // biome-ignore lint/performance/noDelete: This is necessary
                 // biome-ignore lint/suspicious/noExplicitAny: ignore
                 delete (api.components?.schemas?.RestError as any)?.properties?.errorReason?.enum
             }
@@ -160,7 +159,6 @@ for (const item of clientList) {
                             definition.properties.value.type === 'object' &&
                             !('properties' in definition.properties.value)
                         ) {
-                            // biome-ignore lint/performance/noDelete: This is necessary
                             delete definition.properties.value.type
                         }
                     }

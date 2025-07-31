@@ -72,25 +72,6 @@ export const CardAcceptor = z
 
 export type CardAcceptor = z.infer<typeof CardAcceptor>
 
-export const AccountBalances = z
-    .object({
-        accountId: z.string().describe('The unique account identifier').optional(),
-        availableBalance: z.number().describe('The available balance of a deposit or credit account').optional(),
-        cardType: z.enum(['DEBIT', 'CREDIT']).describe('The card type either DEBIT or CREDIT').optional(),
-        creditLimit: z
-            .number()
-            .describe('The overdraft limit of a deposit account or the loan amount in case of a credit account')
-            .optional(),
-        currencyCode: z.string().describe('Currency code used for the account').optional(),
-        totalBalance: z
-            .number()
-            .describe('The current balance of a deposit account or principal balance of a revolving credit')
-            .optional(),
-    })
-    .describe('Account balances presented to inquirer such as card processor')
-
-export type AccountBalances = z.infer<typeof AccountBalances>
-
 export const DepositOverdraftSettings = z
     .object({
         overdraftLimit: z.number().describe('The overdraft limit that was set or changed in this transaction').optional(),
@@ -186,31 +167,29 @@ export const Party = z
 
 export type Party = z.infer<typeof Party>
 
-export const AuthorizationHold = z
+export const AccountBalances = z
     .object({
-        accountKey: z.string().describe('The key of the account linked with the authorization hold.').optional(),
-        advice: z.boolean().describe('Whether the given request should be accepted without balance validations.'),
+        accountId: z.string().describe('The unique account identifier').optional(),
+        availableBalance: z.number().describe('The available balance of a deposit or credit account').optional(),
+        cardType: z.enum(['DEBIT', 'CREDIT']).describe('The card type either DEBIT or CREDIT').optional(),
+        creditLimit: z
+            .number()
+            .describe('The overdraft limit of a deposit account or the loan amount in case of a credit account')
+            .optional(),
+        currencyCode: z.string().describe('Currency code used for the account').optional(),
+        totalBalance: z
+            .number()
+            .describe('The current balance of a deposit account or principal balance of a revolving credit')
+            .optional(),
+    })
+    .describe('Account balances presented to inquirer such as card processor')
+
+export type AccountBalances = z.infer<typeof AccountBalances>
+
+export const CardAuthorizationHold = z
+    .object({
         amount: z.number().describe('The amount of money to be held as a result of the authorization hold request.'),
-        balances: AccountBalances.optional(),
         cardAcceptor: CardAcceptor.optional(),
-        cardToken: z.string().describe('The reference token of the card.').optional(),
-        creationDate: z
-            .string()
-            .datetime({ offset: true })
-            .describe('The organization time when the authorization hold was created')
-            .optional(),
-        creditDebitIndicator: z
-            .enum(['DBIT', 'CRDT'])
-            .describe(
-                'Indicates whether the authorization hold amount is credited or debited.If not provided, the default values is DBIT.',
-            )
-            .optional(),
-        currencyCode: z
-            .string()
-            .describe(
-                'The ISO currency code in which the hold was created. The amounts are stored in the base currency, but the user could have enter it in a foreign currency.',
-            )
-            .optional(),
         customExpirationPeriod: z
             .number()
             .int()
@@ -225,22 +204,60 @@ export const AuthorizationHold = z
             .describe('The original amount of money to be held as a result of the authorization hold request.')
             .optional(),
         originalCurrency: z.string().describe('The original currency in which the hold was created.').optional(),
-        partial: z.boolean().describe('Indicates whether the authorization is partial or not').optional(),
         referenceDateForExpiration: z
             .string()
             .datetime({ offset: true })
             .describe('The date to consider as start date when calculating the number of days passed until expiration')
             .optional(),
-        source: z
-            .enum(['CARD', 'ACCOUNT'])
-            .describe('Indicates the source of the authorization hold, the default values is CARD.')
-            .optional(),
-        status: z.enum(['PENDING', 'REVERSED', 'SETTLED', 'EXPIRED']).describe('The authorization hold status.').optional(),
         userTransactionTime: z.string().describe('The formatted time at which the user made this authorization hold.').optional(),
     })
     .describe('The authorization hold corresponding to a card token')
 
-export type AuthorizationHold = z.infer<typeof AuthorizationHold>
+export type CardAuthorizationHold = z.infer<typeof CardAuthorizationHold>
+
+export const BulkAccountBalances = z
+    .object({
+        availableBalance: z.number().describe('The available balance of a deposit or credit account').optional(),
+        blockedBalance: z.number().describe('The sum of all the blocked amounts on an account').optional(),
+        feesDue: z.number().describe('The fees due representing the total fees due for the account').optional(),
+        forwardAvailableBalance: z
+            .number()
+            .describe(
+                'The sum of all the authorization hold amounts that have `CRDT` as the `creditDebitIndicator` for an account',
+            )
+            .optional(),
+        holdBalance: z
+            .number()
+            .describe(
+                'The sum of all the authorization hold amounts that have `DBIT` as the `creditDebitIndicator` for an account',
+            )
+            .optional(),
+        lockedBalance: z.number().describe('The locked amount that is not available for withdrawal in the accountt').optional(),
+        overdraftAmount: z.number().describe('The overdraft amount that has been taken out in the account').optional(),
+        overdraftInterestDue: z
+            .number()
+            .describe('The amount of interest due to be paid on an account as a result of an authorized overdraft')
+            .optional(),
+        overdraftLimit: z
+            .number()
+            .describe('The overdraft limit of a deposit account or the loan amount in case of a credit account')
+            .optional(),
+        technicalOverdraftAmount: z
+            .number()
+            .describe('The technical overdraft amount that has been taken out in the account')
+            .optional(),
+        technicalOverdraftInterestDue: z
+            .number()
+            .describe('The amount of interest due to be paid on an account as a result of a technical overdraft')
+            .optional(),
+        totalBalance: z
+            .number()
+            .describe('The current balance of a deposit account or principal balance of a revolving credit')
+            .optional(),
+    })
+    .describe('Account balances presented to inquirer such as card processor')
+
+export type BulkAccountBalances = z.infer<typeof BulkAccountBalances>
 
 export const LinkedTransaction = z
     .object({
@@ -484,6 +501,62 @@ export const PatchOperation = z
 
 export type PatchOperation = z.infer<typeof PatchOperation>
 
+export const AuthorizationHold = z
+    .object({
+        accountKey: z.string().describe('The key of the account linked with the authorization hold.').optional(),
+        advice: z.boolean().describe('Whether the given request should be accepted without balance validations.'),
+        amount: z.number().describe('The amount of money to be held as a result of the authorization hold request.'),
+        balances: AccountBalances.optional(),
+        cardAcceptor: CardAcceptor.optional(),
+        cardToken: z.string().describe('The reference token of the card.').optional(),
+        creationDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The organization time when the authorization hold was created')
+            .optional(),
+        creditDebitIndicator: z
+            .enum(['DBIT', 'CRDT'])
+            .describe(
+                'Indicates whether the authorization hold amount is credited or debited.If not provided, the default values is DBIT.',
+            )
+            .optional(),
+        currencyCode: z
+            .string()
+            .describe(
+                'The ISO currency code in which the hold was created. The amounts are stored in the base currency, but the user could have enter it in a foreign currency.',
+            )
+            .optional(),
+        customExpirationPeriod: z
+            .number()
+            .int()
+            .describe('The custom expiration period for the hold which overwrites mcc and default expiration periods')
+            .optional(),
+        exchangeRate: z.number().describe('The exchange rate for the original currency.').optional(),
+        externalReferenceId: z
+            .string()
+            .describe('The external reference ID to be used to reference the account hold in subsequent requests.'),
+        originalAmount: z
+            .number()
+            .describe('The original amount of money to be held as a result of the authorization hold request.')
+            .optional(),
+        originalCurrency: z.string().describe('The original currency in which the hold was created.').optional(),
+        partial: z.boolean().describe('Indicates whether the authorization is partial or not').optional(),
+        referenceDateForExpiration: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The date to consider as start date when calculating the number of days passed until expiration')
+            .optional(),
+        source: z
+            .enum(['CARD', 'ACCOUNT'])
+            .describe('Indicates the source of the authorization hold, the default values is CARD.')
+            .optional(),
+        status: z.enum(['PENDING', 'REVERSED', 'SETTLED', 'EXPIRED']).describe('The authorization hold status.').optional(),
+        userTransactionTime: z.string().describe('The formatted time at which the user made this authorization hold.').optional(),
+    })
+    .describe('The authorization hold corresponding to a card token')
+
+export type AuthorizationHold = z.infer<typeof AuthorizationHold>
+
 export const AuthorizationHoldAmountAdjustmentRequest = z
     .object({
         advice: z.boolean().describe('Whether the given request should be accepted without balance validations.').optional(),
@@ -505,11 +578,33 @@ export type AuthorizationHoldAmountAdjustmentRequest = z.infer<typeof Authorizat
 
 export const BulkCardAuthorizationHoldsInput = z
     .object({
-        holds: AuthorizationHold.array().describe('The list of authorization holds').optional(),
+        accountKey: z.string().describe('The key of the account linked with the authorization hold.').optional(),
+        advice: z.boolean().describe('Whether the given request should be accepted without balance validations.'),
+        cardToken: z.string().describe('The reference token of the card.').optional(),
+        creditDebitIndicator: z
+            .enum(['DBIT', 'CRDT'])
+            .describe(
+                'Indicates whether the authorization hold amount is credited or debited.If not provided, the default values is DBIT.',
+            )
+            .optional(),
+        holds: CardAuthorizationHold.array().describe('The list of authorization holds').optional(),
+        partial: z.boolean().describe('Indicates whether the authorization is partial or not').optional(),
+        source: z
+            .enum(['CARD', 'ACCOUNT'])
+            .describe('Indicates the source of the authorization hold, the default values is CARD.')
+            .optional(),
     })
     .describe('Represents the request payload for creating a bulk card authorization holds.')
 
 export type BulkCardAuthorizationHoldsInput = z.infer<typeof BulkCardAuthorizationHoldsInput>
+
+export const BulkCardAuthorizationHoldsOutput = z
+    .object({
+        balances: BulkAccountBalances.optional(),
+    })
+    .describe('Represents the response payload for creating a bulk card authorization holds.')
+
+export type BulkCardAuthorizationHoldsOutput = z.infer<typeof BulkCardAuthorizationHoldsOutput>
 
 export const CardTransactionInput = z
     .object({

@@ -158,6 +158,10 @@ export const GLAccountingRule = z
                 'INTEREST_FROM_ARREARS_WRITE_OFF_EXPENSE',
                 'PROFIT_EXPENSE',
                 'PROFIT_PAYABLE',
+                'MUDARIB_SHARE',
+                'INTEREST_FROM_FEES_INCOME',
+                'INTEREST_FROM_FEES_RECEIVABLE',
+                'INTEREST_FROM_FEES_WRITE_OFF_EXPENSE',
             ])
             .describe(
                 'General Ledger Financial Resources used to setup the product accounting rules and determine the credit and debit accounts when logging journal entries',
@@ -435,27 +439,6 @@ export const ProductInterestRateSettings = z
 
 export type ProductInterestRateSettings = z.infer<typeof ProductInterestRateSettings>
 
-export const DaysInMonth = z
-    .object({
-        daysInMonth: z
-            .number()
-            .int()
-            .array()
-            .describe(
-                ' Specifies the day(s) of the month when the interest application dates should be. Only available if the Interest Application Method is InterestApplicationMethodDTO#FIXED_DAYS_OF_MONTH. Currently only 1 value can be specified.',
-            )
-            .optional(),
-        shortMonthHandlingMethod: z
-            .enum(['LAST_DAY_IN_MONTH', 'FIRST_DAY_OF_NEXT_MONTH'])
-            .describe(
-                'Determines how to handle the short months, if they select a fixed day of month > 28. Will be null if no such date is selected. Only available if the Interest Application Method is InterestApplicationMethodDTO#FIXED_DAYS_OF_MONTH.',
-            )
-            .optional(),
-    })
-    .describe('Enumeration for days of month and method of handling shorter months.')
-
-export type DaysInMonth = z.infer<typeof DaysInMonth>
-
 export const InterestProductSettings = z
     .object({
         accrueInterestAfterMaturity: z
@@ -728,7 +711,13 @@ export type ProductRedrawSettings = z.infer<typeof ProductRedrawSettings>
 export const ProductPenaltySettings = z
     .object({
         loanPenaltyCalculationMethod: z
-            .enum(['NONE', 'OVERDUE_BALANCE', 'OVERDUE_BALANCE_AND_INTEREST', 'OUTSTANDING_PRINCIPAL'])
+            .enum([
+                'NONE',
+                'OVERDUE_BALANCE',
+                'OVERDUE_BALANCE_AND_INTEREST',
+                'OVERDUE_BALANCE_INTEREST_AND_FEE',
+                'OUTSTANDING_PRINCIPAL',
+            ])
             .describe('The penalty calculation method'),
         loanPenaltyGracePeriod: z
             .number()
@@ -841,9 +830,8 @@ export const ProductInterestSettings = z
             )
             .optional(),
         indexRateSettings: InterestProductSettings.optional(),
-        interestApplicationDays: DaysInMonth.optional(),
         interestApplicationMethod: z
-            .enum(['AFTER_DISBURSEMENT', 'REPAYMENT_DUE_DATE', 'FIXED_DAYS_OF_MONTH'])
+            .enum(['AFTER_DISBURSEMENT', 'REPAYMENT_DUE_DATE'])
             .describe(
                 `The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.`,
             )

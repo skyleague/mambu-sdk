@@ -105,27 +105,6 @@ export const PMTAdjustmentThreshold = z
 
 export type PMTAdjustmentThreshold = z.infer<typeof PMTAdjustmentThreshold>
 
-export const DaysInMonth = z
-    .object({
-        daysInMonth: z
-            .number()
-            .int()
-            .array()
-            .describe(
-                ' Specifies the day(s) of the month when the interest application dates should be. Only available if the Interest Application Method is InterestApplicationMethodDTO#FIXED_DAYS_OF_MONTH. Currently only 1 value can be specified.',
-            )
-            .optional(),
-        shortMonthHandlingMethod: z
-            .enum(['LAST_DAY_IN_MONTH', 'FIRST_DAY_OF_NEXT_MONTH'])
-            .describe(
-                'Determines how to handle the short months, if they select a fixed day of month > 28. Will be null if no such date is selected. Only available if the Interest Application Method is InterestApplicationMethodDTO#FIXED_DAYS_OF_MONTH.',
-            )
-            .optional(),
-    })
-    .describe('Enumeration for days of month and method of handling shorter months.')
-
-export type DaysInMonth = z.infer<typeof DaysInMonth>
-
 export const AccountInterestRateSettings = z
     .object({
         encodedKey: z.string().describe('The encoded key of the interest rate settings, auto generated, unique').optional(),
@@ -558,9 +537,9 @@ export const CustomPaymentAmount = z
                 'NON_SCHEDULED_FEE',
                 'INTEREST_BEARING_FEE',
                 'INTEREST_BEARING_FEE_INTEREST',
+                'CF_PRINCIPAL_IN_ARREARS',
                 'CF_INTEREST',
                 'CF_INTEREST_FROM_ARREARS',
-                'CF_INTEREST_FROM_ARREARS_ACCRUED',
             ])
             .describe('The type of the custom payment'),
         predefinedFeeKey: z.string().describe('The encodedKey of the predefined fee to be paid.').optional(),
@@ -925,7 +904,13 @@ export type PlannedInstallmentFee = z.infer<typeof PlannedInstallmentFee>
 export const PenaltySettings = z
     .object({
         loanPenaltyCalculationMethod: z
-            .enum(['NONE', 'OVERDUE_BALANCE', 'OVERDUE_BALANCE_AND_INTEREST', 'OUTSTANDING_PRINCIPAL'])
+            .enum([
+                'NONE',
+                'OVERDUE_BALANCE',
+                'OVERDUE_BALANCE_AND_INTEREST',
+                'OVERDUE_BALANCE_INTEREST_AND_FEE',
+                'OUTSTANDING_PRINCIPAL',
+            ])
             .describe('The last penalty calculation method, represents on what amount are the penalties calculated.')
             .optional(),
         penaltyRate: z
@@ -955,9 +940,8 @@ export const InterestSettings = z
                 'The effective interest rate. Represents the interest rate for the loan accounts with semi-annually compounding product.',
             )
             .optional(),
-        interestApplicationDays: DaysInMonth.optional(),
         interestApplicationMethod: z
-            .enum(['AFTER_DISBURSEMENT', 'REPAYMENT_DUE_DATE', 'FIXED_DAYS_OF_MONTH'])
+            .enum(['AFTER_DISBURSEMENT', 'REPAYMENT_DUE_DATE'])
             .describe(
                 `The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.`,
             )
@@ -1064,6 +1048,18 @@ export type InvestorFund = z.infer<typeof InvestorFund>
 
 export const FeesAccountSettings = z
     .object({
+        accruedFee: z
+            .number()
+            .describe(
+                'The accrued fee. Represents the accrued fee for the loan account. The fee on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.',
+            )
+            .optional(),
+        accruedFeeFromArrears: z
+            .number()
+            .describe(
+                'The accrued fee from arrears. Represents the accrued fee from arrears for the loan account. The fee on loans is accrued on a daily basis, which allows charging the clients only for the days they actually used the loan amount.',
+            )
+            .optional(),
         feeRate: z
             .number()
             .describe(
@@ -1402,6 +1398,7 @@ export const LoanTransaction = z
             .string()
             .describe('The external ID of the loan transaction, it is customizable, and must be unique.')
             .optional(),
+        feeIncludedInPmt: z.boolean().optional(),
         fees: Fee.array()
             .describe('The amounts that have been applied or paid as part of this transaction and involved predefined fees.')
             .optional(),
@@ -1412,6 +1409,11 @@ export const LoanTransaction = z
         installmentEncodedKey: z
             .string()
             .describe('The specific installment encoded key associated to the loan transaction.')
+            .optional(),
+        lateFeeIncludedInPmt: z.boolean().optional(),
+        linkedPrincipalOverpaymentTransactionKey: z
+            .string()
+            .describe('The specific principal overpayment transaction key associated to the loan transaction.')
             .optional(),
         migrationEventKey: z
             .string()
@@ -1488,6 +1490,7 @@ export const LoanTransaction = z
                 'PENALTY_RATE_CHANGED',
                 'INTEREST_APPLIED',
                 'IBF_INTEREST_APPLIED',
+                'IBF_INTEREST_APPLIED_ADJUSTMENT',
                 'INTEREST_APPLIED_ADJUSTMENT',
                 'INTEREST_DUE_REDUCED',
                 'PENALTY_REDUCTION_ADJUSTMENT',
@@ -1826,9 +1829,39 @@ export const LoanAccount = z
 
 export type LoanAccount = z.infer<typeof LoanAccount>
 
+export const LoanAccountBalanceChange = z
+    .object({
+        amount: z.number().describe('amount by which the balance was changed').optional(),
+        applicationDate: z.string().datetime({ offset: true }).describe('date/time when the change was applied').optional(),
+        creationDate: z.string().datetime({ offset: true }).describe('date/time when the change was recorded').optional(),
+        loanAccountEncodedKey: z.string().describe('encoded key of the loan account').optional(),
+        loanTransactionEncodedKey: z.string().describe('encoded key of the loan transaction').optional(),
+        type: z.string().describe('balance type').optional(),
+    })
+    .describe('Change on a loan account balance')
+
+export type LoanAccountBalanceChange = z.infer<typeof LoanAccountBalanceChange>
+
 export const PayOffAdjustableAmounts = z
     .object({
+        carriedForwardInterestAmount: z
+            .number()
+            .describe('The carried forward interest amount to be paid for Pay Off action')
+            .optional(),
+        carriedForwardInterestFromArrearsAmount: z
+            .number()
+            .describe('The carried forward interest from arrears amount to be paid for Pay Off action')
+            .optional(),
+        carriedForwardPrincipalInArrearsAmount: z
+            .number()
+            .describe('The carried forward principal in arrears amount to be paid for Pay Off action')
+            .optional(),
         feesPaid: z.number().describe('The fee amount to be paid for Pay Off action').optional(),
+        interestBearingFeeAmount: z.number().describe('The interest-bearing fee amount to be paid for Pay Off action').optional(),
+        interestBearingFeeInterestAmount: z
+            .number()
+            .describe('The interest-bearing fee interest amount to be paid for Pay Off action')
+            .optional(),
         interestFromArrearsPaid: z.number().describe('The interest from arrears amount to be paid for Pay Off action').optional(),
         interestPaid: z.number().describe('The interest amount to be paid for Pay Off action').optional(),
         nonScheduledFeeAmount: z.number().describe('The non-scheduled fee amount to be paid for Pay Off action').optional(),
@@ -2178,6 +2211,14 @@ export const InterestSettingsForSchedulePreview = z
 
 export type InterestSettingsForSchedulePreview = z.infer<typeof InterestSettingsForSchedulePreview>
 
+export const FeesSettingsForSchedulePreview = z
+    .object({
+        feeRate: z.number().describe('The fee rate. Represents the fee rate for the loan account.').optional(),
+    })
+    .describe('Defines fees settings for schedule preview.')
+
+export type FeesSettingsForSchedulePreview = z.infer<typeof FeesSettingsForSchedulePreview>
+
 export const DisbursementDetailsForSchedulePreview = z
     .object({
         expectedDisbursementDate: z
@@ -2202,6 +2243,8 @@ export const RefinanceWriteOffAmounts = z
     .object({
         fee: z.number().describe('Fee write-off amount').optional(),
         interest: z.number().describe('Interest write-off amount').optional(),
+        interestBearingFees: z.number().describe('Interest Bearing Fees write-off amount').optional(),
+        interestBearingFeesInterest: z.number().describe('Interest Bearing Fees Interest write-off amount').optional(),
         interestFromArrears: z.number().optional(),
         penalty: z.number().describe('Penalty write-off amount').optional(),
     })
@@ -2238,6 +2281,46 @@ export const CarryForwardOptions = z
             .boolean()
             .describe('Choose whether to carry forward accruedInterestFromArrearsBalance from the originating account')
             .optional(),
+        capitaliseInterest: z
+            .boolean()
+            .describe('Choose whether to capitalise interestBalance from the initial account')
+            .optional(),
+        capitaliseInterestAccrued: z
+            .boolean()
+            .describe('Choose whether to capitalise accruedInterestBalance from the initial account')
+            .optional(),
+        capitaliseInterestFromArrears: z
+            .boolean()
+            .describe('Choose whether to capitalise interestFromArrearsBalance from the initial account')
+            .optional(),
+        capitaliseInterestFromArrearsAccrued: z
+            .boolean()
+            .describe('Choose whether to capitalise accruedInterestFromArrearsBalance from the initial account')
+            .optional(),
+        capitalisePrincipalInArrears: z
+            .boolean()
+            .describe('Choose whether to capitalise Principal In Arrears from the initial account')
+            .optional(),
+        carryForwardInterest: z
+            .boolean()
+            .describe('Choose whether to carry forward interestBalance from the initial account')
+            .optional(),
+        carryForwardInterestAccrued: z
+            .boolean()
+            .describe('Choose whether to carry forward accruedInterestBalance from the initial account')
+            .optional(),
+        carryForwardInterestFromArrears: z
+            .boolean()
+            .describe('Choose whether to carry forward interestFromArrearsBalance from the initial account')
+            .optional(),
+        carryForwardInterestFromArrearsAccrued: z
+            .boolean()
+            .describe('Choose whether to carry forward accruedInterestFromArrearsBalance from the initial account')
+            .optional(),
+        carryForwardPrincipalInArrears: z
+            .boolean()
+            .describe('Choose whether to carry forward Principal In Arrears from the initial account')
+            .optional(),
         interestBalance: z
             .boolean()
             .describe('Choose whether to carry forward interestBalance from the originating account')
@@ -2250,6 +2333,23 @@ export const CarryForwardOptions = z
             .boolean()
             .describe('Choose whether to carry forward loanAccountState from the originating account')
             .optional(),
+        writeOffInterest: z.boolean().describe('Choose whether to write off interestBalance from the initial account').optional(),
+        writeOffInterestAccrued: z
+            .boolean()
+            .describe('Choose whether to write off accruedInterestBalance from the initial account')
+            .optional(),
+        writeOffInterestFromArrears: z
+            .boolean()
+            .describe('Choose whether to write off interestFromArrearsBalance from the initial account')
+            .optional(),
+        writeOffInterestFromArrearsAccrued: z
+            .boolean()
+            .describe('Choose whether to write off accruedInterestFromArrearsBalance from the initial account')
+            .optional(),
+        writeOffPrincipalInArrears: z
+            .boolean()
+            .describe('Choose whether to write off Principal In Arrears from the initial account')
+            .optional(),
     })
     .describe(
         'The carry forward options that indicates which fields will be carried forward to new account on the loan account reschedule/refinance',
@@ -2261,6 +2361,8 @@ export const RescheduleWriteOffAmounts = z
     .object({
         fee: z.number().describe('Fee write-off amount').optional(),
         interest: z.number().describe('Interest write-off amount').optional(),
+        interestBearingFees: z.number().describe('Interest Bearing Fees write-off amount').optional(),
+        interestBearingFeesInterest: z.number().describe('Interest Bearing Fees Interest write-off amount').optional(),
         interestFromArrears: z.number().describe('Interest from Arrears write-off amount').optional(),
         penalty: z.number().describe('Penalty write-off amount').optional(),
         principal: z.number().describe('Principal write-off amount').optional(),
@@ -2288,6 +2390,19 @@ export const RescheduleLoanAccount = z
     .describe('The new loan account settings, allowed on the loan account reschedule')
 
 export type RescheduleLoanAccount = z.infer<typeof RescheduleLoanAccount>
+
+export const ApplyBalanceInterestInput = z
+    .object({
+        interestApplicationDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The date up to which interest is to be posted')
+            .optional(),
+        notes: z.string().describe('Additional information for this action').optional(),
+    })
+    .describe('Represents a request for applying the accrued interest on a loan account balance')
+
+export type ApplyBalanceInterestInput = z.infer<typeof ApplyBalanceInterestInput>
 
 export const ApplyInterestInput = z
     .object({
@@ -2495,6 +2610,14 @@ export const LoanAccountAction = z
 
 export type LoanAccountAction = z.infer<typeof LoanAccountAction>
 
+export const LoanAccountBalanceChanges = z
+    .object({
+        balanceChanges: LoanAccountBalanceChange.array().describe('Changes on a loan account balance').optional(),
+    })
+    .describe('Changes on a loan account balance')
+
+export type LoanAccountBalanceChanges = z.infer<typeof LoanAccountBalanceChanges>
+
 export const LoanAccountBalances = z
     .object({
         balances: z.record(z.number().optional()).describe('Balances for a loan account').optional(),
@@ -2559,6 +2682,7 @@ export type PlannedFeeKeys = z.infer<typeof PlannedFeeKeys>
 export const PreviewLoanAccountSchedule = z
     .object({
         disbursementDetails: DisbursementDetailsForSchedulePreview.optional(),
+        feeRateSettings: FeesSettingsForSchedulePreview.optional(),
         interestCommission: z
             .number()
             .describe(
@@ -2592,12 +2716,32 @@ export type PreviewPayOffDueAmountsInAFutureDateInput = z.infer<typeof PreviewPa
 
 export const PreviewPayOffDueAmountsInAFutureDateWrapper = z
     .object({
+        carriedForwardInterestBalance: z
+            .number()
+            .describe('The carried forward interest balance due when pay off the account in a future date')
+            .optional(),
+        carriedForwardInterestFromArrearsBalance: z
+            .number()
+            .describe('The carried forward interest from arrears balance due when pay off the account in a future date')
+            .optional(),
+        carriedForwardPrincipalInArrears: z
+            .number()
+            .describe('The carried forward principal in arrears due when pay off the account in a future date')
+            .optional(),
         earlyRepaymentCharge: z
             .number()
             .describe('The early repayment charge balance due when pay off the account in a future date')
             .optional(),
         feeBalance: z.number().describe('The fee balance due when pay off the account in a future date').optional(),
         interestBalance: z.number().describe('The interest balance due when pay off the account in a future date').optional(),
+        interestBearingFeeBalance: z
+            .number()
+            .describe('The interest bearing fee balance due when pay off the account in a future date')
+            .optional(),
+        interestBearingFeeInterestBalance: z
+            .number()
+            .describe('The interest from interest bearing fee balance due when pay off the account in a future date')
+            .optional(),
         interestFromArrearsBalance: z
             .number()
             .describe('The interest from arrears balance due when pay off the account in a future date')

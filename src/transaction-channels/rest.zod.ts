@@ -6,6 +6,16 @@
 
 import { z } from 'zod'
 
+export const CustomFieldAvailableOption = z
+    .object({
+        score: z.number().describe('The score of the option.').optional(),
+        selectionKey: z.string().describe('The system-generated ID of the option.').optional(),
+        value: z.string().describe('The name of the option.').optional(),
+    })
+    .describe('Represents one option of a selection custom field definition.')
+
+export type CustomFieldAvailableOption = z.infer<typeof CustomFieldAvailableOption>
+
 export const TransactionChannelConstraint = z
     .object({
         criteria: z.enum(['AMOUNT', 'TYPE', 'PRODUCT']).describe('Defines the criteria on which the constraint is applied'),
@@ -36,6 +46,109 @@ export const TransactionChannelConstraint = z
 
 export type TransactionChannelConstraint = z.infer<typeof TransactionChannelConstraint>
 
+export const CustomFieldViewRights = z
+    .object({
+        allUsers: z
+            .boolean()
+            .describe(
+                '`TRUE` if custom field values of a custom field definition can be viewed by all users, `FALSE` if custom field values of a custom field definition can only be viewed by users with the specified roles.',
+            )
+            .optional(),
+        roles: z
+            .string()
+            .array()
+            .describe(
+                'Lists the IDs of the roles that have view rights for the custom field values of a custom field definition if it is not accessible by all users.',
+            )
+            .optional(),
+    })
+    .describe('Represents the view rights for custom field values for a particular custom field definition.')
+
+export type CustomFieldViewRights = z.infer<typeof CustomFieldViewRights>
+
+export const CustomFieldValueValidationSettings = z
+    .object({
+        unique: z.boolean().describe('`TRUE` if this field does not allow duplicate values, `FALSE` otherwise.').optional(),
+        validationPattern: z.string().describe('The expected format for the input.').optional(),
+    })
+    .describe('Represents the settings for field input validation.')
+
+export type CustomFieldValueValidationSettings = z.infer<typeof CustomFieldValueValidationSettings>
+
+export const CustomFieldUsage = z
+    .object({
+        default: z
+            .boolean()
+            .describe(
+                '`TRUE` if the field is displayed by default on create or edit pages for this record type, `FALSE` otherwise.',
+            )
+            .optional(),
+        objectKey: z.string().describe('The key of the record type.').optional(),
+        required: z.boolean().describe('`TRUE` if the field is required for this record type, `FALSE` otherwise.').optional(),
+    })
+    .describe('Represents the usage settings of the custom field definition.')
+
+export type CustomFieldUsage = z.infer<typeof CustomFieldUsage>
+
+export const CustomFieldSelectionOption = z
+    .object({
+        availableOptions: CustomFieldAvailableOption.array()
+            .describe(
+                'The list of options that that are available for the dependent selection custom field value based on the selected parent custom field value.',
+            )
+            .optional(),
+        forSelectionKey: z.string().describe('The key for the parent selection custom field value.').optional(),
+        forValue: z.string().describe('The parent selection custom field value.').optional(),
+    })
+    .describe('Represents the information related to the options of a selection custom field definition.')
+
+export type CustomFieldSelectionOption = z.infer<typeof CustomFieldSelectionOption>
+
+export const CustomFieldEditRights = z
+    .object({
+        allUsers: z
+            .boolean()
+            .describe(
+                '`TRUE` if custom field values of a custom field definition can be edited by all users, `FALSE` if custom field values of a custom field definition can only be edited by users with the specified roles.',
+            )
+            .optional(),
+        roles: z
+            .string()
+            .array()
+            .describe(
+                'The list of IDs of the roles that have edit rights for the custom field values of a custom field definition if it is not accessible by all users.',
+            )
+            .optional(),
+    })
+    .describe('Represents the edit rights for custom field values for a particular custom field definition.')
+
+export type CustomFieldEditRights = z.infer<typeof CustomFieldEditRights>
+
+export const CustomFieldDisplaySettings = z
+    .object({
+        builtInId: z
+            .enum([
+                'FIRST_NAME',
+                'MIDDLE_NAME',
+                'LAST_NAME',
+                'BIRTHDATE',
+                'GENDER',
+                'MOBILE_PHONE',
+                'MOBILE_PHONE_2',
+                'HOME_PHONE',
+                'EMAIL_ADDRESS',
+            ])
+            .describe('The original ID of the built-in custom field definition.')
+            .optional(),
+        description: z.string().describe('The user-provided description of the custom field definition.').optional(),
+        displayName: z.string().describe('The user-provided name of the custom field definition.').optional(),
+        fieldSize: z.enum(['SHORT', 'LONG']).describe('The custom field value display size in the UI.').optional(),
+        position: z.number().int().describe('The custom field definition position in the custom field set.').optional(),
+    })
+    .describe('Represents the display settings of a custom field definition.')
+
+export type CustomFieldDisplaySettings = z.infer<typeof CustomFieldDisplaySettings>
+
 export const Constraint = z
     .object({
         constraints: TransactionChannelConstraint.array()
@@ -58,6 +171,67 @@ export const Constraint = z
 
 export type Constraint = z.infer<typeof Constraint>
 
+export const CustomFieldMeta = z
+    .object({
+        availableFor: z
+            .enum([
+                'CLIENT',
+                'GROUP',
+                'CREDIT_ARRANGEMENT',
+                'LOAN_ACCOUNT',
+                'GUARANTOR',
+                'ASSET',
+                'DEPOSIT_ACCOUNT',
+                'DEPOSIT_PRODUCT',
+                'TRANSACTION_CHANNEL',
+                'TRANSACTION_TYPE',
+                'BRANCH',
+                'CENTRE',
+                'USER',
+            ])
+            .describe('The entity type the custom field definition is associated with.')
+            .optional(),
+        creationDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The date the custom field definition was created.')
+            .optional(),
+        dependentFieldKey: z
+            .string()
+            .describe(
+                'Can be defined only for selection custom field definitions. Indicates the parent custom field definition on which the dependency is based upon.',
+            )
+            .optional(),
+        displaySettings: CustomFieldDisplaySettings.optional(),
+        editRights: CustomFieldEditRights.optional(),
+        encodedKey: z.string().describe('The encoded key of the entity, generated, globally unique').optional(),
+        id: z.string().describe('The user-defined ID, which is globally unique.').optional(),
+        lastModifiedDate: z
+            .string()
+            .datetime({ offset: true })
+            .describe('The date the latest update was performed for this custom field definition.')
+            .optional(),
+        selectionOptions: CustomFieldSelectionOption.array()
+            .describe(
+                'Can be defined only for selection custom field definitions. Indicates that the field has predefined selections and only those can be used to populate it.',
+            )
+            .optional(),
+        state: z
+            .enum(['ACTIVE', 'INACTIVE'])
+            .describe('Indicates whether the custom field definition is active or inactive.')
+            .optional(),
+        type: z
+            .enum(['FREE_TEXT', 'SELECTION', 'NUMBER', 'CHECKBOX', 'DATE', 'DATE_TIME', 'CLIENT_LINK', 'GROUP_LINK', 'USER_LINK'])
+            .describe('The type of custom field definition.')
+            .optional(),
+        usage: CustomFieldUsage.array().describe('Represents the usage settings of a custom field definition.').optional(),
+        valueValidationSettings: CustomFieldValueValidationSettings.optional(),
+        viewRights: CustomFieldViewRights.optional(),
+    })
+    .describe('Represents a custom field definition.')
+
+export type CustomFieldMeta = z.infer<typeof CustomFieldMeta>
+
 export const RestError = z.object({
     errorCode: z.number().int().optional(),
     errorReason: z.string().optional(),
@@ -71,6 +245,9 @@ export const TransactionChannel = z
         availableForAll: z
             .boolean()
             .describe('`TRUE` if the transaction channel is available for all users, `FALSE` otherwise.')
+            .optional(),
+        customFields: CustomFieldMeta.array()
+            .describe('The custom field definition available for the transaction channel.')
             .optional(),
         depositConstraints: Constraint,
         encodedKey: z.string().describe('The encoded key of the entity, generated, globally unique').optional(),

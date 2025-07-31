@@ -16,7 +16,10 @@
     "./*.js": "./.dist/*.js"
   },
   "types": "./.dist/index.d.ts",
-  "files": [".dist", "package.json"],
+  "files": [
+    ".dist",
+    "package.json"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.dist.json",
     "build:index": "node --import tsx/esm scripts/build-index.ts",
@@ -32,20 +35,20 @@
   },
   "dependencies": {
     "split2": "^4.2.0",
-    "zod": "^3.24.2"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@skyleague/axioms": "^6.5.1",
-    "@skyleague/node-standards": "^10.0.1",
-    "@skyleague/therefore": "^7.14.0",
+    "@skyleague/axioms": "^6.6.0",
+    "@skyleague/node-standards": "^12.2.0",
+    "@skyleague/therefore": "^7.15.6",
     "@types/split2": "^4.2.3",
     "camelcase": "^8.0.0",
-    "ky": "^1.7.5",
-    "nock": "^14.0.1",
-    "typescript": "^5.8.2"
+    "ky": "^1.8.2",
+    "nock": "^14.0.7",
+    "typescript": "^5.8.3"
   },
   "peerDependencies": {
-    "ky": "^1.7.4"
+    "ky": "^1.8.2"
   },
   "engines": {
     "node": ">=22"

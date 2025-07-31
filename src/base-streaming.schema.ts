@@ -23,7 +23,6 @@ export const baseMambuStreaming = ky
                 } else if (operation.operationId === 'post-subscriptions-subscription_id-cursors') {
                     operation.operationId = 'commitSubscriptionCursors'
                 } else {
-                    // biome-ignore lint/performance/noDelete: This is necessary to remove the operationId
                     delete operation.operationId
                 }
             }
@@ -31,7 +30,6 @@ export const baseMambuStreaming = ky
 
         const schemas = data.components?.schemas
         if (schemas !== undefined) {
-            // biome-ignore lint/performance/noDelete: This is necessary
             delete ((schemas.Subscription as Schema).properties?.initial_cursors as Schema).minItems
 
             const eventProperties = (schemas.Event as Schema).properties

@@ -48,7 +48,10 @@ export const BackgroundProcess = z
             ])
             .describe('The current status of this process')
             .optional(),
-        type: z.enum(['CRON_JOBS', 'MANUAL_CRON_JOBS_TRIGGER']).describe('The type of the background process').optional(),
+        type: z
+            .enum(['CRON_JOBS', 'EARLY_MANUAL_CRON_JOBS_TRIGGER', 'MANUAL_CRON_JOBS_TRIGGER'])
+            .describe('The type of the background process')
+            .optional(),
     })
     .describe('Represents details of the Background Process')
 

@@ -574,6 +574,14 @@ export const InterestSettingsForSchedulePreview = z
 
 export type InterestSettingsForSchedulePreview = z.infer<typeof InterestSettingsForSchedulePreview>
 
+export const FeesSettingsForSchedulePreview = z
+    .object({
+        feeRate: z.number().describe('The fee rate. Represents the fee rate for the loan account.').optional(),
+    })
+    .describe('Defines fees settings for schedule preview.')
+
+export type FeesSettingsForSchedulePreview = z.infer<typeof FeesSettingsForSchedulePreview>
+
 export const DisbursementDetailsForSchedulePreview = z
     .object({
         expectedDisbursementDate: z
@@ -627,6 +635,7 @@ export type LoanAccountSchedule = z.infer<typeof LoanAccountSchedule>
 export const PreviewLoanAccountSchedule = z
     .object({
         disbursementDetails: DisbursementDetailsForSchedulePreview.optional(),
+        feeRateSettings: FeesSettingsForSchedulePreview.optional(),
         interestCommission: z
             .number()
             .describe(

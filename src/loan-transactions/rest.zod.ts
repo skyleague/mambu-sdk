@@ -169,9 +169,9 @@ export const CustomPaymentAmount = z
                 'NON_SCHEDULED_FEE',
                 'INTEREST_BEARING_FEE',
                 'INTEREST_BEARING_FEE_INTEREST',
+                'CF_PRINCIPAL_IN_ARREARS',
                 'CF_INTEREST',
                 'CF_INTEREST_FROM_ARREARS',
-                'CF_INTEREST_FROM_ARREARS_ACCRUED',
             ])
             .describe('The type of the custom payment'),
         predefinedFeeKey: z.string().describe('The encodedKey of the predefined fee to be paid.').optional(),
@@ -551,6 +551,7 @@ export const LoanTransaction = z
             .string()
             .describe('The external ID of the loan transaction, it is customizable, and must be unique.')
             .optional(),
+        feeIncludedInPmt: z.boolean().optional(),
         fees: Fee.array()
             .describe('The amounts that have been applied or paid as part of this transaction and involved predefined fees.')
             .optional(),
@@ -561,6 +562,11 @@ export const LoanTransaction = z
         installmentEncodedKey: z
             .string()
             .describe('The specific installment encoded key associated to the loan transaction.')
+            .optional(),
+        lateFeeIncludedInPmt: z.boolean().optional(),
+        linkedPrincipalOverpaymentTransactionKey: z
+            .string()
+            .describe('The specific principal overpayment transaction key associated to the loan transaction.')
             .optional(),
         migrationEventKey: z
             .string()
@@ -637,6 +643,7 @@ export const LoanTransaction = z
                 'PENALTY_RATE_CHANGED',
                 'INTEREST_APPLIED',
                 'IBF_INTEREST_APPLIED',
+                'IBF_INTEREST_APPLIED_ADJUSTMENT',
                 'INTEREST_APPLIED_ADJUSTMENT',
                 'INTEREST_DUE_REDUCED',
                 'PENALTY_REDUCTION_ADJUSTMENT',
@@ -881,7 +888,6 @@ export const DisbursementLoanTransactionInput = z
         transferDetails: DisbursementTransferDetailsInput.optional(),
         valueDate: z.string().datetime({ offset: true }).describe('The date of the disbursal (as Organization Time)').optional(),
     })
-    .passthrough()
     .describe('The input representation of a loan transaction when making a disbursement')
 
 export type DisbursementLoanTransactionInput = z.infer<typeof DisbursementLoanTransactionInput>
@@ -1003,7 +1009,6 @@ export const PaymentMadeTransactionInput = z
             .describe('The entry date of the payment made transaction (as Organization Time)')
             .optional(),
     })
-    .passthrough()
     .describe('Represents the request payload for creating a transaction of type PAYMENT_MADE')
 
 export type PaymentMadeTransactionInput = z.infer<typeof PaymentMadeTransactionInput>
@@ -1112,6 +1117,7 @@ export const RepaymentLoanTransactionInput = z
             ])
             .describe('The prepayment recalculation method of the repayment')
             .optional(),
+        principalOverpaymentAmount: z.number().describe('The amount of the principal overpayment').optional(),
         transactionDetails: LoanTransactionDetailsInput.optional(),
         valueDate: z
             .string()
@@ -1119,7 +1125,6 @@ export const RepaymentLoanTransactionInput = z
             .describe('The entry date of the repayment (as Organization Time)')
             .optional(),
     })
-    .passthrough()
     .describe('Represents the request payload for creating a transaction of type REPAYMENT')
 
 export type RepaymentLoanTransactionInput = z.infer<typeof RepaymentLoanTransactionInput>
@@ -1157,7 +1162,6 @@ export const WithdrawalRedrawTransactionInput = z
             .describe('The value date of the withdrawal transaction (as Organization Time)')
             .optional(),
     })
-    .passthrough()
     .describe('Represents the request payload for creating a transaction of type WITHDRAWAL_REDRAW')
 
 export type WithdrawalRedrawTransactionInput = z.infer<typeof WithdrawalRedrawTransactionInput>

@@ -108,6 +108,10 @@ export const DepositGLAccountingRule = z
                 'INTEREST_FROM_ARREARS_WRITE_OFF_EXPENSE',
                 'PROFIT_EXPENSE',
                 'PROFIT_PAYABLE',
+                'MUDARIB_SHARE',
+                'INTEREST_FROM_FEES_INCOME',
+                'INTEREST_FROM_FEES_RECEIVABLE',
+                'INTEREST_FROM_FEES_WRITE_OFF_EXPENSE',
             ])
             .describe(
                 'General Ledger Financial Resources used to setup the product accounting rules and determine the credit and debit accounts when logging journal entries',

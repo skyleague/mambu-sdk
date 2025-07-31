@@ -175,7 +175,7 @@ export const GeneralSetup = z
             .optional(),
         encodedKey: z.string().describe('The encoded key of the general setup, which is auto generated, and unique.').optional(),
         eodProcessingMethod: z
-            .enum(['AUTOMATIC', 'MANUAL'])
+            .enum(['AUTOMATIC', 'MANUAL', 'EARLY_MANUAL'])
             .describe(
                 'The end of day (EOD) processing settings. The `AUTOMATIC` EOD processing runs every midnight. The `MANUAL` EOD processing runs when the client initiates the action from the Mambu UI.',
             )
