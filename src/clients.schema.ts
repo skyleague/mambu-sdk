@@ -4,6 +4,7 @@ import { $restclient } from '@skyleague/therefore'
 import type { PathItem } from '@skyleague/therefore/src/types/openapi.type.js'
 import camelCase from 'camelcase'
 import ky from 'ky'
+import converter from 'swagger2openapi'
 
 export interface Clients {
     items: {
@@ -81,12 +82,16 @@ for (const item of clientList) {
     openapi.info.title ??= item.label
     openapi.info.version ??= '1.0.0'
 
-    exports[camelCase(`mambu_${clientName}`)] = $restclient(openapi, {
+    const converted: { openapi: OpenapiV3 } = await converter.convertObj(openapi, {
+        path: true,
+    })
+
+    exports[camelCase(`mambu_${clientName}`)] = $restclient(converted.openapi, {
         filename: `${clientName}/rest.client.ts`,
         strict: false,
         formats: false,
         client: 'ky',
-        validator: 'zod',
+        validator: 'zod/v4',
         options: {
             timeout: false,
         },

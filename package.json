@@ -35,16 +35,17 @@
   },
   "dependencies": {
     "split2": "^4.2.0",
-    "zod": "^3.25.76"
+    "zod": "^4.0.14"
   },
   "devDependencies": {
     "@skyleague/axioms": "^6.6.0",
     "@skyleague/node-standards": "^12.2.0",
-    "@skyleague/therefore": "^7.15.6",
+    "@skyleague/therefore": "^8.2.2",
     "@types/split2": "^4.2.3",
     "camelcase": "^8.0.0",
     "ky": "^1.8.2",
     "nock": "^14.0.7",
+    "swagger2openapi": "^7.0.8",
     "typescript": "^5.8.3"
   },
   "peerDependencies": {
