@@ -50,7 +50,7 @@ export class MambuNotificationSettings {
     /**
      * GET /notificationsettings/webhook
      *
-     * Retrieves the webhook notification settings
+     * Get the webhook notification settings
      */
     public getWebhookNotificationSettings({
         auth = [['apiKey'], ['basic']],
@@ -81,7 +81,7 @@ export class MambuNotificationSettings {
     /**
      * PUT /notificationsettings/webhook
      *
-     * Updates the webhook notification settings
+     * Update the webhook notification settings
      */
     public updateWebhookNotificationSettings({
         body,

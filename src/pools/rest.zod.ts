@@ -21,10 +21,6 @@ export const PoolSettings = z
         id: z.number().int().describe('The identifier of the pool settings').optional(),
         initialEquivalentRate: z.number().describe('The initial equivalent rate of the pool settings').optional(),
         lastModifiedDate: z.iso.datetime({ offset: true }).describe('The last modified time of the pool setting').optional(),
-        mudaribShareAccountEncodedKey: z
-            .string()
-            .describe('The mudarib share account encoded key of the pool settings')
-            .optional(),
         poolId: z.number().int().describe('The identifier of the investment pool').optional(),
         profitCalculationBalanceType: z
             .enum(['END_OF_THE_DAY_BALANCE', 'AVERAGE_BALANCE', 'MINIMUM_BALANCE'])

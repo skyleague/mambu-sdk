@@ -9,33 +9,21 @@ import { z } from 'zod/v4'
 
 export const CustomFilterConstraint = z
     .object({
-        dataFieldEntityType: z
-            .enum([
-                'CLIENT',
-                'GROUP',
-                'CENTRE',
-                'BRANCH',
-                'SAVINGS_TRANSACTION',
-                'SAVINGS_ACCOUNT',
-                'SAVINGS_PRODUCT',
-                'LOAN_TRANSACTION',
-                'LOAN_ACCOUNT',
-                'USER',
-                'GUARANTY',
-                'LINE_OF_CREDIT',
-                'DISBURSEMENT_DETAILS',
-                'UNKNOWN',
-            ])
-            .describe('The custom filter constraint data field entity type.'),
+        customFieldId: z
+            .string()
+            .describe('The custom field id, which is needed to correlate the CUSTOM filter constraint to a custom field.')
+            .optional(),
+        dataFieldEntityType: z.string().describe('The custom filter constraint data field entity type.'),
         dataFieldType: z
             .enum(['NATIVE', 'CUSTOM'])
             .describe('The custom filter constraint data field type, which must be not null.'),
-        dataFieldValue: z.string().describe('The custom filter constraint data field value.'),
+        dataFieldValue: z.string().describe('The custom filter constraint data field value.').optional(),
         dataType: z
             .enum([
                 'BIG_DECIMAL',
                 'DATE',
                 'DATE_UTC',
+                'DATE_TIME',
                 'ENUM',
                 'KEY',
                 'LONG',
@@ -49,7 +37,31 @@ export const CustomFilterConstraint = z
             ])
             .describe('The custom filter constraint data type, which must be not null.'),
         filterElement: z
-            .enum(['EQUALS', 'EMPTY', 'NOT_EMPTY', 'MORE_THAN', 'LESS_THAN', 'BETWEEN', 'IN'])
+            .enum([
+                'EQUALS',
+                'EQUALS_CASE_SENSITIVE',
+                'DIFFERENT_THAN',
+                'MORE_THAN',
+                'MORE_THAN_OR_EQUALS',
+                'LESS_THAN',
+                'LESS_THAN_OR_EQUALS',
+                'BETWEEN',
+                'IN',
+                'ON',
+                'AFTER',
+                'AFTER_INCLUSIVE',
+                'BEFORE',
+                'BEFORE_INCLUSIVE',
+                'STARTS_WITH',
+                'STARTS_WITH_CASE_SENSITIVE',
+                'TODAY',
+                'THIS_WEEK',
+                'THIS_MONTH',
+                'THIS_YEAR',
+                'LAST_DAYS',
+                'EMPTY',
+                'NOT_EMPTY',
+            ])
             .describe('The custom filter constraint filter element, which must be not null.'),
         groupNumber: z.number().int().describe('The custom filter constraint group number.').optional(),
         id: z.string().describe('The custom filter constraint ID, which must be unique.').optional(),
@@ -82,7 +94,7 @@ export type PatchOperation = z.infer<typeof PatchOperation>
 
 export const BaseTemplateConfiguration = z
     .object({
-        activated: z.boolean().describe('The template activation state. If empty, default is false.').optional(),
+        activated: z.boolean().describe('The template activation state. If empty, default is true.').optional(),
         body: z.string().describe('The template body'),
         event: z
             .enum([

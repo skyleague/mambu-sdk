@@ -368,7 +368,7 @@ export const DepositTransactionBalances = z
 export type DepositTransactionBalances = z.infer<typeof DepositTransactionBalances>
 
 export const DepositTransactionBulkableInputDTO = z
-    .object({
+    .looseObject({
         accountId: z.string().describe('The id of the account'),
         amount: z.number().describe('The amount that was added to an account'),
         externalId: z.string().describe('The external id of the deposit transaction, customizable, unique').optional(),
@@ -731,7 +731,7 @@ export const SearchResponse = DepositTransaction.array()
 export type SearchResponse = z.infer<typeof SearchResponse>
 
 export const SeizeBlockAmount = z
-    .object({
+    .looseObject({
         amount: z.number().describe('The amount of the block fund').optional(),
         blockId: z.string().describe('The id of the block fund'),
         externalId: z.string().describe('The external id of the current transaction, customizable, unique').optional(),
@@ -743,7 +743,7 @@ export const SeizeBlockAmount = z
 export type SeizeBlockAmount = z.infer<typeof SeizeBlockAmount>
 
 export const TransferDepositTransactionInput = z
-    .object({
+    .looseObject({
         amount: z.number().describe('The amount to transfer from account'),
         encodedKey: z.string().describe('The encoded key of the entity, generated, globally unique').optional(),
         externalId: z.string().describe('The external id of the transfer transaction, customizable, unique').optional(),
@@ -761,7 +761,7 @@ export const TransferDepositTransactionInput = z
 export type TransferDepositTransactionInput = z.infer<typeof TransferDepositTransactionInput>
 
 export const WithdrawalDepositTransactionInput = z
-    .object({
+    .looseObject({
         amount: z.number().describe('The amount to withdraw from account'),
         bookingDate: z.iso
             .datetime({ offset: true })

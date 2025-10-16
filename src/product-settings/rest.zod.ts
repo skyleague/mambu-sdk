@@ -62,6 +62,9 @@ export type RestError = z.infer<typeof RestError>
 
 export const ProductSettings = z
     .object({
+        accruedProfitAmountCalculationMethod: z
+            .enum(['CUSTOMER_PROFIT_RATE_AFTER_ADJUSTMENT', 'CUSTOMER_PROFIT_RATE', 'CUSTOMER_PROFIT_RATE_WITH_CAPPED_RATE'])
+            .describe('Accrued profit amount calculation method'),
         balanceEligibility: BalanceEligibility.optional(),
         creationDate: z.iso.datetime({ offset: true }).describe('The creation time of the product settings').optional(),
         effectiveDate: z.iso.date().describe('The effective date of the product settings'),
@@ -75,13 +78,10 @@ export const ProductSettings = z
         productEncodedKey: z.string().describe('The encoded key of the linked deposit product'),
         productPaymentPoint: z.enum(['MONTHLY', 'EVERY_CALENDAR_MONTH']).describe('Product payment point'),
         profit: Profit.optional(),
+        profitAccrualPoint: z.enum(['NEXT_ACCRUAL_DATE', 'CURRENT_ACCRUAL_DATE']).describe('Profit accrual point'),
         profitApplicationPoint: z
             .enum(['PAYMENT_CYCLE_END_DATE', 'NEXT_DAY_AFTER_PAYMENT_CYCLE_END_DATE'])
             .describe('Profit application point'),
-        withholdingTaxEnabled: z
-            .boolean()
-            .describe('Indicates whether withholding tax is enabled for the IPS product')
-            .optional(),
         withholdingTaxSourceKey: z
             .string()
             .describe('The key reference for the withholding tax source associated with the IPS product settings')

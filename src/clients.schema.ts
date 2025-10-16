@@ -124,6 +124,7 @@ for (const item of clientList) {
                     'Client',
                     'Group',
                     'LoanAccount',
+                    'LoanAccountFullDetails',
                     'DepositAccount',
                     'DepositProduct',
                     'CreditArrangement',
@@ -134,6 +135,14 @@ for (const item of clientList) {
                     'LoanTransaction',
                     'DepositTransaction',
                     'Centre',
+                    'RepaymentLoanTransactionInput',
+                    'TransferDepositTransactionInput',
+                    'WithdrawalDepositTransactionInput',
+                    'PaymentMadeTransactionInput',
+                    'WithdrawalRedrawTransactionInput',
+                    'DisbursementLoanTransactionInput',
+                    'DepositTransactionBulkableInputDTO',
+                    'SeizeBlockAmount',
                 ]),
             )) {
                 if (!('$ref' in schema)) {

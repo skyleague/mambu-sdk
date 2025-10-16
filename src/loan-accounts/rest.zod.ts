@@ -301,6 +301,7 @@ export const Currency = z
                 'SGD',
                 'SHP',
                 'SLL',
+                'SLE',
                 'SOS',
                 'SRD',
                 'STD',
@@ -339,6 +340,7 @@ export const Currency = z
                 'XBC',
                 'XBD',
                 'XCD',
+                'XCG',
                 'XDR',
                 'XOF',
                 'XPD',
@@ -351,6 +353,7 @@ export const Currency = z
                 'YER',
                 'ZAR',
                 'ZIG',
+                'ZWG',
                 'ZMK',
                 'ZWL',
                 'ZMW',
@@ -540,6 +543,7 @@ export const CustomPaymentAmount = z
                 'CF_PRINCIPAL_IN_ARREARS',
                 'CF_INTEREST',
                 'CF_INTEREST_FROM_ARREARS',
+                'FEE_INCLUDED_IN_PMT',
             ])
             .describe('The type of the custom payment'),
         predefinedFeeKey: z.string().describe('The encodedKey of the predefined fee to be paid.').optional(),
@@ -940,13 +944,13 @@ export const InterestSettings = z
             )
             .optional(),
         interestApplicationMethod: z
-            .enum(['AFTER_DISBURSEMENT', 'REPAYMENT_DUE_DATE'])
+            .enum(['AFTER_DISBURSEMENT', 'REPAYMENT_DUE_DATE', 'FIXED_DAYS_OF_MONTH'])
             .describe(
                 `The interest application method. Represents the interest application method that determines whether the interest gets applied on the account's disbursement or on each repayment.`,
             )
             .optional(),
         interestBalanceCalculationMethod: z
-            .enum(['ONLY_PRINCIPAL', 'PRINCIPAL_AND_INTEREST'])
+            .enum(['ONLY_PRINCIPAL', 'PRINCIPAL_AND_INTEREST', 'PRINCIPAL_AND_FEE', 'PRINCIPAL_INTEREST_AND_FEE'])
             .describe(
                 `The interest balance calculation method. Represents the option which determines the way the balance for the account's interest is computed.`,
             )
@@ -1981,6 +1985,7 @@ export const LoanAccountFilterCriteria = z
         field: z.union([
             z
                 .enum([
+                    'assignedBranchKey',
                     'accountHolderKey',
                     'productTypeKey',
                     'loanRiskLevelKey',
