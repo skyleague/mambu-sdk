@@ -173,6 +173,7 @@ export const CustomPaymentAmount = z
                 'CF_PRINCIPAL_IN_ARREARS',
                 'CF_INTEREST',
                 'CF_INTEREST_FROM_ARREARS',
+                'FEE_INCLUDED_IN_PMT',
             ])
             .describe('The type of the custom payment'),
         predefinedFeeKey: z.string().describe('The encodedKey of the predefined fee to be paid.').optional(),
@@ -320,6 +321,7 @@ export const Currency = z
                 'SGD',
                 'SHP',
                 'SLL',
+                'SLE',
                 'SOS',
                 'SRD',
                 'STD',
@@ -358,6 +360,7 @@ export const Currency = z
                 'XBC',
                 'XBD',
                 'XCD',
+                'XCG',
                 'XDR',
                 'XOF',
                 'XPD',
@@ -370,6 +373,7 @@ export const Currency = z
                 'YER',
                 'ZAR',
                 'ZIG',
+                'ZWG',
                 'ZMK',
                 'ZWL',
                 'ZMW',
@@ -858,7 +862,7 @@ export const LoanTransactionDetailsInput = z
 export type LoanTransactionDetailsInput = z.infer<typeof LoanTransactionDetailsInput>
 
 export const DisbursementLoanTransactionInput = z
-    .object({
+    .looseObject({
         amount: z.number().describe('The amount to disburse').optional(),
         bookingDate: z.iso
             .datetime({ offset: true })
@@ -974,7 +978,7 @@ export const LockLoanTransactionsWrapper = z
 export type LockLoanTransactionsWrapper = z.infer<typeof LockLoanTransactionsWrapper>
 
 export const PaymentMadeTransactionInput = z
-    .object({
+    .looseObject({
         amount: z.number().describe('The amount of the payment'),
         bookingDate: z.iso
             .datetime({ offset: true })
@@ -1009,6 +1013,19 @@ export const PrincipalOverpaymentLoanTransactionInput = z
             .describe('Extra notes about the repayment transaction. Notes can have at most 255 characters in length.')
             .optional(),
         originalCurrencyCode: z.string().describe('The currency code for the repayment transaction').optional(),
+        prepaymentRecalculationMethod: z
+            .enum([
+                'NO_RECALCULATION',
+                'RESCHEDULE_REMAINING_REPAYMENTS',
+                'RECALCULATE_SCHEDULE_KEEP_SAME_NUMBER_OF_TERMS',
+                'RECALCULATE_SCHEDULE_KEEP_SAME_PRINCIPAL_AMOUNT',
+                'RECALCULATE_SCHEDULE_KEEP_SAME_TOTAL_REPAYMENT_AMOUNT',
+                'REDUCE_AMOUNT_PER_INSTALLMENT',
+                'REDUCE_NUMBER_OF_INSTALLMENTS',
+                'REDUCE_NUMBER_OF_INSTALLMENTS_NEW',
+            ])
+            .describe('The prepayment recalculation method of the repayment')
+            .optional(),
         transactionDetails: LoanTransactionDetailsInput.optional(),
         valueDate: z.iso.datetime({ offset: true }).describe('The entry date of the repayment (as Organization Time)').optional(),
     })
@@ -1054,7 +1071,7 @@ export const RefundLoanTransactionInput = z
 export type RefundLoanTransactionInput = z.infer<typeof RefundLoanTransactionInput>
 
 export const RepaymentLoanTransactionInput = z
-    .object({
+    .looseObject({
         amount: z.number().describe('The amount of the repayment'),
         bookingDate: z.iso
             .datetime({ offset: true })
@@ -1092,10 +1109,6 @@ export const RepaymentLoanTransactionInput = z
 
 export type RepaymentLoanTransactionInput = z.infer<typeof RepaymentLoanTransactionInput>
 
-export const SearchResponse = LoanTransaction.array()
-
-export type SearchResponse = z.infer<typeof SearchResponse>
-
 export const UnlockLoanAccountInput = z
     .object({
         notes: z.string().describe('Extra notes about the current unlocking of account').optional(),
@@ -1105,7 +1118,7 @@ export const UnlockLoanAccountInput = z
 export type UnlockLoanAccountInput = z.infer<typeof UnlockLoanAccountInput>
 
 export const WithdrawalRedrawTransactionInput = z
-    .object({
+    .looseObject({
         amount: z.number().describe('The amount to be withdrawn from redraw balance'),
         bookingDate: z.iso
             .datetime({ offset: true })

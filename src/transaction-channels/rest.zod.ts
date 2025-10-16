@@ -228,6 +228,14 @@ export const CustomFieldMeta = z
 
 export type CustomFieldMeta = z.infer<typeof CustomFieldMeta>
 
+export const TransactionChannelAttributes = z
+    .object({
+        overdraftAllowed: z.boolean().describe('The flag that determines of overdraft is allowed.').optional(),
+    })
+    .describe('Represents transaction channel attributes.')
+
+export type TransactionChannelAttributes = z.infer<typeof TransactionChannelAttributes>
+
 export const RestError = z.object({
     errorCode: z.number().int().optional(),
     errorReason: z.string().optional(),
@@ -238,6 +246,7 @@ export type RestError = z.infer<typeof RestError>
 
 export const TransactionChannel = z
     .object({
+        attributes: TransactionChannelAttributes.optional(),
         availableForAll: z
             .boolean()
             .describe('`TRUE` if the transaction channel is available for all users, `FALSE` otherwise.')

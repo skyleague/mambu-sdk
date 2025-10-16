@@ -50,7 +50,7 @@ export class MambuTemplates {
     /**
      * POST /templates
      *
-     * Create a new template.
+     * Create a new template
      */
     public createTemplate({
         body,
@@ -90,7 +90,7 @@ export class MambuTemplates {
     /**
      * DELETE /templates/{templateId}
      *
-     * Delete template
+     * Delete an existing template
      */
     public delete({
         path,
@@ -128,7 +128,7 @@ export class MambuTemplates {
     /**
      * GET /templates/{templateId}
      *
-     * Retrieve a template by encoded key.
+     * Get template by id
      */
     public getByTemplateId({
         path,
@@ -168,7 +168,7 @@ export class MambuTemplates {
     /**
      * PATCH /templates/{templateId}
      *
-     * Update an existing template.
+     * Update an existing template
      */
     public updateTemplate({
         body,
