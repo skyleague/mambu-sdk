@@ -1109,6 +1109,10 @@ export const RepaymentLoanTransactionInput = z
 
 export type RepaymentLoanTransactionInput = z.infer<typeof RepaymentLoanTransactionInput>
 
+export const SearchResponse = LoanTransaction.array()
+
+export type SearchResponse = z.infer<typeof SearchResponse>
+
 export const UnlockLoanAccountInput = z
     .object({
         notes: z.string().describe('Extra notes about the current unlocking of account').optional(),
