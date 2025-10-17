@@ -25,6 +25,7 @@ import {
     RedrawRepaymentTransactionInputDTO,
     RefundLoanTransactionInput,
     RepaymentLoanTransactionInput,
+    SearchResponse,
     UnlockLoanAccountInput,
     WithdrawalRedrawTransactionInput,
 } from './rest.zod.js'
@@ -782,7 +783,7 @@ export class MambuLoanTransactions {
      *
      * Search loan transactions
      */
-    public search1({
+    public search({
         body,
         query,
         auth = [['apiKey'], ['basic']],
@@ -791,16 +792,15 @@ export class MambuLoanTransactions {
         query?: { offset?: string; limit?: string; paginationDetails?: string; cursor?: string; detailsLevel?: string }
         auth?: string[][] | string[]
     }): Promise<
-        | SuccessResponse<'200', unknown>
-        | FailureResponse<'400', unknown, 'response:statuscode'>
-        | FailureResponse<'401', unknown, 'response:statuscode'>
-        | FailureResponse<'403', unknown, 'response:statuscode'>
-        | FailureResponse<'404', unknown, 'response:statuscode'>
-        | FailureResponse<'409', unknown, 'response:statuscode'>
+        | SuccessResponse<'200', SearchResponse>
+        | FailureResponse<'400', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'401', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'403', ErrorResponse, 'response:statuscode'>
+        | FailureResponse<'404', ErrorResponse, 'response:statuscode'>
         | FailureResponse<undefined, unknown, 'request:body', undefined>
         | FailureResponse<StatusCode<2>, string, 'response:body', Headers>
         | FailureResponse<
-              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404' | '409'>,
+              Exclude<StatusCode<1 | 3 | 4 | 5>, '400' | '401' | '403' | '404'>,
               unknown,
               'response:statuscode',
               Headers
@@ -815,17 +815,17 @@ export class MambuLoanTransactions {
             this.buildClient(auth).post('loans/transactions:search', {
                 json: _body.right,
                 searchParams: query ?? {},
+                headers: { Accept: 'application/vnd.mambu.v2+json' },
             }),
             {
-                200: { safeParse: (x: unknown) => ({ success: true, data: x }) },
-                400: { safeParse: (x: unknown) => ({ success: true, data: x }) },
-                401: { safeParse: (x: unknown) => ({ success: true, data: x }) },
-                403: { safeParse: (x: unknown) => ({ success: true, data: x }) },
-                404: { safeParse: (x: unknown) => ({ success: true, data: x }) },
-                409: { safeParse: (x: unknown) => ({ success: true, data: x }) },
+                200: SearchResponse,
+                400: ErrorResponse,
+                401: ErrorResponse,
+                403: ErrorResponse,
+                404: ErrorResponse,
             },
-            'text',
-        ) as ReturnType<this['search1']>
+            'json',
+        ) as ReturnType<this['search']>
     }
 
     public validateRequestBody<Body>(
